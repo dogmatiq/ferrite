@@ -6,15 +6,17 @@ The format is based on [Keep a Changelog], and this project adheres to
 [Semantic Versioning].
 
 <!-- references -->
-[Keep a Changelog]: https://keepachangelog.com/en/1.0.0/
-[Semantic Versioning]: https://semver.org/spec/v2.0.0.html
+
+[keep a changelog]: https://keepachangelog.com/en/1.0.0/
+[semantic versioning]: https://semver.org/spec/v2.0.0.html
 
 ## [Unreleased]
 
 - Initial release
 
 <!-- references -->
-[Unreleased]: https://github.com/dogmatiq/GITHUB_REPO_NAME
+
+[unreleased]: https://github.com/dogmatiq/ferrite
 
 <!-- version template
 ## [0.0.1] - YYYY-MM-DD
