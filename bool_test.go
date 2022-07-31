@@ -9,15 +9,17 @@ import (
 )
 
 var _ = Describe("type BoolSpec", func() {
+	type customBool bool
+
 	var (
 		reg  *Registry
-		spec *BoolSpec[bool]
+		spec *BoolSpec[customBool]
 	)
 
 	BeforeEach(func() {
 		reg = &Registry{}
 
-		spec = Bool(
+		spec = BoolAs[customBool](
 			"FERRITE_TEST",
 			"<desc>",
 			WithRegistry(reg),
@@ -27,7 +29,7 @@ var _ = Describe("type BoolSpec", func() {
 	Describe("func Value()", func() {
 		DescribeTable(
 			"it returns the value associated with the literal",
-			func(value string, expect bool) {
+			func(value string, expect customBool) {
 				os.Setenv("FERRITE_TEST", value)
 				defer os.Unsetenv("FERRITE_TEST")
 
@@ -35,8 +37,8 @@ var _ = Describe("type BoolSpec", func() {
 				Expect(err).ShouldNot(HaveOccurred())
 				Expect(spec.Value()).To(Equal(expect))
 			},
-			Entry("true", "true", true),
-			Entry("false", "false", false),
+			Entry("true", "true", customBool(true)),
+			Entry("false", "false", customBool(false)),
 		)
 	})
 
@@ -49,7 +51,7 @@ var _ = Describe("type BoolSpec", func() {
 				expectErr(
 					reg.Validate(),
 					`ENVIRONMENT VARIABLES`,
-					` ✗ FERRITE_TEST [bool] (<desc>)`,
+					` ✗ FERRITE_TEST [customBool] (<desc>)`,
 					`   ✓ must be set explicitly`,
 					`   ✗ must be either "true" or "false", got "<invalid>"`,
 				)
@@ -61,7 +63,7 @@ var _ = Describe("type BoolSpec", func() {
 				expectErr(
 					reg.Validate(),
 					`ENVIRONMENT VARIABLES`,
-					` ✗ FERRITE_TEST [bool] (<desc>)`,
+					` ✗ FERRITE_TEST [customBool] (<desc>)`,
 					`   ✗ must be set explicitly`,
 					`   - must be either "true" or "false"`,
 				)
@@ -74,15 +76,15 @@ var _ = Describe("type BoolSpec", func() {
 			When("the variable is not defined", func() {
 				DescribeTable(
 					"it returns the default",
-					func(expect bool) {
+					func(expect customBool) {
 						spec.Default(expect)
 
 						err := reg.Validate()
 						Expect(err).ShouldNot(HaveOccurred())
 						Expect(spec.Value()).To(Equal(expect))
 					},
-					Entry("true", true),
-					Entry("false", false),
+					Entry("true", customBool(true)),
+					Entry("false", customBool(false)),
 				)
 			})
 		})
@@ -96,7 +98,7 @@ var _ = Describe("type BoolSpec", func() {
 		Describe("func Value()", func() {
 			DescribeTable(
 				"it returns the value associated with the literal",
-				func(value string, expect bool) {
+				func(value string, expect customBool) {
 					os.Setenv("FERRITE_TEST", value)
 					defer os.Unsetenv("FERRITE_TEST")
 
@@ -104,8 +106,8 @@ var _ = Describe("type BoolSpec", func() {
 					Expect(err).ShouldNot(HaveOccurred())
 					Expect(spec.Value()).To(Equal(expect))
 				},
-				Entry("true", "yes", true),
-				Entry("false", "no", false),
+				Entry("true", "yes", customBool(true)),
+				Entry("false", "no", customBool(false)),
 			)
 		})
 
@@ -118,7 +120,7 @@ var _ = Describe("type BoolSpec", func() {
 					expectErr(
 						reg.Validate(),
 						`ENVIRONMENT VARIABLES`,
-						` ✗ FERRITE_TEST [bool] (<desc>)`,
+						` ✗ FERRITE_TEST [customBool] (<desc>)`,
 						`   ✓ must be set explicitly`,
 						`   ✗ must be either "yes" or "no", got "true"`,
 					)
