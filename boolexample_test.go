@@ -8,76 +8,80 @@ import (
 )
 
 func ExampleBool_true() {
-	os.Setenv("FERRITE_DEBUG", "true")
+	ferrite.DefaultRegistry.Reset()
+	os.Setenv("FERRITE_BOOL", "true")
+	defer os.Unsetenv("FERRITE_BOOL")
 
 	debug := ferrite.
 		Bool(
-			"FERRITE_DEBUG",
-			"enable debug logging",
+			"FERRITE_BOOL",
+			"example boolean variable",
 		)
 
 	ferrite.ResolveEnvironment()
 
 	if debug.Value() {
-		fmt.Println("DEBUG is on")
+		fmt.Println("value is true")
 	} else {
-		fmt.Println("DEBUG is off")
+		fmt.Println("value is false")
 	}
 
 	// Output:
-	// DEBUG is on
+	// value is true
 }
 
 func ExampleBool_false() {
-	os.Setenv("FERRITE_DEBUG", "false")
+	ferrite.DefaultRegistry.Reset()
+	os.Setenv("FERRITE_BOOL", "false")
+	defer os.Unsetenv("FERRITE_BOOL")
 
 	debug := ferrite.
 		Bool(
-			"FERRITE_DEBUG",
-			"enable debug logging",
+			"FERRITE_BOOL",
+			"example boolean variable",
 		)
 
 	ferrite.ResolveEnvironment()
 
 	if debug.Value() {
-		fmt.Println("DEBUG is on")
+		fmt.Println("value is true")
 	} else {
-		fmt.Println("DEBUG is off")
+		fmt.Println("value is false")
 	}
 
 	// Output:
-	// DEBUG is off
+	// value is false
 }
 
 func ExampleBool_default() {
-	os.Setenv("FERRITE_DEBUG", "")
+	ferrite.DefaultRegistry.Reset()
 
 	debug := ferrite.
 		Bool(
-			"FERRITE_DEBUG",
-			"enable debug logging",
+			"FERRITE_BOOL",
+			"example boolean variable",
 		).
 		Default(true)
 
 	ferrite.ResolveEnvironment()
 
 	if debug.Value() {
-		fmt.Println("DEBUG is on")
+		fmt.Println("value is true")
 	} else {
-		fmt.Println("DEBUG is off")
+		fmt.Println("value is false")
 	}
 
 	// Output:
-	// DEBUG is on
+	// value is true
 }
 
 func ExampleBool_optional() {
-	os.Setenv("FERRITE_DEBUG", "")
+	ferrite.DefaultRegistry.Reset()
 
 	debug := ferrite.
 		Bool(
-			"FERRITE_DEBUG",
-			"enable debug logging",
+			"FERRITE_BOOL",
+			"example boolean variable",
 		).
 		Optional()
 
@@ -86,16 +90,18 @@ func ExampleBool_optional() {
 	if value, ok := debug.Value(); !ok {
 		fmt.Println("DEBUG is empty/undefined")
 	} else if value {
-		fmt.Println("DEBUG is on")
+		fmt.Println("value is true")
 	} else {
-		fmt.Println("DEBUG is off")
+		fmt.Println("value is false")
 	}
 
 	// Output:
 	// DEBUG is empty/undefined
 }
 
-func ExampleBool_required() {
+func ExampleBool_undefined() {
+	ferrite.DefaultRegistry.Reset()
+
 	// Capture the error message from ResolveEnvironment() for testing, this
 	// would not be done in production code.
 	defer func() {
@@ -104,21 +110,45 @@ func ExampleBool_required() {
 
 	debug := ferrite.
 		Bool(
-			"FERRITE_DEBUG",
-			"enable debug logging",
+			"FERRITE_BOOL",
+			"example boolean variable",
 		)
 
 	ferrite.ResolveEnvironment()
 
 	if debug.Value() {
-		fmt.Println("DEBUG is on")
+		fmt.Println("value is true")
 	} else {
-		fmt.Println("DEBUG is off")
+		fmt.Println("value is false")
 	}
 
 	// Output:
 	// ENVIRONMENT VARIABLES
-	// 	✗ FERRITE_DEBUG [bool] (enable debug logging)
+	// 	✗ FERRITE_BOOL [bool] (example boolean variable)
 	// 		✗ must be set explicitly
-	// 		✗ must be set to "true" or "false"
+	// 		✗ must be either "true" or "false"
+}
+
+func ExampleBool_literals() {
+	ferrite.DefaultRegistry.Reset()
+	os.Setenv("FERRITE_BOOL", "yes")
+	defer os.Unsetenv("FERRITE_BOOL")
+
+	debug := ferrite.
+		Bool(
+			"FERRITE_BOOL",
+			"example boolean variable",
+		).
+		Literals("yes", "no")
+
+	ferrite.ResolveEnvironment()
+
+	if debug.Value() {
+		fmt.Println("value is true")
+	} else {
+		fmt.Println("value is false")
+	}
+
+	// Output:
+	// value is true
 }

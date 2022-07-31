@@ -43,6 +43,11 @@ func (r *Registry) Register(s Spec) {
 	r.specs[s.Name()] = s
 }
 
+// Reset removes all variable specifications from the registry.
+func (r *Registry) Reset() {
+	r.specs = nil
+}
+
 // Resolve parses and validates all environment variables in the registry,
 // allowing their associated values to be obtained.
 func (r *Registry) Resolve(lookup Lookup) error {
@@ -61,6 +66,6 @@ func (r *Registry) Resolve(lookup Lookup) error {
 // It panics if any of the specifications are violated.
 func (r *Registry) MustResolve(lookup Lookup) {
 	if err := r.Resolve(lookup); err != nil {
-		panic(err)
+		panic(err.Error())
 	}
 }

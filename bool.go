@@ -1,10 +1,13 @@
 package ferrite
 
-import "errors"
+import "fmt"
 
 func Bool(name, desc string) RequiredBoolean {
 	spec := &boolSpec{
 		name: name,
+		desc: desc,
+		t:    "true",
+		f:    "false",
 	}
 
 	DefaultRegistry.Register(spec)
@@ -14,6 +17,8 @@ func Bool(name, desc string) RequiredBoolean {
 
 type boolSpec struct {
 	name  string
+	desc  string
+	t, f  string
 	def   *bool
 	value bool
 }
@@ -31,22 +36,37 @@ func (s *boolSpec) Resolve(lookup Lookup) error {
 			return nil
 		}
 
-		m := `
-ENVIRONMENT VARIABLES
-	✗ FERRITE_DEBUG [bool] (enable debug logging)
+		m := `ENVIRONMENT VARIABLES
+	✗ %s [bool] (%s)
 		✗ must be set explicitly
-		✗ must be set to "true" or "false"
-`
-		return errors.New(m)
+		✗ must be either "%s" or "%s"`
+		return fmt.Errorf(m, s.name, s.desc, s.t, s.f)
 	}
 
-	s.value = raw == "true"
+	switch raw {
+	case s.t:
+		s.value = true
+	case s.f:
+		s.value = false
+	default:
+		m := `ENVIRONMENT VARIABLES
+	✗ %s [bool] (%s)
+		✓ must be set explicitly
+		✗ must be either "%s" or "%s", got "%s"`
+		return fmt.Errorf(m, s.name, s.desc, s.t, s.f, raw)
+	}
 
 	return nil
 }
 
 type RequiredBoolean struct {
 	spec *boolSpec
+}
+
+func (b RequiredBoolean) Literals(t, f string) RequiredBoolean {
+	b.spec.t = t
+	b.spec.f = f
+	return b
 }
 
 func (b RequiredBoolean) Default(def bool) RequiredBoolean {
