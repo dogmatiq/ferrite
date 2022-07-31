@@ -6,17 +6,52 @@ package ferrite
 // values for the variable.
 type Spec interface {
 	Name() string
-	Resolve(Environment) error
+	Resolve() error
 }
 
 // spec provides common functionality for Spec implementations.
-type spec struct {
+type spec[T any] struct {
 	name string
 	desc string
+
+	isResolved bool
+	isDefault  bool
+	def        *T
+	value      T
 }
 
-func (s spec) Name() string {
+func (s *spec[T]) Name() string {
 	return s.name
+}
+
+func (s *spec[T]) Value() T {
+	if !s.isResolved {
+		panic("environment has not been resolved")
+	}
+
+	return s.value
+}
+
+func (s *spec[T]) setDefault(v T) {
+	s.def = &v
+}
+
+func (s *spec[T]) useValue(v T) {
+	s.isResolved = true
+	s.isDefault = false
+	s.value = v
+}
+
+func (s *spec[T]) useDefault() bool {
+	if s.def == nil {
+		return false
+	}
+
+	s.isResolved = true
+	s.isDefault = true
+	s.value = *s.def
+
+	return true
 }
 
 // SpecOption is an option that alters the behavior of a variable specification.

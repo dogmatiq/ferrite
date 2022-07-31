@@ -10,14 +10,10 @@ func ResolveEnvironment() {
 }
 
 // DefaultRegistry is the default environment variable registry.
-var DefaultRegistry = Registry{
-	Environment: ShellEnvironment,
-}
+var DefaultRegistry = Registry{}
 
 // Registry is a container of environment variable specifications.
 type Registry struct {
-	Environment Environment
-
 	specs map[string]Spec
 }
 
@@ -39,7 +35,7 @@ func (r *Registry) Reset() {
 // allowing their associated values to be obtained.
 func (r *Registry) Resolve() error {
 	for _, s := range r.specs {
-		if err := s.Resolve(r.Environment); err != nil {
+		if err := s.Resolve(); err != nil {
 			return err
 		}
 	}
@@ -47,8 +43,8 @@ func (r *Registry) Resolve() error {
 	return nil
 }
 
-// register adds spec to the registry configured by the given options.
-func register[T Spec](spec T, options []SpecOption) T {
+// register adds s to the registry configured by the given options.
+func register(s Spec, options []SpecOption) {
 	opts := specOptions{
 		Registry: &DefaultRegistry,
 	}
@@ -57,7 +53,5 @@ func register[T Spec](spec T, options []SpecOption) T {
 		opt(&opts)
 	}
 
-	opts.Registry.Register(spec)
-
-	return spec
+	opts.Registry.Register(s)
 }

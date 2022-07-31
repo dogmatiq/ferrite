@@ -75,57 +75,6 @@ func ExampleBool_default() {
 	// variable is true
 }
 
-func ExampleBool_optional() {
-	os.Setenv("FERRITE_BOOL", "false")
-	defer os.Unsetenv("FERRITE_BOOL")
-
-	ferrite.DefaultRegistry.Reset()
-
-	debug := ferrite.
-		Bool(
-			"FERRITE_BOOL",
-			"example boolean variable",
-		).
-		Optional()
-
-	ferrite.ResolveEnvironment()
-
-	if !debug.IsExplicit() {
-		fmt.Println("variable is empty or undefined")
-	} else if debug.Value() {
-		fmt.Println("variable is true")
-	} else {
-		fmt.Println("variable is false")
-	}
-
-	// Output:
-	// variable is false
-}
-
-func ExampleBool_optionalUndefined() {
-	ferrite.DefaultRegistry.Reset()
-
-	debug := ferrite.
-		Bool(
-			"FERRITE_BOOL",
-			"example boolean variable",
-		).
-		Optional()
-
-	ferrite.ResolveEnvironment()
-
-	if !debug.IsExplicit() {
-		fmt.Println("variable is empty or undefined")
-	} else if debug.Value() {
-		fmt.Println("variable is true")
-	} else {
-		fmt.Println("variable is false")
-	}
-
-	// Output:
-	// variable is empty or undefined
-}
-
 func ExampleBool_undefined() {
 	ferrite.DefaultRegistry.Reset()
 
@@ -135,19 +84,13 @@ func ExampleBool_undefined() {
 		fmt.Println(recover())
 	}()
 
-	debug := ferrite.
+	ferrite.
 		Bool(
 			"FERRITE_BOOL",
 			"example boolean variable",
 		)
 
 	ferrite.ResolveEnvironment()
-
-	if debug.Value() {
-		fmt.Println("variable is true")
-	} else {
-		fmt.Println("variable is false")
-	}
 
 	// Output:
 	// ENVIRONMENT VARIABLES
@@ -156,7 +99,7 @@ func ExampleBool_undefined() {
 	//    ✗ must be either "true" or "false"
 }
 
-func ExampleBool_literals() {
+func ExampleBool_customLiterals() {
 	ferrite.DefaultRegistry.Reset()
 	os.Setenv("FERRITE_BOOL", "yes")
 	defer os.Unsetenv("FERRITE_BOOL")

@@ -1,61 +1,54 @@
 package ferrite
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 // Bool declares a boolean environment variable.
 func Bool(name, desc string, options ...SpecOption) *BoolSpec {
-	return register(
-		&BoolSpec{
-			spec: spec{
-				name: name,
-				desc: desc,
-			},
-			t: "true",
-			f: "false",
+	s := &BoolSpec{
+		spec: spec[bool]{
+			name: name,
+			desc: desc,
 		},
-		options,
-	)
+		t: "true",
+		f: "false",
+	}
+
+	register(s, options)
+
+	return s
 }
 
 // BoolSpec is a Spec for boolean types.
 type BoolSpec struct {
-	spec
+	spec[bool]
 
-	t, f     string
-	def      *bool
-	explicit bool
-	value    bool
+	t, f string
 }
 
+// Literals sets a pair of custom stirng literals used to represent true and
+// false. The default literals are "true" and "false".
 func (s *BoolSpec) Literals(t, f string) *BoolSpec {
 	s.t = t
 	s.f = f
 	return s
 }
 
-func (s *BoolSpec) Default(def bool) *BoolSpec {
-	s.def = &def
+// Default sets a default value to use when the environment variable is
+// undefined.
+func (s *BoolSpec) Default(v bool) *BoolSpec {
+	s.setDefault(v)
 	return s
 }
 
-func (s *BoolSpec) Optional() *BoolSpec {
-	return s.Default(false)
-}
-
-func (s *BoolSpec) Value() bool {
-	return s.value
-}
-
-func (s *BoolSpec) IsExplicit() bool {
-	return s.explicit
-}
-
-func (s *BoolSpec) Resolve(env Environment) error {
-	raw, _ := env.Lookup(s.name)
+// Resolve resolves the value of the environment variable from the environment.
+func (s *BoolSpec) Resolve() error {
+	raw := os.Getenv(s.name)
 
 	if raw == "" {
-		if s.def != nil {
-			s.value = *s.def
+		if s.useDefault() {
 			return nil
 		}
 
@@ -68,11 +61,9 @@ func (s *BoolSpec) Resolve(env Environment) error {
 
 	switch raw {
 	case s.t:
-		s.value = true
-		s.explicit = true
+		s.useValue(true)
 	case s.f:
-		s.value = false
-		s.explicit = true
+		s.useValue(false)
 	default:
 		m := `ENVIRONMENT VARIABLES
  ✗ %s [bool] (%s)
