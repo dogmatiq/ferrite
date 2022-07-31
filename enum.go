@@ -3,7 +3,6 @@ package ferrite
 import (
 	"fmt"
 	"os"
-	"strings"
 )
 
 // Enum configures an environment variable as an enumeration with members of
@@ -89,16 +88,20 @@ func (s *EnumSpec[T]) Validate() error {
 			return nil
 		}
 
-		m := `ENVIRONMENT VARIABLES
+		f := `ENVIRONMENT VARIABLES
  ✗ %s [%T enum] (%s)
    ✗ must be set explicitly
-   - must be %s`
+   • must be one of the enum members`
+
+		for _, m := range s.members {
+			f += fmt.Sprintf("\n     • %s", m.Key)
+		}
+
 		return fmt.Errorf(
-			m,
+			f,
 			s.name,
 			s.value,
 			s.desc,
-			s.memberList(),
 		)
 	}
 
@@ -109,37 +112,20 @@ func (s *EnumSpec[T]) Validate() error {
 		}
 	}
 
-	m := `ENVIRONMENT VARIABLES
+	f := `ENVIRONMENT VARIABLES
  ✗ %s [%T enum] (%s)
    ✓ must be set explicitly
-   ✗ must be %s, got %q`
+   ✗ must be one of the enum members, got %q`
+
+	for _, m := range s.members {
+		f += fmt.Sprintf("\n     • %s", m.Key)
+	}
+
 	return fmt.Errorf(
-		m,
+		f,
 		s.name,
 		s.value,
 		s.desc,
-		s.memberList(),
 		raw,
 	)
-}
-
-// memberList returns a string representation of the valid enum members.
-func (s *EnumSpec[T]) memberList() string {
-	var w strings.Builder
-
-	n := len(s.members)
-
-	for i, m := range s.members {
-		if i > 0 {
-			if i == n-1 {
-				w.WriteString(" or ")
-			} else {
-				w.WriteString(", ")
-			}
-		}
-
-		fmt.Fprintf(&w, "%q", m.Key)
-	}
-
-	return w.String()
 }

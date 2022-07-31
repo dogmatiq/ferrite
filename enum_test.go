@@ -1,6 +1,7 @@
 package ferrite_test
 
 import (
+	"fmt"
 	"os"
 
 	. "github.com/dogmatiq/ferrite"
@@ -8,40 +9,54 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+// enumMember is used to test enumerations.
+type enumMember int
+
+const (
+	member0 enumMember = iota
+	member1
+	member2
+)
+
+// String returns the value to use as the enum's key.
+func (m enumMember) String() string {
+	return fmt.Sprintf("<member-%d>", m)
+}
+
 var _ = Describe("type EnumSpec", func() {
 	var (
 		reg  *Registry
-		spec *EnumSpec[string]
+		spec *EnumSpec[enumMember]
 	)
 
 	BeforeEach(func() {
 		reg = &Registry{}
 
-		spec = Enum[string](
+		spec = Enum[enumMember](
 			"FERRITE_TEST",
 			"<desc>",
 			WithRegistry(reg),
 		).Members(
-			"red",
-			"green",
-			"blue",
+			member0,
+			member1,
+			member2,
 		)
 	})
 
 	Describe("func Value()", func() {
 		DescribeTable(
 			"it returns the value associated with the member key",
-			func(value string) {
+			func(value string, expect enumMember) {
 				os.Setenv("FERRITE_TEST", value)
 				defer os.Unsetenv("FERRITE_TEST")
 
 				err := reg.Validate()
 				Expect(err).ShouldNot(HaveOccurred())
-				Expect(spec.Value()).To(Equal(value))
+				Expect(spec.Value()).To(Equal(expect))
 			},
-			Entry("red", "red"),
-			Entry("green", "green"),
-			Entry("blue", "blue"),
+			Entry("member 0", "<member-0>", member0),
+			Entry("member 1", "<member-1>", member1),
+			Entry("member 2", "<member-2>", member2),
 		)
 	})
 
@@ -49,7 +64,10 @@ var _ = Describe("type EnumSpec", func() {
 		When("one of the members has an empty string representation", func() {
 			It("panics", func() {
 				Expect(func() {
-					spec.Members("red", "", "blue")
+					Enum[string](
+						"FERRITE_TEST",
+						"<desc>",
+					).Members("")
 				}).To(PanicWith("enum member must not have an empty string representation"))
 			})
 		})
@@ -59,7 +77,7 @@ var _ = Describe("type EnumSpec", func() {
 		When("the default value is not one of the enum members", func() {
 			It("panics", func() {
 				Expect(func() {
-					spec.Default("<invalid>")
+					spec.Default(enumMember(100))
 				}).To(PanicWith("default value must be one of the enum members"))
 			})
 		})
@@ -74,9 +92,12 @@ var _ = Describe("type EnumSpec", func() {
 				expectErr(
 					reg.Validate(),
 					`ENVIRONMENT VARIABLES`,
-					` ✗ FERRITE_TEST [string enum] (<desc>)`,
+					` ✗ FERRITE_TEST [ferrite_test.enumMember enum] (<desc>)`,
 					`   ✓ must be set explicitly`,
-					`   ✗ must be "red", "green" or "blue", got "<invalid>"`,
+					`   ✗ must be one of the enum members, got "<invalid>"`,
+					`     • <member-0>`,
+					`     • <member-1>`,
+					`     • <member-2>`,
 				)
 			})
 		})
@@ -86,9 +107,12 @@ var _ = Describe("type EnumSpec", func() {
 				expectErr(
 					reg.Validate(),
 					`ENVIRONMENT VARIABLES`,
-					` ✗ FERRITE_TEST [string enum] (<desc>)`,
+					` ✗ FERRITE_TEST [ferrite_test.enumMember enum] (<desc>)`,
 					`   ✗ must be set explicitly`,
-					`   - must be "red", "green" or "blue"`,
+					`   • must be one of the enum members`,
+					`     • <member-0>`,
+					`     • <member-1>`,
+					`     • <member-2>`,
 				)
 			})
 		})
@@ -96,7 +120,7 @@ var _ = Describe("type EnumSpec", func() {
 
 	When("there is a default value", func() {
 		BeforeEach(func() {
-			spec = spec.Default("green")
+			spec = spec.Default(member1)
 		})
 
 		Describe("func Value()", func() {
@@ -104,7 +128,7 @@ var _ = Describe("type EnumSpec", func() {
 				It("returns the default", func() {
 					err := reg.Validate()
 					Expect(err).ShouldNot(HaveOccurred())
-					Expect(spec.Value()).To(Equal("green"))
+					Expect(spec.Value()).To(Equal(member1))
 				})
 			})
 		})
