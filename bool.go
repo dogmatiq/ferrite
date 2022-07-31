@@ -66,7 +66,7 @@ func (s *BoolSpec[T]) Resolve() error {
 		m := `ENVIRONMENT VARIABLES
  ✗ %s [bool] (%s)
    ✗ must be set explicitly
-   ✗ must be either "%s" or "%s"`
+   - must be either "%s" or "%s"`
 		return fmt.Errorf(m, s.name, s.desc, s.t, s.f)
 	}
 

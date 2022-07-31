@@ -24,9 +24,25 @@ var _ = Describe("type BoolSpec", func() {
 		)
 	})
 
+	Describe("func Value()", func() {
+		DescribeTable(
+			"it returns the value associated with the literal",
+			func(value string, expect bool) {
+				os.Setenv("FERRITE_TEST", value)
+				defer os.Unsetenv("FERRITE_TEST")
+
+				err := reg.Resolve()
+				Expect(err).ShouldNot(HaveOccurred())
+				Expect(spec.Value()).To(Equal(expect))
+			},
+			Entry("true", "true", true),
+			Entry("false", "false", false),
+		)
+	})
+
 	Describe("func Resolve()", func() {
 		When("the value is not a valid literal", func() {
-			It("causes an error", func() {
+			It("returns an error", func() {
 				os.Setenv("FERRITE_TEST", "<invalid>")
 				defer os.Unsetenv("FERRITE_TEST")
 
@@ -40,13 +56,62 @@ var _ = Describe("type BoolSpec", func() {
 			})
 		})
 
-		When("the value has custom literals", func() {
-			BeforeEach(func() {
-				spec.Literals("yes", "no")
+		When("the variable is not defined", func() {
+			It("returns an error", func() {
+				expectErr(
+					reg.Resolve(),
+					`ENVIRONMENT VARIABLES`,
+					` ✗ FERRITE_TEST [bool] (<desc>)`,
+					`   ✗ must be set explicitly`,
+					`   - must be either "true" or "false"`,
+				)
 			})
+		})
+	})
 
+	When("there is a default", func() {
+		Describe("func Value()", func() {
+			When("the variable is not defined", func() {
+				DescribeTable(
+					"it returns the default",
+					func(expect bool) {
+						spec.Default(expect)
+
+						err := reg.Resolve()
+						Expect(err).ShouldNot(HaveOccurred())
+						Expect(spec.Value()).To(Equal(expect))
+					},
+					Entry("true", true),
+					Entry("false", false),
+				)
+			})
+		})
+	})
+
+	When("there are custom literals", func() {
+		BeforeEach(func() {
+			spec.Literals("yes", "no")
+		})
+
+		Describe("func Value()", func() {
+			DescribeTable(
+				"it returns the value associated with the literal",
+				func(value string, expect bool) {
+					os.Setenv("FERRITE_TEST", value)
+					defer os.Unsetenv("FERRITE_TEST")
+
+					err := reg.Resolve()
+					Expect(err).ShouldNot(HaveOccurred())
+					Expect(spec.Value()).To(Equal(expect))
+				},
+				Entry("true", "yes", true),
+				Entry("false", "no", false),
+			)
+		})
+
+		Describe("func Resolve()", func() {
 			When("the value is not a valid literal", func() {
-				It("causes an error", func() {
+				It("returns an error", func() {
 					os.Setenv("FERRITE_TEST", "true")
 					defer os.Unsetenv("FERRITE_TEST")
 
@@ -58,16 +123,6 @@ var _ = Describe("type BoolSpec", func() {
 						`   ✗ must be either "yes" or "no", got "true"`,
 					)
 				})
-			})
-		})
-	})
-
-	Describe("func Value()", func() {
-		When("the spec has not been resolved", func() {
-			It("panics", func() {
-				Expect(func() {
-					spec.Value()
-				}).To(PanicWith("environment has not been resolved"))
 			})
 		})
 	})
