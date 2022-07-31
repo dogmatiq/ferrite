@@ -22,7 +22,7 @@ func (s *boolSpec) Name() string {
 	return s.name
 }
 
-func (s *boolSpec) Resolve(lookup LookupFn) error {
+func (s *boolSpec) Resolve(lookup Lookup) error {
 	raw, _ := lookup(s.name)
 
 	if raw == "" {

@@ -1,7 +1,6 @@
 package ferrite
 
 import (
-	"fmt"
 	"os"
 )
 
@@ -12,23 +11,17 @@ func ResolveEnvironment() {
 	DefaultRegistry.MustResolve(os.LookupEnv)
 }
 
-// LookupFn retrieves the value of an environment variable.
+// Lookup retrieves the value of an environment variable.
 //
 // If the variable is present in the environment, value (which may be empty)
 // is returned and ok is true. Otherwise, the value is empty and ok is false.
-type LookupFn func(name string) (value string, ok bool)
+type Lookup func(name string) (value string, ok bool)
 
 // DefaultRegistry is the default environment variable registry.
-var DefaultRegistry = Registry{
-	fatal: func(err error) {
-		fmt.Fprintln(os.Stdout, err)
-		os.Exit(1)
-	},
-}
+var DefaultRegistry Registry
 
 // Registry is a container of environment variable specifications.
 type Registry struct {
-	fatal func(error)
 	specs map[string]Spec
 }
 
@@ -38,9 +31,10 @@ type Registry struct {
 // values for the variable.
 type Spec interface {
 	Name() string
-	Resolve(LookupFn) error
+	Resolve(Lookup) error
 }
 
+// Register adds a variable specification to the register.
 func (r *Registry) Register(s Spec) {
 	if r.specs == nil {
 		r.specs = map[string]Spec{}
@@ -49,7 +43,9 @@ func (r *Registry) Register(s Spec) {
 	r.specs[s.Name()] = s
 }
 
-func (r *Registry) Resolve(lookup LookupFn) error {
+// Resolve parses and validates all environment variables in the registry,
+// allowing their associated values to be obtained.
+func (r *Registry) Resolve(lookup Lookup) error {
 	for _, s := range r.specs {
 		if err := s.Resolve(lookup); err != nil {
 			return err
@@ -59,8 +55,12 @@ func (r *Registry) Resolve(lookup LookupFn) error {
 	return nil
 }
 
-func (r *Registry) MustResolve(lookup LookupFn) {
+// MustResolve parses and validates all environment variables in the registry,
+// allowing their associated values to be obtained.
+//
+// It panics if any of the specifications are violated.
+func (r *Registry) MustResolve(lookup Lookup) {
 	if err := r.Resolve(lookup); err != nil {
-		r.fatal(err)
+		panic(err)
 	}
 }

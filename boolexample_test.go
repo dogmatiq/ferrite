@@ -118,7 +118,7 @@ func ExampleBool_required() {
 
 	// Output:
 	// ENVIRONMENT VARIABLES
-	//	✗ FERRITE_DEBUG [bool] (enable debug logging)
-	//		✗ must be set explicitly
-	//		✗ must be set to "true" or "false"
+	// 	✗ FERRITE_DEBUG [bool] (enable debug logging)
+	// 		✗ must be set explicitly
+	// 		✗ must be set to "true" or "false"
 }
