@@ -10,25 +10,25 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("func ResolveEnvironment()", func() {
+var _ = Describe("func ValidateEnvironment()", func() {
 	BeforeEach(func() {
 		DefaultRegistry.Reset()
 	})
 
-	It("resolves the default registry", func() {
+	It("validates the default registry", func() {
 		os.Setenv("FERRITE_TEST", "true")
 		defer os.Unsetenv("FERRITE_TEST")
 
 		v := Bool("FERRITE_TEST", "<desc>")
-		ResolveEnvironment()
+		ValidateEnvironment()
 		Expect(v.Value()).To(BeTrue())
 	})
 
-	It("panics if the registry can not be resolved", func() {
+	It("panics if the registry can not be validated", func() {
 		Bool("FERRITE_TEST", "<desc>")
 
 		Expect(func() {
-			ResolveEnvironment()
+			ValidateEnvironment()
 		}).To(Panic())
 	})
 })

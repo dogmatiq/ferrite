@@ -54,8 +54,8 @@ func (s *BoolSpec[T]) Default(v T) *BoolSpec[T] {
 	return s
 }
 
-// Resolve resolves the value of the environment variable from the environment.
-func (s *BoolSpec[T]) Resolve() error {
+// Validate validates the environment variable.
+func (s *BoolSpec[T]) Validate() error {
 	raw := os.Getenv(s.name)
 
 	if raw == "" {

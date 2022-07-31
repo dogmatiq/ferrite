@@ -31,7 +31,7 @@ var _ = Describe("type BoolSpec", func() {
 				os.Setenv("FERRITE_TEST", value)
 				defer os.Unsetenv("FERRITE_TEST")
 
-				err := reg.Resolve()
+				err := reg.Validate()
 				Expect(err).ShouldNot(HaveOccurred())
 				Expect(spec.Value()).To(Equal(expect))
 			},
@@ -40,14 +40,14 @@ var _ = Describe("type BoolSpec", func() {
 		)
 	})
 
-	Describe("func Resolve()", func() {
+	Describe("func Validate()", func() {
 		When("the value is not a valid literal", func() {
 			It("returns an error", func() {
 				os.Setenv("FERRITE_TEST", "<invalid>")
 				defer os.Unsetenv("FERRITE_TEST")
 
 				expectErr(
-					reg.Resolve(),
+					reg.Validate(),
 					`ENVIRONMENT VARIABLES`,
 					` ✗ FERRITE_TEST [bool] (<desc>)`,
 					`   ✓ must be set explicitly`,
@@ -59,7 +59,7 @@ var _ = Describe("type BoolSpec", func() {
 		When("the variable is not defined", func() {
 			It("returns an error", func() {
 				expectErr(
-					reg.Resolve(),
+					reg.Validate(),
 					`ENVIRONMENT VARIABLES`,
 					` ✗ FERRITE_TEST [bool] (<desc>)`,
 					`   ✗ must be set explicitly`,
@@ -77,7 +77,7 @@ var _ = Describe("type BoolSpec", func() {
 					func(expect bool) {
 						spec.Default(expect)
 
-						err := reg.Resolve()
+						err := reg.Validate()
 						Expect(err).ShouldNot(HaveOccurred())
 						Expect(spec.Value()).To(Equal(expect))
 					},
@@ -100,7 +100,7 @@ var _ = Describe("type BoolSpec", func() {
 					os.Setenv("FERRITE_TEST", value)
 					defer os.Unsetenv("FERRITE_TEST")
 
-					err := reg.Resolve()
+					err := reg.Validate()
 					Expect(err).ShouldNot(HaveOccurred())
 					Expect(spec.Value()).To(Equal(expect))
 				},
@@ -109,14 +109,14 @@ var _ = Describe("type BoolSpec", func() {
 			)
 		})
 
-		Describe("func Resolve()", func() {
+		Describe("func Validate()", func() {
 			When("the value is not a valid literal", func() {
 				It("returns an error", func() {
 					os.Setenv("FERRITE_TEST", "true")
 					defer os.Unsetenv("FERRITE_TEST")
 
 					expectErr(
-						reg.Resolve(),
+						reg.Validate(),
 						`ENVIRONMENT VARIABLES`,
 						` ✗ FERRITE_TEST [bool] (<desc>)`,
 						`   ✓ must be set explicitly`,

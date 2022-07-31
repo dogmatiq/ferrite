@@ -18,7 +18,7 @@ func ExampleBool() {
 			"example boolean variable",
 		)
 
-	ferrite.ResolveEnvironment()
+	ferrite.ValidateEnvironment()
 
 	if debug.Value() {
 		fmt.Println("variable is true")
@@ -40,7 +40,7 @@ func ExampleBool_default() {
 		).
 		Default(true)
 
-	ferrite.ResolveEnvironment()
+	ferrite.ValidateEnvironment()
 
 	if debug.Value() {
 		fmt.Println("variable is true")
@@ -64,7 +64,7 @@ func ExampleBool_customLiterals() {
 		).
 		Literals("yes", "no")
 
-	ferrite.ResolveEnvironment()
+	ferrite.ValidateEnvironment()
 
 	if debug.Value() {
 		fmt.Println("variable is true")

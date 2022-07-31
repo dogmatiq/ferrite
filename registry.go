@@ -1,10 +1,10 @@
 package ferrite
 
-// ResolveEnvironment validates all environment variables.
+// ValidateEnvironment validates all environment variables.
 //
 // It panics if any of the defined variables are invalid.
-func ResolveEnvironment() {
-	if err := DefaultRegistry.Resolve(); err != nil {
+func ValidateEnvironment() {
+	if err := DefaultRegistry.Validate(); err != nil {
 		panic(err.Error())
 	}
 }
@@ -31,11 +31,11 @@ func (r *Registry) Reset() {
 	r.specs = nil
 }
 
-// Resolve parses and validates all environment variables in the registry,
+// Validate parses and validates all environment variables in the registry,
 // allowing their associated values to be obtained.
-func (r *Registry) Resolve() error {
+func (r *Registry) Validate() error {
 	for _, s := range r.specs {
-		if err := s.Resolve(); err != nil {
+		if err := s.Validate(); err != nil {
 			return err
 		}
 	}
