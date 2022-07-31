@@ -6,8 +6,11 @@ import (
 	"strings"
 )
 
-// Enum declares an environment variable that is an enumeration with members of
+// Enum configures an environment variable as an enumeration with members of
 // type T.
+//
+// name is the name of the environment variable to read. desc is a
+// human-readable description of the environment variable.
 func Enum[T any](
 	name, desc string,
 	options ...SpecOption,
@@ -31,6 +34,17 @@ type EnumSpec[T any] struct {
 	members []enumMember[T]
 }
 
+// enumKey returns the enum key to use for the given value.
+func enumKey(v any) string {
+	k := fmt.Sprint(v)
+	if k == "" {
+		panic("enum member must not have an empty string representation")
+	}
+
+	return k
+}
+
+// enumMember encapsulates an enum key and value.
 type enumMember[T any] struct {
 	Key   string
 	Value T
@@ -128,14 +142,4 @@ func (s *EnumSpec[T]) memberList() string {
 	}
 
 	return w.String()
-}
-
-// enumKey returns the enum key to use for the given value.
-func enumKey(v any) string {
-	k := fmt.Sprint(v)
-	if k == "" {
-		panic("enum member must not have an empty string representation")
-	}
-
-	return k
 }

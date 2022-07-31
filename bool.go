@@ -5,16 +5,23 @@ import (
 	"os"
 )
 
-// Bool declares a boolean environment variable.
+// Bool configures an environment variable as a boolean.
+//
+// name is the name of the environment variable to read. desc is a
+// human-readable description of the environment variable.
 func Bool(
 	name, desc string,
 	options ...SpecOption,
 ) *BoolSpec[bool] {
-	return BoolKind[bool](name, desc, options...)
+	return BoolAs[bool](name, desc, options...)
 }
 
-// BoolKind represents a boolean environment variable as some user-defined type.
-func BoolKind[T ~bool](
+// BoolAs configures an environment variable as a boolean using a user-defined
+// type.
+//
+// name is the name of the environment variable to read. desc is a
+// human-readable description of the environment variable.
+func BoolAs[T ~bool](
 	name, desc string,
 	options ...SpecOption,
 ) *BoolSpec[T] {
@@ -32,15 +39,17 @@ func BoolKind[T ~bool](
 	return s
 }
 
-// BoolSpec is a Spec for boolean types.
+// BoolSpec is the specification for a boolean.
 type BoolSpec[T ~bool] struct {
 	spec[T]
 
 	t, f string
 }
 
-// Literals sets a pair of custom stirng literals used to represent true and
-// false. The default literals are "true" and "false".
+// Literals overrides the default literals used to represent true and false.
+//
+// The default literals "true" and "false" are not considered valid values when
+// using custom literals.
 func (s *BoolSpec[T]) Literals(t, f string) *BoolSpec[T] {
 	s.t = t
 	s.f = f
