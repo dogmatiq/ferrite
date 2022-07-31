@@ -4,18 +4,15 @@ import "fmt"
 
 // Bool declares a boolean environment variable.
 func Bool(name, desc string, options ...SpecOption) *BoolSpec {
-	opts := resolveSpecOptions(options)
-
-	spec := &BoolSpec{
-		name: name,
-		desc: desc,
-		t:    "true",
-		f:    "false",
-	}
-
-	opts.Registry.Register(spec)
-
-	return spec
+	return register(
+		&BoolSpec{
+			name: name,
+			desc: desc,
+			t:    "true",
+			f:    "false",
+		},
+		options,
+	)
 }
 
 // BoolSpec is a Spec for boolean types.

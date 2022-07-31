@@ -25,16 +25,3 @@ func WithRegistry(r *Registry) SpecOption {
 type specOptions struct {
 	Registry *Registry
 }
-
-// resolveSpecOptions resolves a list of SpecOptions into a single specOptions
-func resolveSpecOptions(options []SpecOption) specOptions {
-	opts := specOptions{
-		Registry: &DefaultRegistry,
-	}
-
-	for _, opt := range options {
-		opt(&opts)
-	}
-
-	return opts
-}

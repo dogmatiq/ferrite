@@ -46,3 +46,18 @@ func (r *Registry) Resolve() error {
 
 	return nil
 }
+
+// register adds spec to the registry configured by the given options.
+func register[T Spec](spec T, options []SpecOption) T {
+	opts := specOptions{
+		Registry: &DefaultRegistry,
+	}
+
+	for _, opt := range options {
+		opt(&opts)
+	}
+
+	opts.Registry.Register(spec)
+
+	return spec
+}
