@@ -7,9 +7,9 @@ import (
 
 var _ = Context("boolean values", func() {
 	var (
-		env      MemoryEnvironment
-		reg      *Registry
-		variable RequiredBool
+		env  MemoryEnvironment
+		reg  *Registry
+		spec *BoolSpec
 	)
 
 	BeforeEach(func() {
@@ -19,7 +19,7 @@ var _ = Context("boolean values", func() {
 			Environment: env,
 		}
 
-		variable = Bool(
+		spec = Bool(
 			"FERRITE_TEST",
 			"<desc>",
 			WithRegistry(reg),
@@ -42,7 +42,7 @@ var _ = Context("boolean values", func() {
 
 	When("the value has custom literals", func() {
 		BeforeEach(func() {
-			variable.Literals("yes", "no")
+			spec.Literals("yes", "no")
 		})
 
 		When("the value is not a valid literal", func() {

@@ -3,10 +3,10 @@ package ferrite
 import "fmt"
 
 // Bool declares a boolean environment variable.
-func Bool(name, desc string, options ...SpecOption) RequiredBool {
+func Bool(name, desc string, options ...SpecOption) *BoolSpec {
 	opts := resolveSpecOptions(options)
 
-	spec := &boolSpec{
+	spec := &BoolSpec{
 		name: name,
 		desc: desc,
 		t:    "true",
@@ -15,22 +15,47 @@ func Bool(name, desc string, options ...SpecOption) RequiredBool {
 
 	opts.Registry.Register(spec)
 
-	return RequiredBool{spec}
+	return spec
 }
 
-type boolSpec struct {
-	name  string
-	desc  string
-	t, f  string
-	def   *bool
-	value bool
+// BoolSpec is a Spec for boolean types.
+type BoolSpec struct {
+	name     string
+	desc     string
+	t, f     string
+	def      *bool
+	explicit bool
+	value    bool
 }
 
-func (s *boolSpec) Name() string {
+func (s *BoolSpec) Name() string {
 	return s.name
 }
 
-func (s *boolSpec) Resolve(env Environment) error {
+func (s *BoolSpec) Literals(t, f string) *BoolSpec {
+	s.t = t
+	s.f = f
+	return s
+}
+
+func (s *BoolSpec) Default(def bool) *BoolSpec {
+	s.def = &def
+	return s
+}
+
+func (s *BoolSpec) Optional() *BoolSpec {
+	return s.Default(false)
+}
+
+func (s *BoolSpec) Value() bool {
+	return s.value
+}
+
+func (s *BoolSpec) IsExplicit() bool {
+	return s.explicit
+}
+
+func (s *BoolSpec) Resolve(env Environment) error {
 	raw, _ := env.Lookup(s.name)
 
 	if raw == "" {
@@ -49,8 +74,10 @@ func (s *boolSpec) Resolve(env Environment) error {
 	switch raw {
 	case s.t:
 		s.value = true
+		s.explicit = true
 	case s.f:
 		s.value = false
+		s.explicit = true
 	default:
 		m := `ENVIRONMENT VARIABLES
  ✗ %s [bool] (%s)
@@ -60,37 +87,4 @@ func (s *boolSpec) Resolve(env Environment) error {
 	}
 
 	return nil
-}
-
-type RequiredBool struct {
-	spec *boolSpec
-}
-
-func (b RequiredBool) Literals(t, f string) RequiredBool {
-	b.spec.t = t
-	b.spec.f = f
-	return b
-}
-
-func (b RequiredBool) Default(def bool) RequiredBool {
-	b.spec.def = &def
-	return b
-}
-
-func (b RequiredBool) Optional() OptionalBool {
-	def := false
-	b.spec.def = &def
-	return OptionalBool{b.spec}
-}
-
-func (b RequiredBool) Value() bool {
-	return b.spec.value
-}
-
-type OptionalBool struct {
-	spec *boolSpec
-}
-
-func (b OptionalBool) Value() (bool, bool) {
-	return b.spec.value, false
 }
