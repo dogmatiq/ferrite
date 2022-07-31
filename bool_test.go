@@ -69,7 +69,7 @@ var _ = Describe("type BoolSpec", func() {
 		})
 	})
 
-	When("there is a default", func() {
+	When("there is a default value", func() {
 		Describe("func Value()", func() {
 			When("the variable is not defined", func() {
 				DescribeTable(
