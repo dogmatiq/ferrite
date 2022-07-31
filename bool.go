@@ -6,10 +6,12 @@ import "fmt"
 func Bool(name, desc string, options ...SpecOption) *BoolSpec {
 	return register(
 		&BoolSpec{
-			name: name,
-			desc: desc,
-			t:    "true",
-			f:    "false",
+			spec: spec{
+				name: name,
+				desc: desc,
+			},
+			t: "true",
+			f: "false",
 		},
 		options,
 	)
@@ -17,16 +19,12 @@ func Bool(name, desc string, options ...SpecOption) *BoolSpec {
 
 // BoolSpec is a Spec for boolean types.
 type BoolSpec struct {
-	name     string
-	desc     string
+	spec
+
 	t, f     string
 	def      *bool
 	explicit bool
 	value    bool
-}
-
-func (s *BoolSpec) Name() string {
-	return s.name
 }
 
 func (s *BoolSpec) Literals(t, f string) *BoolSpec {

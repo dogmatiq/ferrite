@@ -9,6 +9,16 @@ type Spec interface {
 	Resolve(Environment) error
 }
 
+// spec provides common functionality for Spec implementations.
+type spec struct {
+	name string
+	desc string
+}
+
+func (s spec) Name() string {
+	return s.name
+}
+
 // SpecOption is an option that alters the behavior of a variable specification.
 type SpecOption func(*specOptions)
 
