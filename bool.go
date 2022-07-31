@@ -6,9 +6,20 @@ import (
 )
 
 // Bool declares a boolean environment variable.
-func Bool(name, desc string, options ...SpecOption) *BoolSpec {
-	s := &BoolSpec{
-		spec: spec[bool]{
+func Bool(
+	name, desc string,
+	options ...SpecOption,
+) *BoolSpec[bool] {
+	return BoolKind[bool](name, desc, options...)
+}
+
+// BoolKind represents a boolean environment variable as some user-defined type.
+func BoolKind[T ~bool](
+	name, desc string,
+	options ...SpecOption,
+) *BoolSpec[T] {
+	s := &BoolSpec[T]{
+		spec: spec[T]{
 			name: name,
 			desc: desc,
 		},
@@ -22,15 +33,15 @@ func Bool(name, desc string, options ...SpecOption) *BoolSpec {
 }
 
 // BoolSpec is a Spec for boolean types.
-type BoolSpec struct {
-	spec[bool]
+type BoolSpec[T ~bool] struct {
+	spec[T]
 
 	t, f string
 }
 
 // Literals sets a pair of custom stirng literals used to represent true and
 // false. The default literals are "true" and "false".
-func (s *BoolSpec) Literals(t, f string) *BoolSpec {
+func (s *BoolSpec[T]) Literals(t, f string) *BoolSpec[T] {
 	s.t = t
 	s.f = f
 	return s
@@ -38,13 +49,13 @@ func (s *BoolSpec) Literals(t, f string) *BoolSpec {
 
 // Default sets a default value to use when the environment variable is
 // undefined.
-func (s *BoolSpec) Default(v bool) *BoolSpec {
+func (s *BoolSpec[T]) Default(v T) *BoolSpec[T] {
 	s.setDefault(v)
 	return s
 }
 
 // Resolve resolves the value of the environment variable from the environment.
-func (s *BoolSpec) Resolve() error {
+func (s *BoolSpec[T]) Resolve() error {
 	raw := os.Getenv(s.name)
 
 	if raw == "" {

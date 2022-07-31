@@ -11,7 +11,7 @@ import (
 var _ = Describe("type BoolSpec", func() {
 	var (
 		reg  *Registry
-		spec *BoolSpec
+		spec *BoolSpec[bool]
 	)
 
 	BeforeEach(func() {
