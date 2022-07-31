@@ -73,10 +73,17 @@ func (s *BoolSpec[T]) Validate() error {
 		}
 
 		m := `ENVIRONMENT VARIABLES
- ✗ %s [bool] (%s)
+ ✗ %s [%s] (%s)
    ✗ must be set explicitly
    - must be either "%s" or "%s"`
-		return fmt.Errorf(m, s.name, s.desc, s.t, s.f)
+		return fmt.Errorf(
+			m,
+			s.name,
+			typeName[T](),
+			s.desc,
+			s.t,
+			s.f,
+		)
 	}
 
 	switch raw {
@@ -86,10 +93,17 @@ func (s *BoolSpec[T]) Validate() error {
 		s.useValue(false)
 	default:
 		m := `ENVIRONMENT VARIABLES
- ✗ %s [bool] (%s)
+ ✗ %s [%s] (%s)
    ✓ must be set explicitly
    ✗ must be either "%s" or "%s", got "%s"`
-		return fmt.Errorf(m, s.name, s.desc, s.t, s.f, raw)
+		return fmt.Errorf(
+			m,
+			s.name,
+			typeName[T](),
+			s.desc,
+			s.t, s.f,
+			raw,
+		)
 	}
 
 	return nil

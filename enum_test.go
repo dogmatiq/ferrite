@@ -92,7 +92,7 @@ var _ = Describe("type EnumSpec", func() {
 				expectErr(
 					reg.Validate(),
 					`ENVIRONMENT VARIABLES`,
-					` ✗ FERRITE_TEST [ferrite_test.enumMember enum] (<desc>)`,
+					` ✗ FERRITE_TEST [enumMember enum] (<desc>)`,
 					`   ✓ must be set explicitly`,
 					`   ✗ must be one of the enum members, got "<invalid>"`,
 					`     • <member-0>`,
@@ -107,7 +107,7 @@ var _ = Describe("type EnumSpec", func() {
 				expectErr(
 					reg.Validate(),
 					`ENVIRONMENT VARIABLES`,
-					` ✗ FERRITE_TEST [ferrite_test.enumMember enum] (<desc>)`,
+					` ✗ FERRITE_TEST [enumMember enum] (<desc>)`,
 					`   ✗ must be set explicitly`,
 					`   • must be one of the enum members`,
 					`     • <member-0>`,

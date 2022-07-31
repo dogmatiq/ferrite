@@ -89,7 +89,7 @@ func (s *EnumSpec[T]) Validate() error {
 		}
 
 		f := `ENVIRONMENT VARIABLES
- ✗ %s [%T enum] (%s)
+ ✗ %s [%s enum] (%s)
    ✗ must be set explicitly
    • must be one of the enum members`
 
@@ -100,7 +100,7 @@ func (s *EnumSpec[T]) Validate() error {
 		return fmt.Errorf(
 			f,
 			s.name,
-			s.value,
+			typeName[T](),
 			s.desc,
 		)
 	}
@@ -113,7 +113,7 @@ func (s *EnumSpec[T]) Validate() error {
 	}
 
 	f := `ENVIRONMENT VARIABLES
- ✗ %s [%T enum] (%s)
+ ✗ %s [%s enum] (%s)
    ✓ must be set explicitly
    ✗ must be one of the enum members, got %q`
 
@@ -124,7 +124,7 @@ func (s *EnumSpec[T]) Validate() error {
 	return fmt.Errorf(
 		f,
 		s.name,
-		s.value,
+		typeName[T](),
 		s.desc,
 		raw,
 	)
