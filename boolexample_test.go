@@ -124,9 +124,9 @@ func ExampleBool_undefined() {
 
 	// Output:
 	// ENVIRONMENT VARIABLES
-	// 	✗ FERRITE_BOOL [bool] (example boolean variable)
-	// 		✗ must be set explicitly
-	// 		✗ must be either "true" or "false"
+	//  ✗ FERRITE_BOOL [bool] (example boolean variable)
+	//    ✗ must be set explicitly
+	//    ✗ must be either "true" or "false"
 }
 
 func ExampleBool_literals() {

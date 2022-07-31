@@ -2,7 +2,10 @@ package ferrite
 
 import "fmt"
 
-func Bool(name, desc string) RequiredBoolean {
+// Bool declares a boolean environment variable.
+func Bool(name, desc string, options ...SpecOption) RequiredBool {
+	opts := resolveSpecOptions(options)
+
 	spec := &boolSpec{
 		name: name,
 		desc: desc,
@@ -10,9 +13,9 @@ func Bool(name, desc string) RequiredBoolean {
 		f:    "false",
 	}
 
-	DefaultRegistry.Register(spec)
+	opts.Registry.Register(spec)
 
-	return RequiredBoolean{spec}
+	return RequiredBool{spec}
 }
 
 type boolSpec struct {
@@ -27,8 +30,8 @@ func (s *boolSpec) Name() string {
 	return s.name
 }
 
-func (s *boolSpec) Resolve(lookup Lookup) error {
-	raw, _ := lookup(s.name)
+func (s *boolSpec) Resolve(env Environment) error {
+	raw, _ := env.Lookup(s.name)
 
 	if raw == "" {
 		if s.def != nil {
@@ -37,9 +40,9 @@ func (s *boolSpec) Resolve(lookup Lookup) error {
 		}
 
 		m := `ENVIRONMENT VARIABLES
-	✗ %s [bool] (%s)
-		✗ must be set explicitly
-		✗ must be either "%s" or "%s"`
+ ✗ %s [bool] (%s)
+   ✗ must be set explicitly
+   ✗ must be either "%s" or "%s"`
 		return fmt.Errorf(m, s.name, s.desc, s.t, s.f)
 	}
 
@@ -50,44 +53,44 @@ func (s *boolSpec) Resolve(lookup Lookup) error {
 		s.value = false
 	default:
 		m := `ENVIRONMENT VARIABLES
-	✗ %s [bool] (%s)
-		✓ must be set explicitly
-		✗ must be either "%s" or "%s", got "%s"`
+ ✗ %s [bool] (%s)
+   ✓ must be set explicitly
+   ✗ must be either "%s" or "%s", got "%s"`
 		return fmt.Errorf(m, s.name, s.desc, s.t, s.f, raw)
 	}
 
 	return nil
 }
 
-type RequiredBoolean struct {
+type RequiredBool struct {
 	spec *boolSpec
 }
 
-func (b RequiredBoolean) Literals(t, f string) RequiredBoolean {
+func (b RequiredBool) Literals(t, f string) RequiredBool {
 	b.spec.t = t
 	b.spec.f = f
 	return b
 }
 
-func (b RequiredBoolean) Default(def bool) RequiredBoolean {
+func (b RequiredBool) Default(def bool) RequiredBool {
 	b.spec.def = &def
 	return b
 }
 
-func (b RequiredBoolean) Optional() OptionalBoolean {
+func (b RequiredBool) Optional() OptionalBool {
 	def := false
 	b.spec.def = &def
-	return OptionalBoolean{b.spec}
+	return OptionalBool{b.spec}
 }
 
-func (b RequiredBoolean) Value() bool {
+func (b RequiredBool) Value() bool {
 	return b.spec.value
 }
 
-type OptionalBoolean struct {
+type OptionalBool struct {
 	spec *boolSpec
 }
 
-func (b OptionalBoolean) Value() (bool, bool) {
+func (b OptionalBool) Value() (bool, bool) {
 	return b.spec.value, false
 }

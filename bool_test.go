@@ -1,52 +1,62 @@
 package ferrite_test
 
 import (
-	"os"
-
 	. "github.com/dogmatiq/ferrite"
 	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
 )
 
 var _ = Context("boolean values", func() {
+	var (
+		env      MemoryEnvironment
+		reg      *Registry
+		variable RequiredBool
+	)
+
 	BeforeEach(func() {
-		DefaultRegistry.Reset()
+		env = MemoryEnvironment{}
+
+		reg = &Registry{
+			Environment: env,
+		}
+
+		variable = Bool(
+			"FERRITE_TEST",
+			"<desc>",
+			WithRegistry(reg),
+		)
 	})
 
 	When("the value is not a valid literal", func() {
-		It("panics", func() {
-			os.Setenv("FERRITE_TEST", "<invalid>")
-			defer os.Unsetenv("FERRITE_TEST")
+		It("causes an error", func() {
+			env["FERRITE_TEST"] = "<invalid>"
 
-			Bool("FERRITE_TEST", "<desc>")
-
-			Expect(func() {
-				ResolveEnvironment()
-			}).To(PanicWith(
-				`ENVIRONMENT VARIABLES
-	✗ FERRITE_TEST [bool] (<desc>)
-		✓ must be set explicitly
-		✗ must be either "true" or "false", got "<invalid>"`,
-			))
+			expectErr(
+				reg.Resolve(),
+				`ENVIRONMENT VARIABLES`,
+				` ✗ FERRITE_TEST [bool] (<desc>)`,
+				`   ✓ must be set explicitly`,
+				`   ✗ must be either "true" or "false", got "<invalid>"`,
+			)
 		})
 	})
 
-	When("the value is not a valid custom literal", func() {
-		It("panics", func() {
-			os.Setenv("FERRITE_TEST", "true")
-			defer os.Unsetenv("FERRITE_TEST")
+	When("the value has custom literals", func() {
+		BeforeEach(func() {
+			variable.Literals("yes", "no")
+		})
 
-			Bool("FERRITE_TEST", "<desc>").
-				Literals("yes", "no")
+		When("the value is not a valid literal", func() {
+			It("causes an error", func() {
+				env["FERRITE_TEST"] = "true"
 
-			Expect(func() {
-				ResolveEnvironment()
-			}).To(PanicWith(
-				`ENVIRONMENT VARIABLES
-	✗ FERRITE_TEST [bool] (<desc>)
-		✓ must be set explicitly
-		✗ must be either "yes" or "no", got "true"`,
-			))
+				expectErr(
+					reg.Resolve(),
+					`ENVIRONMENT VARIABLES`,
+					` ✗ FERRITE_TEST [bool] (<desc>)`,
+					`   ✓ must be set explicitly`,
+					`   ✗ must be either "yes" or "no", got "true"`,
+				)
+			})
 		})
 	})
 })
