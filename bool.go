@@ -77,8 +77,8 @@ func (s *BoolSpec[T]) Validate() VariableValidationResult {
 		ExplicitValue: raw,
 	}
 
-	if s.def != nil {
-		if *s.def {
+	if v, ok := s.Default(); ok {
+		if v {
 			res.DefaultValue = s.t
 		} else {
 			res.DefaultValue = s.f

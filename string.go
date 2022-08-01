@@ -61,8 +61,8 @@ func (s *StringSpec[T]) Validate() VariableValidationResult {
 		Error:         nil,
 	}
 
-	if s.def != nil {
-		res.DefaultValue = fmt.Sprintf("%q", *s.def)
+	if v, ok := s.Default(); ok {
+		res.DefaultValue = fmt.Sprintf("%q", v)
 	}
 
 	if raw != "" {

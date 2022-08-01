@@ -103,8 +103,8 @@ func (s *EnumSpec[T]) Validate() VariableValidationResult {
 		ExplicitValue: raw,
 	}
 
-	if s.def != nil {
-		res.DefaultValue = enumKey(*s.def)
+	if v, ok := s.Default(); ok {
+		res.DefaultValue = enumKey(v)
 	}
 
 	if valid {

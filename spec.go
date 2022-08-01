@@ -17,9 +17,10 @@ type spec[T any] struct {
 	name string
 	desc string
 
-	isValidated bool
-	def         *T
-	value       T
+	isValidated  bool
+	hasDefault   bool
+	defaultValue T
+	value        T
 }
 
 func (s *spec[T]) Name() string {
@@ -34,8 +35,13 @@ func (s *spec[T]) Value() T {
 	return s.value
 }
 
+func (s *spec[T]) Default() (T, bool) {
+	return s.defaultValue, s.hasDefault
+}
+
 func (s *spec[T]) setDefault(v T) {
-	s.def = &v
+	s.hasDefault = true
+	s.defaultValue = v
 }
 
 func (s *spec[T]) useValue(v T) {
@@ -44,14 +50,13 @@ func (s *spec[T]) useValue(v T) {
 }
 
 func (s *spec[T]) useDefault() bool {
-	if s.def == nil {
-		return false
+	if s.hasDefault {
+		s.isValidated = true
+		s.value = s.defaultValue
+		return true
 	}
 
-	s.isValidated = true
-	s.value = *s.def
-
-	return true
+	return false
 }
 
 // SpecOption is an option that alters the behavior of a variable specification.
