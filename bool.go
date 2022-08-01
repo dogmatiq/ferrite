@@ -28,7 +28,7 @@ func BoolAs[T ~bool](name, desc string) *BoolSpec[T] {
 		f: "false",
 	}
 
-	Register[T](s)
+	Register(name, s)
 
 	return s
 }

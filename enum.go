@@ -19,7 +19,7 @@ func Enum[T any](name, desc string) *EnumSpec[T] {
 		},
 	}
 
-	Register[T](s)
+	Register(name, s)
 
 	return s
 }

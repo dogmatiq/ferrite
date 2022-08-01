@@ -26,7 +26,7 @@ func StringAs[T ~string](name, desc string) *StringSpec[T] {
 		},
 	}
 
-	Register[T](s)
+	Register(name, s)
 
 	return s
 }

@@ -17,6 +17,24 @@ func ValidateEnvironment() {
 	}
 }
 
+// Register adds a variable specification to the register.
+//
+// It can be used to register custom specifications with Ferrite's validation
+// system.
+func Register(name string, v Validator) {
+	if registry == nil {
+		registry = map[string]Validator{}
+	}
+
+	registry[name] = v
+}
+
+// Validator is an interface used to validate environment variables
+type Validator interface {
+	// Validate validates the environment variable.
+	Validate(name string) ValidationResult
+}
+
 // ValidationResult is the result of validating an environment variable.
 type ValidationResult struct {
 	// Name is the name of the environment variable.
@@ -63,6 +81,9 @@ type ValidationResult struct {
 }
 
 var (
+	// registry is a global registry of environment variable specs.
+	registry map[string]Validator
+
 	// output is the writer to which the validation result is written.
 	output io.Writer = os.Stderr
 
