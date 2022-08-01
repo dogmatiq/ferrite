@@ -1,30 +1,5 @@
 package ferrite
 
-// Spec is a specification for an environment variable.
-//
-// It describes the environment variable itself, and how to construct valid
-// values for the variable.
-type Spec interface {
-	// Names returns the names of the environment variables constrained by this
-	// spec.
-	Names() []string
-
-	// Validate validates the environment variable.
-	Validate(name string) ValidationResult
-}
-
-// SpecFor is a specification for an environment variable that produces values
-// of type T.
-type SpecFor[T any] interface {
-	Spec
-
-	// Value returns the value of the environment variable.
-	//
-	// It panics if the variable is invalid.
-	Value() T
-}
-
-// spec provides common functionality for Spec implementations.
 type spec[T any] struct {
 	name string
 	desc string
