@@ -11,19 +11,10 @@ import (
 )
 
 var _ = Describe("type EnumSpec", func() {
-	var (
-		reg  *Registry
-		spec *EnumSpec[enumMember]
-	)
+	var spec *EnumSpec[enumMember]
 
 	BeforeEach(func() {
-		reg = &Registry{}
-
-		spec = Enum[enumMember](
-			"FERRITE_ENUM",
-			"<desc>",
-			WithRegistry(reg),
-		).
+		spec = Enum[enumMember]("FERRITE_ENUM", "<desc>").
 			WithMembers(
 				member0,
 				member1,

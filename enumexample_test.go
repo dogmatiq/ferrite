@@ -8,8 +8,8 @@ import (
 )
 
 func ExampleEnum() {
-	Setup()
-	defer Teardown()
+	ferrite.Setup()
+	defer ferrite.Teardown()
 
 	value := ferrite.
 		Enum[string]("FERRITE_ENUM", "example enum variable").
@@ -25,8 +25,8 @@ func ExampleEnum() {
 }
 
 func ExampleEnum_default() {
-	Setup()
-	defer Teardown()
+	ferrite.Setup()
+	defer ferrite.Teardown()
 
 	value := ferrite.
 		Enum[string]("FERRITE_ENUM", "example enum variable").

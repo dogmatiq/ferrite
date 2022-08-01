@@ -9,11 +9,8 @@ import (
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func Bool(
-	name, desc string,
-	options ...SpecOption,
-) *BoolSpec[bool] {
-	return BoolAs[bool](name, desc, options...)
+func Bool(name, desc string) *BoolSpec[bool] {
+	return BoolAs[bool](name, desc)
 }
 
 // BoolAs configures an environment variable as a boolean using a user-defined
@@ -21,10 +18,7 @@ func Bool(
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func BoolAs[T ~bool](
-	name, desc string,
-	options ...SpecOption,
-) *BoolSpec[T] {
+func BoolAs[T ~bool](name, desc string) *BoolSpec[T] {
 	s := &BoolSpec[T]{
 		spec: spec[T]{
 			name: name,
@@ -34,7 +28,7 @@ func BoolAs[T ~bool](
 		f: "false",
 	}
 
-	register(s, options)
+	Register(s)
 
 	return s
 }
@@ -57,6 +51,7 @@ func (s *BoolSpec[T]) WithLiterals(t, f string) *BoolSpec[T] {
 
 	s.t = t
 	s.f = f
+
 	return s
 }
 

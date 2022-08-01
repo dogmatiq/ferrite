@@ -2,10 +2,34 @@ package ferrite
 
 import (
 	"fmt"
+	"io"
 	"strings"
 
 	"golang.org/x/exp/slices"
 )
+
+// ValidateEnvironment validates all environment variables.
+func ValidateEnvironment() {
+	if res := validate(); !res.IsValid() {
+		io.WriteString(output, res.String())
+		exit(1)
+	}
+}
+
+// validate parses and validates all environment variables in the registry,
+// allowing their associated values to be obtained.
+func validate() RegistryValidationResult {
+	var res RegistryValidationResult
+
+	for _, s := range registry {
+		res.Variables = append(
+			res.Variables,
+			s.Validate(),
+		)
+	}
+
+	return res
+}
 
 const (
 	// valid is the icon displayed next to valid environment variables.

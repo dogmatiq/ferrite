@@ -11,10 +11,7 @@ import (
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func Enum[T any](
-	name, desc string,
-	options ...SpecOption,
-) *EnumSpec[T] {
+func Enum[T any](name, desc string) *EnumSpec[T] {
 	s := &EnumSpec[T]{
 		spec: spec[T]{
 			name: name,
@@ -22,7 +19,7 @@ func Enum[T any](
 		},
 	}
 
-	register(s, options)
+	Register(s)
 
 	return s
 }

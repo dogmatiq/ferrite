@@ -12,19 +12,10 @@ import (
 var _ = Describe("type BoolSpec", func() {
 	type customBool bool
 
-	var (
-		reg  *Registry
-		spec *BoolSpec[customBool]
-	)
+	var spec *BoolSpec[customBool]
 
 	BeforeEach(func() {
-		reg = &Registry{}
-
-		spec = BoolAs[customBool](
-			"FERRITE_BOOL",
-			"<desc>",
-			WithRegistry(reg),
-		)
+		spec = BoolAs[customBool]("FERRITE_BOOL", "<desc>")
 	})
 
 	AfterEach(func() {

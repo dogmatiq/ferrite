@@ -7,8 +7,8 @@ import (
 )
 
 func ExampleValidateEnvironment_failure() {
-	Setup()
-	defer Teardown()
+	ferrite.Setup()
+	defer ferrite.Teardown()
 
 	ferrite.
 		String("FERRITE_STRING", "example string")

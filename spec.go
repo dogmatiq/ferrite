@@ -58,20 +58,3 @@ func (s *spec[T]) useDefault() bool {
 
 	return false
 }
-
-// SpecOption is an option that alters the behavior of a variable specification.
-type SpecOption func(*specOptions)
-
-// WithRegistry is an option that sets the registry to use for a specific
-// variable specification.
-func WithRegistry(r *Registry) SpecOption {
-	return func(opts *specOptions) {
-		opts.Registry = r
-	}
-}
-
-// specOptions is a set of options that alter the behavior of a variable
-// specification.
-type specOptions struct {
-	Registry *Registry
-}

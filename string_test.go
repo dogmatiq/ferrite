@@ -12,19 +12,10 @@ import (
 var _ = Describe("type StringSpec", func() {
 	type customString string
 
-	var (
-		reg  *Registry
-		spec *StringSpec[customString]
-	)
+	var spec *StringSpec[customString]
 
 	BeforeEach(func() {
-		reg = &Registry{}
-
-		spec = StringAs[customString](
-			"FERRITE_STRING",
-			"<desc>",
-			WithRegistry(reg),
-		)
+		spec = StringAs[customString]("FERRITE_STRING", "<desc>")
 	})
 
 	AfterEach(func() {

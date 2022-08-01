@@ -8,8 +8,8 @@ import (
 )
 
 func ExampleString() {
-	Setup()
-	defer Teardown()
+	ferrite.Setup()
+	defer ferrite.Teardown()
 
 	value := ferrite.
 		String(
@@ -27,8 +27,8 @@ func ExampleString() {
 }
 
 func ExampleString_default() {
-	Setup()
-	defer Teardown()
+	ferrite.Setup()
+	defer ferrite.Teardown()
 
 	value := ferrite.
 		String(

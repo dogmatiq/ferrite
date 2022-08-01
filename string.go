@@ -9,11 +9,8 @@ import (
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func String(
-	name, desc string,
-	options ...SpecOption,
-) *StringSpec[string] {
-	return StringAs[string](name, desc, options...)
+func String(name, desc string) *StringSpec[string] {
+	return StringAs[string](name, desc)
 }
 
 // StringAs configures an environment variable as a string using a user-defined
@@ -21,10 +18,7 @@ func String(
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func StringAs[T ~string](
-	name, desc string,
-	options ...SpecOption,
-) *StringSpec[T] {
+func StringAs[T ~string](name, desc string) *StringSpec[T] {
 	s := &StringSpec[T]{
 		spec: spec[T]{
 			name: name,
@@ -32,7 +26,7 @@ func StringAs[T ~string](
 		},
 	}
 
-	register(s, options)
+	Register(s)
 
 	return s
 }
