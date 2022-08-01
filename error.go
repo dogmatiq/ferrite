@@ -9,7 +9,7 @@ import (
 var (
 	// errUndefined is an error indicating that a mandatory environment variable
 	// with no default value was not set explicitly in the environment.
-	errUndefined = errors.New("must be defined and not empty")
+	errUndefined = errors.New("must not be empty")
 )
 
 // errNotInList returns an error indicating that the environment variable value

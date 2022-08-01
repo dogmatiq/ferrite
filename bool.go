@@ -63,44 +63,34 @@ func (s *BoolSpec[T]) Default(v T) *BoolSpec[T] {
 	return s
 }
 
-func (s *BoolSpec[T]) Describe() SpecDescription {
-	var def string
+// Validate validates the environment variable.
+func (s *BoolSpec[T]) Validate() VariableValidationResult {
+	raw := os.Getenv(s.name)
+	res := VariableValidationResult{
+		Name:          s.name,
+		Description:   s.desc,
+		ValidInput:    fmt.Sprintf("%s|%s", s.t, s.f),
+		ExplicitValue: raw,
+	}
+
 	if s.def != nil {
 		if *s.def {
-			def = s.t
+			res.DefaultValue = s.t
 		} else {
-			def = s.f
+			res.DefaultValue = s.f
 		}
 	}
 
-	return SpecDescription{
-		s.desc,
-		fmt.Sprintf("%s|%s", s.t, s.f),
-		def,
-	}
-}
-
-// Validate validates the environment variable.
-func (s *BoolSpec[T]) Validate() (value string, isDefault bool, _ error) {
-	switch os.Getenv(s.name) {
+	switch raw {
 	case s.t:
 		s.useValue(true)
-		return s.t, false, nil
-
 	case s.f:
 		s.useValue(false)
-		return s.f, false, nil
-
 	case "":
-		if v, err := s.useDefault(); err != nil {
-			return "", false, err
-		} else if v {
-			return s.t, true, nil
-		} else {
-			return s.f, true, nil
-		}
-
+		res.Error = s.useDefault()
 	default:
-		return "", false, errNotInList(s.t, s.f)
+		res.Error = errNotInList(s.t, s.f)
 	}
+
+	return res
 }

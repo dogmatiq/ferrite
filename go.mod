@@ -8,8 +8,11 @@ require (
 	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e
 )
 
+require google.golang.org/protobuf v1.28.0 // indirect
+
 require (
 	github.com/google/go-cmp v0.5.8 // indirect
+	github.com/jmalloc/gomegax v0.0.0-20200507221434-64fca4c0e03a
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
 	golang.org/x/sys v0.0.0-20220422013727-9388b58f7150 // indirect
 	golang.org/x/text v0.3.7 // indirect

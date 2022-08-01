@@ -80,50 +80,41 @@ func (s *EnumSpec[T]) Default(v T) *EnumSpec[T] {
 	panic("the default value must be one of the enum members")
 }
 
-func (s *EnumSpec[T]) Describe() SpecDescription {
-	var keys []string
-	for _, m := range s.members {
-		keys = append(keys, m.Key)
-	}
-
-	var def string
-	if s.def != nil {
-		def = enumKey(*s.def)
-	}
-
-	return SpecDescription{
-		s.desc,
-		strings.Join(keys, "|"),
-		def,
-	}
-}
-
 // Validate validates the environment variable.
 //
 // It returns a string representation of the value.
-func (s *EnumSpec[T]) Validate() (value string, isDefault bool, _ error) {
+func (s *EnumSpec[T]) Validate() VariableValidationResult {
 	raw := os.Getenv(s.name)
 
+	var keys []string
+	valid := false
 	for _, m := range s.members {
+		keys = append(keys, m.Key)
 		if raw == m.Key {
+			valid = true
 			s.useValue(m.Value)
-			return m.Key, false, nil
 		}
 	}
 
-	if raw != "" {
-		var keys []string
-		for _, m := range s.members {
-			keys = append(keys, m.Key)
-		}
-
-		return "", false, errNotInList(keys...)
+	res := VariableValidationResult{
+		Name:          s.name,
+		Description:   s.desc,
+		ValidInput:    strings.Join(keys, "|"),
+		ExplicitValue: raw,
 	}
 
-	v, err := s.useDefault()
-	if err != nil {
-		return "", false, err
+	if s.def != nil {
+		res.DefaultValue = enumKey(*s.def)
 	}
 
-	return enumKey(v), true, nil
+	switch {
+	case valid:
+		return res
+	case raw == "":
+		res.Error = s.useDefault()
+	default:
+		res.Error = errNotInList(keys...)
+	}
+
+	return res
 }

@@ -8,20 +8,8 @@ type Spec interface {
 	// Name returns the name of the environment variable.
 	Name() string
 
-	// Describe human-readable descriptions of the variable's behavior.
-	Describe() SpecDescription
-
 	// Validate validates the environment variable.
-	//
-	// It returns a string representation of the value.
-	Validate() (value string, isDefault bool, _ error)
-}
-
-// SpecDescription encapsulates descriptions of various aspects of a Spec.
-type SpecDescription struct {
-	Variable string
-	Input    string
-	Default  string
+	Validate() VariableValidationResult
 }
 
 // spec provides common functionality for Spec implementations.
@@ -55,15 +43,15 @@ func (s *spec[T]) useValue(v T) {
 	s.value = v
 }
 
-func (s *spec[T]) useDefault() (zero T, _ error) {
+func (s *spec[T]) useDefault() error {
 	if s.def == nil {
-		return zero, errUndefined
+		return errUndefined
 	}
 
 	s.isValidated = true
 	s.value = *s.def
 
-	return s.value, nil
+	return nil
 }
 
 // SpecOption is an option that alters the behavior of a variable specification.

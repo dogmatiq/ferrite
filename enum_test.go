@@ -54,8 +54,8 @@ var _ = Describe("type EnumSpec", func() {
 			func(value string, expect enumMember) {
 				os.Setenv("FERRITE_ENUM", value)
 
-				err := reg.Validate(nil)
-				Expect(err).ShouldNot(HaveOccurred())
+				res := spec.Validate()
+				Expect(res.Error).ShouldNot(HaveOccurred())
 				Expect(spec.Value()).To(Equal(expect))
 			},
 			Entry("member 0", "<member-0>", member0),
@@ -92,15 +92,15 @@ var _ = Describe("type EnumSpec", func() {
 			It("returns an error", func() {
 				os.Setenv("FERRITE_ENUM", "<invalid>")
 
-				err := reg.Validate(nil)
-				Expect(err).To(MatchError(`must be one of "<member-0>", "<member-1>" or "<member-2>"`))
+				res := spec.Validate()
+				Expect(res.Error).To(MatchError(`must be one of "<member-0>", "<member-1>" or "<member-2>"`))
 			})
 		})
 
 		When("the variable is not defined", func() {
 			It("returns an error", func() {
-				err := reg.Validate(nil)
-				Expect(err).To(MatchError("must be defined and not empty"))
+				res := spec.Validate()
+				Expect(res.Error).To(MatchError("must not be empty"))
 			})
 		})
 	})
@@ -113,8 +113,8 @@ var _ = Describe("type EnumSpec", func() {
 		Describe("func Value()", func() {
 			When("the variable is not defined", func() {
 				It("returns the default", func() {
-					err := reg.Validate(nil)
-					Expect(err).ShouldNot(HaveOccurred())
+					res := spec.Validate()
+					Expect(res.Error).ShouldNot(HaveOccurred())
 					Expect(spec.Value()).To(Equal(member1))
 				})
 			})

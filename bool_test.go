@@ -30,54 +30,75 @@ var _ = Describe("type BoolSpec", func() {
 		Teardown()
 	})
 
-	Describe("func Value()", func() {
-		DescribeTable(
-			"it returns the value associated with the literal",
-			func(value string, expect customBool) {
-				os.Setenv("FERRITE_BOOL", value)
-
-				err := reg.Validate(nil)
-				Expect(err).ShouldNot(HaveOccurred())
-				Expect(spec.Value()).To(Equal(expect))
-			},
-			Entry("true", "true", customBool(true)),
-			Entry("false", "false", customBool(false)),
-		)
-	})
-
-	Describe("func Validate()", func() {
-		When("the value is not a valid literal", func() {
-			It("returns an error", func() {
-				os.Setenv("FERRITE_BOOL", "<invalid>")
-
-				err := reg.Validate(nil)
-				Expect(err).Should(MatchError(`must be either "true" or "false"`))
-			})
-		})
-
-		When("the variable is not defined", func() {
-			It("returns an error", func() {
-				err := reg.Validate(nil)
-				Expect(err).Should(MatchError(`must be defined and not empty`))
-			})
-		})
-	})
-
-	When("there is a default value", func() {
+	When("the environment variable is set to one of the standard literals", func() {
 		Describe("func Value()", func() {
-			When("the variable is not defined", func() {
+			DescribeTable(
+				"it returns the value associated with the literal",
+				func(value string, expect customBool) {
+					os.Setenv("FERRITE_BOOL", value)
+
+					res := spec.Validate()
+					Expect(res.Error).ShouldNot(HaveOccurred())
+					Expect(spec.Value()).To(Equal(expect))
+				},
+				Entry("true", "true", customBool(true)),
+				Entry("false", "false", customBool(false)),
+			)
+		})
+
+		Describe("func Validate()", func() {
+			It("returns a successful result", func() {
+				os.Setenv("FERRITE_BOOL", "true")
+
+				Expect(spec.Validate()).To(Equal(
+					VariableValidationResult{
+						Name:          "FERRITE_BOOL",
+						Description:   "<desc>",
+						ValidInput:    "true|false",
+						DefaultValue:  "",
+						ExplicitValue: "true",
+						Error:         nil,
+					},
+				))
+			})
+		})
+	})
+
+	When("the environment variable is empty", func() {
+		When("there is a default value", func() {
+			Describe("func Value()", func() {
 				DescribeTable(
 					"it returns the default",
 					func(expect customBool) {
 						spec.Default(expect)
 
-						err := reg.Validate(nil)
-						Expect(err).ShouldNot(HaveOccurred())
+						res := spec.Validate()
+						Expect(res.Error).ShouldNot(HaveOccurred())
 						Expect(spec.Value()).To(Equal(expect))
 					},
 					Entry("true", customBool(true)),
 					Entry("false", customBool(false)),
 				)
+			})
+		})
+
+		When("there is no default value", func() {
+			Describe("func Validate()", func() {
+				It("it returns an error", func() {
+					res := spec.Validate()
+					Expect(res.Error).Should(MatchError(`must not be empty`))
+				})
+			})
+		})
+	})
+
+	When("the environment variable is set to some other value", func() {
+		Describe("func Validate()", func() {
+			It("returns an error", func() {
+				os.Setenv("FERRITE_BOOL", "<invalid>")
+
+				res := spec.Validate()
+				Expect(res.Error).Should(MatchError(`must be either "true" or "false"`))
 			})
 		})
 	})
@@ -87,29 +108,36 @@ var _ = Describe("type BoolSpec", func() {
 			spec.Literals("yes", "no")
 		})
 
-		Describe("func Value()", func() {
-			DescribeTable(
-				"it returns the value associated with the literal",
-				func(value string, expect customBool) {
-					os.Setenv("FERRITE_BOOL", value)
+		When("the environment variable is set to one of the custom literals", func() {
+			Describe("func Value()", func() {
+				DescribeTable(
+					"it returns the value associated with the literal",
+					func(value string, expect customBool) {
+						os.Setenv("FERRITE_BOOL", value)
 
-					err := reg.Validate(nil)
-					Expect(err).ShouldNot(HaveOccurred())
-					Expect(spec.Value()).To(Equal(expect))
-				},
-				Entry("true", "yes", customBool(true)),
-				Entry("false", "no", customBool(false)),
-			)
+						res := spec.Validate()
+						Expect(res.Error).ShouldNot(HaveOccurred())
+						Expect(spec.Value()).To(Equal(expect))
+					},
+					Entry("true", "yes", customBool(true)),
+					Entry("false", "no", customBool(false)),
+				)
+			})
 		})
 
-		Describe("func Validate()", func() {
-			When("the value is not a valid literal", func() {
-				It("returns an error", func() {
-					os.Setenv("FERRITE_BOOL", "true")
+		When("the environment variable is set to some other value", func() {
+			Describe("func Validate()", func() {
+				DescribeTable(
+					"it returns an error",
+					func(value string) {
+						os.Setenv("FERRITE_BOOL", value)
 
-					err := reg.Validate(nil)
-					Expect(err).Should(MatchError(`must be either "yes" or "no"`))
-				})
+						res := spec.Validate()
+						Expect(res.Error).Should(MatchError(`must be either "yes" or "no"`))
+					},
+					Entry("true", "true"),
+					Entry("false", "false"),
+				)
 			})
 		})
 	})

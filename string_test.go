@@ -34,8 +34,8 @@ var _ = Describe("type StringSpec", func() {
 		It("returns the value", func() {
 			os.Setenv("FERRITE_STRING", "<value>")
 
-			err := reg.Validate(nil)
-			Expect(err).ShouldNot(HaveOccurred())
+			res := spec.Validate()
+			Expect(res.Error).ShouldNot(HaveOccurred())
 			Expect(spec.Value()).To(Equal(customString("<value>")))
 		})
 	})
@@ -43,8 +43,8 @@ var _ = Describe("type StringSpec", func() {
 	Describe("func Validate()", func() {
 		When("the variable is not defined", func() {
 			It("returns an error", func() {
-				err := reg.Validate(nil)
-				Expect(err).To(MatchError("must be defined and not empty"))
+				res := spec.Validate()
+				Expect(res.Error).To(MatchError("must not be empty"))
 			})
 		})
 	})
@@ -56,8 +56,8 @@ var _ = Describe("type StringSpec", func() {
 					expect := customString("<value>")
 					spec.Default(expect)
 
-					err := reg.Validate(nil)
-					Expect(err).ShouldNot(HaveOccurred())
+					res := spec.Validate()
+					Expect(res.Error).ShouldNot(HaveOccurred())
 					Expect(spec.Value()).To(Equal(expect))
 				})
 			})
