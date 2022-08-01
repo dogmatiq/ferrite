@@ -46,19 +46,23 @@ type BoolSpec[T ~bool] struct {
 	t, f string
 }
 
-// Literals overrides the default literals used to represent true and false.
+// WithLiterals overrides the default literals used to represent true and false.
 //
 // The default literals "true" and "false" are not considered valid values when
 // using custom literals.
-func (s *BoolSpec[T]) Literals(t, f string) *BoolSpec[T] {
+func (s *BoolSpec[T]) WithLiterals(t, f string) *BoolSpec[T] {
+	if t == "" || f == "" {
+		panic("boolean literals must not be zero-length")
+	}
+
 	s.t = t
 	s.f = f
 	return s
 }
 
-// Default sets a default value to use when the environment variable is
+// WithDefault sets a default value to use when the environment variable is
 // undefined.
-func (s *BoolSpec[T]) Default(v T) *BoolSpec[T] {
+func (s *BoolSpec[T]) WithDefault(v T) *BoolSpec[T] {
 	s.setDefault(v)
 	return s
 }

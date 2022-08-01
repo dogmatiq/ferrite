@@ -35,7 +35,7 @@ func ExampleString_default() {
 			"FERRITE_STRING",
 			"example string variable",
 		).
-		Default("<default>")
+		WithDefault("<default>")
 
 	ferrite.ValidateEnvironment()
 

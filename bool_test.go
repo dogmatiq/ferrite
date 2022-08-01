@@ -72,7 +72,7 @@ var _ = Describe("type BoolSpec", func() {
 				DescribeTable(
 					"it returns the default",
 					func(expect customBool) {
-						spec.Default(expect)
+						spec.WithDefault(expect)
 
 						res := spec.Validate()
 						Expect(res.Error).ShouldNot(HaveOccurred())
@@ -85,7 +85,7 @@ var _ = Describe("type BoolSpec", func() {
 
 			Describe("func Validate()", func() {
 				It("returns a success result", func() {
-					spec.Default(true)
+					spec.WithDefault(true)
 
 					Expect(spec.Validate()).To(Equal(
 						VariableValidationResult{
@@ -143,7 +143,7 @@ var _ = Describe("type BoolSpec", func() {
 
 	When("there are custom literals", func() {
 		BeforeEach(func() {
-			spec.Literals("yes", "no")
+			spec.WithLiterals("yes", "no")
 		})
 
 		When("the environment variable is set to one of the custom literals", func() {
@@ -185,6 +185,24 @@ var _ = Describe("type BoolSpec", func() {
 					Entry("true", "true"),
 					Entry("false", "false"),
 				)
+			})
+		})
+	})
+
+	Describe("func WithLiterals()", func() {
+		When("the true literal is empty", func() {
+			It("panics", func() {
+				Expect(func() {
+					spec.WithLiterals("", "no")
+				}).To(PanicWith("boolean literals must not be zero-length"))
+			})
+		})
+
+		When("the true literal is empty", func() {
+			It("panics", func() {
+				Expect(func() {
+					spec.WithLiterals("yes", "")
+				}).To(PanicWith("boolean literals must not be zero-length"))
 			})
 		})
 	})

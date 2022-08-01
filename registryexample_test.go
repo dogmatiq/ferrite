@@ -15,7 +15,7 @@ func ExampleValidateEnvironment_failure() {
 
 	ferrite.
 		String("FERRITE_DEFAULTABLE", "string with a default").
-		Default("the default")
+		WithDefault("the default")
 
 	ferrite.
 		Bool("FERRITE_BOOL", "example boolean")

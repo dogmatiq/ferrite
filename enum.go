@@ -50,11 +50,11 @@ type enumMember[T any] struct {
 	Value T
 }
 
-// Members adds members to the enum.
+// WithMembers adds members to the enum.
 //
 // The environment variable must be set to the string representation of one of
-// the member values. Members must not have an empty string representation.
-func (s *EnumSpec[T]) Members(members ...T) *EnumSpec[T] {
+// the member values. WithMembers must not have an empty string representation.
+func (s *EnumSpec[T]) WithMembers(members ...T) *EnumSpec[T] {
 	for _, v := range members {
 		k := enumKey(v)
 
@@ -64,11 +64,11 @@ func (s *EnumSpec[T]) Members(members ...T) *EnumSpec[T] {
 	return s
 }
 
-// Default sets a default value to use when the environment variable is
+// WithDefault sets a default value to use when the environment variable is
 // undefined.
 //
 // It must be one of the allowed members.
-func (s *EnumSpec[T]) Default(v T) *EnumSpec[T] {
+func (s *EnumSpec[T]) WithDefault(v T) *EnumSpec[T] {
 	for _, m := range s.members {
 		k := enumKey(v)
 		if k == m.Key {

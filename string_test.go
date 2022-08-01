@@ -63,7 +63,7 @@ var _ = Describe("type StringSpec", func() {
 	When("the environment variable is empty", func() {
 		When("there is a default value", func() {
 			BeforeEach(func() {
-				spec.Default("<value>")
+				spec.WithDefault("<value>")
 			})
 
 			Describe("func Value()", func() {

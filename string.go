@@ -42,9 +42,9 @@ type StringSpec[T ~string] struct {
 	spec[T]
 }
 
-// Default sets a default value to use when the environment variable is
+// WithDefault sets a default value to use when the environment variable is
 // undefined.
-func (s *StringSpec[T]) Default(v T) *StringSpec[T] {
+func (s *StringSpec[T]) WithDefault(v T) *StringSpec[T] {
 	s.setDefault(v)
 	return s
 }

@@ -13,7 +13,7 @@ func ExampleEnum() {
 
 	value := ferrite.
 		Enum[string]("FERRITE_ENUM", "example enum variable").
-		Members("red", "green", "blue")
+		WithMembers("red", "green", "blue")
 
 	os.Setenv("FERRITE_ENUM", "red")
 	ferrite.ValidateEnvironment()
@@ -30,8 +30,8 @@ func ExampleEnum_default() {
 
 	value := ferrite.
 		Enum[string]("FERRITE_ENUM", "example enum variable").
-		Members("red", "green", "blue").
-		Default("green")
+		WithMembers("red", "green", "blue").
+		WithDefault("green")
 
 	ferrite.ValidateEnvironment()
 

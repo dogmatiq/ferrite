@@ -24,7 +24,7 @@ var _ = Describe("type EnumSpec", func() {
 			"<desc>",
 			WithRegistry(reg),
 		).
-			Members(
+			WithMembers(
 				member0,
 				member1,
 				member2,
@@ -73,7 +73,7 @@ var _ = Describe("type EnumSpec", func() {
 	When("the environment variable is empty", func() {
 		When("there is a default value", func() {
 			BeforeEach(func() {
-				spec = spec.Default(member1)
+				spec = spec.WithDefault(member1)
 			})
 
 			Describe("func Value()", func() {
@@ -142,24 +142,24 @@ var _ = Describe("type EnumSpec", func() {
 		})
 	})
 
-	Describe("func Members()", func() {
+	Describe("func WithMembers()", func() {
 		When("one of the members has an empty string representation", func() {
 			It("panics", func() {
 				Expect(func() {
 					Enum[string](
 						"FERRITE_ENUM",
 						"<desc>",
-					).Members("")
+					).WithMembers("")
 				}).To(PanicWith("enum member must not have an empty string representation"))
 			})
 		})
 	})
 
-	Describe("func Default()", func() {
+	Describe("func WithDefault()", func() {
 		When("the default value is not a member of the enum", func() {
 			It("panics", func() {
 				Expect(func() {
-					spec.Default(enumMember(100))
+					spec.WithDefault(enumMember(100))
 				}).To(PanicWith("the default value must be one of the enum members"))
 			})
 		})

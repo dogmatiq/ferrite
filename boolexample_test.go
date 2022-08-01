@@ -29,7 +29,7 @@ func ExampleBool_default() {
 
 	value := ferrite.
 		Bool("FERRITE_BOOL", "example boolean variable").
-		Default(true)
+		WithDefault(true)
 
 	ferrite.ValidateEnvironment()
 
@@ -45,7 +45,7 @@ func ExampleBool_customLiterals() {
 
 	value := ferrite.
 		Bool("FERRITE_BOOL", "example boolean variable").
-		Literals("yes", "no")
+		WithLiterals("yes", "no")
 
 	os.Setenv("FERRITE_BOOL", "yes")
 	ferrite.ValidateEnvironment()
