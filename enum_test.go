@@ -33,24 +33,28 @@ var _ = Describe("type EnumSpec", func() {
 		reg = &Registry{}
 
 		spec = Enum[enumMember](
-			"FERRITE_TEST",
+			"FERRITE_ENUM",
 			"<desc>",
 			WithRegistry(reg),
-		).Members(
-			member0,
-			member1,
-			member2,
-		)
+		).
+			Members(
+				member0,
+				member1,
+				member2,
+			)
+	})
+
+	AfterEach(func() {
+		Teardown()
 	})
 
 	Describe("func Value()", func() {
 		DescribeTable(
 			"it returns the value associated with the member key",
 			func(value string, expect enumMember) {
-				os.Setenv("FERRITE_TEST", value)
-				defer os.Unsetenv("FERRITE_TEST")
+				os.Setenv("FERRITE_ENUM", value)
 
-				err := reg.Validate()
+				err := reg.Validate(nil)
 				Expect(err).ShouldNot(HaveOccurred())
 				Expect(spec.Value()).To(Equal(expect))
 			},
@@ -65,7 +69,7 @@ var _ = Describe("type EnumSpec", func() {
 			It("panics", func() {
 				Expect(func() {
 					Enum[string](
-						"FERRITE_TEST",
+						"FERRITE_ENUM",
 						"<desc>",
 					).Members("")
 				}).To(PanicWith("enum member must not have an empty string representation"))
@@ -78,7 +82,7 @@ var _ = Describe("type EnumSpec", func() {
 			It("panics", func() {
 				Expect(func() {
 					spec.Default(enumMember(100))
-				}).To(PanicWith("default value must be one of the enum members"))
+				}).To(PanicWith("the default value must be one of the enum members"))
 			})
 		})
 	})
@@ -86,34 +90,17 @@ var _ = Describe("type EnumSpec", func() {
 	Describe("func Validate()", func() {
 		When("the value is not one of the member keys", func() {
 			It("returns an error", func() {
-				os.Setenv("FERRITE_TEST", "<invalid>")
-				defer os.Unsetenv("FERRITE_TEST")
+				os.Setenv("FERRITE_ENUM", "<invalid>")
 
-				expectErr(
-					reg.Validate(),
-					`ENVIRONMENT VARIABLES`,
-					` ✗ FERRITE_TEST [enumMember enum] (<desc>)`,
-					`   ✓ must be set explicitly`,
-					`   ✗ must be one of the enum members, got "<invalid>"`,
-					`     • <member-0>`,
-					`     • <member-1>`,
-					`     • <member-2>`,
-				)
+				err := reg.Validate(nil)
+				Expect(err).To(MatchError(`must be one of "<member-0>", "<member-1>" or "<member-2>"`))
 			})
 		})
 
 		When("the variable is not defined", func() {
 			It("returns an error", func() {
-				expectErr(
-					reg.Validate(),
-					`ENVIRONMENT VARIABLES`,
-					` ✗ FERRITE_TEST [enumMember enum] (<desc>)`,
-					`   ✗ must be set explicitly`,
-					`   • must be one of the enum members`,
-					`     • <member-0>`,
-					`     • <member-1>`,
-					`     • <member-2>`,
-				)
+				err := reg.Validate(nil)
+				Expect(err).To(MatchError("must be defined and not empty"))
 			})
 		})
 	})
@@ -126,7 +113,7 @@ var _ = Describe("type EnumSpec", func() {
 		Describe("func Value()", func() {
 			When("the variable is not defined", func() {
 				It("returns the default", func() {
-					err := reg.Validate()
+					err := reg.Validate(nil)
 					Expect(err).ShouldNot(HaveOccurred())
 					Expect(spec.Value()).To(Equal(member1))
 				})

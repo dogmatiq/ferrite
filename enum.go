@@ -3,6 +3,7 @@ package ferrite
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 // Enum configures an environment variable as an enumeration with members of
@@ -76,56 +77,53 @@ func (s *EnumSpec[T]) Default(v T) *EnumSpec[T] {
 		}
 	}
 
-	panic("default value must be one of the enum members")
+	panic("the default value must be one of the enum members")
+}
+
+func (s *EnumSpec[T]) Describe() SpecDescription {
+	var keys []string
+	for _, m := range s.members {
+		keys = append(keys, m.Key)
+	}
+
+	var def string
+	if s.def != nil {
+		def = enumKey(*s.def)
+	}
+
+	return SpecDescription{
+		s.desc,
+		strings.Join(keys, "|"),
+		def,
+	}
 }
 
 // Validate validates the environment variable.
-func (s *EnumSpec[T]) Validate() error {
+//
+// It returns a string representation of the value.
+func (s *EnumSpec[T]) Validate() (value string, isDefault bool, _ error) {
 	raw := os.Getenv(s.name)
-
-	if raw == "" {
-		if s.useDefault() {
-			return nil
-		}
-
-		f := `ENVIRONMENT VARIABLES
- ✗ %s [%s enum] (%s)
-   ✗ must be set explicitly
-   • must be one of the enum members`
-
-		for _, m := range s.members {
-			f += fmt.Sprintf("\n     • %s", m.Key)
-		}
-
-		return fmt.Errorf(
-			f,
-			s.name,
-			typeName[T](),
-			s.desc,
-		)
-	}
 
 	for _, m := range s.members {
 		if raw == m.Key {
 			s.useValue(m.Value)
-			return nil
+			return m.Key, false, nil
 		}
 	}
 
-	f := `ENVIRONMENT VARIABLES
- ✗ %s [%s enum] (%s)
-   ✓ must be set explicitly
-   ✗ must be one of the enum members, got %q`
+	if raw != "" {
+		var keys []string
+		for _, m := range s.members {
+			keys = append(keys, m.Key)
+		}
 
-	for _, m := range s.members {
-		f += fmt.Sprintf("\n     • %s", m.Key)
+		return "", false, errNotInList(keys...)
 	}
 
-	return fmt.Errorf(
-		f,
-		s.name,
-		typeName[T](),
-		s.desc,
-		raw,
-	)
+	v, err := s.useDefault()
+	if err != nil {
+		return "", false, err
+	}
+
+	return enumKey(v), true, nil
 }

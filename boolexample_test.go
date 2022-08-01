@@ -8,15 +8,13 @@ import (
 )
 
 func ExampleBool() {
-	ferrite.DefaultRegistry.Reset()
+	Setup()
+	defer Teardown()
+
+	value := ferrite.
+		Bool("FERRITE_BOOL", "example boolean variable")
+
 	os.Setenv("FERRITE_BOOL", "true")
-	defer os.Unsetenv("FERRITE_BOOL")
-
-	value := ferrite.Bool(
-		"FERRITE_BOOL",
-		"example boolean variable",
-	)
-
 	ferrite.ValidateEnvironment()
 
 	fmt.Println("value is", value.Value())
@@ -26,12 +24,11 @@ func ExampleBool() {
 }
 
 func ExampleBool_default() {
-	ferrite.DefaultRegistry.Reset()
+	Setup()
+	defer Teardown()
 
-	value := ferrite.Bool(
-		"FERRITE_BOOL",
-		"example boolean variable",
-	).
+	value := ferrite.
+		Bool("FERRITE_BOOL", "example boolean variable").
 		Default(true)
 
 	ferrite.ValidateEnvironment()
@@ -43,16 +40,14 @@ func ExampleBool_default() {
 }
 
 func ExampleBool_customLiterals() {
-	ferrite.DefaultRegistry.Reset()
-	os.Setenv("FERRITE_BOOL", "yes")
-	defer os.Unsetenv("FERRITE_BOOL")
+	Setup()
+	defer Teardown()
 
-	value := ferrite.Bool(
-		"FERRITE_BOOL",
-		"example boolean variable",
-	).
+	value := ferrite.
+		Bool("FERRITE_BOOL", "example boolean variable").
 		Literals("yes", "no")
 
+	os.Setenv("FERRITE_BOOL", "yes")
 	ferrite.ValidateEnvironment()
 
 	fmt.Println("value is", value.Value())

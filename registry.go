@@ -1,13 +1,30 @@
 package ferrite
 
+import (
+	"bytes"
+	"fmt"
+	"io"
+	"os"
+
+	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
+)
+
 // ValidateEnvironment validates all environment variables.
 //
 // It panics if any of the defined variables are invalid.
 func ValidateEnvironment() {
-	if err := DefaultRegistry.Validate(); err != nil {
-		panic(err.Error())
+	var w bytes.Buffer
+	if err := DefaultRegistry.Validate(&w); err != nil {
+		io.Copy(stderr, &w)
+		exit(1)
 	}
 }
+
+var (
+	stderr io.Writer = os.Stderr
+	exit             = os.Exit
+)
 
 // DefaultRegistry is the default environment variable registry.
 var DefaultRegistry = Registry{}
@@ -33,14 +50,63 @@ func (r *Registry) Reset() {
 
 // Validate parses and validates all environment variables in the registry,
 // allowing their associated values to be obtained.
-func (r *Registry) Validate() error {
-	for _, s := range r.specs {
-		if err := s.Validate(); err != nil {
-			return err
+func (r *Registry) Validate(w io.Writer) error {
+	var rows [][]string
+	var cause error
+
+	specs := maps.Values(r.specs)
+	slices.SortFunc(specs, func(a, b Spec) bool {
+		return a.Name() < b.Name()
+	})
+
+	for _, s := range specs {
+		marker := " "
+		status := ""
+
+		value, isDefault, err := s.Validate()
+		if err == nil {
+			if isDefault {
+				status = fmt.Sprintf("%s using default value", pass)
+			} else {
+				status = fmt.Sprintf("%s set to %s", pass, value)
+			}
+		} else {
+			marker = chevron
+			status = fmt.Sprintf("%s %s", fail, err)
+
+			if cause == nil {
+				cause = err
+			}
 		}
+
+		desc := s.Describe()
+
+		input := desc.Input
+		if desc.Default != "" {
+			input += " = " + desc.Default
+		}
+
+		rows = append(rows, []string{
+			" " + marker + " " + s.Name(),
+			input,
+			desc.Variable,
+			status,
+		})
 	}
 
-	return nil
+	if w == nil {
+		w = io.Discard
+	}
+
+	if _, err := fmt.Fprintln(w, "ENVIRONMENT VARIABLES:"); err != nil {
+		return err
+	}
+
+	if err := renderTable(w, rows); err != nil {
+		return err
+	}
+
+	return cause
 }
 
 // register adds s to the registry configured by the given options.

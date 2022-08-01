@@ -63,48 +63,44 @@ func (s *BoolSpec[T]) Default(v T) *BoolSpec[T] {
 	return s
 }
 
-// Validate validates the environment variable.
-func (s *BoolSpec[T]) Validate() error {
-	raw := os.Getenv(s.name)
-
-	if raw == "" {
-		if s.useDefault() {
-			return nil
+func (s *BoolSpec[T]) Describe() SpecDescription {
+	var def string
+	if s.def != nil {
+		if *s.def {
+			def = s.t
+		} else {
+			def = s.f
 		}
-
-		m := `ENVIRONMENT VARIABLES
- ✗ %s [%s] (%s)
-   ✗ must be set explicitly
-   - must be either "%s" or "%s"`
-		return fmt.Errorf(
-			m,
-			s.name,
-			typeName[T](),
-			s.desc,
-			s.t,
-			s.f,
-		)
 	}
 
-	switch raw {
+	return SpecDescription{
+		s.desc,
+		fmt.Sprintf("%s|%s", s.t, s.f),
+		def,
+	}
+}
+
+// Validate validates the environment variable.
+func (s *BoolSpec[T]) Validate() (value string, isDefault bool, _ error) {
+	switch os.Getenv(s.name) {
 	case s.t:
 		s.useValue(true)
+		return s.t, false, nil
+
 	case s.f:
 		s.useValue(false)
-	default:
-		m := `ENVIRONMENT VARIABLES
- ✗ %s [%s] (%s)
-   ✓ must be set explicitly
-   ✗ must be either "%s" or "%s", got "%s"`
-		return fmt.Errorf(
-			m,
-			s.name,
-			typeName[T](),
-			s.desc,
-			s.t, s.f,
-			raw,
-		)
-	}
+		return s.f, false, nil
 
-	return nil
+	case "":
+		if v, err := s.useDefault(); err != nil {
+			return "", false, err
+		} else if v {
+			return s.t, true, nil
+		} else {
+			return s.f, true, nil
+		}
+
+	default:
+		return "", false, errNotInList(s.t, s.f)
+	}
 }

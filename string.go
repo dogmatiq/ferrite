@@ -49,27 +49,33 @@ func (s *StringSpec[T]) Default(v T) *StringSpec[T] {
 	return s
 }
 
+func (s *StringSpec[T]) Describe() SpecDescription {
+	var def string
+	if s.def != nil {
+		def = fmt.Sprintf("%q", *s.def)
+	}
+
+	return SpecDescription{
+		s.desc,
+		typeName[T](),
+		def,
+	}
+}
+
 // Validate validates the environment variable.
-func (s *StringSpec[T]) Validate() error {
+func (s *StringSpec[T]) Validate() (value string, isDefault bool, _ error) {
 	raw := os.Getenv(s.name)
 
 	if raw == "" {
-		if s.useDefault() {
-			return nil
+		v, err := s.useDefault()
+		if err != nil {
+			return "", false, err
 		}
 
-		m := `ENVIRONMENT VARIABLES
- ✗ %s [%s] (%s)
-   ✗ must be set explicitly`
-		return fmt.Errorf(
-			m,
-			s.name,
-			typeName[T](),
-			s.desc,
-		)
+		return fmt.Sprintf("%q", v), true, nil
 	}
 
 	s.useValue(T(raw))
 
-	return nil
+	return fmt.Sprintf("%q", raw), false, nil
 }

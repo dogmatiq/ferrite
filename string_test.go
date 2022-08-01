@@ -20,18 +20,21 @@ var _ = Describe("type StringSpec", func() {
 		reg = &Registry{}
 
 		spec = StringAs[customString](
-			"FERRITE_TEST",
+			"FERRITE_STRING",
 			"<desc>",
 			WithRegistry(reg),
 		)
 	})
 
+	AfterEach(func() {
+		Teardown()
+	})
+
 	Describe("func Value()", func() {
 		It("returns the value", func() {
-			os.Setenv("FERRITE_TEST", "<value>")
-			defer os.Unsetenv("FERRITE_TEST")
+			os.Setenv("FERRITE_STRING", "<value>")
 
-			err := reg.Validate()
+			err := reg.Validate(nil)
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(spec.Value()).To(Equal(customString("<value>")))
 		})
@@ -40,12 +43,8 @@ var _ = Describe("type StringSpec", func() {
 	Describe("func Validate()", func() {
 		When("the variable is not defined", func() {
 			It("returns an error", func() {
-				expectErr(
-					reg.Validate(),
-					`ENVIRONMENT VARIABLES`,
-					` ✗ FERRITE_TEST [customString] (<desc>)`,
-					`   ✗ must be set explicitly`,
-				)
+				err := reg.Validate(nil)
+				Expect(err).To(MatchError("must be defined and not empty"))
 			})
 		})
 	})
@@ -57,7 +56,7 @@ var _ = Describe("type StringSpec", func() {
 					expect := customString("<value>")
 					spec.Default(expect)
 
-					err := reg.Validate()
+					err := reg.Validate(nil)
 					Expect(err).ShouldNot(HaveOccurred())
 					Expect(spec.Value()).To(Equal(expect))
 				})

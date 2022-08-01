@@ -8,16 +8,14 @@ import (
 )
 
 func ExampleEnum() {
-	ferrite.DefaultRegistry.Reset()
-	os.Setenv("FERRITE_ENUM", "red")
-	defer os.Unsetenv("FERRITE_ENUM")
+	Setup()
+	defer Teardown()
 
-	value := ferrite.Enum[string](
-		"FERRITE_ENUM",
-		"example enum variable",
-	).
+	value := ferrite.
+		Enum[string]("FERRITE_ENUM", "example enum variable").
 		Members("red", "green", "blue")
 
+	os.Setenv("FERRITE_ENUM", "red")
 	ferrite.ValidateEnvironment()
 
 	fmt.Println("value is", value.Value())
@@ -27,12 +25,11 @@ func ExampleEnum() {
 }
 
 func ExampleEnum_default() {
-	ferrite.DefaultRegistry.Reset()
+	Setup()
+	defer Teardown()
 
-	value := ferrite.Enum[string](
-		"FERRITE_ENUM",
-		"example enum variable",
-	).
+	value := ferrite.
+		Enum[string]("FERRITE_ENUM", "example enum variable").
 		Members("red", "green", "blue").
 		Default("green")
 

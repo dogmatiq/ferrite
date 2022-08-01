@@ -1,41 +1,66 @@
 package ferrite_test
 
 import (
+	"io"
 	"os"
 	"strings"
 
 	. "github.com/dogmatiq/ferrite"
-	. "github.com/jmalloc/gomegax"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
+func Setup() {
+	SetExitBehavior(os.Stdout, func(code int) {})
+}
+
+func Teardown() {
+	SetExitBehavior(os.Stderr, os.Exit)
+	DefaultRegistry.Reset()
+	unsetTestVariables()
+}
+
+func unsetTestVariables() {
+	for _, env := range os.Environ() {
+		if strings.HasPrefix(env, "FERRITE_") {
+			i := strings.Index(env, "=")
+			os.Unsetenv(env[:i])
+		}
+	}
+}
+
 var _ = Describe("func ValidateEnvironment()", func() {
-	BeforeEach(func() {
-		DefaultRegistry.Reset()
+	AfterEach(func() {
+		Teardown()
 	})
 
 	It("validates the default registry", func() {
-		os.Setenv("FERRITE_TEST", "true")
-		defer os.Unsetenv("FERRITE_TEST")
+		v := Bool("FERRITE_REG", "<desc>")
 
-		v := Bool("FERRITE_TEST", "<desc>")
+		os.Setenv("FERRITE_REG", "true")
 		ValidateEnvironment()
+
 		Expect(v.Value()).To(BeTrue())
 	})
 
-	It("panics if the registry can not be validated", func() {
-		Bool("FERRITE_TEST", "<desc>")
+	It("writes a report and exits if the registry can not be validated", func() {
+		called := false
+		// w := gbytes.NewBuffer()
 
-		Expect(func() {
-			ValidateEnvironment()
-		}).To(Panic())
+		SetExitBehavior(
+			io.Discard,
+			func(code int) {
+				Expect(code).To(Equal(1))
+				called = true
+			},
+		)
+
+		Bool("FERRITE_REG", "<desc>")
+
+		ValidateEnvironment()
+		// w.Close()
+
+		// Expect(w).To(gbytes.Say(`x`))
+		Expect(called).To(BeTrue())
 	})
 })
-
-func expectErr(err error, expect ...string) {
-	ExpectWithOffset(1, err).Should(HaveOccurred())
-
-	actual := strings.Split(err.Error(), "\n")
-	ExpectWithOffset(1, actual).To(EqualX(expect))
-}

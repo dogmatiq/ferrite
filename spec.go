@@ -5,8 +5,23 @@ package ferrite
 // It describes the environment variable itself, and how to construct valid
 // values for the variable.
 type Spec interface {
+	// Name returns the name of the environment variable.
 	Name() string
-	Validate() error
+
+	// Describe human-readable descriptions of the variable's behavior.
+	Describe() SpecDescription
+
+	// Validate validates the environment variable.
+	//
+	// It returns a string representation of the value.
+	Validate() (value string, isDefault bool, _ error)
+}
+
+// SpecDescription encapsulates descriptions of various aspects of a Spec.
+type SpecDescription struct {
+	Variable string
+	Input    string
+	Default  string
 }
 
 // spec provides common functionality for Spec implementations.
@@ -15,7 +30,6 @@ type spec[T any] struct {
 	desc string
 
 	isValidated bool
-	isDefault   bool
 	def         *T
 	value       T
 }
@@ -38,20 +52,18 @@ func (s *spec[T]) setDefault(v T) {
 
 func (s *spec[T]) useValue(v T) {
 	s.isValidated = true
-	s.isDefault = false
 	s.value = v
 }
 
-func (s *spec[T]) useDefault() bool {
+func (s *spec[T]) useDefault() (zero T, _ error) {
 	if s.def == nil {
-		return false
+		return zero, errUndefined
 	}
 
 	s.isValidated = true
-	s.isDefault = true
 	s.value = *s.def
 
-	return true
+	return s.value, nil
 }
 
 // SpecOption is an option that alters the behavior of a variable specification.

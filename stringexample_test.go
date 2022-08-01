@@ -8,9 +8,8 @@ import (
 )
 
 func ExampleString() {
-	ferrite.DefaultRegistry.Reset()
-	os.Setenv("FERRITE_STRING", "<value>")
-	defer os.Unsetenv("FERRITE_STRING")
+	Setup()
+	defer Teardown()
 
 	value := ferrite.
 		String(
@@ -18,6 +17,7 @@ func ExampleString() {
 			"example string variable",
 		)
 
+	os.Setenv("FERRITE_STRING", "<value>")
 	ferrite.ValidateEnvironment()
 
 	fmt.Println("value is", value.Value())
