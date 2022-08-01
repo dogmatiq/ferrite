@@ -10,10 +10,6 @@ type spec[T any] struct {
 	value        T
 }
 
-func (s *spec[T]) Names() []string {
-	return []string{s.name}
-}
-
 func (s *spec[T]) Default() (T, bool) {
 	return s.defaultValue, s.hasDefault
 }
