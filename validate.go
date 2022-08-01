@@ -32,7 +32,7 @@ func Register(name string, v Validator) {
 // Validator is an interface used to validate environment variables
 type Validator interface {
 	// Validate validates the environment variable.
-	Validate(name string) ValidationResult
+	Validate(name, value string) ValidationResult
 }
 
 // ValidationResult is the result of validating an environment variable.
@@ -97,7 +97,7 @@ func validate() (string, bool) {
 
 	ok := true
 	for n, s := range registry {
-		res := s.Validate(n)
+		res := s.Validate(n, os.Getenv(n))
 		if res.Error != nil {
 			ok = false
 		}

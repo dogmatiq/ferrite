@@ -2,7 +2,6 @@ package ferrite
 
 import (
 	"fmt"
-	"os"
 	"strings"
 )
 
@@ -80,14 +79,12 @@ func (s *EnumSpec[T]) WithDefault(v T) *EnumSpec[T] {
 // Validate validates the environment variable.
 //
 // It returns a string representation of the value.
-func (s *EnumSpec[T]) Validate(name string) ValidationResult {
-	raw := os.Getenv(name)
-
+func (s *EnumSpec[T]) Validate(name, value string) ValidationResult {
 	var keys []string
 	valid := false
 	for _, m := range s.members {
 		keys = append(keys, m.Key)
-		if raw == m.Key {
+		if value == m.Key {
 			valid = true
 			s.useValue(m.Value)
 		}
@@ -97,7 +94,7 @@ func (s *EnumSpec[T]) Validate(name string) ValidationResult {
 		Name:          name,
 		Description:   s.desc,
 		ValidInput:    strings.Join(keys, "|"),
-		ExplicitValue: raw,
+		ExplicitValue: value,
 	}
 
 	if v, ok := s.Default(); ok {
@@ -106,8 +103,8 @@ func (s *EnumSpec[T]) Validate(name string) ValidationResult {
 
 	if valid {
 		// nothing more to do
-	} else if raw != "" {
-		res.Error = fmt.Errorf("%s is not a member of the enum", raw)
+	} else if value != "" {
+		res.Error = fmt.Errorf("%s is not a member of the enum", value)
 	} else if s.useDefault() {
 		res.UsingDefault = true
 	} else {

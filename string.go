@@ -2,7 +2,6 @@ package ferrite
 
 import (
 	"fmt"
-	"os"
 )
 
 // String configures an environment variable as a string.
@@ -44,14 +43,13 @@ func (s *StringSpec[T]) WithDefault(v T) *StringSpec[T] {
 }
 
 // Validate validates the environment variable.
-func (s *StringSpec[T]) Validate(name string) ValidationResult {
-	raw := os.Getenv(name)
+func (s *StringSpec[T]) Validate(name, value string) ValidationResult {
 	res := ValidationResult{
 		Name:          name,
 		Description:   s.desc,
 		ValidInput:    fmt.Sprintf("[%T]", s.value),
 		DefaultValue:  "",
-		ExplicitValue: fmt.Sprintf("%q", raw),
+		ExplicitValue: fmt.Sprintf("%q", value),
 		Error:         nil,
 	}
 
@@ -59,8 +57,8 @@ func (s *StringSpec[T]) Validate(name string) ValidationResult {
 		res.DefaultValue = fmt.Sprintf("%q", v)
 	}
 
-	if raw != "" {
-		s.useValue(T(raw))
+	if value != "" {
+		s.useValue(T(value))
 	} else if s.useDefault() {
 		res.UsingDefault = true
 	} else {

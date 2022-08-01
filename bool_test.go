@@ -29,7 +29,7 @@ var _ = Describe("type BoolSpec", func() {
 				func(value string, expect customBool) {
 					os.Setenv("FERRITE_BOOL", value)
 
-					res := spec.Validate("FERRITE_BOOL")
+					res := spec.Validate("FERRITE_BOOL", value)
 					Expect(res.Error).ShouldNot(HaveOccurred())
 					Expect(spec.Value()).To(Equal(expect))
 				},
@@ -42,7 +42,7 @@ var _ = Describe("type BoolSpec", func() {
 			It("returns a successful result", func() {
 				os.Setenv("FERRITE_BOOL", "true")
 
-				Expect(spec.Validate("FERRITE_BOOL")).To(Equal(
+				Expect(spec.Validate("FERRITE_BOOL", "true")).To(Equal(
 					ValidationResult{
 						Name:          "FERRITE_BOOL",
 						Description:   "<desc>",
@@ -65,7 +65,7 @@ var _ = Describe("type BoolSpec", func() {
 					func(expect customBool) {
 						spec.WithDefault(expect)
 
-						res := spec.Validate("FERRITE_BOOL")
+						res := spec.Validate("FERRITE_BOOL", "")
 						Expect(res.Error).ShouldNot(HaveOccurred())
 						Expect(spec.Value()).To(Equal(expect))
 					},
@@ -78,7 +78,7 @@ var _ = Describe("type BoolSpec", func() {
 				It("returns a success result", func() {
 					spec.WithDefault(true)
 
-					Expect(spec.Validate("FERRITE_BOOL")).To(Equal(
+					Expect(spec.Validate("FERRITE_BOOL", "")).To(Equal(
 						ValidationResult{
 							Name:          "FERRITE_BOOL",
 							Description:   "<desc>",
@@ -96,7 +96,7 @@ var _ = Describe("type BoolSpec", func() {
 		When("there is no default value", func() {
 			Describe("func Validate()", func() {
 				It("returns a failure result", func() {
-					Expect(spec.Validate("FERRITE_BOOL")).To(Equal(
+					Expect(spec.Validate("FERRITE_BOOL", "")).To(Equal(
 						ValidationResult{
 							Name:          "FERRITE_BOOL",
 							Description:   "<desc>",
@@ -117,7 +117,7 @@ var _ = Describe("type BoolSpec", func() {
 			It("returns a failure result", func() {
 				os.Setenv("FERRITE_BOOL", "<invalid>")
 
-				Expect(spec.Validate("FERRITE_BOOL")).To(Equal(
+				Expect(spec.Validate("FERRITE_BOOL", "<invalid>")).To(Equal(
 					ValidationResult{
 						Name:          "FERRITE_BOOL",
 						Description:   "<desc>",
@@ -144,7 +144,7 @@ var _ = Describe("type BoolSpec", func() {
 					func(value string, expect customBool) {
 						os.Setenv("FERRITE_BOOL", value)
 
-						res := spec.Validate("FERRITE_BOOL")
+						res := spec.Validate("FERRITE_BOOL", value)
 						Expect(res.Error).ShouldNot(HaveOccurred())
 						Expect(spec.Value()).To(Equal(expect))
 					},
@@ -161,7 +161,7 @@ var _ = Describe("type BoolSpec", func() {
 					func(value string) {
 						os.Setenv("FERRITE_BOOL", value)
 
-						Expect(spec.Validate("FERRITE_BOOL")).To(Equal(
+						Expect(spec.Validate("FERRITE_BOOL", value)).To(Equal(
 							ValidationResult{
 								Name:          "FERRITE_BOOL",
 								Description:   "<desc>",
