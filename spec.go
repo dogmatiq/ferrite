@@ -12,6 +12,17 @@ type Spec interface {
 	Validate() VariableValidationResult
 }
 
+// SpecFor is a specification for an environment variable that produces values
+// of type T.
+type SpecFor[T any] interface {
+	Spec
+
+	// Value returns the value of the environment variable.
+	//
+	// It panics if the variable is invalid.
+	Value() T
+}
+
 // spec provides common functionality for Spec implementations.
 type spec[T any] struct {
 	name string

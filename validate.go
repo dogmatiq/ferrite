@@ -3,6 +3,7 @@ package ferrite
 import (
 	"fmt"
 	"io"
+	"os"
 	"strings"
 
 	"golang.org/x/exp/slices"
@@ -15,6 +16,14 @@ func ValidateEnvironment() {
 		exit(1)
 	}
 }
+
+var (
+	// output is the writer to which the validation result is written.
+	output io.Writer = os.Stderr
+
+	// exit is called to exit the process when validation fails.
+	exit = os.Exit
+)
 
 // validate parses and validates all environment variables in the registry,
 // allowing their associated values to be obtained.
