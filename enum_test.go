@@ -48,7 +48,7 @@ var _ = Describe("type EnumSpec", func() {
 				os.Setenv("FERRITE_ENUM", "<member-1>")
 
 				Expect(spec.Validate()).To(Equal(
-					VariableValidationResult{
+					ValidationResult{
 						Name:          "FERRITE_ENUM",
 						Description:   "<desc>",
 						ValidInput:    "<member-0>|<member-1>|<member-2>",
@@ -80,7 +80,7 @@ var _ = Describe("type EnumSpec", func() {
 			Describe("func Validate()", func() {
 				It("returns a success result", func() {
 					Expect(spec.Validate()).To(Equal(
-						VariableValidationResult{
+						ValidationResult{
 							Name:          "FERRITE_ENUM",
 							Description:   "<desc>",
 							ValidInput:    "<member-0>|<member-1>|<member-2>",
@@ -98,7 +98,7 @@ var _ = Describe("type EnumSpec", func() {
 			Describe("func Validate()", func() {
 				It("returns a failure result", func() {
 					Expect(spec.Validate()).To(Equal(
-						VariableValidationResult{
+						ValidationResult{
 							Name:          "FERRITE_ENUM",
 							Description:   "<desc>",
 							ValidInput:    "<member-0>|<member-1>|<member-2>",
@@ -119,7 +119,7 @@ var _ = Describe("type EnumSpec", func() {
 				os.Setenv("FERRITE_ENUM", "<invalid>")
 
 				Expect(spec.Validate()).To(Equal(
-					VariableValidationResult{
+					ValidationResult{
 						Name:          "FERRITE_ENUM",
 						Description:   "<desc>",
 						ValidInput:    "<member-0>|<member-1>|<member-2>",

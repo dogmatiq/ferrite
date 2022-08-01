@@ -6,6 +6,9 @@ var (
 )
 
 // Register adds a variable specification to the register.
+//
+// It can be used to register custom specifications with Ferrite's validation
+// system.
 func Register[T any, S SpecFor[T]](s S) {
 	if registry == nil {
 		registry = map[string]Spec{}

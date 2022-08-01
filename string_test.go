@@ -38,7 +38,7 @@ var _ = Describe("type StringSpec", func() {
 		Describe("func Validate()", func() {
 			It("returns a successful result", func() {
 				Expect(spec.Validate()).To(Equal(
-					VariableValidationResult{
+					ValidationResult{
 						Name:          "FERRITE_STRING",
 						Description:   "<desc>",
 						ValidInput:    "[ferrite_test.customString]",
@@ -68,7 +68,7 @@ var _ = Describe("type StringSpec", func() {
 			Describe("func Validate()", func() {
 				It("returns a success result", func() {
 					Expect(spec.Validate()).To(Equal(
-						VariableValidationResult{
+						ValidationResult{
 							Name:          "FERRITE_STRING",
 							Description:   "<desc>",
 							ValidInput:    "[ferrite_test.customString]",
@@ -86,7 +86,7 @@ var _ = Describe("type StringSpec", func() {
 			Describe("func Validate()", func() {
 				It("returns a failure result", func() {
 					Expect(spec.Validate()).To(Equal(
-						VariableValidationResult{
+						ValidationResult{
 							Name:          "FERRITE_STRING",
 							Description:   "<desc>",
 							ValidInput:    "[ferrite_test.customString]",

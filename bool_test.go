@@ -43,7 +43,7 @@ var _ = Describe("type BoolSpec", func() {
 				os.Setenv("FERRITE_BOOL", "true")
 
 				Expect(spec.Validate()).To(Equal(
-					VariableValidationResult{
+					ValidationResult{
 						Name:          "FERRITE_BOOL",
 						Description:   "<desc>",
 						ValidInput:    "true|false",
@@ -79,7 +79,7 @@ var _ = Describe("type BoolSpec", func() {
 					spec.WithDefault(true)
 
 					Expect(spec.Validate()).To(Equal(
-						VariableValidationResult{
+						ValidationResult{
 							Name:          "FERRITE_BOOL",
 							Description:   "<desc>",
 							ValidInput:    "true|false",
@@ -97,7 +97,7 @@ var _ = Describe("type BoolSpec", func() {
 			Describe("func Validate()", func() {
 				It("returns a failure result", func() {
 					Expect(spec.Validate()).To(Equal(
-						VariableValidationResult{
+						ValidationResult{
 							Name:          "FERRITE_BOOL",
 							Description:   "<desc>",
 							ValidInput:    "true|false",
@@ -118,7 +118,7 @@ var _ = Describe("type BoolSpec", func() {
 				os.Setenv("FERRITE_BOOL", "<invalid>")
 
 				Expect(spec.Validate()).To(Equal(
-					VariableValidationResult{
+					ValidationResult{
 						Name:          "FERRITE_BOOL",
 						Description:   "<desc>",
 						ValidInput:    "true|false",
@@ -162,7 +162,7 @@ var _ = Describe("type BoolSpec", func() {
 						os.Setenv("FERRITE_BOOL", value)
 
 						Expect(spec.Validate()).To(Equal(
-							VariableValidationResult{
+							ValidationResult{
 								Name:          "FERRITE_BOOL",
 								Description:   "<desc>",
 								ValidInput:    "yes|no",

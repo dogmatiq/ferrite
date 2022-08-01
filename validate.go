@@ -11,10 +11,55 @@ import (
 
 // ValidateEnvironment validates all environment variables.
 func ValidateEnvironment() {
-	if res := validate(); !res.IsValid() {
-		io.WriteString(output, res.String())
+	if result, ok := validate(); !ok {
+		io.WriteString(output, result)
 		exit(1)
 	}
+}
+
+// ValidationResult is the result of validating an environment variable.
+type ValidationResult struct {
+	// Name is the name of the environment variable.
+	Name string
+
+	// Description is a human-readable description of the environment variable.
+	Description string
+
+	// ValidInput is a human-readable description of what constitutes valid
+	// input for this environment variable.
+	//
+	// It is free-form text, but spec implementations SHOULD adhere to the
+	// following conventions:
+	//
+	//  - separate enum style inputs with pipe, e.g. "true|false"
+	//  - render type names inside square barckets, e.g. "[string]"
+	ValidInput string
+
+	// DefaultValue is the environment variable's default value, rendered as it
+	// should be displayed in the console.
+	//
+	// This is not necessarily equal to a raw environment variable value. For
+	// example, StringSpec renders strings with surrounding quotes.
+	//
+	// It must be non-empty if the environment variable has a default value;
+	// otherwise it must be empty.
+	DefaultValue string
+
+	// ExplicitValue is the environment variable's value as captured from the
+	// environment, rendered as it should be displayed in the console.
+	//
+	// This is not necessarily equal to the raw environment variable value. For
+	// example, StringSpec renders strings with surrounding quotes.
+	ExplicitValue string
+
+	// UsingDefault is true if the environment variable's default value
+	// would be retuned by the specs Value() method.
+	UsingDefault bool
+
+	// Error is an error describing why the validation failed.
+	//
+	// If it is nil, the validation is considered successful.
+	Error error
 }
 
 var (
@@ -25,19 +70,21 @@ var (
 	exit = os.Exit
 )
 
-// validate parses and validates all environment variables in the registry,
-// allowing their associated values to be obtained.
-func validate() RegistryValidationResult {
-	var res RegistryValidationResult
+// validate parses and validates all environment variables.
+func validate() (string, bool) {
+	var results []ValidationResult
 
+	ok := true
 	for _, s := range registry {
-		res.Variables = append(
-			res.Variables,
-			s.Validate(),
-		)
+		res := s.Validate()
+		if res.Error != nil {
+			ok = false
+		}
+
+		results = append(results, res)
 	}
 
-	return res
+	return renderResults(results), ok
 }
 
 const (
@@ -52,33 +99,18 @@ const (
 	chevron = "❯"
 )
 
-// RegistryValidationResult is the result of validating environment variables.
-type RegistryValidationResult struct {
-	Variables []VariableValidationResult
-}
-
-// IsValid returns true if all environment variables in the registry are valid.
-func (r RegistryValidationResult) IsValid() bool {
-	for _, v := range r.Variables {
-		if v.Error != nil {
-			return false
-		}
-	}
-
-	return true
-}
-
-// String returns a human-readable representation of the validation result.
-func (r RegistryValidationResult) String() string {
+// renderResults renders a set of validation results as a human-readable string.
+func renderResults(results []ValidationResult) string {
 	slices.SortFunc(
-		r.Variables,
-		func(a, b VariableValidationResult) bool {
+		results,
+		func(a, b ValidationResult) bool {
 			return a.Name < b.Name
 		},
 	)
 
 	var t table
-	for _, v := range r.Variables {
+
+	for _, v := range results {
 		name := " "
 		if v.Error != nil {
 			name += chevron
@@ -105,18 +137,6 @@ func (r RegistryValidationResult) String() string {
 	}
 
 	return "ENVIRONMENT VARIABLES:\n" + t.String()
-}
-
-// VariableValidationResult contains information about a single environment
-// variable on a RegistryValidationResult.
-type VariableValidationResult struct {
-	Name          string
-	Description   string
-	ValidInput    string
-	DefaultValue  string
-	ExplicitValue string
-	UsingDefault  bool
-	Error         error
 }
 
 // table renders a column-aligned table.

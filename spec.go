@@ -9,7 +9,7 @@ type Spec interface {
 	Name() string
 
 	// Validate validates the environment variable.
-	Validate() VariableValidationResult
+	Validate() ValidationResult
 }
 
 // SpecFor is a specification for an environment variable that produces values
