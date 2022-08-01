@@ -55,7 +55,7 @@ func (s *StringSpec[T]) Validate() VariableValidationResult {
 	res := VariableValidationResult{
 		Name:          s.name,
 		Description:   s.desc,
-		ValidInput:    typeName[T](),
+		ValidInput:    fmt.Sprintf("[%T]", s.value),
 		DefaultValue:  "",
 		ExplicitValue: fmt.Sprintf("%q", raw),
 		Error:         nil,
@@ -65,11 +65,12 @@ func (s *StringSpec[T]) Validate() VariableValidationResult {
 		res.DefaultValue = fmt.Sprintf("%q", *s.def)
 	}
 
-	if raw == "" {
-		res.UsingDefault = true
-		res.Error = s.useDefault()
-	} else {
+	if raw != "" {
 		s.useValue(T(raw))
+	} else if s.useDefault() {
+		res.UsingDefault = true
+	} else {
+		res.Error = errUndefined
 	}
 
 	return res

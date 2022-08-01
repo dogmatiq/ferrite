@@ -43,15 +43,15 @@ func (s *spec[T]) useValue(v T) {
 	s.value = v
 }
 
-func (s *spec[T]) useDefault() error {
+func (s *spec[T]) useDefault() bool {
 	if s.def == nil {
-		return errUndefined
+		return false
 	}
 
 	s.isValidated = true
 	s.value = *s.def
 
-	return nil
+	return true
 }
 
 // SpecOption is an option that alters the behavior of a variable specification.

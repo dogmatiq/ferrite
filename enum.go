@@ -107,13 +107,14 @@ func (s *EnumSpec[T]) Validate() VariableValidationResult {
 		res.DefaultValue = enumKey(*s.def)
 	}
 
-	switch {
-	case valid:
-		return res
-	case raw == "":
-		res.Error = s.useDefault()
-	default:
-		res.Error = errNotInList(keys...)
+	if valid {
+		// nothing more to do
+	} else if raw != "" {
+		res.Error = fmt.Errorf("%s is not a member of the enum", raw)
+	} else if s.useDefault() {
+		res.UsingDefault = true
+	} else {
+		res.Error = errUndefined
 	}
 
 	return res

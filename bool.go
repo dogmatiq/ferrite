@@ -81,15 +81,16 @@ func (s *BoolSpec[T]) Validate() VariableValidationResult {
 		}
 	}
 
-	switch raw {
-	case s.t:
+	if raw == s.t {
 		s.useValue(true)
-	case s.f:
+	} else if raw == s.f {
 		s.useValue(false)
-	case "":
-		res.Error = s.useDefault()
-	default:
-		res.Error = errNotInList(s.t, s.f)
+	} else if raw != "" {
+		res.Error = fmt.Errorf("must be either %q or %q", s.t, s.f)
+	} else if s.useDefault() {
+		res.UsingDefault = true
+	} else {
+		res.Error = errUndefined
 	}
 
 	return res

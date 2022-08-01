@@ -28,7 +28,7 @@ func ExampleValidateEnvironment_failure() {
 
 	// Output:
 	// ENVIRONMENT VARIABLES:
-	//    FERRITE_BOOL         true|false              example boolean        ✓ set to false
-	//    FERRITE_DEFAULTABLE  string = "the default"  string with a default  ✓ using default value
-	//  ❯ FERRITE_STRING       string                  example string         ✗ must not be empty
+	//    FERRITE_BOOL         true|false                example boolean        ✓ set to false
+	//    FERRITE_DEFAULTABLE  [string] = "the default"  string with a default  ✓ using default value
+	//  ❯ FERRITE_STRING       [string]                  example string         ✗ must not be empty
 }

@@ -1,6 +1,7 @@
 package ferrite_test
 
 import (
+	"errors"
 	"os"
 
 	. "github.com/dogmatiq/ferrite"
@@ -57,6 +58,7 @@ var _ = Describe("type BoolSpec", func() {
 						ValidInput:    "true|false",
 						DefaultValue:  "",
 						ExplicitValue: "true",
+						UsingDefault:  false,
 						Error:         nil,
 					},
 				))
@@ -80,13 +82,40 @@ var _ = Describe("type BoolSpec", func() {
 					Entry("false", customBool(false)),
 				)
 			})
+
+			Describe("func Validate()", func() {
+				It("returns a success result", func() {
+					spec.Default(true)
+
+					Expect(spec.Validate()).To(Equal(
+						VariableValidationResult{
+							Name:          "FERRITE_BOOL",
+							Description:   "<desc>",
+							ValidInput:    "true|false",
+							DefaultValue:  "true",
+							ExplicitValue: "",
+							UsingDefault:  true,
+							Error:         nil,
+						},
+					))
+				})
+			})
 		})
 
 		When("there is no default value", func() {
 			Describe("func Validate()", func() {
-				It("it returns an error", func() {
-					res := spec.Validate()
-					Expect(res.Error).Should(MatchError(`must not be empty`))
+				It("returns a failure result", func() {
+					Expect(spec.Validate()).To(Equal(
+						VariableValidationResult{
+							Name:          "FERRITE_BOOL",
+							Description:   "<desc>",
+							ValidInput:    "true|false",
+							DefaultValue:  "",
+							ExplicitValue: "",
+							UsingDefault:  false,
+							Error:         errors.New(`must not be empty`),
+						},
+					))
 				})
 			})
 		})
@@ -94,11 +123,20 @@ var _ = Describe("type BoolSpec", func() {
 
 	When("the environment variable is set to some other value", func() {
 		Describe("func Validate()", func() {
-			It("returns an error", func() {
+			It("returns a failure result", func() {
 				os.Setenv("FERRITE_BOOL", "<invalid>")
 
-				res := spec.Validate()
-				Expect(res.Error).Should(MatchError(`must be either "true" or "false"`))
+				Expect(spec.Validate()).To(Equal(
+					VariableValidationResult{
+						Name:          "FERRITE_BOOL",
+						Description:   "<desc>",
+						ValidInput:    "true|false",
+						DefaultValue:  "",
+						ExplicitValue: "<invalid>",
+						UsingDefault:  false,
+						Error:         errors.New(`must be either "true" or "false"`),
+					},
+				))
 			})
 		})
 	})
@@ -128,12 +166,21 @@ var _ = Describe("type BoolSpec", func() {
 		When("the environment variable is set to some other value", func() {
 			Describe("func Validate()", func() {
 				DescribeTable(
-					"it returns an error",
+					"it returns a failure result",
 					func(value string) {
 						os.Setenv("FERRITE_BOOL", value)
 
-						res := spec.Validate()
-						Expect(res.Error).Should(MatchError(`must be either "yes" or "no"`))
+						Expect(spec.Validate()).To(Equal(
+							VariableValidationResult{
+								Name:          "FERRITE_BOOL",
+								Description:   "<desc>",
+								ValidInput:    "yes|no",
+								DefaultValue:  "",
+								ExplicitValue: value,
+								UsingDefault:  false,
+								Error:         errors.New(`must be either "yes" or "no"`),
+							},
+						))
 					},
 					Entry("true", "true"),
 					Entry("false", "false"),
