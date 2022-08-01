@@ -25,3 +25,22 @@ func ExampleString() {
 	// Output:
 	// value is <value>
 }
+
+func ExampleString_default() {
+	Setup()
+	defer Teardown()
+
+	value := ferrite.
+		String(
+			"FERRITE_STRING",
+			"example string variable",
+		).
+		Default("<default>")
+
+	ferrite.ValidateEnvironment()
+
+	fmt.Println("value is", value.Value())
+
+	// Output:
+	// value is <default>
+}
