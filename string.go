@@ -44,10 +44,10 @@ func (s *StringSpec[T]) WithDefault(v T) *StringSpec[T] {
 }
 
 // Validate validates the environment variable.
-func (s *StringSpec[T]) Validate() ValidationResult {
-	raw := os.Getenv(s.name)
+func (s *StringSpec[T]) Validate(name string) ValidationResult {
+	raw := os.Getenv(name)
 	res := ValidationResult{
-		Name:          s.name,
+		Name:          name,
 		Description:   s.desc,
 		ValidInput:    fmt.Sprintf("[%T]", s.value),
 		DefaultValue:  "",

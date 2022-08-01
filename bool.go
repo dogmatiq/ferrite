@@ -63,10 +63,10 @@ func (s *BoolSpec[T]) WithDefault(v T) *BoolSpec[T] {
 }
 
 // Validate validates the environment variable.
-func (s *BoolSpec[T]) Validate() ValidationResult {
-	raw := os.Getenv(s.name)
+func (s *BoolSpec[T]) Validate(name string) ValidationResult {
+	raw := os.Getenv(name)
 	res := ValidationResult{
-		Name:          s.name,
+		Name:          name,
 		Description:   s.desc,
 		ValidInput:    fmt.Sprintf("%s|%s", s.t, s.f),
 		ExplicitValue: raw,

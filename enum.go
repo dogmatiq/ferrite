@@ -80,8 +80,8 @@ func (s *EnumSpec[T]) WithDefault(v T) *EnumSpec[T] {
 // Validate validates the environment variable.
 //
 // It returns a string representation of the value.
-func (s *EnumSpec[T]) Validate() ValidationResult {
-	raw := os.Getenv(s.name)
+func (s *EnumSpec[T]) Validate(name string) ValidationResult {
+	raw := os.Getenv(name)
 
 	var keys []string
 	valid := false
@@ -94,7 +94,7 @@ func (s *EnumSpec[T]) Validate() ValidationResult {
 	}
 
 	res := ValidationResult{
-		Name:          s.name,
+		Name:          name,
 		Description:   s.desc,
 		ValidInput:    strings.Join(keys, "|"),
 		ExplicitValue: raw,

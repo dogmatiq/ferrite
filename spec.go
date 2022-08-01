@@ -5,11 +5,12 @@ package ferrite
 // It describes the environment variable itself, and how to construct valid
 // values for the variable.
 type Spec interface {
-	// Name returns the name of the environment variable.
-	Name() string
+	// Names returns the names of the environment variables constrained by this
+	// spec.
+	Names() []string
 
 	// Validate validates the environment variable.
-	Validate() ValidationResult
+	Validate(name string) ValidationResult
 }
 
 // SpecFor is a specification for an environment variable that produces values
@@ -34,8 +35,12 @@ type spec[T any] struct {
 	value        T
 }
 
-func (s *spec[T]) Name() string {
-	return s.name
+func (s *spec[T]) Names() []string {
+	return []string{s.name}
+}
+
+func (s *spec[T]) Default() (T, bool) {
+	return s.defaultValue, s.hasDefault
 }
 
 func (s *spec[T]) Value() T {
@@ -44,10 +49,6 @@ func (s *spec[T]) Value() T {
 	}
 
 	return s.value
-}
-
-func (s *spec[T]) Default() (T, bool) {
-	return s.defaultValue, s.hasDefault
 }
 
 func (s *spec[T]) setDefault(v T) {

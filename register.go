@@ -14,5 +14,7 @@ func Register[T any, S SpecFor[T]](s S) {
 		registry = map[string]Spec{}
 	}
 
-	registry[s.Name()] = s
+	for _, name := range s.Names() {
+		registry[name] = s
+	}
 }

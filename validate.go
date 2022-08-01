@@ -75,8 +75,8 @@ func validate() (string, bool) {
 	var results []ValidationResult
 
 	ok := true
-	for _, s := range registry {
-		res := s.Validate()
+	for n, s := range registry {
+		res := s.Validate(n)
 		if res.Error != nil {
 			ok = false
 		}
