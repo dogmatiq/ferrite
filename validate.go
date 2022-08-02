@@ -108,6 +108,23 @@ func validate() (string, bool) {
 	return renderResults(results), ok
 }
 
+// inputOfType returns a strring describing a variable's valid input as any
+// value of type T.
+func inputOfType[T any]() string {
+	var zero T
+	return fmt.Sprintf("[%T]", zero)
+}
+
+// renderString returns a representation of a string suitable for use in
+// validation results.
+func renderString[T ~string](v *T) string {
+	if v == nil {
+		return ""
+	}
+
+	return fmt.Sprintf("%q", *v)
+}
+
 const (
 	// valid is the icon displayed next to valid environment variables.
 	valid = "✓"
