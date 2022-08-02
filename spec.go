@@ -70,21 +70,22 @@ func (s *impl[T, S]) Validate() []ValidationResult {
 	return []ValidationResult{s.result}
 }
 
-// resolve populates s.value and s.result.
+// resolve populates s.value and s.result, or returns immediately if they are
+// already populated.
 func (s *impl[T, S]) resolve() {
-	if atomic.LoadUint32(&s.done) != 0 {
-		return
+	if atomic.LoadUint32(&s.done) == 0 {
+		s.m.Lock()
+		defer s.m.Unlock()
+
+		if s.done == 0 {
+			defer atomic.StoreUint32(&s.done, 1)
+			s.parseAndValidate()
+		}
 	}
+}
 
-	s.m.Lock()
-	defer s.m.Unlock()
-
-	if s.done != 0 {
-		return
-	}
-
-	defer atomic.StoreUint32(&s.done, 1)
-
+// parseAndValidate populates s.value and s.result.
+func (s *impl[T, S]) parseAndValidate() {
 	s.result.ValidInput = s.self.renderValidInput()
 	value := os.Getenv(s.result.Name)
 
