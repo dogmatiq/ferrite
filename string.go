@@ -1,6 +1,8 @@
 package ferrite
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // String configures an environment variable as a string.
 //
@@ -23,10 +25,13 @@ func StringAs[T ~string](name, desc string) *StringSpec[T] {
 
 // StringSpec is the specification for a string.
 type StringSpec[T ~string] struct {
-	standard[T, *StringSpec[T]]
+	impl[T, *StringSpec[T]]
 }
 
 // parses parses and validates the value of the environment variable.
+//
+// validate() must be called on the result, as the parsed value does not
+// necessarily meet all of the requirements.
 func (s *StringSpec[T]) parse(value string) (T, error) {
 	return T(value), nil
 }
@@ -34,6 +39,11 @@ func (s *StringSpec[T]) parse(value string) (T, error) {
 // validate validates a parsed or default value.
 func (s *StringSpec[T]) validate(value T) error {
 	return nil
+}
+
+// renderValidInput returns a string representation of the valid input values.
+func (s *StringSpec[T]) renderValidInput() string {
+	return inputType[T]()
 }
 
 // renderParsed returns a string representation of the parsed value as it should

@@ -108,21 +108,17 @@ func validate() (string, bool) {
 	return renderResults(results), ok
 }
 
-// inputOfType returns a strring describing a variable's valid input as any
+// inputType returns a strring describing a variable's valid input as any
 // value of type T.
-func inputOfType[T any]() string {
+func inputType[T any]() string {
 	var zero T
 	return fmt.Sprintf("[%T]", zero)
 }
 
-// renderString returns a representation of a string suitable for use in
-// validation results.
-func renderString[T ~string](v *T) string {
-	if v == nil {
-		return ""
-	}
-
-	return fmt.Sprintf("%q", *v)
+// inputList returns a string describing a variable's vaild input as a list of
+// accepted values.
+func inputList(values ...string) string {
+	return strings.Join(values, "|")
 }
 
 const (

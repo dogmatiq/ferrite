@@ -7,69 +7,11 @@ import (
 	"sync/atomic"
 )
 
-type spec[T any] struct {
-	name string
-	desc string
-
-	isValidated  bool
-	hasDefault   bool
-	defaultValue T
-	value        T
-}
-
-func (s *spec[T]) Default() (T, bool) {
-	return s.defaultValue, s.hasDefault
-}
-
-func (s *spec[T]) Value() T {
-	if !s.isValidated {
-		panic("environment has not been validated")
-	}
-
-	return s.value
-}
-
-func (s *spec[T]) setDefault(v T) {
-	s.hasDefault = true
-	s.defaultValue = v
-}
-
-func (s *spec[T]) useValue(v T) {
-	s.isValidated = true
-	s.value = v
-}
-
-func (s *spec[T]) useDefault() bool {
-	if s.hasDefault {
-		s.isValidated = true
-		s.value = s.defaultValue
-		return true
-	}
-
-	return false
-}
-
-// facade is a constraint for specifications that parse environment variables
-// into values of type T.
-type facade[T any] interface {
-	// parses parses and validates the value of the environment variable.
-	parse(value string) (T, error)
-
-	// validate validates a parsed or default value.
-	validate(value T) error
-
-	// renderParsed returns a string representation of the parsed value as it should
-	// appear in validation reports.
-	renderParsed(value T) string
-
-	// renderRaw returns a string representation of the raw string value as it
-	// should appear in validation reports.
-	renderRaw(value string) string
-}
-
-// standard is the basis for a standard variable specification.
-type standard[T any, F facade[T]] struct {
-	facade F
+// impl is the basis for a impl variable specification.
+//
+// S is the concrete type of the specification.
+type impl[T any, S spec[T]] struct {
+	self S
 
 	done      uint32
 	m         sync.Mutex
@@ -79,19 +21,18 @@ type standard[T any, F facade[T]] struct {
 }
 
 // init initializes the spec.
-func (s *standard[T, F]) init(f F, name, desc string) {
-	s.facade = f
+func (s *impl[T, S]) init(self S, name, desc string) {
+	s.self = self
 	s.result.Name = name
 	s.result.Description = desc
-	s.result.ValidInput = fmt.Sprintf("[%T]", s.value)
 
 	Register(name, s)
 }
 
 // WithDefault sets a default value to use when the environment variable is
 // undefined.
-func (s *standard[T, F]) WithDefault(v T) F {
-	if err := s.facade.validate(v); err != nil {
+func (s *impl[T, S]) WithDefault(v T) S {
+	if err := s.self.validate(v); err != nil {
 		panic(fmt.Sprintf(
 			"default value of %s is invalid: %s",
 			s.result.Name,
@@ -99,17 +40,17 @@ func (s *standard[T, F]) WithDefault(v T) F {
 		))
 	}
 
-	return s.update(func() {
+	return s.with(func() {
 		s.defaulted = true
 		s.value = v
-		s.result.DefaultValue = s.facade.renderParsed(v)
+		s.result.DefaultValue = s.self.renderParsed(v)
 	})
 }
 
 // Value returns the environment variable's value.
 //
 // It panics if the value is invalid.
-func (s *standard[T, F]) Value() T {
+func (s *impl[T, S]) Value() T {
 	s.resolve()
 
 	if s.result.Error != nil {
@@ -124,13 +65,13 @@ func (s *standard[T, F]) Value() T {
 }
 
 // Validate validates the environment variable.
-func (s *standard[T, F]) Validate() ValidationResult {
+func (s *impl[T, S]) Validate() ValidationResult {
 	s.resolve()
 	return s.result
 }
 
 // resolve populates s.value and s.result.
-func (s *standard[T, F]) resolve() {
+func (s *impl[T, S]) resolve() {
 	if atomic.LoadUint32(&s.done) != 0 {
 		return
 	}
@@ -142,6 +83,7 @@ func (s *standard[T, F]) resolve() {
 		return
 	}
 
+	s.result.ValidInput = s.self.renderValidInput()
 	value := os.Getenv(s.result.Name)
 
 	if value == "" {
@@ -154,37 +96,61 @@ func (s *standard[T, F]) resolve() {
 		return
 	}
 
-	s.result.ExplicitValue = s.facade.renderRaw(value)
+	s.result.ExplicitValue = s.self.renderRaw(value)
 
-	v, err := s.facade.parse(value)
+	v, err := s.self.parse(value)
 	if err != nil {
 		s.result.Error = err
 		return
 	}
 
-	if err := s.facade.validate(v); err != nil {
+	if err := s.self.validate(v); err != nil {
 		s.result.Error = err
 		return
 	}
 
 	s.value = v
-	s.result.ExplicitValue = s.facade.renderParsed(v)
+	s.result.ExplicitValue = s.self.renderParsed(v)
 }
 
-// update calls fn while holding a lock on s.
+// with calls fn while holding a lock on s.
 //
-// It panics if s has already been populated by parsing the environment
-// variable.
-func (s *standard[T, F]) update(fn func()) F {
+// It panics if the value has already been resolved.
+func (s *impl[T, S]) with(fn func()) S {
 	if atomic.LoadUint32(&s.done) == 0 {
 		s.m.Lock()
 		defer s.m.Unlock()
 
 		if s.done == 0 {
 			fn()
-			return s.facade
+			return s.self
 		}
 	}
 
 	panic("cannot modify spec after value has been used or validated")
+}
+
+// spec is a constraint for concrete implementations of a spec that embed
+// impl[T].
+type spec[T any] interface {
+	// parses parses and validates the value of the environment variable.
+	//
+	// validate() must be called on the result, as the parsed value does not
+	// necessarily meet all of the requirements.
+	parse(value string) (T, error)
+
+	// validate validates a parsed or default value.
+	validate(value T) error
+
+	// renderValidInput returns a string representation of the valid input
+	// values.
+	renderValidInput() string
+
+	// renderParsed returns a string representation of the parsed value as it
+	// should appear in validation reports.
+	renderParsed(value T) string
+
+	// renderRaw returns a string representation of the raw string value as it
+	// should appear in validation reports.
+	renderRaw(value string) string
 }

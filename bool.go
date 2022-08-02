@@ -25,7 +25,7 @@ func BoolAs[T ~bool](name, desc string) *BoolSpec[T] {
 
 // BoolSpec is the specification for a boolean.
 type BoolSpec[T ~bool] struct {
-	standard[T, *BoolSpec[T]]
+	impl[T, *BoolSpec[T]]
 	t, f string
 }
 
@@ -38,7 +38,7 @@ func (s *BoolSpec[T]) WithLiterals(t, f string) *BoolSpec[T] {
 		panic("boolean literals must not be zero-length")
 	}
 
-	return s.update(func() {
+	return s.with(func() {
 		s.t = t
 		s.f = f
 		s.result.ValidInput = fmt.Sprintf("%s|%s", t, f)
@@ -46,6 +46,9 @@ func (s *BoolSpec[T]) WithLiterals(t, f string) *BoolSpec[T] {
 }
 
 // parses parses and validates the value of the environment variable.
+//
+// validate() must be called on the result, as the parsed value does not
+// necessarily meet all of the requirements.
 func (s *BoolSpec[T]) parse(value string) (T, error) {
 	switch value {
 	case s.t:
@@ -60,6 +63,11 @@ func (s *BoolSpec[T]) parse(value string) (T, error) {
 // validate validates a parsed or default value.
 func (s *BoolSpec[T]) validate(value T) error {
 	return nil
+}
+
+// renderValidInput returns a string representation of the valid input values.
+func (s *BoolSpec[T]) renderValidInput() string {
+	return inputList(s.t, s.f)
 }
 
 // renderParsed returns a string representation of the parsed value as it should

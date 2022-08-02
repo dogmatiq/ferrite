@@ -151,7 +151,7 @@ var _ = Describe("type EnumSpec", func() {
 			It("panics", func() {
 				Expect(func() {
 					spec.WithDefault(enumMember(100))
-				}).To(PanicWith("the default value must be one of the enum members"))
+				}).To(PanicWith("default value of FERRITE_ENUM is invalid: <member-100> is not a member of the enum"))
 			})
 		})
 	})
