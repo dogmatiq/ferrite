@@ -53,30 +53,37 @@ func (s *spec[T]) useDefault() bool {
 // into values of type T.
 type facade[T any] interface {
 	// parses parses and validates the value of the environment variable.
-	parse(value string, def *T) (T, ValidationResult)
+	parse(value string) (T, error)
 
 	// validate validates a parsed or default value.
 	validate(value T) error
+
+	// renderParsed returns a string representation of the parsed value as it should
+	// appear in validation reports.
+	renderParsed(value T) string
+
+	// renderRaw returns a string representation of the raw string value as it
+	// should appear in validation reports.
+	renderRaw(value string) string
 }
 
 // standard is the basis for a standard variable specification.
 type standard[T any, F facade[T]] struct {
 	facade F
-	name   string
-	desc   string
 
-	done   uint32
-	m      sync.Mutex
-	def    *T
-	value  T
-	result ValidationResult
+	done      uint32
+	m         sync.Mutex
+	defaulted bool
+	value     T
+	result    ValidationResult
 }
 
 // init initializes the spec.
 func (s *standard[T, F]) init(f F, name, desc string) {
-	s.name = name
-	s.desc = desc
 	s.facade = f
+	s.result.Name = name
+	s.result.Description = desc
+	s.result.ValidInput = fmt.Sprintf("[%T]", s.value)
 
 	Register(name, s)
 }
@@ -85,22 +92,32 @@ func (s *standard[T, F]) init(f F, name, desc string) {
 // undefined.
 func (s *standard[T, F]) WithDefault(v T) F {
 	if err := s.facade.validate(v); err != nil {
-		panic(fmt.Sprintf("default value of %s is invalid: %s", s.name, err))
+		panic(fmt.Sprintf(
+			"default value of %s is invalid: %s",
+			s.result.Name,
+			err,
+		))
 	}
 
-	s.update(func() {
-		s.def = &v
+	return s.update(func() {
+		s.defaulted = true
+		s.value = v
+		s.result.DefaultValue = s.facade.renderParsed(v)
 	})
-
-	return s.facade
 }
 
 // Value returns the environment variable's value.
 //
 // It panics if the value is invalid.
 func (s *standard[T, F]) Value() T {
-	if res := s.Validate(); res.Error != nil {
-		panic(fmt.Sprintf("%s is invalid: %s", s.name, res.Error))
+	s.resolve()
+
+	if s.result.Error != nil {
+		panic(fmt.Sprintf(
+			"%s is invalid: %s",
+			s.result.Name,
+			s.result.Error,
+		))
 	}
 
 	return s.value
@@ -108,35 +125,63 @@ func (s *standard[T, F]) Value() T {
 
 // Validate validates the environment variable.
 func (s *standard[T, F]) Validate() ValidationResult {
-	if atomic.LoadUint32(&s.done) == 0 {
-		s.m.Lock()
-		defer s.m.Unlock()
+	s.resolve()
+	return s.result
+}
 
-		if s.done == 0 {
-			value := os.Getenv(s.name)
-			s.value, s.result = s.facade.parse(value, s.def)
-
-			if s.result.Error == nil {
-				s.result.Error = s.facade.validate(s.value)
-			}
-		}
+// resolve populates s.value and s.result.
+func (s *standard[T, F]) resolve() {
+	if atomic.LoadUint32(&s.done) != 0 {
+		return
 	}
 
-	return s.result
+	s.m.Lock()
+	defer s.m.Unlock()
+
+	if s.done != 0 {
+		return
+	}
+
+	value := os.Getenv(s.result.Name)
+	s.result.ExplicitValue = s.facade.renderRaw(value)
+
+	if value == "" {
+		if s.defaulted {
+			s.result.UsingDefault = true
+		} else {
+			s.result.Error = errUndefined
+		}
+
+		return
+	}
+
+	v, err := s.facade.parse(value)
+	if err != nil {
+		s.result.Error = err
+		return
+	}
+
+	if err := s.facade.validate(v); err != nil {
+		s.result.Error = err
+		return
+	}
+
+	s.value = v
+	s.result.ExplicitValue = s.facade.renderParsed(v)
 }
 
 // update calls fn while holding a lock on s.
 //
 // It panics if s has already been populated by parsing the environment
 // variable.
-func (s *standard[T, F]) update(fn func()) {
+func (s *standard[T, F]) update(fn func()) F {
 	if atomic.LoadUint32(&s.done) == 0 {
 		s.m.Lock()
 		defer s.m.Unlock()
 
 		if s.done == 0 {
 			fn()
-			return
+			return s.facade
 		}
 	}
 

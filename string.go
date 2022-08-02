@@ -1,5 +1,7 @@
 package ferrite
 
+import "fmt"
+
 // String configures an environment variable as a string.
 //
 // name is the name of the environment variable to read. desc is a
@@ -25,30 +27,23 @@ type StringSpec[T ~string] struct {
 }
 
 // parses parses and validates the value of the environment variable.
-func (s *StringSpec[T]) parse(value string, def *T) (T, ValidationResult) {
-	res := ValidationResult{
-		Name:          s.name,
-		Description:   s.desc,
-		ValidInput:    inputOfType[T](),
-		DefaultValue:  renderString(def),
-		ExplicitValue: renderString(&value),
-	}
-
-	if value != "" {
-		return T(value), res
-	}
-
-	if def != nil {
-		res.UsingDefault = true
-		return *def, res
-	}
-
-	res.Error = errUndefined
-
-	return "", res
+func (s *StringSpec[T]) parse(value string) (T, error) {
+	return T(value), nil
 }
 
 // validate validates a parsed or default value.
 func (s *StringSpec[T]) validate(value T) error {
 	return nil
+}
+
+// renderParsed returns a string representation of the parsed value as it should
+// appear in validation reports.
+func (s *StringSpec[T]) renderParsed(value T) string {
+	return fmt.Sprintf("%q", value)
+}
+
+// renderRaw returns a string representation of the raw string value as it
+// should appear in validation reports.
+func (s *StringSpec[T]) renderRaw(value string) string {
+	return fmt.Sprintf("%q", value)
 }
