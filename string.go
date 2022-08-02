@@ -47,3 +47,8 @@ func (s *StringSpec[T]) parse(value string, def *T) (T, ValidationResult) {
 
 	return "", res
 }
+
+// validate validates a parsed or default value.
+func (s *StringSpec[T]) validate(value T) error {
+	return nil
+}

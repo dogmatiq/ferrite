@@ -83,7 +83,7 @@ var _ = Describe("type StringSpec", func() {
 				It("panics", func() {
 					Expect(func() {
 						spec.Value()
-					}).To(PanicWith("FERRITE_STRING: must not be empty"))
+					}).To(PanicWith("FERRITE_STRING is invalid: must not be empty"))
 				})
 			})
 

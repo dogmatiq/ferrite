@@ -54,6 +54,9 @@ func (s *spec[T]) useDefault() bool {
 type facade[T any] interface {
 	// parses parses and validates the value of the environment variable.
 	parse(value string, def *T) (T, ValidationResult)
+
+	// validate validates a parsed or default value.
+	validate(value T) error
 }
 
 // standard is the basis for a standard variable specification.
@@ -81,6 +84,10 @@ func (s *standard[T, F]) init(f F, name, desc string) {
 // WithDefault sets a default value to use when the environment variable is
 // undefined.
 func (s *standard[T, F]) WithDefault(v T) F {
+	if err := s.facade.validate(v); err != nil {
+		panic(fmt.Sprintf("default value of %s is invalid: %s", s.name, err))
+	}
+
 	s.update(func() {
 		s.def = &v
 	})
@@ -93,7 +100,7 @@ func (s *standard[T, F]) WithDefault(v T) F {
 // It panics if the value is invalid.
 func (s *standard[T, F]) Value() T {
 	if res := s.Validate(); res.Error != nil {
-		panic(fmt.Sprintf("%s: %s", s.name, res.Error))
+		panic(fmt.Sprintf("%s is invalid: %s", s.name, res.Error))
 	}
 
 	return s.value
@@ -108,6 +115,10 @@ func (s *standard[T, F]) Validate() ValidationResult {
 		if s.done == 0 {
 			value := os.Getenv(s.name)
 			s.value, s.result = s.facade.parse(value, s.def)
+
+			if s.result.Error == nil {
+				s.result.Error = s.facade.validate(s.value)
+			}
 		}
 	}
 
