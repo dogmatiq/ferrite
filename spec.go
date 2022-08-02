@@ -143,7 +143,6 @@ func (s *standard[T, F]) resolve() {
 	}
 
 	value := os.Getenv(s.result.Name)
-	s.result.ExplicitValue = s.facade.renderRaw(value)
 
 	if value == "" {
 		if s.defaulted {
@@ -154,6 +153,8 @@ func (s *standard[T, F]) resolve() {
 
 		return
 	}
+
+	s.result.ExplicitValue = s.facade.renderRaw(value)
 
 	v, err := s.facade.parse(value)
 	if err != nil {

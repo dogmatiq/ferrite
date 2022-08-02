@@ -2,7 +2,6 @@ package ferrite
 
 import (
 	"fmt"
-	"os"
 )
 
 // Bool configures an environment variable as a boolean.
@@ -19,24 +18,14 @@ func Bool(name, desc string) *BoolSpec[bool] {
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
 func BoolAs[T ~bool](name, desc string) *BoolSpec[T] {
-	s := &BoolSpec[T]{
-		spec: spec[T]{
-			name: name,
-			desc: desc,
-		},
-		t: "true",
-		f: "false",
-	}
-
-	Register(name, s)
-
-	return s
+	s := &BoolSpec[T]{}
+	s.init(s, name, desc)
+	return s.WithLiterals("true", "false")
 }
 
 // BoolSpec is the specification for a boolean.
 type BoolSpec[T ~bool] struct {
-	spec[T]
-
+	standard[T, *BoolSpec[T]]
 	t, f string
 }
 
@@ -49,48 +38,41 @@ func (s *BoolSpec[T]) WithLiterals(t, f string) *BoolSpec[T] {
 		panic("boolean literals must not be zero-length")
 	}
 
-	s.t = t
-	s.f = f
-
-	return s
+	return s.update(func() {
+		s.t = t
+		s.f = f
+		s.result.ValidInput = fmt.Sprintf("%s|%s", t, f)
+	})
 }
 
-// WithDefault sets a default value to use when the environment variable is
-// undefined.
-func (s *BoolSpec[T]) WithDefault(v T) *BoolSpec[T] {
-	s.setDefault(v)
-	return s
+// parses parses and validates the value of the environment variable.
+func (s *BoolSpec[T]) parse(value string) (T, error) {
+	switch value {
+	case s.t:
+		return true, nil
+	case s.f:
+		return false, nil
+	default:
+		return false, fmt.Errorf("must be either %q or %q", s.t, s.f)
+	}
 }
 
-// Validate validates the environment variable.
-func (s *BoolSpec[T]) Validate() ValidationResult {
-	raw := os.Getenv(s.name)
-	res := ValidationResult{
-		Name:          s.name,
-		Description:   s.desc,
-		ValidInput:    fmt.Sprintf("%s|%s", s.t, s.f),
-		ExplicitValue: raw,
-	}
+// validate validates a parsed or default value.
+func (s *BoolSpec[T]) validate(value T) error {
+	return nil
+}
 
-	if v, ok := s.Default(); ok {
-		if v {
-			res.DefaultValue = s.t
-		} else {
-			res.DefaultValue = s.f
-		}
+// renderParsed returns a string representation of the parsed value as it should
+// appear in validation reports.
+func (s *BoolSpec[T]) renderParsed(value T) string {
+	if value {
+		return s.t
 	}
+	return s.f
+}
 
-	if raw == s.t {
-		s.useValue(true)
-	} else if raw == s.f {
-		s.useValue(false)
-	} else if raw != "" {
-		res.Error = fmt.Errorf("must be either %q or %q", s.t, s.f)
-	} else if s.useDefault() {
-		res.UsingDefault = true
-	} else {
-		res.Error = errUndefined
-	}
-
-	return res
+// renderRaw returns a string representation of the raw string value as it
+// should appear in validation reports.
+func (s *BoolSpec[T]) renderRaw(value string) string {
+	return value
 }
