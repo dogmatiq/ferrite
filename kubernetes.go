@@ -10,15 +10,18 @@ import (
 // KubeService reads Kubernetes service discovery environment variables for a
 // service's port.
 //
-// name is the name of the Kubernetes service, NOT the environment variable.
-func KubeService(name, desc string) *KubeServiceSpec {
+// svc is the name of the Kubernetes service, NOT the environment variable.
+//
+// The environment variables "<svc>_SERVICE_HOST" and "<svc>_SERVICE_PORT" are
+// used to construct an address for the service.
+func KubeService(svc, desc string) *KubeServiceSpec {
 	s := &KubeServiceSpec{
-		service: name,
+		service: svc,
 		hostResult: ValidationResult{
-			Name: fmt.Sprintf("%s_SERVICE_HOST", kubeToEnv(name)),
+			Name: fmt.Sprintf("%s_SERVICE_HOST", kubeToEnv(svc)),
 		},
 		portResult: ValidationResult{
-			Name: fmt.Sprintf("%s_SERVICE_PORT", kubeToEnv(name)),
+			Name: fmt.Sprintf("%s_SERVICE_PORT", kubeToEnv(svc)),
 		},
 	}
 
@@ -36,15 +39,27 @@ type KubeServiceSpec struct {
 	portResult ValidationResult
 }
 
-func (s *KubeServiceSpec) WithNamedPort(name string) {
+// WithNamedPort uses a Kubernetes named port instead of the default service
+// port.
+//
+//
+// The "<service>_SERVICE_PORT_<port>" environment variable is used instead of
+// "<service>_SERVICE_PORT".
+//
+// The Kubernetes port name is the name configured in the service manifest. It
+// is not to be confused with an IANA registered port name (e.g. "https"),
+// although the two may use the same names.
+//
+// See https://kubernetes.io/docs/concepts/services-networking/service/#multi-port-services
+func (s *KubeServiceSpec) WithNamedPort(port string) {
 	s.portResult.Name = fmt.Sprintf(
 		"%s_SERVICE_PORT_%s",
 		kubeToEnv(s.service),
-		kubeToEnv(name),
+		kubeToEnv(port),
 	)
 }
 
-// Address returns the address of the Kubernetes service.
+// Address returns the address (host:port) of the Kubernetes service.
 func (s *KubeServiceSpec) Address() string {
 	host := os.Getenv(s.hostResult.Name)
 	port := os.Getenv(s.portResult.Name)
@@ -74,6 +89,27 @@ func (s *KubeServiceSpec) Address() string {
 	return net.JoinHostPort(host, port)
 }
 
+// Port returns the port of the Kubernetes service.
+//
+// It may be a port number of an IANA registered port name (e.g. "https").
+func (s *KubeServiceSpec) Port() string {
+	port := os.Getenv(s.portResult.Name)
+
+	if s.defaulted {
+		if port == "" {
+			port = s.port
+		}
+	} else if port == "" {
+		panic(fmt.Sprintf(
+			"%s is invalid: %s",
+			s.portResult.Name,
+			errUndefined,
+		))
+	}
+
+	return port
+}
+
 // Validate validates the environment variables.
 func (s *KubeServiceSpec) Validate() []ValidationResult {
 	return []ValidationResult{
@@ -82,6 +118,11 @@ func (s *KubeServiceSpec) Validate() []ValidationResult {
 	}
 }
 
+// WithDefault sets a default value to use when the environment variables are
+// undefined.
+//
+// port may be a port number or an IANA registered port name (such as "https").
+// The IANA name is not to be confused with the Kubernetes port name.
 func (s *KubeServiceSpec) WithDefault(host, port string) *KubeServiceSpec {
 	// TODO: validate host/port
 	s.defaulted = true
