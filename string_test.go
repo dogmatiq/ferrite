@@ -19,7 +19,7 @@ var _ = Describe("type StringSpec", func() {
 	})
 
 	AfterEach(func() {
-		Teardown()
+		tearDown()
 	})
 
 	When("the environment variable is not empty", func() {

@@ -12,7 +12,7 @@ import (
 
 var _ = Describe("func ValidateEnvironment()", func() {
 	AfterEach(func() {
-		Teardown()
+		tearDown()
 	})
 
 	It("invokes the registered validators", func() {

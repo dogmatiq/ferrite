@@ -19,7 +19,7 @@ var _ = Describe("type BoolSpec", func() {
 	})
 
 	AfterEach(func() {
-		Teardown()
+		tearDown()
 	})
 
 	When("the environment variable is set to one of the standard literals", func() {

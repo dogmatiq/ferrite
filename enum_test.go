@@ -23,7 +23,7 @@ var _ = Describe("type EnumSpec", func() {
 	})
 
 	AfterEach(func() {
-		Teardown()
+		tearDown()
 	})
 
 	When("the environment variable is set to one of the enum members", func() {
