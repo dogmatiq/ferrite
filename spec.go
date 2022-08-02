@@ -83,6 +83,8 @@ func (s *impl[T, S]) resolve() {
 		return
 	}
 
+	defer atomic.StoreUint32(&s.done, 1)
+
 	s.result.ValidInput = s.self.renderValidInput()
 	value := os.Getenv(s.result.Name)
 
