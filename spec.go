@@ -92,7 +92,7 @@ func (s *standard[T, F]) WithDefault(v T) F {
 //
 // It panics if the value is invalid.
 func (s *standard[T, F]) Value() T {
-	if res := s.Validate(s.name); res.Error != nil {
+	if res := s.Validate(); res.Error != nil {
 		panic(fmt.Sprintf("%s: %s", s.name, res.Error))
 	}
 
@@ -100,7 +100,7 @@ func (s *standard[T, F]) Value() T {
 }
 
 // Validate validates the environment variable.
-func (s *standard[T, F]) Validate(_ string) ValidationResult {
+func (s *standard[T, F]) Validate() ValidationResult {
 	if atomic.LoadUint32(&s.done) == 0 {
 		s.m.Lock()
 		defer s.m.Unlock()
