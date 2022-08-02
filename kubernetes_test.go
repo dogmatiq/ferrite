@@ -1,6 +1,7 @@
 package ferrite_test
 
 import (
+	"errors"
 	"os"
 
 	. "github.com/dogmatiq/ferrite"
@@ -22,7 +23,7 @@ var _ = Describe("type KubeServiceSpec", func() {
 		// FERRITE_SVC_PORT_12345_TCP_PORT=12345
 		// FERRITE_SVC_PORT_12345_TCP_ADDR=host.example.org
 
-		spec = KubeService("ferrite-svc", "<desc>")
+		spec = KubeService("ferrite-svc")
 	})
 
 	AfterEach(func() {
@@ -54,6 +55,29 @@ var _ = Describe("type KubeServiceSpec", func() {
 				})
 			})
 		})
+
+		Describe("func Validate()", func() {
+			It("returns success results", func() {
+				Expect(spec.Validate()).To(ConsistOf(
+					ValidationResult{
+						Name:          "FERRITE_SVC_SERVICE_HOST",
+						Description:   `Hostname or IP address of the "ferrite-svc" service.`,
+						ValidInput:    "[string]",
+						DefaultValue:  "",
+						ExplicitValue: "host.example.org",
+						Error:         nil,
+					},
+					ValidationResult{
+						Name:          "FERRITE_SVC_SERVICE_PORT",
+						Description:   `Network port of the "ferrite-svc" service.`,
+						ValidInput:    "[string]|(1..65535)",
+						DefaultValue:  "",
+						ExplicitValue: "12345",
+						Error:         nil,
+					},
+				))
+			})
+		})
 	})
 
 	When("using a named port", func() {
@@ -69,6 +93,29 @@ var _ = Describe("type KubeServiceSpec", func() {
 				Expect(spec.Address()).To(Equal("host.example.org:12345"))
 				Expect(spec.Host()).To(Equal("host.example.org"))
 				Expect(spec.Port()).To(Equal("12345"))
+			})
+		})
+
+		Describe("func Validate()", func() {
+			It("returns success results", func() {
+				Expect(spec.Validate()).To(ConsistOf(
+					ValidationResult{
+						Name:          "FERRITE_SVC_SERVICE_HOST",
+						Description:   `Hostname or IP address of the "ferrite-svc" service.`,
+						ValidInput:    "[string]",
+						DefaultValue:  "",
+						ExplicitValue: "host.example.org",
+						Error:         nil,
+					},
+					ValidationResult{
+						Name:          "FERRITE_SVC_SERVICE_PORT_NAMED_PORT",
+						Description:   `Network port of the "ferrite-svc" service's "named-port" port.`,
+						ValidInput:    "[string]|(1..65535)",
+						DefaultValue:  "",
+						ExplicitValue: "12345",
+						Error:         nil,
+					},
+				))
 			})
 		})
 	})
@@ -91,6 +138,27 @@ var _ = Describe("type KubeServiceSpec", func() {
 					Expect(spec.Port()).To(Equal("12345"))
 				})
 			})
+
+			Describe("func Validate()", func() {
+				It("returns sucess results", func() {
+					Expect(spec.Validate()).To(ConsistOf(
+						ValidationResult{
+							Name:         "FERRITE_SVC_SERVICE_HOST",
+							Description:  `Hostname or IP address of the "ferrite-svc" service.`,
+							ValidInput:   "[string]",
+							DefaultValue: "default.example.org",
+							UsingDefault: true,
+						},
+						ValidationResult{
+							Name:          "FERRITE_SVC_SERVICE_PORT",
+							Description:   `Network port of the "ferrite-svc" service.`,
+							ValidInput:    "[string]|(1..65535)",
+							DefaultValue:  "54321",
+							ExplicitValue: "12345",
+						},
+					))
+				})
+			})
 		})
 
 		When("there is no default value", func() {
@@ -107,6 +175,25 @@ var _ = Describe("type KubeServiceSpec", func() {
 					Expect(func() {
 						spec.Host()
 					}).To(PanicWith("FERRITE_SVC_SERVICE_HOST is invalid: must not be empty"))
+				})
+			})
+
+			Describe("func Validate()", func() {
+				It("returns a failure result for the host", func() {
+					Expect(spec.Validate()).To(ConsistOf(
+						ValidationResult{
+							Name:        "FERRITE_SVC_SERVICE_HOST",
+							Description: `Hostname or IP address of the "ferrite-svc" service.`,
+							ValidInput:  "[string]",
+							Error:       errors.New(`must not be empty`),
+						},
+						ValidationResult{
+							Name:          "FERRITE_SVC_SERVICE_PORT",
+							Description:   `Network port of the "ferrite-svc" service.`,
+							ValidInput:    "[string]|(1..65535)",
+							ExplicitValue: "12345",
+						},
+					))
 				})
 			})
 		})
@@ -130,6 +217,27 @@ var _ = Describe("type KubeServiceSpec", func() {
 					Expect(spec.Port()).To(Equal("54321"))
 				})
 			})
+
+			Describe("func Validate()", func() {
+				It("returns sucess results", func() {
+					Expect(spec.Validate()).To(ConsistOf(
+						ValidationResult{
+							Name:          "FERRITE_SVC_SERVICE_HOST",
+							Description:   `Hostname or IP address of the "ferrite-svc" service.`,
+							ValidInput:    "[string]",
+							DefaultValue:  "default.example.org",
+							ExplicitValue: "host.example.org",
+						},
+						ValidationResult{
+							Name:         "FERRITE_SVC_SERVICE_PORT",
+							Description:  `Network port of the "ferrite-svc" service.`,
+							ValidInput:   "[string]|(1..65535)",
+							DefaultValue: "54321",
+							UsingDefault: true,
+						},
+					))
+				})
+			})
 		})
 
 		When("there is no default value", func() {
@@ -148,6 +256,25 @@ var _ = Describe("type KubeServiceSpec", func() {
 					}).To(PanicWith("FERRITE_SVC_SERVICE_PORT is invalid: must not be empty"))
 				})
 			})
+
+			Describe("func Validate()", func() {
+				It("returns a failure result for the port", func() {
+					Expect(spec.Validate()).To(ConsistOf(
+						ValidationResult{
+							Name:          "FERRITE_SVC_SERVICE_HOST",
+							Description:   `Hostname or IP address of the "ferrite-svc" service.`,
+							ValidInput:    "[string]",
+							ExplicitValue: "host.example.org",
+						},
+						ValidationResult{
+							Name:        "FERRITE_SVC_SERVICE_PORT",
+							Description: `Network port of the "ferrite-svc" service.`,
+							ValidInput:  "[string]|(1..65535)",
+							Error:       errors.New(`must not be empty`),
+						},
+					))
+				})
+			})
 		})
 	})
 
@@ -162,6 +289,27 @@ var _ = Describe("type KubeServiceSpec", func() {
 					Expect(spec.Address()).To(Equal("default.example.org:54321"))
 					Expect(spec.Host()).To(Equal("default.example.org"))
 					Expect(spec.Port()).To(Equal("54321"))
+				})
+			})
+
+			Describe("func Validate()", func() {
+				It("returns success results", func() {
+					Expect(spec.Validate()).To(ConsistOf(
+						ValidationResult{
+							Name:         "FERRITE_SVC_SERVICE_HOST",
+							Description:  `Hostname or IP address of the "ferrite-svc" service.`,
+							ValidInput:   "[string]",
+							DefaultValue: "default.example.org",
+							UsingDefault: true,
+						},
+						ValidationResult{
+							Name:         "FERRITE_SVC_SERVICE_PORT",
+							Description:  `Network port of the "ferrite-svc" service.`,
+							ValidInput:   "[string]|(1..65535)",
+							DefaultValue: "54321",
+							UsingDefault: true,
+						},
+					))
 				})
 			})
 		})
@@ -188,6 +336,25 @@ var _ = Describe("type KubeServiceSpec", func() {
 					Expect(func() {
 						spec.Port()
 					}).To(PanicWith("FERRITE_SVC_SERVICE_PORT is invalid: must not be empty"))
+				})
+			})
+
+			Describe("func Validate()", func() {
+				It("returns failure results", func() {
+					Expect(spec.Validate()).To(ConsistOf(
+						ValidationResult{
+							Name:        "FERRITE_SVC_SERVICE_HOST",
+							Description: `Hostname or IP address of the "ferrite-svc" service.`,
+							ValidInput:  "[string]",
+							Error:       errors.New(`must not be empty`),
+						},
+						ValidationResult{
+							Name:        "FERRITE_SVC_SERVICE_PORT",
+							Description: `Network port of the "ferrite-svc" service.`,
+							ValidInput:  "[string]|(1..65535)",
+							Error:       errors.New(`must not be empty`),
+						},
+					))
 				})
 			})
 		})
