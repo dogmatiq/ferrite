@@ -29,7 +29,7 @@ var _ = Describe("type StringSpec", func() {
 
 		Describe("func Value()", func() {
 			It("returns the raw string value", func() {
-				res := spec.Validate("FERRITE_STRING", "<value>")
+				res := spec.Validate("FERRITE_STRING")
 				Expect(res.Error).ShouldNot(HaveOccurred())
 				Expect(spec.Value()).To(Equal(customString("<value>")))
 			})
@@ -37,7 +37,7 @@ var _ = Describe("type StringSpec", func() {
 
 		Describe("func Validate()", func() {
 			It("returns a successful result", func() {
-				Expect(spec.Validate("FERRITE_STRING", "<value>")).To(Equal(
+				Expect(spec.Validate("FERRITE_STRING")).To(Equal(
 					ValidationResult{
 						Name:          "FERRITE_STRING",
 						Description:   "<desc>",
@@ -59,7 +59,7 @@ var _ = Describe("type StringSpec", func() {
 
 			Describe("func Value()", func() {
 				It("returns the default", func() {
-					res := spec.Validate("FERRITE_STRING", "")
+					res := spec.Validate("FERRITE_STRING")
 					Expect(res.Error).ShouldNot(HaveOccurred())
 					Expect(spec.Value()).To(Equal(customString("<value>")))
 				})
@@ -67,7 +67,7 @@ var _ = Describe("type StringSpec", func() {
 
 			Describe("func Validate()", func() {
 				It("returns a success result", func() {
-					Expect(spec.Validate("FERRITE_STRING", "")).To(Equal(
+					Expect(spec.Validate("FERRITE_STRING")).To(Equal(
 						ValidationResult{
 							Name:          "FERRITE_STRING",
 							Description:   "<desc>",
@@ -85,7 +85,7 @@ var _ = Describe("type StringSpec", func() {
 		When("there is no default value", func() {
 			Describe("func Validate()", func() {
 				It("returns a failure result", func() {
-					Expect(spec.Validate("FERRITE_STRING", "")).To(Equal(
+					Expect(spec.Validate("FERRITE_STRING")).To(Equal(
 						ValidationResult{
 							Name:          "FERRITE_STRING",
 							Description:   "<desc>",

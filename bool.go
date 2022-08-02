@@ -2,6 +2,7 @@ package ferrite
 
 import (
 	"fmt"
+	"os"
 )
 
 // Bool configures an environment variable as a boolean.
@@ -62,12 +63,13 @@ func (s *BoolSpec[T]) WithDefault(v T) *BoolSpec[T] {
 }
 
 // Validate validates the environment variable.
-func (s *BoolSpec[T]) Validate(name, value string) ValidationResult {
+func (s *BoolSpec[T]) Validate(name string) ValidationResult {
+	raw := os.Getenv(name)
 	res := ValidationResult{
 		Name:          name,
 		Description:   s.desc,
 		ValidInput:    fmt.Sprintf("%s|%s", s.t, s.f),
-		ExplicitValue: value,
+		ExplicitValue: raw,
 	}
 
 	if v, ok := s.Default(); ok {
@@ -78,11 +80,11 @@ func (s *BoolSpec[T]) Validate(name, value string) ValidationResult {
 		}
 	}
 
-	if value == s.t {
+	if raw == s.t {
 		s.useValue(true)
-	} else if value == s.f {
+	} else if raw == s.f {
 		s.useValue(false)
-	} else if value != "" {
+	} else if raw != "" {
 		res.Error = fmt.Errorf("must be either %q or %q", s.t, s.f)
 	} else if s.useDefault() {
 		res.UsingDefault = true
