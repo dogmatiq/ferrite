@@ -26,7 +26,7 @@ func (s *impl[T, S]) init(self S, name, desc string) {
 	s.result.Name = name
 	s.result.Description = desc
 
-	Register(name, s)
+	Register(s)
 }
 
 // WithDefault sets a default value to use when the environment variable is

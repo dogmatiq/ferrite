@@ -36,7 +36,10 @@ func (s *EnumSpec[T]) WithMembers(members ...T) *EnumSpec[T] {
 			}
 
 			if _, ok := s.members[k]; ok {
-				panic(fmt.Sprintf("enum already has a %q member", k))
+				panic(fmt.Sprintf(
+					"enum already has a %q member",
+					k,
+				))
 			}
 
 			if s.members == nil {

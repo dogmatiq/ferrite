@@ -19,7 +19,7 @@ func ValidateEnvironment() {
 }
 
 // Register adds a validator to the global validation system.
-func Register(name string, v Validator) {
+func Register(v Validator) {
 	validatorsM.Lock()
 	validators = append(validators, v)
 	validatorsM.Unlock()
