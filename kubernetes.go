@@ -89,6 +89,25 @@ func (s *KubeServiceSpec) Address() string {
 	return net.JoinHostPort(host, port)
 }
 
+// Host returns the hostname or IP address of the Kubernetes service.
+func (s *KubeServiceSpec) Host() string {
+	host := os.Getenv(s.hostResult.Name)
+
+	if s.defaulted {
+		if host == "" {
+			host = s.host
+		}
+	} else if host == "" {
+		panic(fmt.Sprintf(
+			"%s is invalid: %s",
+			s.hostResult.Name,
+			errUndefined,
+		))
+	}
+
+	return host
+}
+
 // Port returns the port of the Kubernetes service.
 //
 // It may be a port number of an IANA registered port name (e.g. "https").

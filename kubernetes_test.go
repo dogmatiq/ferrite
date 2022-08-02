@@ -12,6 +12,16 @@ var _ = Describe("type KubeServiceSpec", func() {
 	var spec *KubeServiceSpec
 
 	BeforeEach(func() {
+		// FERRITE_SVC_SERVICE_HOST=host.example.org
+		// FERRITE_SVC_SERVICE_PORT=12345
+		// FERRITE_SVC_SERVICE_PORT_NAMED_PORT=12345
+		// FERRITE_SVC_PORT=tcp://host.example.org:12345
+
+		// FERRITE_SVC_PORT_12345_TCP=tcp://host.example.org:12345
+		// FERRITE_SVC_PORT_12345_TCP_PROTO=tcp
+		// FERRITE_SVC_PORT_12345_TCP_PORT=12345
+		// FERRITE_SVC_PORT_12345_TCP_ADDR=host.example.org
+
 		spec = KubeService("ferrite-svc", "<desc>")
 	})
 
@@ -25,14 +35,10 @@ var _ = Describe("type KubeServiceSpec", func() {
 			os.Setenv("FERRITE_SVC_SERVICE_PORT", "12345")
 		})
 
-		Describe("func Address()", func() {
-			It("returns the network address", func() {
+		Describe("func Address(), Host() and Port()", func() {
+			It("return the network address", func() {
 				Expect(spec.Address()).To(Equal("host.example.org:12345"))
-			})
-		})
-
-		Describe("func Port()", func() {
-			It("returns the port", func() {
+				Expect(spec.Host()).To(Equal("host.example.org"))
 				Expect(spec.Port()).To(Equal("12345"))
 			})
 		})
@@ -58,14 +64,10 @@ var _ = Describe("type KubeServiceSpec", func() {
 			os.Setenv("FERRITE_SVC_SERVICE_PORT_NAMED_PORT", "12345")
 		})
 
-		Describe("func Address()", func() {
-			It("returns the network address", func() {
+		Describe("func Address(), Host() and Port()", func() {
+			It("return the network address", func() {
 				Expect(spec.Address()).To(Equal("host.example.org:12345"))
-			})
-		})
-
-		Describe("func Port()", func() {
-			It("returns the port", func() {
+				Expect(spec.Host()).To(Equal("host.example.org"))
 				Expect(spec.Port()).To(Equal("12345"))
 			})
 		})
@@ -82,14 +84,10 @@ var _ = Describe("type KubeServiceSpec", func() {
 				spec.WithDefault("default.example.org", "54321")
 			})
 
-			Describe("func Address()", func() {
-				It("returns the default host with the explicit port", func() {
+			Describe("func Address(), Host() and Port()", func() {
+				It("return the network address with the default host", func() {
 					Expect(spec.Address()).To(Equal("default.example.org:12345"))
-				})
-			})
-
-			Describe("func Port()", func() {
-				It("returns the port", func() {
+					Expect(spec.Host()).To(Equal("default.example.org"))
 					Expect(spec.Port()).To(Equal("12345"))
 				})
 			})
@@ -100,6 +98,14 @@ var _ = Describe("type KubeServiceSpec", func() {
 				It("panics", func() {
 					Expect(func() {
 						spec.Address()
+					}).To(PanicWith("FERRITE_SVC_SERVICE_HOST is invalid: must not be empty"))
+				})
+			})
+
+			Describe("func Host()", func() {
+				It("panics", func() {
+					Expect(func() {
+						spec.Host()
 					}).To(PanicWith("FERRITE_SVC_SERVICE_HOST is invalid: must not be empty"))
 				})
 			})
@@ -117,14 +123,10 @@ var _ = Describe("type KubeServiceSpec", func() {
 				spec.WithDefault("default.example.org", "54321")
 			})
 
-			Describe("func Address()", func() {
-				It("returns the explicit host with the default port", func() {
+			Describe("func Address(), Host() and Port()", func() {
+				It("return the network address with the default port", func() {
 					Expect(spec.Address()).To(Equal("host.example.org:54321"))
-				})
-			})
-
-			Describe("func Port()", func() {
-				It("returns the default port", func() {
+					Expect(spec.Host()).To(Equal("host.example.org"))
 					Expect(spec.Port()).To(Equal("54321"))
 				})
 			})
@@ -155,14 +157,10 @@ var _ = Describe("type KubeServiceSpec", func() {
 				spec.WithDefault("default.example.org", "54321")
 			})
 
-			Describe("func Address()", func() {
-				It("returns the default", func() {
+			Describe("func Address(), Host() and Port()", func() {
+				It("return the default network address", func() {
 					Expect(spec.Address()).To(Equal("default.example.org:54321"))
-				})
-			})
-
-			Describe("func Port()", func() {
-				It("returns the default port", func() {
+					Expect(spec.Host()).To(Equal("default.example.org"))
 					Expect(spec.Port()).To(Equal("54321"))
 				})
 			})
@@ -173,6 +171,14 @@ var _ = Describe("type KubeServiceSpec", func() {
 				It("panics", func() {
 					Expect(func() {
 						spec.Address()
+					}).To(PanicWith("FERRITE_SVC_SERVICE_HOST is invalid: must not be empty"))
+				})
+			})
+
+			Describe("func Host()", func() {
+				It("panics", func() {
+					Expect(func() {
+						spec.Host()
 					}).To(PanicWith("FERRITE_SVC_SERVICE_HOST is invalid: must not be empty"))
 				})
 			})
