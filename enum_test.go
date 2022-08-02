@@ -33,8 +33,6 @@ var _ = Describe("type EnumSpec", func() {
 				func(value string, expect enumMember) {
 					os.Setenv("FERRITE_ENUM", value)
 
-					res := spec.Validate()
-					Expect(res.Error).ShouldNot(HaveOccurred())
 					Expect(spec.Value()).To(Equal(expect))
 				},
 				Entry("member 0", "<member-0>", member0),
@@ -47,7 +45,7 @@ var _ = Describe("type EnumSpec", func() {
 			It("returns a successful result", func() {
 				os.Setenv("FERRITE_ENUM", "<member-1>")
 
-				Expect(spec.Validate()).To(Equal(
+				Expect(spec.Validate()).To(ConsistOf(
 					ValidationResult{
 						Name:          "FERRITE_ENUM",
 						Description:   "<desc>",
@@ -70,8 +68,6 @@ var _ = Describe("type EnumSpec", func() {
 			Describe("func Value()", func() {
 				When("the variable is not defined", func() {
 					It("returns the default", func() {
-						res := spec.Validate()
-						Expect(res.Error).ShouldNot(HaveOccurred())
 						Expect(spec.Value()).To(Equal(member1))
 					})
 				})
@@ -79,7 +75,7 @@ var _ = Describe("type EnumSpec", func() {
 
 			Describe("func Validate()", func() {
 				It("returns a success result", func() {
-					Expect(spec.Validate()).To(Equal(
+					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
 							Name:          "FERRITE_ENUM",
 							Description:   "<desc>",
@@ -95,9 +91,17 @@ var _ = Describe("type EnumSpec", func() {
 		})
 
 		When("there is no default value", func() {
+			Describe("func Value()", func() {
+				It("panics", func() {
+					Expect(func() {
+						spec.Value()
+					}).To(PanicWith("FERRITE_ENUM is invalid: must not be empty"))
+				})
+			})
+
 			Describe("func Validate()", func() {
 				It("returns a failure result", func() {
-					Expect(spec.Validate()).To(Equal(
+					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
 							Name:          "FERRITE_ENUM",
 							Description:   "<desc>",
@@ -118,7 +122,7 @@ var _ = Describe("type EnumSpec", func() {
 			It("returns an failure result", func() {
 				os.Setenv("FERRITE_ENUM", "<invalid>")
 
-				Expect(spec.Validate()).To(Equal(
+				Expect(spec.Validate()).To(ConsistOf(
 					ValidationResult{
 						Name:          "FERRITE_ENUM",
 						Description:   "<desc>",

@@ -65,9 +65,9 @@ func (s *impl[T, S]) Value() T {
 }
 
 // Validate validates the environment variable.
-func (s *impl[T, S]) Validate() ValidationResult {
+func (s *impl[T, S]) Validate() []ValidationResult {
 	s.resolve()
-	return s.result
+	return []ValidationResult{s.result}
 }
 
 // resolve populates s.value and s.result.

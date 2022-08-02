@@ -15,7 +15,7 @@ var _ = Describe("func ValidateEnvironment()", func() {
 		Teardown()
 	})
 
-	It("validates the global registry", func() {
+	It("invokes the registered validators", func() {
 		v := Bool("FERRITE_REG", "<desc>")
 
 		os.Setenv("FERRITE_REG", "true")
@@ -24,7 +24,7 @@ var _ = Describe("func ValidateEnvironment()", func() {
 		Expect(v.Value()).To(BeTrue())
 	})
 
-	It("writes a report and exits if the registry can not be validated", func() {
+	It("writes a report and exits if a validator fails", func() {
 		stderr := &strings.Builder{}
 		called := false
 

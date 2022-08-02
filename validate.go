@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"sync"
 
 	"golang.org/x/exp/slices"
 )
@@ -17,22 +18,17 @@ func ValidateEnvironment() {
 	}
 }
 
-// Register adds a variable specification to the register.
-//
-// It can be used to register custom specifications with Ferrite's validation
-// system.
+// Register adds a validator to the global validation system.
 func Register(name string, v Validator) {
-	if registry == nil {
-		registry = map[string]Validator{}
-	}
-
-	registry[name] = v
+	validatorsM.Lock()
+	validators = append(validators, v)
+	validatorsM.Unlock()
 }
 
 // Validator is an interface used to validate environment variables
 type Validator interface {
 	// Validate validates the environment variable.
-	Validate() ValidationResult
+	Validate() []ValidationResult
 }
 
 // ValidationResult is the result of validating an environment variable.
@@ -81,8 +77,10 @@ type ValidationResult struct {
 }
 
 var (
-	// registry is a global registry of environment variable specs.
-	registry map[string]Validator
+	// validators is a global set of validators that are invoked by
+	// ValidateEnvironment().
+	validatorsM sync.Mutex
+	validators  []Validator
 
 	// output is the writer to which the validation result is written.
 	output io.Writer = os.Stderr
@@ -93,16 +91,20 @@ var (
 
 // validate parses and validates all environment variables.
 func validate() (string, bool) {
+	validatorsM.Lock()
+	defer validatorsM.Unlock()
+
 	var results []ValidationResult
-
 	ok := true
-	for _, s := range registry {
-		res := s.Validate()
-		if res.Error != nil {
-			ok = false
-		}
 
-		results = append(results, res)
+	for _, s := range validators {
+		for _, res := range s.Validate() {
+			if res.Error != nil {
+				ok = false
+			}
+
+			results = append(results, res)
+		}
 	}
 
 	return renderResults(results), ok

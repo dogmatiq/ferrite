@@ -30,7 +30,7 @@ func Setup() {
 // Teardown resets the global state after a test.
 func Teardown() {
 	SetExitBehavior(os.Stderr, os.Exit)
-	registry = nil
+	validators = nil
 
 	for _, env := range os.Environ() {
 		if strings.HasPrefix(env, "FERRITE_") {
