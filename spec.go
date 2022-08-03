@@ -3,8 +3,6 @@ package ferrite
 import (
 	"fmt"
 	"os"
-	"sync"
-	"sync/atomic"
 )
 
 // impl is the basis for a impl variable specification.
@@ -13,8 +11,7 @@ import (
 type impl[T any, S spec[T]] struct {
 	self S
 
-	done      uint32
-	m         sync.Mutex
+	seal      seal
 	defaulted bool
 	value     T
 	result    ValidationResult
@@ -73,64 +70,44 @@ func (s *impl[T, S]) Validate() []ValidationResult {
 // resolve populates s.value and s.result, or returns immediately if they are
 // already populated.
 func (s *impl[T, S]) resolve() {
-	if atomic.LoadUint32(&s.done) == 0 {
-		s.m.Lock()
-		defer s.m.Unlock()
+	s.seal.Close(func() {
+		s.result.ValidInput = s.self.renderValidInput()
+		value := os.Getenv(s.result.Name)
 
-		if s.done == 0 {
-			defer atomic.StoreUint32(&s.done, 1)
-			s.parseAndValidate()
-		}
-	}
-}
+		if value == "" {
+			if s.defaulted {
+				s.result.UsingDefault = true
+			} else {
+				s.result.Error = errUndefined
+			}
 
-// parseAndValidate populates s.value and s.result.
-func (s *impl[T, S]) parseAndValidate() {
-	s.result.ValidInput = s.self.renderValidInput()
-	value := os.Getenv(s.result.Name)
-
-	if value == "" {
-		if s.defaulted {
-			s.result.UsingDefault = true
-		} else {
-			s.result.Error = errUndefined
+			return
 		}
 
-		return
-	}
+		s.result.ExplicitValue = s.self.renderRaw(value)
 
-	s.result.ExplicitValue = s.self.renderRaw(value)
+		v, err := s.self.parse(value)
+		if err != nil {
+			s.result.Error = err
+			return
+		}
 
-	v, err := s.self.parse(value)
-	if err != nil {
-		s.result.Error = err
-		return
-	}
+		if err := s.self.validate(v); err != nil {
+			s.result.Error = err
+			return
+		}
 
-	if err := s.self.validate(v); err != nil {
-		s.result.Error = err
-		return
-	}
-
-	s.value = v
-	s.result.ExplicitValue = s.self.renderParsed(v)
+		s.value = v
+		s.result.ExplicitValue = s.self.renderParsed(v)
+	})
 }
 
 // with calls fn while holding a lock on s.
 //
 // It panics if the value has already been resolved.
 func (s *impl[T, S]) with(fn func()) S {
-	if atomic.LoadUint32(&s.done) == 0 {
-		s.m.Lock()
-		defer s.m.Unlock()
-
-		if s.done == 0 {
-			fn()
-			return s.self
-		}
-	}
-
-	panic("cannot modify spec after value has been used or validated")
+	s.seal.Do(fn)
+	return s.self
 }
 
 // spec is a constraint for concrete implementations of a spec that embed

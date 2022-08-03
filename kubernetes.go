@@ -36,7 +36,9 @@ func KubeService(svc string) *KubeServiceSpec {
 
 // KubeServiceSpec is the specification for a Kubernetes service.
 type KubeServiceSpec struct {
-	service    string
+	service string
+
+	seal       seal
 	host, port string
 	hostResult ValidationResult
 	portResult ValidationResult
@@ -54,18 +56,37 @@ type KubeServiceSpec struct {
 // although the two may use the same names.
 //
 // See https://kubernetes.io/docs/concepts/services-networking/service/#multi-port-services
-func (s *KubeServiceSpec) WithNamedPort(port string) {
-	s.portResult.Name = fmt.Sprintf(
-		"%s_SERVICE_PORT_%s",
-		kubeToEnv(s.service),
-		kubeToEnv(port),
-	)
+func (s *KubeServiceSpec) WithNamedPort(port string) *KubeServiceSpec {
+	return s.with(func() {
+		s.portResult.Name = fmt.Sprintf(
+			"%s_SERVICE_PORT_%s",
+			kubeToEnv(s.service),
+			kubeToEnv(port),
+		)
 
-	s.portResult.Description = fmt.Sprintf(
-		`Network port of the "%s" service's "%s" port.`,
-		s.service,
-		port,
-	)
+		s.portResult.Description = fmt.Sprintf(
+			`Network port of the "%s" service's "%s" port.`,
+			s.service,
+			port,
+		)
+	})
+}
+
+// WithDefault sets a default value to use when the environment variables are
+// undefined.
+//
+// port may be a port number or an IANA registered port name (such as "https").
+// The IANA name is not to be confused with the Kubernetes port name.
+func (s *KubeServiceSpec) WithDefault(host, port string) *KubeServiceSpec {
+	return s.with(func() {
+		// TODO: https://github.com/dogmatiq/ferrite/issues/1
+
+		s.host = host
+		s.port = port
+
+		s.hostResult.DefaultValue = host
+		s.portResult.DefaultValue = port
+	})
 }
 
 // Address returns the address (host:port) of the Kubernetes service.
@@ -115,42 +136,40 @@ func (s *KubeServiceSpec) Validate() []ValidationResult {
 	}
 }
 
+// resolve populates s.host, s.port and the validation results, or returns
+// immediately if they are already populated.
 func (s *KubeServiceSpec) resolve() {
-	host := os.Getenv(s.hostResult.Name)
-	port := os.Getenv(s.portResult.Name)
+	// TODO: https://github.com/dogmatiq/ferrite/issues/1
 
-	if host != "" {
-		s.hostResult.ExplicitValue = host
-		s.host = host
-	} else if s.host != "" {
-		s.hostResult.UsingDefault = true
-	} else {
-		s.hostResult.Error = errUndefined
-	}
+	s.seal.Close(func() {
+		host := os.Getenv(s.hostResult.Name)
+		port := os.Getenv(s.portResult.Name)
 
-	if port != "" {
-		s.portResult.ExplicitValue = port
-		s.port = port
-	} else if s.port != "" {
-		s.portResult.UsingDefault = true
-	} else {
-		s.portResult.Error = errUndefined
-	}
+		if host != "" {
+			s.hostResult.ExplicitValue = host
+			s.host = host
+		} else if s.host != "" {
+			s.hostResult.UsingDefault = true
+		} else {
+			s.hostResult.Error = errUndefined
+		}
+
+		if port != "" {
+			s.portResult.ExplicitValue = port
+			s.port = port
+		} else if s.port != "" {
+			s.portResult.UsingDefault = true
+		} else {
+			s.portResult.Error = errUndefined
+		}
+	})
 }
 
-// WithDefault sets a default value to use when the environment variables are
-// undefined.
+// with calls fn while holding a lock on s.
 //
-// port may be a port number or an IANA registered port name (such as "https").
-// The IANA name is not to be confused with the Kubernetes port name.
-func (s *KubeServiceSpec) WithDefault(host, port string) *KubeServiceSpec {
-	// TODO: validate host/port
-	s.host = host
-	s.port = port
-
-	s.hostResult.DefaultValue = host
-	s.portResult.DefaultValue = port
-
+// It panics if the value has already been resolved.
+func (s *KubeServiceSpec) with(fn func()) *KubeServiceSpec {
+	s.seal.Do(fn)
 	return s
 }
 
