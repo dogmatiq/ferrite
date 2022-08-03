@@ -10,7 +10,7 @@ import (
 )
 
 var _ = Describe("type UnsignedSpec", func() {
-	type customNumeric uint
+	type customNumeric uint16
 
 	var spec *UnsignedSpec[customNumeric]
 
@@ -39,11 +39,83 @@ var _ = Describe("type UnsignedSpec", func() {
 					ValidationResult{
 						Name:          "FERRITE_UNSIGNED",
 						Description:   "<desc>",
-						ValidInput:    "[ferrite_test.customNumeric]",
+						ValidInput:    "(0..65535)",
 						ExplicitValue: "123",
 					},
 				))
 			})
+		})
+	})
+
+	When("the environment variable is invalid", func() {
+		Describe("func Value()", func() {
+			DescribeTable(
+				"it panics",
+				func(value, expect string) {
+					os.Setenv("FERRITE_UNSIGNED", value)
+					Expect(func() {
+						spec.Value()
+					}).To(PanicWith(expect))
+				},
+				Entry(
+					"underflow",
+					"-1",
+					`FERRITE_UNSIGNED is invalid: must be an integer between 0 and 65535`,
+				),
+				Entry(
+					"overflow",
+					"65537",
+					`FERRITE_UNSIGNED is invalid: must be an integer between 0 and 65535`,
+				),
+				Entry(
+					"decimal",
+					"123.45",
+					`FERRITE_UNSIGNED is invalid: must be an integer between 0 and 65535`,
+				),
+				Entry(
+					"invalid characters",
+					"123!",
+					`FERRITE_UNSIGNED is invalid: must be an integer between 0 and 65535`,
+				),
+			)
+		})
+
+		Describe("func Validate()", func() {
+			DescribeTable(
+				"it returns a failure result",
+				func(value, expect string) {
+					os.Setenv("FERRITE_UNSIGNED", value)
+					Expect(spec.Validate()).To(ConsistOf(
+						ValidationResult{
+							Name:          "FERRITE_UNSIGNED",
+							Description:   "<desc>",
+							ValidInput:    "(0..65535)",
+							ExplicitValue: value,
+							Error:         errors.New(expect),
+						},
+					))
+				},
+				Entry(
+					"underflow",
+					"-1",
+					`must be an integer between 0 and 65535`,
+				),
+				Entry(
+					"overflow",
+					"65537",
+					`must be an integer between 0 and 65535`,
+				),
+				Entry(
+					"decimal",
+					"123.45",
+					`must be an integer between 0 and 65535`,
+				),
+				Entry(
+					"invalid characters",
+					"123!",
+					`must be an integer between 0 and 65535`,
+				),
+			)
 		})
 	})
 
@@ -65,7 +137,7 @@ var _ = Describe("type UnsignedSpec", func() {
 						ValidationResult{
 							Name:         "FERRITE_UNSIGNED",
 							Description:  "<desc>",
-							ValidInput:   "[ferrite_test.customNumeric]",
+							ValidInput:   "(0..65535)",
 							DefaultValue: "123",
 							UsingDefault: true,
 						},
@@ -89,7 +161,7 @@ var _ = Describe("type UnsignedSpec", func() {
 						ValidationResult{
 							Name:        "FERRITE_UNSIGNED",
 							Description: "<desc>",
-							ValidInput:  "[ferrite_test.customNumeric]",
+							ValidInput:  "(0..65535)",
 							Error:       errors.New(`must not be empty`),
 						},
 					))

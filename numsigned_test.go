@@ -10,7 +10,7 @@ import (
 )
 
 var _ = Describe("type SignedSpec", func() {
-	type customNumeric int
+	type customNumeric int16
 
 	var spec *SignedSpec[customNumeric]
 
@@ -39,11 +39,83 @@ var _ = Describe("type SignedSpec", func() {
 					ValidationResult{
 						Name:          "FERRITE_SIGNED",
 						Description:   "<desc>",
-						ValidInput:    "[ferrite_test.customNumeric]",
+						ValidInput:    "(-32768..+32767)",
 						ExplicitValue: "-123",
 					},
 				))
 			})
+		})
+	})
+
+	When("the environment variable is invalid", func() {
+		Describe("func Value()", func() {
+			DescribeTable(
+				"it panics",
+				func(value, expect string) {
+					os.Setenv("FERRITE_SIGNED", value)
+					Expect(func() {
+						spec.Value()
+					}).To(PanicWith(expect))
+				},
+				Entry(
+					"underflow",
+					"-32769",
+					`FERRITE_SIGNED is invalid: must be an integer between -32768 and +32767`,
+				),
+				Entry(
+					"overflow",
+					"32768",
+					`FERRITE_SIGNED is invalid: must be an integer between -32768 and +32767`,
+				),
+				Entry(
+					"decimal",
+					"123.45",
+					`FERRITE_SIGNED is invalid: must be an integer between -32768 and +32767`,
+				),
+				Entry(
+					"invalid characters",
+					"123!",
+					`FERRITE_SIGNED is invalid: must be an integer between -32768 and +32767`,
+				),
+			)
+		})
+
+		Describe("func Validate()", func() {
+			DescribeTable(
+				"it returns a failure result",
+				func(value, expect string) {
+					os.Setenv("FERRITE_SIGNED", value)
+					Expect(spec.Validate()).To(ConsistOf(
+						ValidationResult{
+							Name:          "FERRITE_SIGNED",
+							Description:   "<desc>",
+							ValidInput:    "(-32768..+32767)",
+							ExplicitValue: value,
+							Error:         errors.New(expect),
+						},
+					))
+				},
+				Entry(
+					"underflow",
+					"-32769",
+					`must be an integer between -32768 and +32767`,
+				),
+				Entry(
+					"overflow",
+					"32768",
+					`must be an integer between -32768 and +32767`,
+				),
+				Entry(
+					"decimal",
+					"123.45",
+					`must be an integer between -32768 and +32767`,
+				),
+				Entry(
+					"invalid characters",
+					"123!",
+					`must be an integer between -32768 and +32767`,
+				),
+			)
 		})
 	})
 
@@ -65,7 +137,7 @@ var _ = Describe("type SignedSpec", func() {
 						ValidationResult{
 							Name:         "FERRITE_SIGNED",
 							Description:  "<desc>",
-							ValidInput:   "[ferrite_test.customNumeric]",
+							ValidInput:   "(-32768..+32767)",
 							DefaultValue: "-123",
 							UsingDefault: true,
 						},
@@ -89,7 +161,7 @@ var _ = Describe("type SignedSpec", func() {
 						ValidationResult{
 							Name:        "FERRITE_SIGNED",
 							Description: "<desc>",
-							ValidInput:  "[ferrite_test.customNumeric]",
+							ValidInput:  "(-32768..+32767)",
 							Error:       errors.New(`must not be empty`),
 						},
 					))

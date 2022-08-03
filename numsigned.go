@@ -1,6 +1,7 @@
 package ferrite
 
 import (
+	"fmt"
 	"strconv"
 
 	"golang.org/x/exp/constraints"
@@ -11,7 +12,13 @@ import (
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
 func Signed[T constraints.Signed](name, desc string) *SignedSpec[T] {
-	s := &SignedSpec[T]{}
+	shift := bitSize[T]() - 1
+
+	s := &SignedSpec[T]{
+		min: -1 << shift,
+		max: (1 << shift) - 1,
+	}
+
 	s.init(s, name, desc)
 	return s
 }
@@ -19,6 +26,8 @@ func Signed[T constraints.Signed](name, desc string) *SignedSpec[T] {
 // SignedSpec is the specification for a signed integer.
 type SignedSpec[T constraints.Signed] struct {
 	impl[T, *SignedSpec[T]]
+
+	min, max T
 }
 
 // parses parses and validates the value of the environment variable.
@@ -27,23 +36,41 @@ type SignedSpec[T constraints.Signed] struct {
 // necessarily meet all of the requirements.
 func (s *SignedSpec[T]) parse(value string) (T, error) {
 	n, err := strconv.ParseInt(value, 10, bitSize[T]())
-	return T(n), err
+	v := T(n)
+
+	if err != nil {
+		return 0, fmt.Errorf(
+			"must be an integer between %+d and %+d",
+			s.min,
+			s.max,
+		)
+	}
+
+	return v, err
 }
 
 // validate validates a parsed or default value.
 func (s *SignedSpec[T]) validate(value T) error {
+	if value < s.min || value > s.max {
+		return fmt.Errorf(
+			"must be an integer between %+d and %+d",
+			s.min,
+			s.max,
+		)
+	}
+
 	return nil
 }
 
 // renderValidInput returns a string representation of the valid input values.
 func (s *SignedSpec[T]) renderValidInput() string {
-	return inputType[T]()
+	return fmt.Sprintf("(%+d..%+d)", s.min, s.max)
 }
 
 // renderParsed returns a string representation of the parsed value as it should
 // appear in validation reports.
 func (s *SignedSpec[T]) renderParsed(value T) string {
-	return strconv.FormatInt(int64(value), 10)
+	return fmt.Sprintf("%+d", value)
 }
 
 // renderRaw returns a string representation of the raw string value as it
