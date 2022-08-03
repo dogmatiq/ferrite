@@ -13,16 +13,6 @@ var _ = Describe("type KubeServiceSpec", func() {
 	var spec *KubeServiceSpec
 
 	BeforeEach(func() {
-		// FERRITE_SVC_SERVICE_HOST=host.example.org
-		// FERRITE_SVC_SERVICE_PORT=12345
-		// FERRITE_SVC_SERVICE_PORT_NAMED_PORT=12345
-		// FERRITE_SVC_PORT=tcp://host.example.org:12345
-
-		// FERRITE_SVC_PORT_12345_TCP=tcp://host.example.org:12345
-		// FERRITE_SVC_PORT_12345_TCP_PROTO=tcp
-		// FERRITE_SVC_PORT_12345_TCP_PORT=12345
-		// FERRITE_SVC_PORT_12345_TCP_ADDR=host.example.org
-
 		spec = KubeService("ferrite-svc")
 	})
 
@@ -458,27 +448,27 @@ var _ = Describe("type KubeServiceSpec", func() {
 				Entry(
 					"empty",
 					"",
-					"kubernetes port names must not be empty",
+					"kubernetes port name is invalid: must not be empty",
 				),
 				Entry(
 					"starts with a hyphen",
 					"-foo",
-					"kubernetes port names must not begin or end with a hyphen",
+					"kubernetes port name is invalid: must not begin or end with a hyphen",
 				),
 				Entry(
 					"ends with a hyphen",
 					"foo-",
-					"kubernetes port names must not begin or end with a hyphen",
+					"kubernetes port name is invalid: must not begin or end with a hyphen",
 				),
 				Entry(
 					"contains an invalid character",
 					"foo*bar",
-					"kubernetes port names must contain only lowercase ASCII letters, digits and hyphen",
+					"kubernetes port name is invalid: must contain only lowercase ASCII letters, digits and hyphen",
 				),
 				Entry(
 					"contains an uppercase character",
 					"fooBar",
-					"kubernetes port names must contain only lowercase ASCII letters, digits and hyphen",
+					"kubernetes port name is invalid: must contain only lowercase ASCII letters, digits and hyphen",
 				),
 			)
 		})

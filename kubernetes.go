@@ -18,7 +18,12 @@ import (
 // The environment variables "<svc>_SERVICE_HOST" and "<svc>_SERVICE_PORT" are
 // used to construct an address for the service.
 func KubeService(svc string) *KubeServiceSpec {
-	// TODO: panic if service name is invalid
+	if err := validateKubernetesName(svc); err != nil {
+		panic(fmt.Sprintf(
+			"kubernetes service name is invalid: %s",
+			err,
+		))
+	}
 
 	s := &KubeServiceSpec{
 		service: svc,
@@ -61,26 +66,11 @@ type KubeServiceSpec struct {
 //
 // See https://kubernetes.io/docs/concepts/services-networking/service/#multi-port-services
 func (s *KubeServiceSpec) WithNamedPort(port string) *KubeServiceSpec {
-	if port == "" {
-		panic("kubernetes port names must not be empty")
-	}
-
-	n := len(port)
-
-	if port[0] == '-' || port[n-1] == '-' {
-		panic("kubernetes port names must not begin or end with a hyphen")
-	}
-
-	for i := range port {
-		ch := port[i] // iterate by byte (not rune)
-
-		switch {
-		case ch >= 'a' && ch <= 'z':
-		case ch >= '0' && ch <= '9':
-		case ch == '-':
-		default:
-			panic("kubernetes port names must contain only lowercase ASCII letters, digits and hyphen")
-		}
+	if err := validateKubernetesName(port); err != nil {
+		panic(fmt.Sprintf(
+			"kubernetes port name is invalid: %s",
+			err,
+		))
 	}
 
 	return s.with(func() {
@@ -336,6 +326,34 @@ func validateIANAServiceName(name string) error {
 	//RFC-6335: MUST contain at least one letter ('A' - 'Z' or 'a' - 'z').
 	if !hasLetter {
 		return errors.New("must contain at least one letter")
+	}
+
+	return nil
+}
+
+// validateKubernetesName returns an error if name is not a valid Kubernetes
+// resource name.
+func validateKubernetesName(name string) error {
+	if name == "" {
+		return errors.New("must not be empty")
+	}
+
+	n := len(name)
+
+	if name[0] == '-' || name[n-1] == '-' {
+		return errors.New("must not begin or end with a hyphen")
+	}
+
+	for i := range name {
+		ch := name[i] // iterate by byte (not rune)
+
+		switch {
+		case ch >= 'a' && ch <= 'z':
+		case ch >= '0' && ch <= '9':
+		case ch == '-':
+		default:
+			return errors.New("must contain only lowercase ASCII letters, digits and hyphen")
+		}
 	}
 
 	return nil
