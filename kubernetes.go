@@ -1,9 +1,11 @@
 package ferrite
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -52,11 +54,15 @@ type KubeServiceSpec struct {
 // "<service>_SERVICE_PORT".
 //
 // The Kubernetes port name is the name configured in the service manifest. It
-// is not to be confused with an IANA registered port name (e.g. "https"),
+// is not to be confused with an IANA registered service name (e.g. "https"),
 // although the two may use the same names.
 //
 // See https://kubernetes.io/docs/concepts/services-networking/service/#multi-port-services
 func (s *KubeServiceSpec) WithNamedPort(port string) *KubeServiceSpec {
+	// TODO: panic if port is not As with Kubernetes names in general, names for
+	// ports must only contain lowercase alphanumeric characters and -. Port
+	// names must also start and end with an alphanumeric character.
+
 	return s.with(func() {
 		s.portResult.Name = fmt.Sprintf(
 			"%s_SERVICE_PORT_%s",
@@ -75,9 +81,25 @@ func (s *KubeServiceSpec) WithNamedPort(port string) *KubeServiceSpec {
 // WithDefault sets a default value to use when the environment variables are
 // undefined.
 //
-// port may be a port number or an IANA registered port name (such as "https").
-// The IANA name is not to be confused with the Kubernetes port name.
+// The port may be a numeric value between 1 and 65535, or an IANA registered
+// service name (such as "https"). The IANA name is not to be confused with the
+// Kubernetes servcice name or port name.
 func (s *KubeServiceSpec) WithDefault(host, port string) *KubeServiceSpec {
+	if host == "" {
+		panic(fmt.Sprintf(
+			"default value of %s is invalid: must not be empty",
+			s.hostResult.Name,
+		))
+	}
+
+	if err := validatePort(port); err != nil {
+		panic(fmt.Sprintf(
+			"default value of %s is invalid: %s",
+			s.portResult.Name,
+			err,
+		))
+	}
+
 	return s.with(func() {
 		// TODO: https://github.com/dogmatiq/ferrite/issues/1
 
@@ -111,7 +133,7 @@ func (s *KubeServiceSpec) Host() string {
 
 // Port returns the port of the Kubernetes service.
 //
-// It may be a port number of an IANA registered port name (e.g. "https").
+// It may be a port number of an IANA registered service name (e.g. "https").
 func (s *KubeServiceSpec) Port() string {
 	s.resolve()
 
@@ -179,4 +201,73 @@ func kubeToEnv(s string) string {
 	return strings.ToUpper(
 		strings.ReplaceAll(s, "-", "_"),
 	)
+}
+
+// validatePort returns an error if port is neither a numeric port number, nor a
+// valid IANA registered service name.
+func validatePort(port string) error {
+	if port == "" {
+		return errUndefined
+	}
+
+	if isValidIANAService(port) {
+		return nil
+	}
+
+	n, err := strconv.ParseUint(port, 10, 16)
+
+	if errors.Is(err, strconv.ErrSyntax) {
+		return fmt.Errorf("%q is not a valid numeric port or well-formed IANA service name", port)
+	}
+
+	if err == nil && n != 0 {
+		return nil
+	}
+
+	return errors.New("numeric ports must be between 1 and 65535")
+}
+
+// isValidIANAService returns true if name is a valid IANA service name.
+//
+// See https://www.rfc-editor.org/rfc/rfc6335.html#section-5.1.
+func isValidIANAService(name string) bool {
+	// Valid service names are hereby normatively defined as follows:
+
+	n := len(name)
+
+	// RFC-6335: MUST be at least 1 character and no more than 15 characters
+	// long.
+	if n == 0 || n > 15 {
+		return false
+	}
+
+	// RFC-6335: MUST NOT begin or end with a hyphen.
+	if name[0] == '-' || name[n-1] == '-' {
+		return false
+	}
+
+	hasLetter := false
+
+	for i, ch := range name {
+		// RFC-6335: MUST contain only US-ASCII [ANSI.X3.4-1986] letters 'A' -
+		// 'Z' and 'a' - 'z', digits '0' - '9', and hyphens ('-', ASCII 0x2D or
+		// decimal 45).
+		switch {
+		case ch >= 'A' && ch <= 'Z':
+			hasLetter = true
+		case ch >= 'a' && ch <= 'z':
+			hasLetter = true
+		case ch >= '0' && ch <= '9':
+		case ch == '-':
+			// RFC-6335: hyphens MUST NOT be adjacent to other hyphens.
+			if name[i-1] == '-' {
+				return false
+			}
+		default:
+			return false
+		}
+	}
+
+	//RFC-6335: MUST contain at least one letter ('A' - 'Z' or 'a' - 'z').
+	return hasLetter
 }

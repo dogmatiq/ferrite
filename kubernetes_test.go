@@ -359,4 +359,83 @@ var _ = Describe("type KubeServiceSpec", func() {
 			})
 		})
 	})
+
+	Describe("func WithDefault()", func() {
+		When("the port is a valid IANA port name", func() {
+			DescribeTable(
+				"it does not panics",
+				func(port string) {
+					Expect(func() {
+						spec.WithDefault("default.example.org", port)
+					}).NotTo(Panic())
+				},
+				Entry(
+					"lowercase",
+					"https",
+				),
+				Entry(
+					"uppercase",
+					"HTTPS",
+				),
+				Entry(
+					"mixed",
+					"HttpS",
+				),
+				Entry(
+					"hypenated",
+					"foo-bar-spam",
+				),
+				Entry(
+					"contains digits",
+					"0foo1bar2",
+				),
+			)
+		})
+		When("the default is invalid", func() {
+			DescribeTable(
+				"it panics",
+				func(host, port, expect string) {
+					Expect(func() {
+						spec.WithDefault(host, port)
+					}).To(PanicWith(expect))
+				},
+				Entry(
+					"empty host",
+					"",
+					"12345",
+					"default value of FERRITE_SVC_SERVICE_HOST is invalid: must not be empty",
+				),
+				Entry(
+					"empty port",
+					"host.example.org",
+					"",
+					"default value of FERRITE_SVC_SERVICE_PORT is invalid: must not be empty",
+				),
+				Entry(
+					"numeric port too low",
+					"host.example.org",
+					"0",
+					"default value of FERRITE_SVC_SERVICE_PORT is invalid: numeric ports must be between 1 and 65535",
+				),
+				Entry(
+					"numeric port too high",
+					"host.example.org",
+					"65536",
+					"default value of FERRITE_SVC_SERVICE_PORT is invalid: numeric ports must be between 1 and 65535",
+				),
+				Entry(
+					"IANA registered port does not contain any letters",
+					"host.example.org",
+					"100-200",
+					`default value of FERRITE_SVC_SERVICE_PORT is invalid: "100-200" is not a valid numeric port or well-formed IANA service name`,
+				),
+				Entry(
+					"IANA registered port starts with a hyphen",
+					"host.example.org",
+					"-https",
+					`default value of FERRITE_SVC_SERVICE_PORT is invalid: "-https" is not a valid numeric port or well-formed IANA service name`,
+				),
+			)
+		})
+	})
 })
