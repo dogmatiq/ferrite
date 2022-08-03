@@ -24,7 +24,7 @@ func ExampleKubeService() {
 	// address is host.example.org:12345
 }
 
-func ExampleString_namedPort() {
+func ExampleKubeService_namedPort() {
 	setUp()
 	defer tearDown()
 
