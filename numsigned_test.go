@@ -24,12 +24,12 @@ var _ = Describe("type SignedSpec", func() {
 
 	When("the environment variable is not empty", func() {
 		BeforeEach(func() {
-			os.Setenv("FERRITE_SIGNED", "123")
+			os.Setenv("FERRITE_SIGNED", "-123")
 		})
 
 		Describe("func Value()", func() {
 			It("returns the numeric value", func() {
-				Expect(spec.Value()).To(Equal(customNumeric(123)))
+				Expect(spec.Value()).To(Equal(customNumeric(-123)))
 			})
 		})
 
@@ -40,7 +40,7 @@ var _ = Describe("type SignedSpec", func() {
 						Name:          "FERRITE_SIGNED",
 						Description:   "<desc>",
 						ValidInput:    "[ferrite_test.customNumeric]",
-						ExplicitValue: "123",
+						ExplicitValue: "-123",
 					},
 				))
 			})
@@ -50,12 +50,12 @@ var _ = Describe("type SignedSpec", func() {
 	When("the environment variable is empty", func() {
 		When("there is a default value", func() {
 			BeforeEach(func() {
-				spec.WithDefault(123)
+				spec.WithDefault(-123)
 			})
 
 			Describe("func Value()", func() {
 				It("returns the default", func() {
-					Expect(spec.Value()).To(Equal(customNumeric(123)))
+					Expect(spec.Value()).To(Equal(customNumeric(-123)))
 				})
 			})
 
@@ -66,7 +66,7 @@ var _ = Describe("type SignedSpec", func() {
 							Name:         "FERRITE_SIGNED",
 							Description:  "<desc>",
 							ValidInput:   "[ferrite_test.customNumeric]",
-							DefaultValue: "123",
+							DefaultValue: "-123",
 							UsingDefault: true,
 						},
 					))
@@ -87,13 +87,10 @@ var _ = Describe("type SignedSpec", func() {
 				It("returns a failure result", func() {
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:          "FERRITE_SIGNED",
-							Description:   "<desc>",
-							ValidInput:    "[ferrite_test.customNumeric]",
-							DefaultValue:  "",
-							ExplicitValue: "",
-							UsingDefault:  false,
-							Error:         errors.New(`must not be empty`),
+							Name:        "FERRITE_SIGNED",
+							Description: "<desc>",
+							ValidInput:  "[ferrite_test.customNumeric]",
+							Error:       errors.New(`must not be empty`),
 						},
 					))
 				})
