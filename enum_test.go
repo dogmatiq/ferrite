@@ -50,9 +50,7 @@ var _ = Describe("type EnumSpec", func() {
 						Name:          "FERRITE_ENUM",
 						Description:   "<desc>",
 						ValidInput:    "<member-0>|<member-1>|<member-2>",
-						DefaultValue:  "",
 						ExplicitValue: "<member-1>",
-						Error:         nil,
 					},
 				))
 			})
@@ -77,13 +75,11 @@ var _ = Describe("type EnumSpec", func() {
 				It("returns a success result", func() {
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:          "FERRITE_ENUM",
-							Description:   "<desc>",
-							ValidInput:    "<member-0>|<member-1>|<member-2>",
-							DefaultValue:  "<member-1>",
-							ExplicitValue: "",
-							UsingDefault:  true,
-							Error:         nil,
+							Name:         "FERRITE_ENUM",
+							Description:  "<desc>",
+							ValidInput:   "<member-0>|<member-1>|<member-2>",
+							DefaultValue: "<member-1>",
+							UsingDefault: true,
 						},
 					))
 				})
@@ -103,13 +99,10 @@ var _ = Describe("type EnumSpec", func() {
 				It("returns a failure result", func() {
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:          "FERRITE_ENUM",
-							Description:   "<desc>",
-							ValidInput:    "<member-0>|<member-1>|<member-2>",
-							DefaultValue:  "",
-							ExplicitValue: "",
-							UsingDefault:  false,
-							Error:         errors.New(`must not be empty`),
+							Name:        "FERRITE_ENUM",
+							Description: "<desc>",
+							ValidInput:  "<member-0>|<member-1>|<member-2>",
+							Error:       errors.New(`must not be empty`),
 						},
 					))
 				})
@@ -127,9 +120,7 @@ var _ = Describe("type EnumSpec", func() {
 						Name:          "FERRITE_ENUM",
 						Description:   "<desc>",
 						ValidInput:    "<member-0>|<member-1>|<member-2>",
-						DefaultValue:  "",
 						ExplicitValue: "<invalid>",
-						UsingDefault:  false,
 						Error:         errors.New(`<invalid> is not a member of the enum`),
 					},
 				))

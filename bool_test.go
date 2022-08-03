@@ -45,10 +45,7 @@ var _ = Describe("type BoolSpec", func() {
 						Name:          "FERRITE_BOOL",
 						Description:   "<desc>",
 						ValidInput:    "true|false",
-						DefaultValue:  "",
 						ExplicitValue: "true",
-						UsingDefault:  false,
-						Error:         nil,
 					},
 				))
 			})
@@ -76,13 +73,11 @@ var _ = Describe("type BoolSpec", func() {
 
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:          "FERRITE_BOOL",
-							Description:   "<desc>",
-							ValidInput:    "true|false",
-							DefaultValue:  "true",
-							ExplicitValue: "",
-							UsingDefault:  true,
-							Error:         nil,
+							Name:         "FERRITE_BOOL",
+							Description:  "<desc>",
+							ValidInput:   "true|false",
+							DefaultValue: "true",
+							UsingDefault: true,
 						},
 					))
 				})
@@ -102,13 +97,10 @@ var _ = Describe("type BoolSpec", func() {
 				It("returns a failure result", func() {
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:          "FERRITE_BOOL",
-							Description:   "<desc>",
-							ValidInput:    "true|false",
-							DefaultValue:  "",
-							ExplicitValue: "",
-							UsingDefault:  false,
-							Error:         errors.New(`must not be empty`),
+							Name:        "FERRITE_BOOL",
+							Description: "<desc>",
+							ValidInput:  "true|false",
+							Error:       errors.New(`must not be empty`),
 						},
 					))
 				})
@@ -136,9 +128,7 @@ var _ = Describe("type BoolSpec", func() {
 						Name:          "FERRITE_BOOL",
 						Description:   "<desc>",
 						ValidInput:    "true|false",
-						DefaultValue:  "",
 						ExplicitValue: "<invalid>",
-						UsingDefault:  false,
 						Error:         errors.New(`must be either "true" or "false"`),
 					},
 				))
@@ -178,9 +168,7 @@ var _ = Describe("type BoolSpec", func() {
 								Name:          "FERRITE_BOOL",
 								Description:   "<desc>",
 								ValidInput:    "yes|no",
-								DefaultValue:  "",
 								ExplicitValue: value,
-								UsingDefault:  false,
 								Error:         errors.New(`must be either "yes" or "no"`),
 							},
 						))

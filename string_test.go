@@ -40,9 +40,7 @@ var _ = Describe("type StringSpec", func() {
 						Name:          "FERRITE_STRING",
 						Description:   "<desc>",
 						ValidInput:    "[ferrite_test.customString]",
-						DefaultValue:  "",
 						ExplicitValue: `"<value>"`,
-						Error:         nil,
 					},
 				))
 			})
@@ -65,13 +63,11 @@ var _ = Describe("type StringSpec", func() {
 				It("returns a success result", func() {
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:          "FERRITE_STRING",
-							Description:   "<desc>",
-							ValidInput:    "[ferrite_test.customString]",
-							DefaultValue:  `"<value>"`,
-							ExplicitValue: "",
-							UsingDefault:  true,
-							Error:         nil,
+							Name:         "FERRITE_STRING",
+							Description:  "<desc>",
+							ValidInput:   "[ferrite_test.customString]",
+							DefaultValue: `"<value>"`,
+							UsingDefault: true,
 						},
 					))
 				})
@@ -91,13 +87,10 @@ var _ = Describe("type StringSpec", func() {
 				It("returns a failure result", func() {
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:          "FERRITE_STRING",
-							Description:   "<desc>",
-							ValidInput:    "[ferrite_test.customString]",
-							DefaultValue:  "",
-							ExplicitValue: "",
-							UsingDefault:  false,
-							Error:         errors.New(`must not be empty`),
+							Name:        "FERRITE_STRING",
+							Description: "<desc>",
+							ValidInput:  "[ferrite_test.customString]",
+							Error:       errors.New(`must not be empty`),
 						},
 					))
 				})

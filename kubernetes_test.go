@@ -53,17 +53,13 @@ var _ = Describe("type KubeServiceSpec", func() {
 						Name:          "FERRITE_SVC_SERVICE_HOST",
 						Description:   `Hostname or IP address of the "ferrite-svc" service.`,
 						ValidInput:    "[string]",
-						DefaultValue:  "",
 						ExplicitValue: "host.example.org",
-						Error:         nil,
 					},
 					ValidationResult{
 						Name:          "FERRITE_SVC_SERVICE_PORT",
 						Description:   `Network port of the "ferrite-svc" service.`,
 						ValidInput:    "[string]|(1..65535)",
-						DefaultValue:  "",
 						ExplicitValue: "12345",
-						Error:         nil,
 					},
 				))
 			})
@@ -179,17 +175,13 @@ var _ = Describe("type KubeServiceSpec", func() {
 						Name:          "FERRITE_SVC_SERVICE_HOST",
 						Description:   `Hostname or IP address of the "ferrite-svc" service.`,
 						ValidInput:    "[string]",
-						DefaultValue:  "",
 						ExplicitValue: "host.example.org",
-						Error:         nil,
 					},
 					ValidationResult{
 						Name:          "FERRITE_SVC_SERVICE_PORT_NAMED_PORT",
 						Description:   `Network port of the "ferrite-svc" service's "named-port" port.`,
 						ValidInput:    "[string]|(1..65535)",
-						DefaultValue:  "",
 						ExplicitValue: "12345",
-						Error:         nil,
 					},
 				))
 			})
