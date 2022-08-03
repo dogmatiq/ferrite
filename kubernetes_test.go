@@ -361,14 +361,45 @@ var _ = Describe("type KubeServiceSpec", func() {
 	})
 
 	Describe("func WithDefault()", func() {
-		When("the port is a valid IANA port name", func() {
+		When("the host is valid", func() {
 			DescribeTable(
-				"it does not panics",
+				"it does not panic",
+				func(host string) {
+					Expect(func() {
+						spec.WithDefault(host, "12345")
+					}).NotTo(Panic())
+				},
+				Entry(
+					"IPv4",
+					"192.168.1.2",
+				),
+				Entry(
+					"IPv6",
+					"::1",
+				),
+				Entry(
+					"unqualified DNS name",
+					"svc-name",
+				),
+				Entry(
+					"qualified DNS name",
+					"svc-name.example.org",
+				),
+			)
+		})
+
+		When("the port is valid", func() {
+			DescribeTable(
+				"it does not panic",
 				func(port string) {
 					Expect(func() {
 						spec.WithDefault("default.example.org", port)
 					}).NotTo(Panic())
 				},
+				Entry(
+					"numeric",
+					"12345",
+				),
 				Entry(
 					"lowercase",
 					"https",
@@ -391,6 +422,7 @@ var _ = Describe("type KubeServiceSpec", func() {
 				),
 			)
 		})
+
 		When("the default is invalid", func() {
 			DescribeTable(
 				"it panics",
@@ -404,6 +436,24 @@ var _ = Describe("type KubeServiceSpec", func() {
 					"",
 					"12345",
 					"default value of FERRITE_SVC_SERVICE_HOST is invalid: must not be empty",
+				),
+				Entry(
+					"hostname begins with a dot",
+					".foo",
+					"12345",
+					"default value of FERRITE_SVC_SERVICE_HOST is invalid: hostname must not begin or end with a dot",
+				),
+				Entry(
+					"hostname ends with a dot",
+					"foo.",
+					"12345",
+					"default value of FERRITE_SVC_SERVICE_HOST is invalid: hostname must not begin or end with a dot",
+				),
+				Entry(
+					"hostname contains whitespace",
+					"foo .bar",
+					"12345",
+					"default value of FERRITE_SVC_SERVICE_HOST is invalid: hostname must not contain whitespace",
 				),
 				Entry(
 					"empty port",
@@ -424,16 +474,40 @@ var _ = Describe("type KubeServiceSpec", func() {
 					"default value of FERRITE_SVC_SERVICE_PORT is invalid: numeric ports must be between 1 and 65535",
 				),
 				Entry(
-					"IANA registered port does not contain any letters",
+					"IANA service name is too long",
 					"host.example.org",
-					"100-200",
-					`default value of FERRITE_SVC_SERVICE_PORT is invalid: "100-200" is not a valid numeric port or well-formed IANA service name`,
+					"this-name-is-very-long",
+					`default value of FERRITE_SVC_SERVICE_PORT is invalid: "this-name-is-very-long" is not a valid IANA service name (must be between 1 and 15 characters)`,
 				),
 				Entry(
-					"IANA registered port starts with a hyphen",
+					"IANA service name does not contain any letters",
 					"host.example.org",
-					"-https",
-					`default value of FERRITE_SVC_SERVICE_PORT is invalid: "-https" is not a valid numeric port or well-formed IANA service name`,
+					"100-200",
+					`default value of FERRITE_SVC_SERVICE_PORT is invalid: "100-200" is not a valid IANA service name (must contain at least one letter)`,
+				),
+				Entry(
+					"IANA service name starts with a hyphen",
+					"host.example.org",
+					"-foo",
+					`default value of FERRITE_SVC_SERVICE_PORT is invalid: "-foo" is not a valid IANA service name (must not begin or end with a hyphen)`,
+				),
+				Entry(
+					"IANA service name ends with a hyphen",
+					"host.example.org",
+					"foo-",
+					`default value of FERRITE_SVC_SERVICE_PORT is invalid: "foo-" is not a valid IANA service name (must not begin or end with a hyphen)`,
+				),
+				Entry(
+					"IANA service name contains adjacent hyphens",
+					"host.example.org",
+					"foo--bar",
+					`default value of FERRITE_SVC_SERVICE_PORT is invalid: "foo--bar" is not a valid IANA service name (must not contain adjacent hyphens)`,
+				),
+				Entry(
+					"contains invalid character",
+					"host.example.org",
+					"foo*bar",
+					`default value of FERRITE_SVC_SERVICE_PORT is invalid: "foo*bar" is not a valid IANA service name (must contain only ASCII letters, digits and hyphen)`,
 				),
 			)
 		})

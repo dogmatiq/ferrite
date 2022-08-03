@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 // KubeService reads Kubernetes service discovery environment variables for a
@@ -85,10 +86,11 @@ func (s *KubeServiceSpec) WithNamedPort(port string) *KubeServiceSpec {
 // service name (such as "https"). The IANA name is not to be confused with the
 // Kubernetes servcice name or port name.
 func (s *KubeServiceSpec) WithDefault(host, port string) *KubeServiceSpec {
-	if host == "" {
+	if err := validateHost(host); err != nil {
 		panic(fmt.Sprintf(
-			"default value of %s is invalid: must not be empty",
+			"default value of %s is invalid: %s",
 			s.hostResult.Name,
+			err,
 		))
 	}
 
@@ -203,6 +205,35 @@ func kubeToEnv(s string) string {
 	)
 }
 
+// validateHost reutrns an error if host is not a valid hostname or IP address.
+//
+// The hostname validation is intentionally very permissive as it's not unheard
+// of to encounter functioning services in the wild that have DNS names that are
+// technically invalid. This includes hostnames that start with hyphens!
+func validateHost(host string) error {
+	if host == "" {
+		return errUndefined
+	}
+
+	if net.ParseIP(host) != nil {
+		return nil
+	}
+
+	n := len(host)
+
+	if host[0] == '.' || host[n-1] == '.' {
+		return errors.New("hostname must not begin or end with a dot")
+	}
+
+	for _, r := range host {
+		if unicode.IsSpace(r) {
+			return errors.New("hostname must not contain whitespace")
+		}
+	}
+
+	return nil
+}
+
 // validatePort returns an error if port is neither a numeric port number, nor a
 // valid IANA registered service name.
 func validatePort(port string) error {
@@ -210,14 +241,14 @@ func validatePort(port string) error {
 		return errUndefined
 	}
 
-	if isValidIANAService(port) {
-		return nil
-	}
-
 	n, err := strconv.ParseUint(port, 10, 16)
 
 	if errors.Is(err, strconv.ErrSyntax) {
-		return fmt.Errorf("%q is not a valid numeric port or well-formed IANA service name", port)
+		if err := validateIANAServiceName(port); err != nil {
+			return fmt.Errorf("%q is not a valid IANA service name (%s)", port, err)
+		}
+
+		return nil
 	}
 
 	if err == nil && n != 0 {
@@ -227,28 +258,29 @@ func validatePort(port string) error {
 	return errors.New("numeric ports must be between 1 and 65535")
 }
 
-// isValidIANAService returns true if name is a valid IANA service name.
+// validateIANAServiceName returns an error if name is not a valid IANA service
+// name.
 //
 // See https://www.rfc-editor.org/rfc/rfc6335.html#section-5.1.
-func isValidIANAService(name string) bool {
-	// Valid service names are hereby normatively defined as follows:
-
+func validateIANAServiceName(name string) error {
 	n := len(name)
 
 	// RFC-6335: MUST be at least 1 character and no more than 15 characters
 	// long.
 	if n == 0 || n > 15 {
-		return false
+		return errors.New("must be between 1 and 15 characters")
 	}
 
 	// RFC-6335: MUST NOT begin or end with a hyphen.
 	if name[0] == '-' || name[n-1] == '-' {
-		return false
+		return errors.New("must not begin or end with a hyphen")
 	}
 
 	hasLetter := false
 
-	for i, ch := range name {
+	for i := range name {
+		ch := name[i] // iterate by byte (not rune)
+
 		// RFC-6335: MUST contain only US-ASCII [ANSI.X3.4-1986] letters 'A' -
 		// 'Z' and 'a' - 'z', digits '0' - '9', and hyphens ('-', ASCII 0x2D or
 		// decimal 45).
@@ -258,16 +290,21 @@ func isValidIANAService(name string) bool {
 		case ch >= 'a' && ch <= 'z':
 			hasLetter = true
 		case ch >= '0' && ch <= '9':
+			// digit ok!
 		case ch == '-':
 			// RFC-6335: hyphens MUST NOT be adjacent to other hyphens.
 			if name[i-1] == '-' {
-				return false
+				return errors.New("must not contain adjacent hyphens")
 			}
 		default:
-			return false
+			return errors.New("must contain only ASCII letters, digits and hyphen")
 		}
 	}
 
 	//RFC-6335: MUST contain at least one letter ('A' - 'Z' or 'a' - 'z').
-	return hasLetter
+	if !hasLetter {
+		return errors.New("must contain at least one letter")
+	}
+
+	return nil
 }
