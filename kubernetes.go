@@ -60,9 +60,27 @@ type KubeServiceSpec struct {
 //
 // See https://kubernetes.io/docs/concepts/services-networking/service/#multi-port-services
 func (s *KubeServiceSpec) WithNamedPort(port string) *KubeServiceSpec {
-	// TODO: panic if port is not As with Kubernetes names in general, names for
-	// ports must only contain lowercase alphanumeric characters and -. Port
-	// names must also start and end with an alphanumeric character.
+	if port == "" {
+		panic("kubernetes port names must not be empty")
+	}
+
+	n := len(port)
+
+	if port[0] == '-' || port[n-1] == '-' {
+		panic("kubernetes port names must not begin or end with a hyphen")
+	}
+
+	for i := range port {
+		ch := port[i] // iterate by byte (not rune)
+
+		switch {
+		case ch >= 'a' && ch <= 'z':
+		case ch >= '0' && ch <= '9':
+		case ch == '-':
+		default:
+			panic("kubernetes port names must contain only lowercase ASCII letters, digits and hyphen")
+		}
+	}
 
 	return s.with(func() {
 		s.portResult.Name = fmt.Sprintf(

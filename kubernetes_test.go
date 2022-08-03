@@ -360,6 +360,44 @@ var _ = Describe("type KubeServiceSpec", func() {
 		})
 	})
 
+	Describe("func WithNamedPort()", func() {
+		When("the port name is invalid", func() {
+			DescribeTable(
+				"it panics",
+				func(port, expect string) {
+					Expect(func() {
+						spec.WithNamedPort(port)
+					}).To(PanicWith(expect))
+				},
+				Entry(
+					"empty",
+					"",
+					"kubernetes port names must not be empty",
+				),
+				Entry(
+					"starts with a hyphen",
+					"-foo",
+					"kubernetes port names must not begin or end with a hyphen",
+				),
+				Entry(
+					"ends with a hyphen",
+					"foo-",
+					"kubernetes port names must not begin or end with a hyphen",
+				),
+				Entry(
+					"contains an invalid character",
+					"foo*bar",
+					"kubernetes port names must contain only lowercase ASCII letters, digits and hyphen",
+				),
+				Entry(
+					"contains an uppercase character",
+					"fooBar",
+					"kubernetes port names must contain only lowercase ASCII letters, digits and hyphen",
+				),
+			)
+		})
+	})
+
 	Describe("func WithDefault()", func() {
 		When("the host is valid", func() {
 			DescribeTable(
@@ -504,7 +542,7 @@ var _ = Describe("type KubeServiceSpec", func() {
 					`default value of FERRITE_SVC_SERVICE_PORT is invalid: "foo--bar" is not a valid IANA service name (must not contain adjacent hyphens)`,
 				),
 				Entry(
-					"contains invalid character",
+					"IANA service name contains an invalid character",
 					"host.example.org",
 					"foo*bar",
 					`default value of FERRITE_SVC_SERVICE_PORT is invalid: "foo*bar" is not a valid IANA service name (must contain only ASCII letters, digits and hyphen)`,
