@@ -18,6 +18,8 @@ import (
 // The environment variables "<svc>_SERVICE_HOST" and "<svc>_SERVICE_PORT" are
 // used to construct an address for the service.
 func KubeService(svc string) *KubeServiceSpec {
+	// TODO: panic if service name is invalid
+
 	s := &KubeServiceSpec{
 		service: svc,
 		hostResult: ValidationResult{
@@ -49,7 +51,6 @@ type KubeServiceSpec struct {
 
 // WithNamedPort uses a Kubernetes named port instead of the default service
 // port.
-//
 //
 // The "<service>_SERVICE_PORT_<port>" environment variable is used instead of
 // "<service>_SERVICE_PORT".
@@ -121,8 +122,6 @@ func (s *KubeServiceSpec) WithDefault(host, port string) *KubeServiceSpec {
 	}
 
 	return s.with(func() {
-		// TODO: https://github.com/dogmatiq/ferrite/issues/1
-
 		s.host = host
 		s.port = port
 
@@ -181,30 +180,45 @@ func (s *KubeServiceSpec) Validate() []ValidationResult {
 // resolve populates s.host, s.port and the validation results, or returns
 // immediately if they are already populated.
 func (s *KubeServiceSpec) resolve() {
-	// TODO: https://github.com/dogmatiq/ferrite/issues/1
-
 	s.seal.Close(func() {
-		host := os.Getenv(s.hostResult.Name)
-		port := os.Getenv(s.portResult.Name)
+		validateExplicitValue(
+			validateHost,
+			&s.host,
+			&s.hostResult,
+		)
 
-		if host != "" {
-			s.hostResult.ExplicitValue = host
-			s.host = host
-		} else if s.host != "" {
-			s.hostResult.UsingDefault = true
-		} else {
-			s.hostResult.Error = errUndefined
-		}
-
-		if port != "" {
-			s.portResult.ExplicitValue = port
-			s.port = port
-		} else if s.port != "" {
-			s.portResult.UsingDefault = true
-		} else {
-			s.portResult.Error = errUndefined
-		}
+		validateExplicitValue(
+			validatePort,
+			&s.port,
+			&s.portResult,
+		)
 	})
+}
+
+// resolveOne resolves a single environment variable.
+func validateExplicitValue(
+	validate func(string) error,
+	value *string,
+	result *ValidationResult,
+) {
+	if raw := os.Getenv(result.Name); raw != "" {
+		result.ExplicitValue = raw
+
+		if err := validate(raw); err != nil {
+			result.Error = err
+			return
+		}
+
+		*value = raw
+		return
+	}
+
+	if *value != "" {
+		result.UsingDefault = true
+		return
+	}
+
+	result.Error = errUndefined
 }
 
 // with calls fn while holding a lock on s.

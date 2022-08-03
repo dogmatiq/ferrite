@@ -80,6 +80,92 @@ var _ = Describe("type KubeServiceSpec", func() {
 		})
 	})
 
+	When("the host is invalid", func() {
+		BeforeEach(func() {
+			os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org.") // note trailing dot
+			os.Setenv("FERRITE_SVC_SERVICE_PORT", "12345")
+		})
+
+		Describe("func Address()", func() {
+			It("panics", func() {
+				Expect(func() {
+					spec.Address()
+				}).To(PanicWith("FERRITE_SVC_SERVICE_HOST is invalid: hostname must not begin or end with a dot"))
+			})
+		})
+
+		Describe("func Host()", func() {
+			It("panics", func() {
+				Expect(func() {
+					spec.Host()
+				}).To(PanicWith("FERRITE_SVC_SERVICE_HOST is invalid: hostname must not begin or end with a dot"))
+			})
+		})
+
+		Describe("func Validate()", func() {
+			It("returns a failure result for the port", func() {
+				Expect(spec.Validate()).To(ConsistOf(
+					ValidationResult{
+						Name:          "FERRITE_SVC_SERVICE_HOST",
+						Description:   `Hostname or IP address of the "ferrite-svc" service.`,
+						ValidInput:    "[string]",
+						ExplicitValue: "host.example.org.",
+						Error:         errors.New(`hostname must not begin or end with a dot`),
+					},
+					ValidationResult{
+						Name:          "FERRITE_SVC_SERVICE_PORT",
+						Description:   `Network port of the "ferrite-svc" service.`,
+						ValidInput:    "[string]|(1..65535)",
+						ExplicitValue: "12345",
+					},
+				))
+			})
+		})
+	})
+
+	When("the port is invalid", func() {
+		BeforeEach(func() {
+			os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
+			os.Setenv("FERRITE_SVC_SERVICE_PORT", "foo-") // note trailing hyphen
+		})
+
+		Describe("func Address()", func() {
+			It("panics", func() {
+				Expect(func() {
+					spec.Address()
+				}).To(PanicWith(`FERRITE_SVC_SERVICE_PORT is invalid: "foo-" is not a valid IANA service name (must not begin or end with a hyphen)`))
+			})
+		})
+
+		Describe("func Port()", func() {
+			It("panics", func() {
+				Expect(func() {
+					spec.Port()
+				}).To(PanicWith(`FERRITE_SVC_SERVICE_PORT is invalid: "foo-" is not a valid IANA service name (must not begin or end with a hyphen)`))
+			})
+		})
+
+		Describe("func Validate()", func() {
+			It("returns a failure result for the port", func() {
+				Expect(spec.Validate()).To(ConsistOf(
+					ValidationResult{
+						Name:          "FERRITE_SVC_SERVICE_HOST",
+						Description:   `Hostname or IP address of the "ferrite-svc" service.`,
+						ValidInput:    "[string]",
+						ExplicitValue: "host.example.org",
+					},
+					ValidationResult{
+						Name:          "FERRITE_SVC_SERVICE_PORT",
+						Description:   `Network port of the "ferrite-svc" service.`,
+						ValidInput:    "[string]|(1..65535)",
+						ExplicitValue: "foo-",
+						Error:         errors.New(`"foo-" is not a valid IANA service name (must not begin or end with a hyphen)`),
+					},
+				))
+			})
+		})
+	})
+
 	When("using a named port", func() {
 		BeforeEach(func() {
 			spec.WithNamedPort("named-port")
