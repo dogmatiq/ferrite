@@ -12,10 +12,7 @@ func ExampleString() {
 	defer tearDown()
 
 	value := ferrite.
-		String(
-			"FERRITE_STRING",
-			"example string variable",
-		)
+		String("FERRITE_STRING", "example string variable")
 
 	os.Setenv("FERRITE_STRING", "<value>")
 	ferrite.ValidateEnvironment()
@@ -31,10 +28,7 @@ func ExampleString_default() {
 	defer tearDown()
 
 	value := ferrite.
-		String(
-			"FERRITE_STRING",
-			"example string variable",
-		).
+		String("FERRITE_STRING", "example string variable").
 		WithDefault("<default>")
 
 	ferrite.ValidateEnvironment()

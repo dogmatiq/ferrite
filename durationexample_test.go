@@ -13,10 +13,7 @@ func ExampleDuration() {
 	defer tearDown()
 
 	value := ferrite.
-		Duration(
-			"FERRITE_DURATION",
-			"example duration variable",
-		)
+		Duration("FERRITE_DURATION", "example duration variable")
 
 	os.Setenv("FERRITE_DURATION", "630s")
 	ferrite.ValidateEnvironment()
@@ -32,10 +29,7 @@ func ExampleDuration_default() {
 	defer tearDown()
 
 	value := ferrite.
-		Duration(
-			"FERRITE_DURATION",
-			"example duration variable",
-		).
+		Duration("FERRITE_DURATION", "example duration variable").
 		WithDefault(630 * time.Second)
 
 	ferrite.ValidateEnvironment()
