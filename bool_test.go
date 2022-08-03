@@ -2,6 +2,7 @@ package ferrite_test
 
 import (
 	"errors"
+	"fmt"
 	"os"
 
 	. "github.com/dogmatiq/ferrite"
@@ -117,7 +118,7 @@ var _ = Describe("type BoolSpec", func() {
 			It("panics", func() {
 				Expect(func() {
 					spec.Value()
-				}).To(PanicWith(`FERRITE_BOOL is invalid: must be either "true" or "false"`))
+				}).To(PanicWith(`FERRITE_BOOL is invalid: must be either "true" or "false", got "<invalid>"`))
 			})
 		})
 
@@ -129,7 +130,7 @@ var _ = Describe("type BoolSpec", func() {
 						Description:   "<desc>",
 						ValidInput:    "true|false",
 						ExplicitValue: "<invalid>",
-						Error:         errors.New(`must be either "true" or "false"`),
+						Error:         errors.New(`must be either "true" or "false", got "<invalid>"`),
 					},
 				))
 			})
@@ -169,7 +170,7 @@ var _ = Describe("type BoolSpec", func() {
 								Description:   "<desc>",
 								ValidInput:    "yes|no",
 								ExplicitValue: value,
-								Error:         errors.New(`must be either "yes" or "no"`),
+								Error:         fmt.Errorf(`must be either "yes" or "no", got "%s"`, value),
 							},
 						))
 					},

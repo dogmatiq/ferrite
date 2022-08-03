@@ -56,7 +56,7 @@ func (s *BoolSpec[T]) parse(value string) (T, error) {
 	case s.f:
 		return false, nil
 	default:
-		return false, fmt.Errorf("must be either %q or %q", s.t, s.f)
+		return false, fmt.Errorf("must be either %q or %q, got %q", s.t, s.f, value)
 	}
 }
 
