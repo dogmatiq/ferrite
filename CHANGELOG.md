@@ -10,13 +10,14 @@ The format is based on [Keep a Changelog], and this project adheres to
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
-## [Unreleased]
+## [0.1.0] - 2022-08-03
 
 - Initial release
 
 <!-- references -->
 
 [unreleased]: https://github.com/dogmatiq/ferrite
+[0.1.0]: https://github.com/dogmatiq/ferrite/releases/tag/v0.1.0
 
 <!-- version template
 ## [0.0.1] - YYYY-MM-DD
