@@ -2,6 +2,8 @@ package ferrite
 
 import (
 	"fmt"
+
+	"github.com/dogmatiq/ferrite/schema"
 )
 
 // String configures an environment variable as a string.
@@ -41,9 +43,10 @@ func (s *StringSpec[T]) validate(value T) error {
 	return nil
 }
 
-// renderValidInput returns a string representation of the valid input values.
-func (s *StringSpec[T]) renderValidInput() string {
-	return inputType[T]()
+// schema returns the schema that describes the environment variable's
+// valid values.
+func (s *StringSpec[T]) schema() schema.Schema {
+	return schema.Type[T]()
 }
 
 // renderParsed returns a string representation of the parsed value as it should

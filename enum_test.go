@@ -6,6 +6,7 @@ import (
 	"os"
 
 	. "github.com/dogmatiq/ferrite"
+	"github.com/dogmatiq/ferrite/schema"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -47,9 +48,13 @@ var _ = Describe("type EnumSpec", func() {
 
 				Expect(spec.Validate()).To(ConsistOf(
 					ValidationResult{
-						Name:          "FERRITE_ENUM",
-						Description:   "<desc>",
-						ValidInput:    "<member-0>|<member-1>|<member-2>",
+						Name:        "FERRITE_ENUM",
+						Description: "<desc>",
+						Schema: schema.OneOf{
+							schema.Literal("<member-0>"),
+							schema.Literal("<member-1>"),
+							schema.Literal("<member-2>"),
+						},
 						ExplicitValue: "<member-1>",
 					},
 				))
@@ -75,9 +80,13 @@ var _ = Describe("type EnumSpec", func() {
 				It("returns a success result", func() {
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:         "FERRITE_ENUM",
-							Description:  "<desc>",
-							ValidInput:   "<member-0>|<member-1>|<member-2>",
+							Name:        "FERRITE_ENUM",
+							Description: "<desc>",
+							Schema: schema.OneOf{
+								schema.Literal("<member-0>"),
+								schema.Literal("<member-1>"),
+								schema.Literal("<member-2>"),
+							},
 							DefaultValue: "<member-1>",
 							UsingDefault: true,
 						},
@@ -101,8 +110,12 @@ var _ = Describe("type EnumSpec", func() {
 						ValidationResult{
 							Name:        "FERRITE_ENUM",
 							Description: "<desc>",
-							ValidInput:  "<member-0>|<member-1>|<member-2>",
-							Error:       errors.New(`must not be empty`),
+							Schema: schema.OneOf{
+								schema.Literal("<member-0>"),
+								schema.Literal("<member-1>"),
+								schema.Literal("<member-2>"),
+							},
+							Error: errors.New(`must not be empty`),
 						},
 					))
 				})
@@ -117,9 +130,13 @@ var _ = Describe("type EnumSpec", func() {
 
 				Expect(spec.Validate()).To(ConsistOf(
 					ValidationResult{
-						Name:          "FERRITE_ENUM",
-						Description:   "<desc>",
-						ValidInput:    "<member-0>|<member-1>|<member-2>",
+						Name:        "FERRITE_ENUM",
+						Description: "<desc>",
+						Schema: schema.OneOf{
+							schema.Literal("<member-0>"),
+							schema.Literal("<member-1>"),
+							schema.Literal("<member-2>"),
+						},
 						ExplicitValue: "<invalid>",
 						Error:         errors.New(`<invalid> is not a member of the enum`),
 					},

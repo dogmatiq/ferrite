@@ -2,6 +2,8 @@ package ferrite
 
 import (
 	"fmt"
+
+	"github.com/dogmatiq/ferrite/schema"
 )
 
 // Bool configures an environment variable as a boolean.
@@ -41,7 +43,10 @@ func (s *BoolSpec[T]) WithLiterals(t, f string) *BoolSpec[T] {
 	return s.with(func() {
 		s.t = t
 		s.f = f
-		s.result.ValidInput = fmt.Sprintf("%s|%s", t, f)
+		s.result.Schema = schema.OneOf{
+			schema.Literal(t),
+			schema.Literal(f),
+		}
 	})
 }
 
@@ -65,9 +70,13 @@ func (s *BoolSpec[T]) validate(value T) error {
 	return nil
 }
 
-// renderValidInput returns a string representation of the valid input values.
-func (s *BoolSpec[T]) renderValidInput() string {
-	return inputList(s.t, s.f)
+// schema returns the schema that describes the environment variable's
+// valid values.
+func (s *BoolSpec[T]) schema() schema.Schema {
+	return schema.OneOf{
+		schema.Literal(s.t),
+		schema.Literal(s.f),
+	}
 }
 
 // renderParsed returns a string representation of the parsed value as it should

@@ -3,6 +3,8 @@ package ferrite
 import (
 	"errors"
 	"time"
+
+	"github.com/dogmatiq/ferrite/schema"
 )
 
 // Duration configures an environment variable as a duration.
@@ -37,9 +39,12 @@ func (s *DurationSpec) validate(value time.Duration) error {
 	return nil
 }
 
-// renderValidInput returns a string representation of the valid input values.
-func (s *DurationSpec) renderValidInput() string {
-	return "(1ns...)"
+// schema returns the schema that describes the environment variable's
+// valid values.
+func (s *DurationSpec) schema() schema.Schema {
+	return schema.Range{
+		Min: s.renderParsed(time.Nanosecond),
+	}
 }
 
 // renderParsed returns a string representation of the parsed value as it should

@@ -6,6 +6,7 @@ import (
 	"os"
 
 	. "github.com/dogmatiq/ferrite"
+	"github.com/dogmatiq/ferrite/schema"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -43,9 +44,12 @@ var _ = Describe("type BoolSpec", func() {
 
 				Expect(spec.Validate()).To(ConsistOf(
 					ValidationResult{
-						Name:          "FERRITE_BOOL",
-						Description:   "<desc>",
-						ValidInput:    "true|false",
+						Name:        "FERRITE_BOOL",
+						Description: "<desc>",
+						Schema: schema.OneOf{
+							schema.Literal("true"),
+							schema.Literal("false"),
+						},
 						ExplicitValue: "true",
 					},
 				))
@@ -74,9 +78,12 @@ var _ = Describe("type BoolSpec", func() {
 
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:         "FERRITE_BOOL",
-							Description:  "<desc>",
-							ValidInput:   "true|false",
+							Name:        "FERRITE_BOOL",
+							Description: "<desc>",
+							Schema: schema.OneOf{
+								schema.Literal("true"),
+								schema.Literal("false"),
+							},
 							DefaultValue: "true",
 							UsingDefault: true,
 						},
@@ -100,8 +107,11 @@ var _ = Describe("type BoolSpec", func() {
 						ValidationResult{
 							Name:        "FERRITE_BOOL",
 							Description: "<desc>",
-							ValidInput:  "true|false",
-							Error:       errors.New(`must not be empty`),
+							Schema: schema.OneOf{
+								schema.Literal("true"),
+								schema.Literal("false"),
+							},
+							Error: errors.New(`must not be empty`),
 						},
 					))
 				})
@@ -126,9 +136,12 @@ var _ = Describe("type BoolSpec", func() {
 			It("returns a failure result", func() {
 				Expect(spec.Validate()).To(ConsistOf(
 					ValidationResult{
-						Name:          "FERRITE_BOOL",
-						Description:   "<desc>",
-						ValidInput:    "true|false",
+						Name:        "FERRITE_BOOL",
+						Description: "<desc>",
+						Schema: schema.OneOf{
+							schema.Literal("true"),
+							schema.Literal("false"),
+						},
 						ExplicitValue: "<invalid>",
 						Error:         errors.New(`must be either "true" or "false", got "<invalid>"`),
 					},
@@ -166,9 +179,12 @@ var _ = Describe("type BoolSpec", func() {
 
 						Expect(spec.Validate()).To(ConsistOf(
 							ValidationResult{
-								Name:          "FERRITE_BOOL",
-								Description:   "<desc>",
-								ValidInput:    "yes|no",
+								Name:        "FERRITE_BOOL",
+								Description: "<desc>",
+								Schema: schema.OneOf{
+									schema.Literal("yes"),
+									schema.Literal("no"),
+								},
 								ExplicitValue: value,
 								Error:         fmt.Errorf(`must be either "yes" or "no", got "%s"`, value),
 							},

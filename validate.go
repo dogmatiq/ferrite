@@ -7,6 +7,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/dogmatiq/ferrite/internal/table"
+	"github.com/dogmatiq/ferrite/schema"
 	"golang.org/x/exp/slices"
 )
 
@@ -39,15 +41,8 @@ type ValidationResult struct {
 	// Description is a human-readable description of the environment variable.
 	Description string
 
-	// ValidInput is a human-readable description of what constitutes valid
-	// input for this environment variable.
-	//
-	// It is free-form text, but spec implementations SHOULD adhere to the
-	// following conventions:
-	//
-	//  - separate enum style inputs with pipe, e.g. "true|false"
-	//  - render type names inside square barckets, e.g. "[string]"
-	ValidInput string
+	// Schema describes the valid values for this environment variable.
+	Schema schema.Schema
 
 	// DefaultValue is the environment variable's default value, rendered as it
 	// should be displayed in the console.
@@ -144,7 +139,7 @@ func renderResults(results []ValidationResult) string {
 		},
 	)
 
-	var t table
+	var t table.Table
 
 	for _, v := range results {
 		name := " "
@@ -155,7 +150,10 @@ func renderResults(results []ValidationResult) string {
 		}
 		name += " " + v.Name
 
-		input := v.ValidInput
+		renderer := &validateSchemaRenderer{}
+		v.Schema.AcceptVisitor(renderer)
+
+		input := renderer.Output.String()
 		if v.DefaultValue != "" {
 			input += " = " + v.DefaultValue
 		}
@@ -175,45 +173,34 @@ func renderResults(results []ValidationResult) string {
 	return "ENVIRONMENT VARIABLES:\n" + t.String()
 }
 
-// table renders a column-aligned table.
-type table struct {
-	widths []int
-	rows   [][]string
+type validateSchemaRenderer struct {
+	Output strings.Builder
 }
 
-// AddRow adds a row to the table.
-func (t *table) AddRow(columns ...string) {
-	for len(t.widths) < len(columns) {
-		t.widths = append(t.widths, 0)
-	}
-
-	for i, col := range columns {
-		if len(col) > t.widths[i] {
-			t.widths[i] = len(col)
+func (r *validateSchemaRenderer) VisitOneOf(s schema.OneOf) {
+	for i, c := range s {
+		if i > 0 {
+			r.Output.WriteString("|")
 		}
-	}
 
-	t.rows = append(t.rows, columns)
+		c.AcceptVisitor(r)
+	}
 }
 
-// String returns the rendered table.
-func (t *table) String() string {
-	var w strings.Builder
+func (r *validateSchemaRenderer) VisitLiteral(s schema.Literal) {
+	r.Output.WriteString(string(s))
+}
 
-	for _, columns := range t.rows {
-		n := len(columns) - 1
+func (r *validateSchemaRenderer) VisitType(s schema.TypeSchema) {
+	fmt.Fprintf(&r.Output, "[%s]", s.Type)
+}
 
-		for i, col := range columns[:n] {
-			fmt.Fprintf(
-				&w,
-				"%-*s  ",
-				t.widths[i],
-				col,
-			)
-		}
-
-		fmt.Fprintln(&w, columns[n])
+func (r *validateSchemaRenderer) VisitRange(s schema.Range) {
+	if s.Min != "" && s.Max != "" {
+		fmt.Fprintf(&r.Output, "(%s..%s)", s.Min, s.Max)
+	} else if s.Max != "" {
+		fmt.Fprintf(&r.Output, "(...%s)", s.Max)
+	} else {
+		fmt.Fprintf(&r.Output, "(%s...)", s.Min)
 	}
-
-	return w.String()
 }

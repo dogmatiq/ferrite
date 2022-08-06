@@ -5,6 +5,7 @@ import (
 	"os"
 
 	. "github.com/dogmatiq/ferrite"
+	"github.com/dogmatiq/ferrite/schema"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -37,9 +38,12 @@ var _ = Describe("type SignedSpec", func() {
 			It("returns a successful result", func() {
 				Expect(spec.Validate()).To(ConsistOf(
 					ValidationResult{
-						Name:          "FERRITE_SIGNED",
-						Description:   "<desc>",
-						ValidInput:    "(-32768..+32767)",
+						Name:        "FERRITE_SIGNED",
+						Description: "<desc>",
+						Schema: schema.Range{
+							Min: "-32768",
+							Max: "+32767",
+						},
 						ExplicitValue: "-123",
 					},
 				))
@@ -87,9 +91,12 @@ var _ = Describe("type SignedSpec", func() {
 					os.Setenv("FERRITE_SIGNED", value)
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:          "FERRITE_SIGNED",
-							Description:   "<desc>",
-							ValidInput:    "(-32768..+32767)",
+							Name:        "FERRITE_SIGNED",
+							Description: "<desc>",
+							Schema: schema.Range{
+								Min: "-32768",
+								Max: "+32767",
+							},
 							ExplicitValue: value,
 							Error:         errors.New(expect),
 						},
@@ -135,9 +142,12 @@ var _ = Describe("type SignedSpec", func() {
 				It("returns a success result", func() {
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:         "FERRITE_SIGNED",
-							Description:  "<desc>",
-							ValidInput:   "(-32768..+32767)",
+							Name:        "FERRITE_SIGNED",
+							Description: "<desc>",
+							Schema: schema.Range{
+								Min: "-32768",
+								Max: "+32767",
+							},
 							DefaultValue: "-123",
 							UsingDefault: true,
 						},
@@ -161,8 +171,11 @@ var _ = Describe("type SignedSpec", func() {
 						ValidationResult{
 							Name:        "FERRITE_SIGNED",
 							Description: "<desc>",
-							ValidInput:  "(-32768..+32767)",
-							Error:       errors.New(`must not be empty`),
+							Schema: schema.Range{
+								Min: "-32768",
+								Max: "+32767",
+							},
+							Error: errors.New(`must not be empty`),
 						},
 					))
 				})

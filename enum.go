@@ -2,6 +2,8 @@ package ferrite
 
 import (
 	"fmt"
+
+	"github.com/dogmatiq/ferrite/schema"
 )
 
 // Enum configures an environment variable as an enumeration with members of
@@ -76,9 +78,15 @@ func (s *EnumSpec[T]) validate(value T) error {
 	return nil
 }
 
-// renderValidInput returns a string representation of the valid input values.
-func (s *EnumSpec[T]) renderValidInput() string {
-	return inputList(s.order...)
+// schema returns the schema that describes the environment variable's
+// valid values.
+func (s *EnumSpec[T]) schema() schema.Schema {
+	var oneOf schema.OneOf
+	for _, m := range s.order {
+		oneOf = append(oneOf, schema.Literal(m))
+	}
+
+	return oneOf
 }
 
 // renderParsed returns a string representation of the parsed value as it should

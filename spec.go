@@ -3,6 +3,8 @@ package ferrite
 import (
 	"fmt"
 	"os"
+
+	"github.com/dogmatiq/ferrite/schema"
 )
 
 // impl is the basis for a impl variable specification.
@@ -71,7 +73,7 @@ func (s *impl[T, S]) Validate() []ValidationResult {
 // already populated.
 func (s *impl[T, S]) resolve() {
 	s.seal.Close(func() {
-		s.result.ValidInput = s.self.renderValidInput()
+		s.result.Schema = s.self.schema()
 		value := os.Getenv(s.result.Name)
 
 		if value == "" {
@@ -122,9 +124,9 @@ type spec[T any] interface {
 	// validate validates a parsed or default value.
 	validate(value T) error
 
-	// renderValidInput returns a string representation of the valid input
-	// values.
-	renderValidInput() string
+	// schema returns the schema that describes the environment variable's
+	// valid values.
+	schema() schema.Schema
 
 	// renderParsed returns a string representation of the parsed value as it
 	// should appear in validation reports.

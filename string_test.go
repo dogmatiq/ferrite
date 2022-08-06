@@ -5,6 +5,7 @@ import (
 	"os"
 
 	. "github.com/dogmatiq/ferrite"
+	"github.com/dogmatiq/ferrite/schema"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -39,7 +40,7 @@ var _ = Describe("type StringSpec", func() {
 					ValidationResult{
 						Name:          "FERRITE_STRING",
 						Description:   "<desc>",
-						ValidInput:    "[ferrite_test.customString]",
+						Schema:        schema.Type[customString](),
 						ExplicitValue: `"<value>"`,
 					},
 				))
@@ -65,7 +66,7 @@ var _ = Describe("type StringSpec", func() {
 						ValidationResult{
 							Name:         "FERRITE_STRING",
 							Description:  "<desc>",
-							ValidInput:   "[ferrite_test.customString]",
+							Schema:       schema.Type[customString](),
 							DefaultValue: `"<value>"`,
 							UsingDefault: true,
 						},
@@ -89,7 +90,7 @@ var _ = Describe("type StringSpec", func() {
 						ValidationResult{
 							Name:        "FERRITE_STRING",
 							Description: "<desc>",
-							ValidInput:  "[ferrite_test.customString]",
+							Schema:      schema.Type[customString](),
 							Error:       errors.New(`must not be empty`),
 						},
 					))

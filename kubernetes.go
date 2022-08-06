@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+
+	"github.com/dogmatiq/ferrite/schema"
 )
 
 // KubeService reads Kubernetes service discovery environment variables for a
@@ -30,12 +32,18 @@ func KubeService(svc string) *KubeServiceSpec {
 		hostResult: ValidationResult{
 			Name:        fmt.Sprintf("%s_SERVICE_HOST", kubeToEnv(svc)),
 			Description: fmt.Sprintf(`Hostname or IP address of the "%s" service.`, svc),
-			ValidInput:  "[string]",
+			Schema:      schema.Type[string](),
 		},
 		portResult: ValidationResult{
 			Name:        fmt.Sprintf("%s_SERVICE_PORT", kubeToEnv(svc)),
 			Description: fmt.Sprintf(`Network port of the "%s" service.`, svc),
-			ValidInput:  "[string]|(1..65535)",
+			Schema: schema.OneOf{
+				schema.Type[string](),
+				schema.Range{
+					Min: "1",
+					Max: "65535",
+				},
+			},
 		},
 	}
 

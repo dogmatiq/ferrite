@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/dogmatiq/ferrite/schema"
 	"golang.org/x/exp/constraints"
 )
 
@@ -60,9 +61,13 @@ func (s *UnsignedSpec[T]) validate(value T) error {
 	return nil
 }
 
-// renderValidInput returns a string representation of the valid input values.
-func (s *UnsignedSpec[T]) renderValidInput() string {
-	return fmt.Sprintf("(%d..%d)", s.min, s.max)
+// schema returns the schema that describes the environment variable's
+// valid values.
+func (s *UnsignedSpec[T]) schema() schema.Schema {
+	return schema.Range{
+		Min: s.renderParsed(s.min),
+		Max: s.renderParsed(s.max),
+	}
 }
 
 // renderParsed returns a string representation of the parsed value as it should
