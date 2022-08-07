@@ -12,7 +12,7 @@ func ExampleEnum_required() {
 	defer tearDown()
 
 	v := ferrite.
-		Enum[string]("FERRITE_ENUM", "example enum variable").
+		Enum("FERRITE_ENUM", "example enum variable").
 		WithMembers("red", "green", "blue").
 		Required()
 
@@ -30,7 +30,7 @@ func ExampleEnum_default() {
 	defer tearDown()
 
 	v := ferrite.
-		Enum[string]("FERRITE_ENUM", "example enum variable").
+		Enum("FERRITE_ENUM", "example enum variable").
 		WithMembers("red", "green", "blue").
 		WithDefault("green").
 		Required()
@@ -48,7 +48,7 @@ func ExampleEnum_optional() {
 	defer tearDown()
 
 	v := ferrite.
-		Enum[string]("FERRITE_ENUM", "example enum variable").
+		Enum("FERRITE_ENUM", "example enum variable").
 		WithMembers("red", "green", "blue").
 		Optional()
 

@@ -9,12 +9,20 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-// Enum configures an environment variable as an enumeration with members of
+// Enum configures an environment variable as an enumeration.
+//
+// name is the name of the environment variable to read. desc is a
+// human-readable description of the environment variable.
+func Enum(name, desc string) EnumBuilder[string] {
+	return EnumAs[string](name, desc)
+}
+
+// EnumAs configures an environment variable as an enumeration with members of
 // type T.
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func Enum[T any](name, desc string) EnumBuilder[T] {
+func EnumAs[T any](name, desc string) EnumBuilder[T] {
 	return EnumBuilder[T]{
 		name: name,
 		desc: desc,

@@ -27,7 +27,7 @@ var _ = Describe("type EnumSpec", func() {
 	var builder EnumBuilder[enumMember]
 
 	BeforeEach(func() {
-		builder = Enum[enumMember]("FERRITE_ENUM", "<desc>").
+		builder = EnumAs[enumMember]("FERRITE_ENUM", "<desc>").
 			WithMembers(
 				member0,
 				member1,
@@ -180,7 +180,7 @@ var _ = Describe("type EnumSpec", func() {
 	When("one of the members has an empty literal representation", func() {
 		It("uses that member as the default", func() {
 			v := ferrite.
-				Enum[string]("FERRITE_ENUM", "<desc>").
+				EnumAs[string]("FERRITE_ENUM", "<desc>").
 				WithMembers("foo", "", "bar").
 				Required().
 				Value()
@@ -190,7 +190,7 @@ var _ = Describe("type EnumSpec", func() {
 
 		It("does not take precedence over an explicit default", func() {
 			v := ferrite.
-				Enum[string]("FERRITE_ENUM", "<desc>").
+				EnumAs[string]("FERRITE_ENUM", "<desc>").
 				WithDefault("foo").
 				WithMembers("foo", "", "bar").
 				Required().
@@ -216,7 +216,7 @@ var _ = Describe("type EnumSpec", func() {
 		It("panics", func() {
 			Expect(func() {
 				ferrite.
-					Enum[string]("FERRITE_ENUM", "<desc>").
+					EnumAs[string]("FERRITE_ENUM", "<desc>").
 					Required()
 			}).To(PanicWith(
 				`specification for FERRITE_ENUM is invalid: no enum members are defined`,
