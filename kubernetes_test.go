@@ -21,6 +21,29 @@ var _ = Describe("type KubeServiceSpec", func() {
 		tearDown()
 	})
 
+	Describe("func Describe()", func() {
+		It("describes the variables", func() {
+			Expect(spec.Describe()).To(ConsistOf(
+				VariableXXX{
+					Name:        "FERRITE_SVC_SERVICE_HOST",
+					Description: `Hostname or IP address of the "ferrite-svc" service.`,
+					Schema:      schema.Type[string](),
+				},
+				VariableXXX{
+					Name:        "FERRITE_SVC_SERVICE_PORT",
+					Description: `Network port of the "ferrite-svc" service.`,
+					Schema: schema.OneOf{
+						schema.Type[string](),
+						schema.Range{
+							Min: "1",
+							Max: "65535",
+						},
+					},
+				},
+			))
+		})
+	})
+
 	When("both the host and port environment variables are set", func() {
 		BeforeEach(func() {
 			os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
@@ -51,22 +74,12 @@ var _ = Describe("type KubeServiceSpec", func() {
 			It("returns success results", func() {
 				Expect(spec.Validate()).To(ConsistOf(
 					ValidationResult{
-						Name:          "FERRITE_SVC_SERVICE_HOST",
-						Description:   `Hostname or IP address of the "ferrite-svc" service.`,
-						Schema:        schema.Type[string](),
-						ExplicitValue: "host.example.org",
+						Name:  "FERRITE_SVC_SERVICE_HOST",
+						Value: "host.example.org",
 					},
 					ValidationResult{
-						Name:        "FERRITE_SVC_SERVICE_PORT",
-						Description: `Network port of the "ferrite-svc" service.`,
-						Schema: schema.OneOf{
-							schema.Type[string](),
-							schema.Range{
-								Min: "1",
-								Max: "65535",
-							},
-						},
-						ExplicitValue: "12345",
+						Name:  "FERRITE_SVC_SERVICE_PORT",
+						Value: "12345",
 					},
 				))
 			})
@@ -99,23 +112,12 @@ var _ = Describe("type KubeServiceSpec", func() {
 			It("returns a failure result for the port", func() {
 				Expect(spec.Validate()).To(ConsistOf(
 					ValidationResult{
-						Name:          "FERRITE_SVC_SERVICE_HOST",
-						Description:   `Hostname or IP address of the "ferrite-svc" service.`,
-						Schema:        schema.Type[string](),
-						ExplicitValue: "host.example.org.",
-						Error:         errors.New(`hostname must not begin or end with a dot`),
+						Name:  "FERRITE_SVC_SERVICE_HOST",
+						Error: errors.New(`hostname must not begin or end with a dot`),
 					},
 					ValidationResult{
-						Name:        "FERRITE_SVC_SERVICE_PORT",
-						Description: `Network port of the "ferrite-svc" service.`,
-						Schema: schema.OneOf{
-							schema.Type[string](),
-							schema.Range{
-								Min: "1",
-								Max: "65535",
-							},
-						},
-						ExplicitValue: "12345",
+						Name:  "FERRITE_SVC_SERVICE_PORT",
+						Value: "12345",
 					},
 				))
 			})
@@ -148,23 +150,12 @@ var _ = Describe("type KubeServiceSpec", func() {
 			It("returns a failure result for the port", func() {
 				Expect(spec.Validate()).To(ConsistOf(
 					ValidationResult{
-						Name:          "FERRITE_SVC_SERVICE_HOST",
-						Description:   `Hostname or IP address of the "ferrite-svc" service.`,
-						Schema:        schema.Type[string](),
-						ExplicitValue: "host.example.org",
+						Name:  "FERRITE_SVC_SERVICE_HOST",
+						Value: "host.example.org",
 					},
 					ValidationResult{
-						Name:        "FERRITE_SVC_SERVICE_PORT",
-						Description: `Network port of the "ferrite-svc" service.`,
-						Schema: schema.OneOf{
-							schema.Type[string](),
-							schema.Range{
-								Min: "1",
-								Max: "65535",
-							},
-						},
-						ExplicitValue: "foo-",
-						Error:         errors.New(`"foo-" is not a valid IANA service name (must not begin or end with a hyphen)`),
+						Name:  "FERRITE_SVC_SERVICE_PORT",
+						Error: errors.New(`"foo-" is not a valid IANA service name (must not begin or end with a hyphen)`),
 					},
 				))
 			})
@@ -191,22 +182,12 @@ var _ = Describe("type KubeServiceSpec", func() {
 			It("returns success results", func() {
 				Expect(spec.Validate()).To(ConsistOf(
 					ValidationResult{
-						Name:          "FERRITE_SVC_SERVICE_HOST",
-						Description:   `Hostname or IP address of the "ferrite-svc" service.`,
-						Schema:        schema.Type[string](),
-						ExplicitValue: "host.example.org",
+						Name:  "FERRITE_SVC_SERVICE_HOST",
+						Value: "host.example.org",
 					},
 					ValidationResult{
-						Name:        "FERRITE_SVC_SERVICE_PORT_NAMED_PORT",
-						Description: `Network port of the "ferrite-svc" service's "named-port" port.`,
-						Schema: schema.OneOf{
-							schema.Type[string](),
-							schema.Range{
-								Min: "1",
-								Max: "65535",
-							},
-						},
-						ExplicitValue: "12345",
+						Name:  "FERRITE_SVC_SERVICE_PORT_NAMED_PORT",
+						Value: "12345",
 					},
 				))
 			})
@@ -232,17 +213,16 @@ var _ = Describe("type KubeServiceSpec", func() {
 				})
 			})
 
-			Describe("func Validate()", func() {
-				It("returns sucess results", func() {
-					Expect(spec.Validate()).To(ConsistOf(
-						ValidationResult{
-							Name:         "FERRITE_SVC_SERVICE_HOST",
-							Description:  `Hostname or IP address of the "ferrite-svc" service.`,
-							Schema:       schema.Type[string](),
-							DefaultValue: "default.example.org",
-							UsingDefault: true,
+			Describe("func Describe()", func() {
+				It("describes the variables", func() {
+					Expect(spec.Describe()).To(ConsistOf(
+						VariableXXX{
+							Name:        "FERRITE_SVC_SERVICE_HOST",
+							Description: `Hostname or IP address of the "ferrite-svc" service.`,
+							Schema:      schema.Type[string](),
+							Default:     "default.example.org",
 						},
-						ValidationResult{
+						VariableXXX{
 							Name:        "FERRITE_SVC_SERVICE_PORT",
 							Description: `Network port of the "ferrite-svc" service.`,
 							Schema: schema.OneOf{
@@ -252,8 +232,23 @@ var _ = Describe("type KubeServiceSpec", func() {
 									Max: "65535",
 								},
 							},
-							DefaultValue:  "54321",
-							ExplicitValue: "12345",
+							Default: "54321",
+						},
+					))
+				})
+			})
+
+			Describe("func Validate()", func() {
+				It("returns sucess results", func() {
+					Expect(spec.Validate()).To(ConsistOf(
+						ValidationResult{
+							Name:        "FERRITE_SVC_SERVICE_HOST",
+							Value:       "default.example.org",
+							UsedDefault: true,
+						},
+						ValidationResult{
+							Name:  "FERRITE_SVC_SERVICE_PORT",
+							Value: "12345",
 						},
 					))
 				})
@@ -281,22 +276,12 @@ var _ = Describe("type KubeServiceSpec", func() {
 				It("returns a failure result for the host", func() {
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:        "FERRITE_SVC_SERVICE_HOST",
-							Description: `Hostname or IP address of the "ferrite-svc" service.`,
-							Schema:      schema.Type[string](),
-							Error:       errors.New(`must not be empty`),
+							Name:  "FERRITE_SVC_SERVICE_HOST",
+							Error: errors.New(`must not be empty`),
 						},
 						ValidationResult{
-							Name:        "FERRITE_SVC_SERVICE_PORT",
-							Description: `Network port of the "ferrite-svc" service.`,
-							Schema: schema.OneOf{
-								schema.Type[string](),
-								schema.Range{
-									Min: "1",
-									Max: "65535",
-								},
-							},
-							ExplicitValue: "12345",
+							Name:  "FERRITE_SVC_SERVICE_PORT",
+							Value: "12345",
 						},
 					))
 				})
@@ -327,24 +312,13 @@ var _ = Describe("type KubeServiceSpec", func() {
 				It("returns sucess results", func() {
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:          "FERRITE_SVC_SERVICE_HOST",
-							Description:   `Hostname or IP address of the "ferrite-svc" service.`,
-							Schema:        schema.Type[string](),
-							DefaultValue:  "default.example.org",
-							ExplicitValue: "host.example.org",
+							Name:  "FERRITE_SVC_SERVICE_HOST",
+							Value: "host.example.org",
 						},
 						ValidationResult{
 							Name:        "FERRITE_SVC_SERVICE_PORT",
-							Description: `Network port of the "ferrite-svc" service.`,
-							Schema: schema.OneOf{
-								schema.Type[string](),
-								schema.Range{
-									Min: "1",
-									Max: "65535",
-								},
-							},
-							DefaultValue: "54321",
-							UsingDefault: true,
+							Value:       "54321",
+							UsedDefault: true,
 						},
 					))
 				})
@@ -372,21 +346,11 @@ var _ = Describe("type KubeServiceSpec", func() {
 				It("returns a failure result for the port", func() {
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:          "FERRITE_SVC_SERVICE_HOST",
-							Description:   `Hostname or IP address of the "ferrite-svc" service.`,
-							Schema:        schema.Type[string](),
-							ExplicitValue: "host.example.org",
+							Name:  "FERRITE_SVC_SERVICE_HOST",
+							Value: "host.example.org",
 						},
 						ValidationResult{
-							Name:        "FERRITE_SVC_SERVICE_PORT",
-							Description: `Network port of the "ferrite-svc" service.`,
-							Schema: schema.OneOf{
-								schema.Type[string](),
-								schema.Range{
-									Min: "1",
-									Max: "65535",
-								},
-							},
+							Name:  "FERRITE_SVC_SERVICE_PORT",
 							Error: errors.New(`must not be empty`),
 						},
 					))
@@ -413,24 +377,14 @@ var _ = Describe("type KubeServiceSpec", func() {
 				It("returns success results", func() {
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:         "FERRITE_SVC_SERVICE_HOST",
-							Description:  `Hostname or IP address of the "ferrite-svc" service.`,
-							Schema:       schema.Type[string](),
-							DefaultValue: "default.example.org",
-							UsingDefault: true,
+							Name:        "FERRITE_SVC_SERVICE_HOST",
+							Value:       "default.example.org",
+							UsedDefault: true,
 						},
 						ValidationResult{
 							Name:        "FERRITE_SVC_SERVICE_PORT",
-							Description: `Network port of the "ferrite-svc" service.`,
-							Schema: schema.OneOf{
-								schema.Type[string](),
-								schema.Range{
-									Min: "1",
-									Max: "65535",
-								},
-							},
-							DefaultValue: "54321",
-							UsingDefault: true,
+							Value:       "54321",
+							UsedDefault: true,
 						},
 					))
 				})
@@ -466,21 +420,11 @@ var _ = Describe("type KubeServiceSpec", func() {
 				It("returns failure results", func() {
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:        "FERRITE_SVC_SERVICE_HOST",
-							Description: `Hostname or IP address of the "ferrite-svc" service.`,
-							Schema:      schema.Type[string](),
-							Error:       errors.New(`must not be empty`),
+							Name:  "FERRITE_SVC_SERVICE_HOST",
+							Error: errors.New(`must not be empty`),
 						},
 						ValidationResult{
-							Name:        "FERRITE_SVC_SERVICE_PORT",
-							Description: `Network port of the "ferrite-svc" service.`,
-							Schema: schema.OneOf{
-								schema.Type[string](),
-								schema.Range{
-									Min: "1",
-									Max: "65535",
-								},
-							},
+							Name:  "FERRITE_SVC_SERVICE_PORT",
 							Error: errors.New(`must not be empty`),
 						},
 					))

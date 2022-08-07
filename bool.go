@@ -2,15 +2,18 @@ package ferrite
 
 import (
 	"fmt"
+	"os"
 
+	"github.com/dogmatiq/ferrite/internal/optional"
 	"github.com/dogmatiq/ferrite/schema"
+	"github.com/dogmatiq/ferrite/spec"
 )
 
 // Bool configures an environment variable as a boolean.
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func Bool(name, desc string) *BoolSpec[bool] {
+func Bool(name, desc string) BoolBuilder[bool] {
 	return BoolAs[bool](name, desc)
 }
 
@@ -19,77 +22,124 @@ func Bool(name, desc string) *BoolSpec[bool] {
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func BoolAs[T ~bool](name, desc string) *BoolSpec[T] {
-	s := &BoolSpec[T]{}
-	s.init(s, name, desc)
-	return s.WithLiterals("true", "false")
+func BoolAs[T ~bool](name, desc string) BoolBuilder[T] {
+	b := &BoolBuilder[T]{
+		name: name,
+		desc: desc,
+	}
+
+	return b.WithLiterals(
+		fmt.Sprint(T(true)),
+		fmt.Sprint(T(false)),
+	)
 }
 
-// BoolSpec is the specification for a boolean.
-type BoolSpec[T ~bool] struct {
-	impl[T, *BoolSpec[T]]
+// BoolBuilder builds a specification for a boolean value.
+type BoolBuilder[T ~bool] struct {
+	name string
+	desc string
 	t, f string
+	def  optional.Optional[T]
 }
 
 // WithLiterals overrides the default literals used to represent true and false.
 //
-// The default literals "true" and "false" are not considered valid values when
-// using custom literals.
-func (s *BoolSpec[T]) WithLiterals(t, f string) *BoolSpec[T] {
+// The default literals "true" and "false" are no longer valid values when using
+// custom literals.
+func (b BoolBuilder[T]) WithLiterals(t, f string) BoolBuilder[T] {
 	if t == "" || f == "" {
 		panic("boolean literals must not be zero-length")
 	}
 
-	return s.with(func() {
-		s.t = t
-		s.f = f
-		s.result.Schema = schema.OneOf{
-			schema.Literal(t),
-			schema.Literal(f),
-		}
-	})
+	b.t = t
+	b.f = f
+
+	return b
 }
 
-// parses parses and validates the value of the environment variable.
+// WithDefault sets a default value of the variable.
 //
-// validate() must be called on the result, as the parsed value does not
-// necessarily meet all of the requirements.
-func (s *BoolSpec[T]) parse(value string) (T, error) {
-	switch value {
-	case s.t:
-		return true, nil
-	case s.f:
-		return false, nil
+// It is used when the environment variable is undefined or empty.
+func (b BoolBuilder[T]) WithDefault(v T) BoolBuilder[T] {
+	b.def = optional.With(v)
+	return b
+}
+
+// Required completes the build process and registers a required variable with
+// Ferrite's validation system.
+func (b BoolBuilder[T]) Required() Required[T] {
+	return Required[T]{
+		b.resolver(false),
+	}
+}
+
+// Optional completes the build process and registers an optional variable with
+// Ferrite's validation system.
+func (b BoolBuilder[T]) Optional() Optional[T] {
+	return Optional[T]{
+		b.resolver(true),
+	}
+}
+
+func (b BoolBuilder[T]) resolve() (spec.Value[T], error) {
+	switch str := os.Getenv(b.name); str {
+	case b.t, b.f:
+		return spec.Value[T]{
+			Parsed:     str == b.t,
+			Normalized: str,
+		}, nil
+
+	case "":
+		if parsed, ok := b.def.TryGet(); ok {
+			return spec.Value[T]{
+				Parsed:     parsed,
+				Normalized: b.render(parsed),
+				IsDefault:  true,
+			}, nil
+		}
+
+		return spec.Value[T]{}, UndefinedError{Name: b.name}
+
 	default:
-		return false, fmt.Errorf("must be either %q or %q, got %q", s.t, s.f, value)
+		return spec.Value[T]{}, fmt.Errorf(
+			`%s must be either "%s" or "%s", got "%s"`,
+			b.name,
+			b.t,
+			b.f,
+			str,
+		)
 	}
 }
 
-// validate validates a parsed or default value.
-func (s *BoolSpec[T]) validate(value T) error {
-	return nil
-}
-
-// schema returns the schema that describes the environment variable's
-// valid values.
-func (s *BoolSpec[T]) schema() schema.Schema {
-	return schema.OneOf{
-		schema.Literal(s.t),
-		schema.Literal(s.f),
+func (b BoolBuilder[T]) resolver(opt bool) *spec.Resolver[T] {
+	s := spec.Spec{
+		Name:        b.name,
+		Description: b.desc,
+		Necessity:   spec.Required,
+		Schema: schema.OneOf{
+			schema.Literal(b.t),
+			schema.Literal(b.f),
+		},
 	}
-}
 
-// renderParsed returns a string representation of the parsed value as it should
-// appear in validation reports.
-func (s *BoolSpec[T]) renderParsed(value T) string {
-	if value {
-		return s.t
+	if v, ok := b.def.TryGet(); ok {
+		s.Necessity = spec.Defaulted
+		s.Default = b.render(v)
 	}
-	return s.f
+
+	if opt {
+		s.Necessity = spec.Optional
+	}
+
+	r := spec.NewResolver(s, b.resolve)
+	spec.Register(r)
+
+	return r
 }
 
-// renderRaw returns a string representation of the raw string value as it
-// should appear in validation reports.
-func (s *BoolSpec[T]) renderRaw(value string) string {
-	return value
+func (b BoolBuilder[T]) render(v T) string {
+	if v {
+		return b.t
+	}
+	return b.f
 }

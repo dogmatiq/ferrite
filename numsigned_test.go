@@ -23,6 +23,21 @@ var _ = Describe("type SignedSpec", func() {
 		tearDown()
 	})
 
+	Describe("func Describe()", func() {
+		It("describes the variable", func() {
+			Expect(spec.Describe()).To(ConsistOf(
+				VariableXXX{
+					Name:        "FERRITE_SIGNED",
+					Description: "<desc>",
+					Schema: schema.Range{
+						Min: "-32768",
+						Max: "+32767",
+					},
+				},
+			))
+		})
+	})
+
 	When("the environment variable is not empty", func() {
 		BeforeEach(func() {
 			os.Setenv("FERRITE_SIGNED", "-123")
@@ -38,13 +53,8 @@ var _ = Describe("type SignedSpec", func() {
 			It("returns a successful result", func() {
 				Expect(spec.Validate()).To(ConsistOf(
 					ValidationResult{
-						Name:        "FERRITE_SIGNED",
-						Description: "<desc>",
-						Schema: schema.Range{
-							Min: "-32768",
-							Max: "+32767",
-						},
-						ExplicitValue: "-123",
+						Name:  "FERRITE_SIGNED",
+						Value: "-123",
 					},
 				))
 			})
@@ -91,14 +101,8 @@ var _ = Describe("type SignedSpec", func() {
 					os.Setenv("FERRITE_SIGNED", value)
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:        "FERRITE_SIGNED",
-							Description: "<desc>",
-							Schema: schema.Range{
-								Min: "-32768",
-								Max: "+32767",
-							},
-							ExplicitValue: value,
-							Error:         errors.New(expect),
+							Name:  "FERRITE_SIGNED",
+							Error: errors.New(expect),
 						},
 					))
 				},
@@ -138,18 +142,29 @@ var _ = Describe("type SignedSpec", func() {
 				})
 			})
 
-			Describe("func Validate()", func() {
-				It("returns a success result", func() {
-					Expect(spec.Validate()).To(ConsistOf(
-						ValidationResult{
+			Describe("func Describe()", func() {
+				It("describes the variable", func() {
+					Expect(spec.Describe()).To(ConsistOf(
+						VariableXXX{
 							Name:        "FERRITE_SIGNED",
 							Description: "<desc>",
 							Schema: schema.Range{
 								Min: "-32768",
 								Max: "+32767",
 							},
-							DefaultValue: "-123",
-							UsingDefault: true,
+							Default: "-123",
+						},
+					))
+				})
+			})
+
+			Describe("func Validate()", func() {
+				It("returns a success result", func() {
+					Expect(spec.Validate()).To(ConsistOf(
+						ValidationResult{
+							Name:        "FERRITE_SIGNED",
+							Value:       "-123",
+							UsedDefault: true,
 						},
 					))
 				})
@@ -169,12 +184,7 @@ var _ = Describe("type SignedSpec", func() {
 				It("returns a failure result", func() {
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:        "FERRITE_SIGNED",
-							Description: "<desc>",
-							Schema: schema.Range{
-								Min: "-32768",
-								Max: "+32767",
-							},
+							Name:  "FERRITE_SIGNED",
 							Error: errors.New(`must not be empty`),
 						},
 					))

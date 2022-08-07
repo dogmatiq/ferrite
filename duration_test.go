@@ -24,6 +24,20 @@ var _ = Describe("type DurationSpec", func() {
 		tearDown()
 	})
 
+	Describe("func Describe()", func() {
+		It("describes the variable", func() {
+			Expect(spec.Describe()).To(ConsistOf(
+				VariableXXX{
+					Name:        "FERRITE_DURATION",
+					Description: "<desc>",
+					Schema: schema.Range{
+						Min: "1ns",
+					},
+				},
+			))
+		})
+	})
+
 	When("the environment variable is not empty", func() {
 		BeforeEach(func() {
 			os.Setenv("FERRITE_DURATION", "630s")
@@ -39,12 +53,8 @@ var _ = Describe("type DurationSpec", func() {
 			It("returns a successful result", func() {
 				Expect(spec.Validate()).To(ConsistOf(
 					ValidationResult{
-						Name:        "FERRITE_DURATION",
-						Description: "<desc>",
-						Schema: schema.Range{
-							Min: "1ns",
-						},
-						ExplicitValue: "10m30s",
+						Name:  "FERRITE_DURATION",
+						Value: "10m30s",
 					},
 				))
 			})
@@ -81,13 +91,8 @@ var _ = Describe("type DurationSpec", func() {
 					os.Setenv("FERRITE_DURATION", value)
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:        "FERRITE_DURATION",
-							Description: "<desc>",
-							Schema: schema.Range{
-								Min: "1ns",
-							},
-							ExplicitValue: value,
-							Error:         errors.New(expect),
+							Name:  "FERRITE_DURATION",
+							Error: errors.New(expect),
 						},
 					))
 				},
@@ -117,17 +122,28 @@ var _ = Describe("type DurationSpec", func() {
 				})
 			})
 
-			Describe("func Validate()", func() {
-				It("returns a success result", func() {
-					Expect(spec.Validate()).To(ConsistOf(
-						ValidationResult{
+			Describe("func Describe()", func() {
+				It("describes the variable", func() {
+					Expect(spec.Describe()).To(ConsistOf(
+						VariableXXX{
 							Name:        "FERRITE_DURATION",
 							Description: "<desc>",
 							Schema: schema.Range{
 								Min: "1ns",
 							},
-							DefaultValue: "10m30s",
-							UsingDefault: true,
+							Default: "10m30s",
+						},
+					))
+				})
+			})
+
+			Describe("func Validate()", func() {
+				It("returns a success result", func() {
+					Expect(spec.Validate()).To(ConsistOf(
+						ValidationResult{
+							Name:        "FERRITE_DURATION",
+							Value:       "10m30s",
+							UsedDefault: true,
 						},
 					))
 				})
@@ -147,11 +163,7 @@ var _ = Describe("type DurationSpec", func() {
 				It("returns a failure result", func() {
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:        "FERRITE_DURATION",
-							Description: "<desc>",
-							Schema: schema.Range{
-								Min: "1ns",
-							},
+							Name:  "FERRITE_DURATION",
 							Error: errors.New(`must not be empty`),
 						},
 					))

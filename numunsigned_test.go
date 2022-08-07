@@ -23,6 +23,21 @@ var _ = Describe("type UnsignedSpec", func() {
 		tearDown()
 	})
 
+	Describe("func Describe()", func() {
+		It("describes the variable", func() {
+			Expect(spec.Describe()).To(ConsistOf(
+				VariableXXX{
+					Name:        "FERRITE_UNSIGNED",
+					Description: "<desc>",
+					Schema: schema.Range{
+						Min: "0",
+						Max: "65535",
+					},
+				},
+			))
+		})
+	})
+
 	When("the environment variable is not empty", func() {
 		BeforeEach(func() {
 			os.Setenv("FERRITE_UNSIGNED", "123")
@@ -38,13 +53,8 @@ var _ = Describe("type UnsignedSpec", func() {
 			It("returns a successful result", func() {
 				Expect(spec.Validate()).To(ConsistOf(
 					ValidationResult{
-						Name:        "FERRITE_UNSIGNED",
-						Description: "<desc>",
-						Schema: schema.Range{
-							Min: "0",
-							Max: "65535",
-						},
-						ExplicitValue: "123",
+						Name:  "FERRITE_UNSIGNED",
+						Value: "123",
 					},
 				))
 			})
@@ -91,14 +101,8 @@ var _ = Describe("type UnsignedSpec", func() {
 					os.Setenv("FERRITE_UNSIGNED", value)
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:        "FERRITE_UNSIGNED",
-							Description: "<desc>",
-							Schema: schema.Range{
-								Min: "0",
-								Max: "65535",
-							},
-							ExplicitValue: value,
-							Error:         errors.New(expect),
+							Name:  "FERRITE_UNSIGNED",
+							Error: errors.New(expect),
 						},
 					))
 				},
@@ -143,13 +147,8 @@ var _ = Describe("type UnsignedSpec", func() {
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
 							Name:        "FERRITE_UNSIGNED",
-							Description: "<desc>",
-							Schema: schema.Range{
-								Min: "0",
-								Max: "65535",
-							},
-							DefaultValue: "123",
-							UsingDefault: true,
+							Value:       "123",
+							UsedDefault: true,
 						},
 					))
 				})
@@ -169,12 +168,7 @@ var _ = Describe("type UnsignedSpec", func() {
 				It("returns a failure result", func() {
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:        "FERRITE_UNSIGNED",
-							Description: "<desc>",
-							Schema: schema.Range{
-								Min: "0",
-								Max: "65535",
-							},
+							Name:  "FERRITE_UNSIGNED",
 							Error: errors.New(`must not be empty`),
 						},
 					))

@@ -16,12 +16,12 @@ var _ = Describe("func ValidateEnvironment()", func() {
 	})
 
 	It("invokes the registered validators", func() {
-		v := Bool("FERRITE_REG", "<desc>")
+		v := String("FERRITE_REG", "<desc>")
 
-		os.Setenv("FERRITE_REG", "true")
+		os.Setenv("FERRITE_REG", "<value>")
 		ValidateEnvironment()
 
-		Expect(v.Value()).To(BeTrue())
+		Expect(v.Value()).To(Equal("<value>"))
 	})
 
 	It("writes a report and exits if a validator fails", func() {
@@ -36,7 +36,7 @@ var _ = Describe("func ValidateEnvironment()", func() {
 			},
 		)
 
-		Bool("FERRITE_REG", "<desc>")
+		String("FERRITE_REG", "<desc>")
 
 		ValidateEnvironment()
 
@@ -44,7 +44,7 @@ var _ = Describe("func ValidateEnvironment()", func() {
 		expectLines(
 			stderr.String(),
 			`ENVIRONMENT VARIABLES:`,
-			` ❯ FERRITE_REG    true|false  <desc>  ✗ must not be empty`,
+			` ❯ FERRITE_REG    [string]  <desc>  ✗ must not be empty`,
 		)
 	})
 })

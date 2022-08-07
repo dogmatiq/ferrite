@@ -7,23 +7,72 @@ import (
 	"github.com/dogmatiq/ferrite/schema"
 )
 
+// Spec is a specification for an environment variable.
+type Spec interface {
+	// Describe returns a description of the environment variable(s) described
+	// by this spec.
+	Describe() []VariableXXX
+
+	// Validate validates the environment variable(s) described by this spec.
+	Validate() []ValidationResult
+}
+
+// VariableXXX describes an environment variable.
+type VariableXXX struct {
+	// Name is the name of the environment variable.
+	Name string
+
+	// Description is a human-readable description of the environment variable.
+	Description string
+
+	// Schema describes the valid values for this environment variable.
+	Schema schema.Schema
+
+	// Default is the environment variable's default value.
+	//
+	// It must be non-empty if the environment variable has a default value;
+	// otherwise it must be empty.
+	Default string
+}
+
+// ValidationResult is the result of validating an environment variable.
+type ValidationResult struct {
+	// Name is the name of the environment variable.
+	Name string
+
+	// Value is the environment variable's value.
+	Value string
+
+	// UsedDefault is true if the default value of the environment variable was
+	// used to populate the value.
+	UsedDefault bool
+
+	// Error is an error describing why the validation failed.
+	//
+	// If it is nil, the validation is considered successful.
+	Error error
+}
+
 // impl is the basis for a impl variable specification.
 //
 // S is the concrete type of the specification.
-type impl[T any, S spec[T]] struct {
+type impl[T any, S specXXX[T]] struct {
 	self S
 
-	seal      seal
-	defaulted bool
-	value     T
-	result    ValidationResult
+	name string
+	desc string
+
+	m     smutex
+	def   *T
+	value *T
+	err   error
 }
 
 // init initializes the spec.
 func (s *impl[T, S]) init(self S, name, desc string) {
 	s.self = self
-	s.result.Name = name
-	s.result.Description = desc
+	s.name = name
+	s.desc = desc
 
 	Register(s)
 }
@@ -34,15 +83,14 @@ func (s *impl[T, S]) WithDefault(v T) S {
 	if err := s.self.validate(v); err != nil {
 		panic(fmt.Sprintf(
 			"default value of %s is invalid: %s",
-			s.result.Name,
+			s.name,
 			err,
 		))
 	}
 
 	return s.with(func() {
-		s.defaulted = true
-		s.value = v
-		s.result.DefaultValue = s.self.renderParsed(v)
+		s.def = &v
+		s.value = s.def
 	})
 }
 
@@ -52,55 +100,84 @@ func (s *impl[T, S]) WithDefault(v T) S {
 func (s *impl[T, S]) Value() T {
 	s.resolve()
 
-	if s.result.Error != nil {
-		panic(fmt.Sprintf(
-			"%s is invalid: %s",
-			s.result.Name,
-			s.result.Error,
-		))
+	if s.err != nil {
+		panic(fmt.Sprintf("%s is invalid: %s", s.name, s.err))
 	}
 
-	return s.value
+	return *s.value
+}
+
+// Describe returns a description of the environment variable(s) described by
+// this spec.
+func (s *impl[T, S]) Describe() []VariableXXX {
+	s.m.RLock()
+	defer s.m.RUnlock()
+
+	def := ""
+	if s.def != nil {
+		def = s.self.renderParsed(*s.def)
+	}
+
+	return []VariableXXX{
+		{
+			Name:        s.name,
+			Description: s.desc,
+			Schema:      s.self.schema(),
+			Default:     def,
+		},
+	}
 }
 
 // Validate validates the environment variable.
 func (s *impl[T, S]) Validate() []ValidationResult {
 	s.resolve()
-	return []ValidationResult{s.result}
+
+	if s.err != nil {
+		return []ValidationResult{
+			{
+				Name:  s.name,
+				Error: s.err,
+			},
+		}
+	}
+
+	return []ValidationResult{
+		{
+			Name:        s.name,
+			Value:       s.self.renderParsed(*s.value),
+			UsedDefault: s.value == s.def, // address comparison, not value
+		},
+	}
 }
 
 // resolve populates s.value and s.result, or returns immediately if they are
 // already populated.
 func (s *impl[T, S]) resolve() {
-	s.seal.Close(func() {
-		s.result.Schema = s.self.schema()
-		value := os.Getenv(s.result.Name)
+	s.m.Seal(func() {
+		value := os.Getenv(s.name)
 
 		if value == "" {
-			if s.defaulted {
-				s.result.UsingDefault = true
+			if s.def != nil {
+				s.value = s.def
 			} else {
-				s.result.Error = errUndefined
+				s.err = errUndefined
 			}
 
 			return
 		}
 
-		s.result.ExplicitValue = s.self.renderRaw(value)
-
 		v, err := s.self.parse(value)
 		if err != nil {
-			s.result.Error = err
+			s.err = err
 			return
 		}
 
 		if err := s.self.validate(v); err != nil {
-			s.result.Error = err
+			s.err = err
 			return
 		}
 
-		s.value = v
-		s.result.ExplicitValue = s.self.renderParsed(v)
+		s.value = &v
 	})
 }
 
@@ -108,13 +185,17 @@ func (s *impl[T, S]) resolve() {
 //
 // It panics if the value has already been resolved.
 func (s *impl[T, S]) with(fn func()) S {
-	s.seal.Do(fn)
+	s.m.Lock()
+	defer s.m.Unlock()
+
+	fn()
+
 	return s.self
 }
 
-// spec is a constraint for concrete implementations of a spec that embed
+// specXXX is a constraint for concrete implementations of a specXXX that embed
 // impl[T].
-type spec[T any] interface {
+type specXXX[T any] interface {
 	// parses parses and validates the value of the environment variable.
 	//
 	// validate() must be called on the result, as the parsed value does not

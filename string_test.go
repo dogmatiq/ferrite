@@ -23,6 +23,18 @@ var _ = Describe("type StringSpec", func() {
 		tearDown()
 	})
 
+	Describe("func Describe()", func() {
+		It("describes the variable", func() {
+			Expect(spec.Describe()).To(ConsistOf(
+				VariableXXX{
+					Name:        "FERRITE_STRING",
+					Description: "<desc>",
+					Schema:      schema.Type[customString](),
+				},
+			))
+		})
+	})
+
 	When("the environment variable is not empty", func() {
 		BeforeEach(func() {
 			os.Setenv("FERRITE_STRING", "<value>")
@@ -38,10 +50,8 @@ var _ = Describe("type StringSpec", func() {
 			It("returns a successful result", func() {
 				Expect(spec.Validate()).To(ConsistOf(
 					ValidationResult{
-						Name:          "FERRITE_STRING",
-						Description:   "<desc>",
-						Schema:        schema.Type[customString](),
-						ExplicitValue: `"<value>"`,
+						Name:  "FERRITE_STRING",
+						Value: `<value>`,
 					},
 				))
 			})
@@ -60,15 +70,26 @@ var _ = Describe("type StringSpec", func() {
 				})
 			})
 
+			Describe("func Describe()", func() {
+				It("describes the variable", func() {
+					Expect(spec.Describe()).To(ConsistOf(
+						VariableXXX{
+							Name:        "FERRITE_STRING",
+							Description: "<desc>",
+							Schema:      schema.Type[customString](),
+							Default:     "<value>",
+						},
+					))
+				})
+			})
+
 			Describe("func Validate()", func() {
 				It("returns a success result", func() {
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:         "FERRITE_STRING",
-							Description:  "<desc>",
-							Schema:       schema.Type[customString](),
-							DefaultValue: `"<value>"`,
-							UsingDefault: true,
+							Name:        "FERRITE_STRING",
+							Value:       "<value>",
+							UsedDefault: true,
 						},
 					))
 				})
@@ -88,10 +109,8 @@ var _ = Describe("type StringSpec", func() {
 				It("returns a failure result", func() {
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:        "FERRITE_STRING",
-							Description: "<desc>",
-							Schema:      schema.Type[customString](),
-							Error:       errors.New(`must not be empty`),
+							Name:  "FERRITE_STRING",
+							Error: errors.New(`must not be empty`),
 						},
 					))
 				})

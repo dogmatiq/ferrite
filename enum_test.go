@@ -27,6 +27,22 @@ var _ = Describe("type EnumSpec", func() {
 		tearDown()
 	})
 
+	Describe("func Describe()", func() {
+		It("describes the variable", func() {
+			Expect(spec.Describe()).To(ConsistOf(
+				VariableXXX{
+					Name:        "FERRITE_ENUM",
+					Description: "<desc>",
+					Schema: schema.OneOf{
+						schema.Literal("<member-0>"),
+						schema.Literal("<member-1>"),
+						schema.Literal("<member-2>"),
+					},
+				},
+			))
+		})
+	})
+
 	When("the environment variable is set to one of the enum members", func() {
 		Describe("func Value()", func() {
 			DescribeTable(
@@ -48,14 +64,8 @@ var _ = Describe("type EnumSpec", func() {
 
 				Expect(spec.Validate()).To(ConsistOf(
 					ValidationResult{
-						Name:        "FERRITE_ENUM",
-						Description: "<desc>",
-						Schema: schema.OneOf{
-							schema.Literal("<member-0>"),
-							schema.Literal("<member-1>"),
-							schema.Literal("<member-2>"),
-						},
-						ExplicitValue: "<member-1>",
+						Name:  "FERRITE_ENUM",
+						Value: "<member-1>",
 					},
 				))
 			})
@@ -76,10 +86,10 @@ var _ = Describe("type EnumSpec", func() {
 				})
 			})
 
-			Describe("func Validate()", func() {
-				It("returns a success result", func() {
-					Expect(spec.Validate()).To(ConsistOf(
-						ValidationResult{
+			Describe("func Describe()", func() {
+				It("describes the variable", func() {
+					Expect(spec.Describe()).To(ConsistOf(
+						VariableXXX{
 							Name:        "FERRITE_ENUM",
 							Description: "<desc>",
 							Schema: schema.OneOf{
@@ -87,8 +97,19 @@ var _ = Describe("type EnumSpec", func() {
 								schema.Literal("<member-1>"),
 								schema.Literal("<member-2>"),
 							},
-							DefaultValue: "<member-1>",
-							UsingDefault: true,
+							Default: "<member-1>",
+						},
+					))
+				})
+			})
+
+			Describe("func Validate()", func() {
+				It("returns a success result", func() {
+					Expect(spec.Validate()).To(ConsistOf(
+						ValidationResult{
+							Name:        "FERRITE_ENUM",
+							Value:       "<member-1>",
+							UsedDefault: true,
 						},
 					))
 				})
@@ -108,13 +129,7 @@ var _ = Describe("type EnumSpec", func() {
 				It("returns a failure result", func() {
 					Expect(spec.Validate()).To(ConsistOf(
 						ValidationResult{
-							Name:        "FERRITE_ENUM",
-							Description: "<desc>",
-							Schema: schema.OneOf{
-								schema.Literal("<member-0>"),
-								schema.Literal("<member-1>"),
-								schema.Literal("<member-2>"),
-							},
+							Name:  "FERRITE_ENUM",
 							Error: errors.New(`must not be empty`),
 						},
 					))
@@ -130,15 +145,8 @@ var _ = Describe("type EnumSpec", func() {
 
 				Expect(spec.Validate()).To(ConsistOf(
 					ValidationResult{
-						Name:        "FERRITE_ENUM",
-						Description: "<desc>",
-						Schema: schema.OneOf{
-							schema.Literal("<member-0>"),
-							schema.Literal("<member-1>"),
-							schema.Literal("<member-2>"),
-						},
-						ExplicitValue: "<invalid>",
-						Error:         errors.New(`<invalid> is not a member of the enum`),
+						Name:  "FERRITE_ENUM",
+						Error: errors.New(`<invalid> is not a member of the enum`),
 					},
 				))
 			})

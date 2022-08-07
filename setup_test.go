@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/dogmatiq/ferrite"
+	"github.com/dogmatiq/ferrite/spec"
 )
 
 // setUp configures the validation exit behavior such that it prints to stdout
@@ -21,6 +22,7 @@ func setUp() {
 func tearDown() {
 	ferrite.SetExitBehavior(os.Stderr, os.Exit)
 	ferrite.ClearValidators()
+	spec.ResetRegistry()
 
 	for _, env := range os.Environ() {
 		if strings.HasPrefix(env, "FERRITE_") {

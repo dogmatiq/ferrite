@@ -52,7 +52,7 @@ func (s *StringSpec[T]) schema() schema.Schema {
 // renderParsed returns a string representation of the parsed value as it should
 // appear in validation reports.
 func (s *StringSpec[T]) renderParsed(value T) string {
-	return fmt.Sprintf("%q", value)
+	return string(value)
 }
 
 // renderRaw returns a string representation of the raw string value as it

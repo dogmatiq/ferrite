@@ -29,22 +29,29 @@ func KubeService(svc string) *KubeServiceSpec {
 
 	s := &KubeServiceSpec{
 		service: svc,
-		hostResult: ValidationResult{
-			Name:        fmt.Sprintf("%s_SERVICE_HOST", kubeToEnv(svc)),
-			Description: fmt.Sprintf(`Hostname or IP address of the "%s" service.`, svc),
-			Schema:      schema.Type[string](),
-		},
-		portResult: ValidationResult{
-			Name:        fmt.Sprintf("%s_SERVICE_PORT", kubeToEnv(svc)),
-			Description: fmt.Sprintf(`Network port of the "%s" service.`, svc),
-			Schema: schema.OneOf{
-				schema.Type[string](),
-				schema.Range{
-					Min: "1",
-					Max: "65535",
-				},
-			},
-		},
+		// s.portResult.Description = fmt.Sprintf(
+		// 	`Network port of the "%s" service's "%s" port.`,
+		// 	s.service,
+		// 	port,
+		// )
+		// })
+
+		// hostResult: ValidationResult{
+		// 	Name:        fmt.Sprintf("%s_SERVICE_HOST", kubeToEnv(svc)),
+		// 	Description: fmt.Sprintf(`Hostname or IP address of the "%s" service.`, svc),
+		// 	Schema:      schema.Type[string](),
+		// },
+		// portResult: ValidationResult{
+		// 	Name:        fmt.Sprintf("%s_SERVICE_PORT", kubeToEnv(svc)),
+		// 	Description: fmt.Sprintf(`Network port of the "%s" service.`, svc),
+		// 	Schema: schema.OneOf{
+		// 		schema.Type[string](),
+		// 		schema.Range{
+		// 			Min: "1",
+		// 			Max: "65535",
+		// 		},
+		// 	},
+		// },
 	}
 
 	Register(s)
@@ -56,10 +63,11 @@ func KubeService(svc string) *KubeServiceSpec {
 type KubeServiceSpec struct {
 	service string
 
-	seal       seal
-	host, port string
-	hostResult ValidationResult
-	portResult ValidationResult
+	m                smutex
+	portName         string
+	defHost, defPort string
+	host, port       string
+	hostErr, portErr error
 }
 
 // WithNamedPort uses a Kubernetes named port instead of the default service
@@ -82,17 +90,7 @@ func (s *KubeServiceSpec) WithNamedPort(port string) *KubeServiceSpec {
 	}
 
 	return s.with(func() {
-		s.portResult.Name = fmt.Sprintf(
-			"%s_SERVICE_PORT_%s",
-			kubeToEnv(s.service),
-			kubeToEnv(port),
-		)
-
-		s.portResult.Description = fmt.Sprintf(
-			`Network port of the "%s" service's "%s" port.`,
-			s.service,
-			port,
-		)
+		s.portName = port
 	})
 }
 
@@ -103,28 +101,25 @@ func (s *KubeServiceSpec) WithNamedPort(port string) *KubeServiceSpec {
 // service name (such as "https"). The IANA name is not to be confused with the
 // Kubernetes servcice name or port name.
 func (s *KubeServiceSpec) WithDefault(host, port string) *KubeServiceSpec {
-	if err := validateHost(host); err != nil {
-		panic(fmt.Sprintf(
-			"default value of %s is invalid: %s",
-			s.hostResult.Name,
-			err,
-		))
-	}
-
-	if err := validatePort(port); err != nil {
-		panic(fmt.Sprintf(
-			"default value of %s is invalid: %s",
-			s.portResult.Name,
-			err,
-		))
-	}
-
 	return s.with(func() {
-		s.host = host
-		s.port = port
+		if err := validateHost(host); err != nil {
+			panic(fmt.Sprintf(
+				"default value of %s is invalid: %s",
+				s.hostVarNameL(),
+				err,
+			))
+		}
 
-		s.hostResult.DefaultValue = host
-		s.portResult.DefaultValue = port
+		if err := validatePort(port); err != nil {
+			panic(fmt.Sprintf(
+				"default value of %s is invalid: %s",
+				s.portVarNameL(),
+				err,
+			))
+		}
+
+		s.defHost = host
+		s.defPort = port
 	})
 }
 
@@ -137,15 +132,19 @@ func (s *KubeServiceSpec) Address() string {
 func (s *KubeServiceSpec) Host() string {
 	s.resolve()
 
-	if s.hostResult.Error != nil {
+	if s.hostErr != nil {
 		panic(fmt.Sprintf(
 			"%s is invalid: %s",
-			s.hostResult.Name,
-			s.hostResult.Error,
+			s.hostVarNameL(),
+			s.hostErr,
 		))
 	}
 
-	return s.host
+	if s.host != "" {
+		return s.host
+	}
+
+	return s.defHost
 }
 
 // Port returns the port of the Kubernetes service.
@@ -154,76 +153,144 @@ func (s *KubeServiceSpec) Host() string {
 func (s *KubeServiceSpec) Port() string {
 	s.resolve()
 
-	if s.portResult.Error != nil {
+	if s.portErr != nil {
 		panic(fmt.Sprintf(
 			"%s is invalid: %s",
-			s.portResult.Name,
-			s.portResult.Error,
+			s.portVarNameL(),
+			s.portErr,
 		))
 	}
 
-	return s.port
+	if s.port != "" {
+		return s.port
+	}
+
+	return s.defPort
+}
+
+// Describe returns a description of the environment variable(s) described by
+// this spec.
+func (s *KubeServiceSpec) Describe() []VariableXXX {
+	s.m.RLock()
+	defer s.m.RUnlock()
+
+	return []VariableXXX{
+		{
+			Name:        s.hostVarNameL(),
+			Description: fmt.Sprintf(`Hostname or IP address of the "%s" service.`, s.service),
+			Schema:      schema.Type[string](),
+			Default:     s.defHost,
+		},
+		{
+			Name:        s.portVarNameL(),
+			Description: fmt.Sprintf(`Network port of the "%s" service.`, s.service),
+			Schema: schema.OneOf{
+				schema.Type[string](),
+				schema.Range{Min: "1", Max: "65535"},
+			},
+			Default: s.defPort,
+		},
+	}
 }
 
 // Validate validates the environment variables.
 func (s *KubeServiceSpec) Validate() []ValidationResult {
 	s.resolve()
 
-	return []ValidationResult{
-		s.hostResult,
-		s.portResult,
+	hostResult := ValidationResult{
+		Name: s.hostVarNameL(),
 	}
+
+	if s.hostErr != nil {
+		hostResult.Error = s.hostErr
+	} else {
+		hostResult.Value = s.Host()
+		hostResult.UsedDefault = s.host == ""
+	}
+
+	portResult := ValidationResult{
+		Name: s.portVarNameL(),
+	}
+
+	if s.portErr != nil {
+		portResult.Error = s.portErr
+	} else {
+		portResult.Value = s.Port()
+		portResult.UsedDefault = s.port == ""
+	}
+
+	return []ValidationResult{hostResult, portResult}
 }
 
 // resolve populates s.host, s.port and the validation results, or returns
 // immediately if they are already populated.
 func (s *KubeServiceSpec) resolve() {
-	s.seal.Close(func() {
-		validateExplicitValue(
+	s.m.Seal(func() {
+		s.host, s.hostErr = validateValue(
+			s.hostVarNameL(),
+			s.defHost,
 			validateHost,
-			&s.host,
-			&s.hostResult,
 		)
 
-		validateExplicitValue(
+		s.port, s.portErr = validateValue(
+			s.portVarNameL(),
+			s.defPort,
 			validatePort,
-			&s.port,
-			&s.portResult,
 		)
 	})
 }
 
-// resolveOne resolves a single environment variable.
-func validateExplicitValue(
-	validate func(string) error,
-	value *string,
-	result *ValidationResult,
-) {
-	if raw := os.Getenv(result.Name); raw != "" {
-		result.ExplicitValue = raw
+func (s *KubeServiceSpec) hostVarNameL() string {
+	return fmt.Sprintf(
+		"%s_SERVICE_HOST",
+		kubeToEnv(s.service),
+	)
+}
 
+func (s *KubeServiceSpec) portVarNameL() string {
+	if s.portName == "" {
+		return fmt.Sprintf(
+			"%s_SERVICE_PORT",
+			kubeToEnv(s.service),
+		)
+	}
+
+	return fmt.Sprintf(
+		"%s_SERVICE_PORT_%s",
+		kubeToEnv(s.service),
+		kubeToEnv(s.portName),
+	)
+}
+
+func validateValue(
+	name string,
+	def string,
+	validate func(string) error,
+) (string, error) {
+	if raw := os.Getenv(name); raw != "" {
 		if err := validate(raw); err != nil {
-			result.Error = err
-			return
+			return "", err
 		}
 
-		*value = raw
-		return
+		return raw, nil
 	}
 
-	if *value != "" {
-		result.UsingDefault = true
-		return
+	if def == "" {
+		return "", errUndefined
 	}
 
-	result.Error = errUndefined
+	return "", nil
 }
 
 // with calls fn while holding a lock on s.
 //
 // It panics if the value has already been resolved.
 func (s *KubeServiceSpec) with(fn func()) *KubeServiceSpec {
-	s.seal.Do(fn)
+	s.m.Lock()
+	defer s.m.Unlock()
+
+	fn()
+
 	return s
 }
 

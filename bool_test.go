@@ -1,207 +1,202 @@
 package ferrite_test
 
 import (
-	"errors"
-	"fmt"
 	"os"
 
 	. "github.com/dogmatiq/ferrite"
-	"github.com/dogmatiq/ferrite/schema"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("type BoolSpec", func() {
-	type customBool bool
+type userDefinedBool bool
 
-	var spec *BoolSpec[customBool]
+func (v userDefinedBool) String() string {
+	if v {
+		return "yes"
+	}
+	return "no"
+}
+
+var _ = Describe("type BoolBuilder", func() {
+	var builder BoolBuilder[userDefinedBool]
 
 	BeforeEach(func() {
-		spec = BoolAs[customBool]("FERRITE_BOOL", "<desc>")
+		builder = BoolAs[userDefinedBool]("FERRITE_BOOL", "<desc>")
 	})
 
 	AfterEach(func() {
 		tearDown()
 	})
 
-	When("the environment variable is set to one of the standard literals", func() {
-		Describe("func Value()", func() {
-			DescribeTable(
-				"it returns the value associated with the literal",
-				func(value string, expect customBool) {
-					os.Setenv("FERRITE_BOOL", value)
-
-					Expect(spec.Value()).To(Equal(expect))
-				},
-				Entry("true", "true", customBool(true)),
-				Entry("false", "false", customBool(false)),
-			)
-		})
-
-		Describe("func Validate()", func() {
-			It("returns a successful result", func() {
-				os.Setenv("FERRITE_BOOL", "true")
-
-				Expect(spec.Validate()).To(ConsistOf(
-					ValidationResult{
-						Name:        "FERRITE_BOOL",
-						Description: "<desc>",
-						Schema: schema.OneOf{
-							schema.Literal("true"),
-							schema.Literal("false"),
-						},
-						ExplicitValue: "true",
-					},
-				))
-			})
-		})
-	})
-
-	When("the environment variable is empty", func() {
-		When("there is a default value", func() {
-			Describe("func Value()", func() {
-				DescribeTable(
-					"it returns the default",
-					func(expect customBool) {
-						spec.WithDefault(expect)
-
-						Expect(spec.Value()).To(Equal(expect))
-					},
-					Entry("true", customBool(true)),
-					Entry("false", customBool(false)),
-				)
-			})
-
-			Describe("func Validate()", func() {
-				It("returns a success result", func() {
-					spec.WithDefault(true)
-
-					Expect(spec.Validate()).To(ConsistOf(
-						ValidationResult{
-							Name:        "FERRITE_BOOL",
-							Description: "<desc>",
-							Schema: schema.OneOf{
-								schema.Literal("true"),
-								schema.Literal("false"),
-							},
-							DefaultValue: "true",
-							UsingDefault: true,
-						},
-					))
-				})
-			})
-		})
-
-		When("there is no default value", func() {
-			Describe("func Value()", func() {
-				It("panics", func() {
-					Expect(func() {
-						spec.Value()
-					}).To(PanicWith("FERRITE_BOOL is invalid: must not be empty"))
-				})
-			})
-
-			Describe("func Validate()", func() {
-				It("returns a failure result", func() {
-					Expect(spec.Validate()).To(ConsistOf(
-						ValidationResult{
-							Name:        "FERRITE_BOOL",
-							Description: "<desc>",
-							Schema: schema.OneOf{
-								schema.Literal("true"),
-								schema.Literal("false"),
-							},
-							Error: errors.New(`must not be empty`),
-						},
-					))
-				})
-			})
-		})
-	})
-
-	When("the environment variable is set to some other value", func() {
-		BeforeEach(func() {
-			os.Setenv("FERRITE_BOOL", "<invalid>")
-		})
-
-		Describe("func Value()", func() {
-			It("panics", func() {
-				Expect(func() {
-					spec.Value()
-				}).To(PanicWith(`FERRITE_BOOL is invalid: must be either "true" or "false", got "<invalid>"`))
-			})
-		})
-
-		Describe("func Validate()", func() {
-			It("returns a failure result", func() {
-				Expect(spec.Validate()).To(ConsistOf(
-					ValidationResult{
-						Name:        "FERRITE_BOOL",
-						Description: "<desc>",
-						Schema: schema.OneOf{
-							schema.Literal("true"),
-							schema.Literal("false"),
-						},
-						ExplicitValue: "<invalid>",
-						Error:         errors.New(`must be either "true" or "false", got "<invalid>"`),
-					},
-				))
-			})
-		})
-	})
-
-	When("there are custom literals", func() {
-		BeforeEach(func() {
-			spec.WithLiterals("yes", "no")
-		})
-
-		When("the environment variable is set to one of the custom literals", func() {
+	When("the variable is required", func() {
+		When("the environment variable is set to one of the accepted literals", func() {
 			Describe("func Value()", func() {
 				DescribeTable(
 					"it returns the value associated with the literal",
-					func(value string, expect customBool) {
+					func(value string, expect userDefinedBool) {
 						os.Setenv("FERRITE_BOOL", value)
 
-						Expect(spec.Value()).To(Equal(expect))
+						v := builder.
+							Required().
+							Value()
+
+						Expect(v).To(Equal(expect))
 					},
-					Entry("true", "yes", customBool(true)),
-					Entry("false", "no", customBool(false)),
+					Entry("true", "yes", userDefinedBool(true)),
+					Entry("false", "no", userDefinedBool(false)),
 				)
 			})
 		})
 
-		When("the environment variable is set to some other value", func() {
-			Describe("func Validate()", func() {
+		When("the environment variable is empty", func() {
+			When("there is a default value", func() {
+				Describe("func Value()", func() {
+					DescribeTable(
+						"it returns the default",
+						func(expect userDefinedBool) {
+							v := builder.
+								WithDefault(expect).
+								Required().
+								Value()
+
+							Expect(v).To(Equal(expect))
+						},
+						Entry("true", userDefinedBool(true)),
+						Entry("false", userDefinedBool(false)),
+					)
+				})
+			})
+
+			When("there is no default value", func() {
+				Describe("func Value()", func() {
+					It("panics", func() {
+						Expect(func() {
+							builder.
+								Required().
+								Value()
+						}).To(PanicWith(
+							"FERRITE_BOOL is undefined and does not have a default value",
+						))
+					})
+				})
+			})
+		})
+
+		When("the environment variable is invalid", func() {
+			BeforeEach(func() {
+				// we don't accept true/false for the userDefinedBool type
+				os.Setenv("FERRITE_BOOL", "true")
+			})
+
+			Describe("func Value()", func() {
+				It("panics", func() {
+					Expect(func() {
+						builder.
+							Required().
+							Value()
+					}).To(PanicWith(
+						`FERRITE_BOOL must be either "yes" or "no", got "true"`,
+					))
+				})
+			})
+		})
+	})
+
+	When("the variable is optional", func() {
+		When("the environment variable is set to one of the standard literals", func() {
+			Describe("func Value()", func() {
 				DescribeTable(
-					"it returns a failure result",
-					func(value string) {
+					"it returns the value associated with the literal",
+					func(value string, expect userDefinedBool) {
 						os.Setenv("FERRITE_BOOL", value)
 
-						Expect(spec.Validate()).To(ConsistOf(
-							ValidationResult{
-								Name:        "FERRITE_BOOL",
-								Description: "<desc>",
-								Schema: schema.OneOf{
-									schema.Literal("yes"),
-									schema.Literal("no"),
-								},
-								ExplicitValue: value,
-								Error:         fmt.Errorf(`must be either "yes" or "no", got "%s"`, value),
-							},
-						))
+						v, ok := builder.
+							Optional().
+							Value()
+
+						Expect(ok).To(BeTrue())
+						Expect(v).To(Equal(expect))
 					},
-					Entry("true", "true"),
-					Entry("false", "false"),
+					Entry("true", "yes", userDefinedBool(true)),
+					Entry("false", "no", userDefinedBool(false)),
 				)
+			})
+		})
+
+		When("the environment variable is empty", func() {
+			When("there is a default value", func() {
+				Describe("func Value()", func() {
+					DescribeTable(
+						"it returns the default",
+						func(expect userDefinedBool) {
+							v, ok := builder.
+								WithDefault(expect).
+								Optional().
+								Value()
+
+							Expect(ok).To(BeTrue())
+							Expect(v).To(Equal(expect))
+						},
+						Entry("true", userDefinedBool(true)),
+						Entry("false", userDefinedBool(false)),
+					)
+				})
+			})
+
+			When("there is no default value", func() {
+				Describe("func Value()", func() {
+					It("returns with ok == false", func() {
+						_, ok := builder.
+							Optional().
+							Value()
+
+						Expect(ok).To(BeFalse())
+					})
+				})
+			})
+		})
+
+		When("the environment variable is invalid", func() {
+			BeforeEach(func() {
+				// we don't accept true/false for the userDefinedBool type
+				os.Setenv("FERRITE_BOOL", "true")
+			})
+
+			Describe("func Value()", func() {
+				It("panics", func() {
+					Expect(func() {
+						builder.
+							Optional().
+							Value()
+					}).To(PanicWith(
+						`FERRITE_BOOL must be either "yes" or "no", got "true"`,
+					))
+				})
 			})
 		})
 	})
 
 	Describe("func WithLiterals()", func() {
+		DescribeTable(
+			"it overrides the default literals",
+			func(value string, expect userDefinedBool) {
+				os.Setenv("FERRITE_BOOL", value)
+
+				v := builder.
+					WithLiterals("true", "false").
+					Required().
+					Value()
+
+				Expect(v).To(Equal(expect))
+			},
+			Entry("true", "true", userDefinedBool(true)),
+			Entry("false", "false", userDefinedBool(false)),
+		)
+
 		When("the true literal is empty", func() {
 			It("panics", func() {
 				Expect(func() {
-					spec.WithLiterals("", "no")
+					builder.WithLiterals("", "no")
 				}).To(PanicWith("boolean literals must not be zero-length"))
 			})
 		})
@@ -209,7 +204,7 @@ var _ = Describe("type BoolSpec", func() {
 		When("the true literal is empty", func() {
 			It("panics", func() {
 				Expect(func() {
-					spec.WithLiterals("yes", "")
+					builder.WithLiterals("yes", "")
 				}).To(PanicWith("boolean literals must not be zero-length"))
 			})
 		})
