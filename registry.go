@@ -78,15 +78,15 @@ func validate() (string, bool) {
 }
 
 const (
-	// valid is the icon displayed next to valid environment variables.
-	valid = "✓"
+	// validIcon is the icon displayed next to validIcon environment variables.
+	validIcon = "✓"
 
-	// invalid is the icon displayed next to invalid environment variables.
-	invalid = "✗"
+	// invalidIcon is the icon displayed next to invalidIcon environment variables.
+	invalidIcon = "✗"
 
-	// chevron is the icon used to draw attention to invalid environment
+	// chevronIcon is the icon used to draw attention to invalid environment
 	// variables.
-	chevron = "❯"
+	chevronIcon = "❯"
 )
 
 // renderResults renders a set of validation results as a human-readable string.
@@ -103,7 +103,7 @@ func renderResults(results []pair) string {
 	for _, v := range results {
 		name := " "
 		if v.Result.Error != nil {
-			name += chevron
+			name += chevronIcon
 		} else {
 			name += " "
 		}
@@ -119,11 +119,11 @@ func renderResults(results []pair) string {
 
 		status := ""
 		if v.Result.Error != nil {
-			status += invalid + " " + v.Result.Error.Error()
+			status += invalidIcon + " " + v.Result.Error.Error()
 		} else if v.Result.UsedDefault {
-			status += fmt.Sprintf("%s using default value", valid)
+			status += fmt.Sprintf("%s using default value", validIcon)
 		} else {
-			status += fmt.Sprintf("%s set to %q", valid, v.Result.Value)
+			status += fmt.Sprintf("%s set to %q", validIcon, v.Result.Value)
 		}
 
 		t.AddRow(name, input, v.Variable.Description, status)
@@ -162,4 +162,50 @@ func (r *validateSchemaRenderer) VisitRange(s schema.Range) {
 	} else {
 		fmt.Fprintf(&r.Output, "(%s...)", s.Min)
 	}
+}
+
+// Spec is a specification for an environment variable.
+type Spec interface {
+	// Describe returns a description of the environment variable(s) described
+	// by this spec.
+	Describe() []VariableXXX
+
+	// Validate validates the environment variable(s) described by this spec.
+	Validate() []ValidationResult
+}
+
+// VariableXXX describes an environment variable.
+type VariableXXX struct {
+	// Name is the name of the environment variable.
+	Name string
+
+	// Description is a human-readable description of the environment variable.
+	Description string
+
+	// Schema describes the valid values for this environment variable.
+	Schema schema.Schema
+
+	// Default is the environment variable's default value.
+	//
+	// It must be non-empty if the environment variable has a default value;
+	// otherwise it must be empty.
+	Default string
+}
+
+// ValidationResult is the result of validating an environment variable.
+type ValidationResult struct {
+	// Name is the name of the environment variable.
+	Name string
+
+	// Value is the environment variable's value.
+	Value string
+
+	// UsedDefault is true if the default value of the environment variable was
+	// used to populate the value.
+	UsedDefault bool
+
+	// Error is an error describing why the validation failed.
+	//
+	// If it is nil, the validation is considered successful.
+	Error error
 }

@@ -38,10 +38,6 @@ func (r *Resolver[T]) Resolve() (Value[T], error) {
 	return r.value, r.err
 }
 
-// func (r *Resolver[T]) resolve() (value, error) {
-// 	return r.Resolve()
-// }
-
 // Value is the resolved value of an environment variable.
 type Value[T any] struct {
 	Go        T
@@ -56,9 +52,3 @@ func (v Value[T]) String() string {
 func (v Value[T]) isDefault() bool {
 	return v.IsDefault
 }
-
-// // value is an untyped interface for a value.
-// type value interface {
-// 	String() string
-// 	isDefault() bool
-// }

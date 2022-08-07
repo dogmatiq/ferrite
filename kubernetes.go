@@ -9,17 +9,29 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/dogmatiq/ferrite/internal/optional"
 	"github.com/dogmatiq/ferrite/schema"
+	"github.com/dogmatiq/ferrite/spec"
 )
 
-// KubeService reads Kubernetes service discovery environment variables for a
+// KubernetesAddress is the address of a Kubernetes service.
+type KubernetesAddress struct {
+	Host string
+	Port string
+}
+
+func (a KubernetesAddress) String() string {
+	return net.JoinHostPort(a.Host, a.Port)
+}
+
+// KubernetesService reads Kubernetes service discovery environment variables for a
 // service's port.
 //
 // svc is the name of the Kubernetes service, NOT the environment variable.
 //
 // The environment variables "<svc>_SERVICE_HOST" and "<svc>_SERVICE_PORT" are
 // used to construct an address for the service.
-func KubeService(svc string) *KubeServiceSpec {
+func KubernetesService(svc string) KubernetesServiceBuilder {
 	if err := validateKubernetesName(svc); err != nil {
 		panic(fmt.Sprintf(
 			"kubernetes service name is invalid: %s",
@@ -27,47 +39,24 @@ func KubeService(svc string) *KubeServiceSpec {
 		))
 	}
 
-	s := &KubeServiceSpec{
+	return KubernetesServiceBuilder{
 		service: svc,
-		// s.portResult.Description = fmt.Sprintf(
-		// 	`Network port of the "%s" service's "%s" port.`,
-		// 	s.service,
-		// 	port,
-		// )
-		// })
-
-		// hostResult: ValidationResult{
-		// 	Name:        fmt.Sprintf("%s_SERVICE_HOST", kubeToEnv(svc)),
-		// 	Description: fmt.Sprintf(`Hostname or IP address of the "%s" service.`, svc),
-		// 	Schema:      schema.Type[string](),
-		// },
-		// portResult: ValidationResult{
-		// 	Name:        fmt.Sprintf("%s_SERVICE_PORT", kubeToEnv(svc)),
-		// 	Description: fmt.Sprintf(`Network port of the "%s" service.`, svc),
-		// 	Schema: schema.OneOf{
-		// 		schema.Type[string](),
-		// 		schema.Range{
-		// 			Min: "1",
-		// 			Max: "65535",
-		// 		},
-		// 	},
-		// },
+		hostVar: fmt.Sprintf(
+			"%s_SERVICE_HOST",
+			kubernetesNameToEnv(svc),
+		),
+		portVar: fmt.Sprintf(
+			"%s_SERVICE_PORT",
+			kubernetesNameToEnv(svc),
+		),
 	}
-
-	Register(s)
-
-	return s
 }
 
-// KubeServiceSpec is the specification for a Kubernetes service.
-type KubeServiceSpec struct {
-	service string
-
-	m                smutex
-	portName         string
-	defHost, defPort string
-	host, port       string
-	hostErr, portErr error
+// KubernetesServiceBuilder is the specification for a Kubernetes service.
+type KubernetesServiceBuilder struct {
+	service          string
+	hostVar, portVar string
+	def              optional.Optional[KubernetesAddress]
 }
 
 // WithNamedPort uses a Kubernetes named port instead of the default service
@@ -81,17 +70,22 @@ type KubeServiceSpec struct {
 // although the two may use the same names.
 //
 // See https://kubernetes.io/docs/concepts/services-networking/service/#multi-port-services
-func (s *KubeServiceSpec) WithNamedPort(port string) *KubeServiceSpec {
+func (b KubernetesServiceBuilder) WithNamedPort(port string) KubernetesServiceBuilder {
 	if err := validateKubernetesName(port); err != nil {
 		panic(fmt.Sprintf(
-			"kubernetes port name is invalid: %s",
+			"specification of kubernetes %q service is invalid: invalid named port: %s",
+			b.service,
 			err,
 		))
 	}
 
-	return s.with(func() {
-		s.portName = port
-	})
+	b.portVar = fmt.Sprintf(
+		"%s_SERVICE_PORT_%s",
+		kubernetesNameToEnv(b.service),
+		kubernetesNameToEnv(port),
+	)
+
+	return b
 }
 
 // WithDefault sets a default value to use when the environment variables are
@@ -100,216 +94,238 @@ func (s *KubeServiceSpec) WithNamedPort(port string) *KubeServiceSpec {
 // The port may be a numeric value between 1 and 65535, or an IANA registered
 // service name (such as "https"). The IANA name is not to be confused with the
 // Kubernetes servcice name or port name.
-func (s *KubeServiceSpec) WithDefault(host, port string) *KubeServiceSpec {
-	return s.with(func() {
-		if err := validateHost(host); err != nil {
-			panic(fmt.Sprintf(
-				"default value of %s is invalid: %s",
-				s.hostVarNameL(),
-				err,
-			))
-		}
-
-		if err := validatePort(port); err != nil {
-			panic(fmt.Sprintf(
-				"default value of %s is invalid: %s",
-				s.portVarNameL(),
-				err,
-			))
-		}
-
-		s.defHost = host
-		s.defPort = port
-	})
-}
-
-// Address returns the address (host:port) of the Kubernetes service.
-func (s *KubeServiceSpec) Address() string {
-	return net.JoinHostPort(s.Host(), s.Port())
-}
-
-// Host returns the hostname or IP address of the Kubernetes service.
-func (s *KubeServiceSpec) Host() string {
-	s.resolve()
-
-	if s.hostErr != nil {
+func (b KubernetesServiceBuilder) WithDefault(host, port string) KubernetesServiceBuilder {
+	if err := validateHost(host); err != nil {
 		panic(fmt.Sprintf(
-			"%s is invalid: %s",
-			s.hostVarNameL(),
-			s.hostErr,
+			"specification of kubernetes %q service is invalid: %s",
+			b.service,
+			err,
 		))
 	}
 
-	if s.host != "" {
-		return s.host
-	}
-
-	return s.defHost
-}
-
-// Port returns the port of the Kubernetes service.
-//
-// It may be a port number of an IANA registered service name (e.g. "https").
-func (s *KubeServiceSpec) Port() string {
-	s.resolve()
-
-	if s.portErr != nil {
+	if err := validatePort(port); err != nil {
 		panic(fmt.Sprintf(
-			"%s is invalid: %s",
-			s.portVarNameL(),
-			s.portErr,
+			"specification of kubernetes %q service is invalid: %s",
+			b.service,
+			err,
 		))
 	}
 
-	if s.port != "" {
-		return s.port
-	}
+	b.def = optional.With(KubernetesAddress{host, port})
 
-	return s.defPort
+	return b
 }
 
-// Describe returns a description of the environment variable(s) described by
-// this spec.
-func (s *KubeServiceSpec) Describe() []VariableXXX {
-	s.m.RLock()
-	defer s.m.RUnlock()
+// Required completes the build process and registers a required variable with
+// Ferrite's validation system.
+func (b KubernetesServiceBuilder) Required() Required[KubernetesAddress] {
+	hostSpec := b.hostSpec()
+	portSpec := b.portSpec()
 
-	return []VariableXXX{
-		{
-			Name:        s.hostVarNameL(),
-			Description: fmt.Sprintf(`Hostname or IP address of the "%s" service.`, s.service),
-			Schema:      schema.Type[string](),
-			Default:     s.defHost,
-		},
-		{
-			Name:        s.portVarNameL(),
-			Description: fmt.Sprintf(`Network port of the "%s" service.`, s.service),
-			Schema: schema.OneOf{
-				schema.Type[string](),
-				schema.Range{Min: "1", Max: "65535"},
-			},
-			Default: s.defPort,
+	hostRes := spec.NewResolver(hostSpec, b.resolveHost)
+	portRes := spec.NewResolver(portSpec, b.resolvePort)
+
+	spec.Register(hostRes)
+	spec.Register(portRes)
+
+	return Required[KubernetesAddress]{
+		func() (KubernetesAddress, error) {
+			host, err := hostRes.Resolve()
+			if err != nil {
+				return KubernetesAddress{}, err
+			}
+
+			port, err := portRes.Resolve()
+			if err != nil {
+				return KubernetesAddress{}, err
+			}
+
+			return KubernetesAddress{host.Go, port.Go}, nil
 		},
 	}
 }
 
-// Validate validates the environment variables.
-func (s *KubeServiceSpec) Validate() []ValidationResult {
-	s.resolve()
+// Optional completes the build process and registers an optional variable with
+// Ferrite's validation system.
+func (b KubernetesServiceBuilder) Optional() Optional[KubernetesAddress] {
+	hostSpec := b.hostSpec()
+	portSpec := b.portSpec()
 
-	hostResult := ValidationResult{
-		Name: s.hostVarNameL(),
+	hostSpec.Necessity = spec.Optional
+	portSpec.Necessity = spec.Optional
+
+	hostRes := spec.NewResolver(hostSpec, b.resolveHost)
+	portRes := spec.NewResolver(portSpec, b.resolvePort)
+
+	spec.Register(hostRes)
+	spec.Register(portRes)
+
+	return Optional[KubernetesAddress]{
+		func() (KubernetesAddress, error) {
+			host, hostErr := hostRes.Resolve()
+			port, portErr := portRes.Resolve()
+
+			if hostErr != nil {
+				if portErr == nil {
+					var undef UndefinedError
+					if errors.As(hostErr, &undef) {
+						undef.Cause = fmt.Errorf("%s is defined, define both or neither", b.portVar)
+						hostErr = undef
+					}
+				}
+
+				return KubernetesAddress{}, hostErr
+			}
+
+			if portErr != nil {
+				var undef UndefinedError
+				if errors.As(portErr, &undef) {
+					undef.Cause = fmt.Errorf("%s is defined, define both or neither", b.hostVar)
+					portErr = undef
+				}
+
+				return KubernetesAddress{}, portErr
+			}
+
+			return KubernetesAddress{host.Go, port.Go}, nil
+		},
 	}
-
-	if s.hostErr != nil {
-		hostResult.Error = s.hostErr
-	} else {
-		hostResult.Value = s.Host()
-		hostResult.UsedDefault = s.host == ""
-	}
-
-	portResult := ValidationResult{
-		Name: s.portVarNameL(),
-	}
-
-	if s.portErr != nil {
-		portResult.Error = s.portErr
-	} else {
-		portResult.Value = s.Port()
-		portResult.UsedDefault = s.port == ""
-	}
-
-	return []ValidationResult{hostResult, portResult}
 }
 
-// resolve populates s.host, s.port and the validation results, or returns
-// immediately if they are already populated.
-func (s *KubeServiceSpec) resolve() {
-	s.m.Seal(func() {
-		s.host, s.hostErr = validateValue(
-			s.hostVarNameL(),
-			s.defHost,
-			validateHost,
-		)
-
-		s.port, s.portErr = validateValue(
-			s.portVarNameL(),
-			s.defPort,
-			validatePort,
-		)
-	})
-}
-
-func (s *KubeServiceSpec) hostVarNameL() string {
-	return fmt.Sprintf(
-		"%s_SERVICE_HOST",
-		kubeToEnv(s.service),
-	)
-}
-
-func (s *KubeServiceSpec) portVarNameL() string {
-	if s.portName == "" {
-		return fmt.Sprintf(
-			"%s_SERVICE_PORT",
-			kubeToEnv(s.service),
-		)
+func (b KubernetesServiceBuilder) hostSpec() spec.Spec {
+	s := spec.Spec{
+		Name: b.hostVar,
+		Description: fmt.Sprintf(
+			"hostname or IP address of the %q service",
+			b.service,
+		),
+		Necessity: spec.Required,
+		Schema:    schema.Type[string](),
 	}
 
-	return fmt.Sprintf(
-		"%s_SERVICE_PORT_%s",
-		kubeToEnv(s.service),
-		kubeToEnv(s.portName),
-	)
-}
-
-func validateValue(
-	name string,
-	def string,
-	validate func(string) error,
-) (string, error) {
-	if raw := os.Getenv(name); raw != "" {
-		if err := validate(raw); err != nil {
-			return "", err
-		}
-
-		return raw, nil
+	if v, ok := b.def.Get(); ok {
+		s.Necessity = spec.Defaulted
+		s.Default = v.Host
 	}
-
-	if def == "" {
-		return "", errUndefined
-	}
-
-	return "", nil
-}
-
-// with calls fn while holding a lock on s.
-//
-// It panics if the value has already been resolved.
-func (s *KubeServiceSpec) with(fn func()) *KubeServiceSpec {
-	s.m.Lock()
-	defer s.m.Unlock()
-
-	fn()
 
 	return s
 }
 
-// kubeToEnv converts a kubernetes resource name to an environment variable
+func (b KubernetesServiceBuilder) portSpec() spec.Spec {
+	s := spec.Spec{
+		Name: b.portVar,
+		Description: fmt.Sprintf(
+			"network port of the %q service",
+			b.service,
+		),
+		Necessity: spec.Required,
+		Schema: schema.OneOf{
+			schema.Type[string](),
+			schema.Range{
+				Min: "1",
+				Max: "65535",
+			},
+		},
+	}
+
+	if v, ok := b.def.Get(); ok {
+		s.Necessity = spec.Defaulted
+		s.Default = v.Port
+	}
+
+	return s
+}
+
+func (b KubernetesServiceBuilder) resolveHost() (spec.Value[string], error) {
+	env := os.Getenv(b.hostVar)
+
+	if env == "" {
+		if v, ok := b.def.Get(); ok {
+			return spec.Value[string]{
+				Go:        v.Host,
+				Env:       v.Host,
+				IsDefault: true,
+			}, nil
+		}
+
+		return undefined[string](b.hostVar)
+	}
+
+	if err := validateHost(env); err != nil {
+		return invalid[string](b.hostVar, env, "%w", err)
+	}
+
+	return spec.Value[string]{
+		Go:  env,
+		Env: env,
+	}, nil
+}
+
+func (b KubernetesServiceBuilder) resolvePort() (spec.Value[string], error) {
+	env := os.Getenv(b.portVar)
+
+	if env == "" {
+		if v, ok := b.def.Get(); ok {
+			return spec.Value[string]{
+				Go:        v.Port,
+				Env:       v.Port,
+				IsDefault: true,
+			}, nil
+		}
+
+		return undefined[string](b.portVar)
+	}
+
+	if err := validatePort(env); err != nil {
+		return invalid[string](b.portVar, env, "%w", err)
+	}
+
+	return spec.Value[string]{
+		Go:  env,
+		Env: env,
+	}, nil
+}
+
+// kubernetesNameToEnv converts a kubernetes resource name to an environment variable
 // name, as per Kubernetes own behavior.
-func kubeToEnv(s string) string {
+func kubernetesNameToEnv(s string) string {
 	return strings.ToUpper(
 		strings.ReplaceAll(s, "-", "_"),
 	)
 }
 
-// validateHost reutrns an error if host is not a valid hostname or IP address.
-//
-// The hostname validation is intentionally very permissive as it's not unheard
-// of to encounter functioning services in the wild that have DNS names that are
-// technically invalid. This includes hostnames that start with hyphens!
+// validateKubernetesName returns an error if name is not a valid Kubernetes
+// resource name.
+func validateKubernetesName(name string) error {
+	if name == "" {
+		return errors.New("name must not be empty")
+	}
+
+	n := len(name)
+
+	if name[0] == '-' || name[n-1] == '-' {
+		return errors.New("name must not begin or end with a hyphen")
+	}
+
+	for i := range name {
+		ch := name[i] // iterate by byte (not rune)
+
+		switch {
+		case ch >= 'a' && ch <= 'z':
+		case ch >= '0' && ch <= '9':
+		case ch == '-':
+		default:
+			return errors.New("name must contain only lowercase ASCII letters, digits and hyphen")
+		}
+	}
+
+	return nil
+}
+
+// validateHost returns an error of host is not a valid hostname.
 func validateHost(host string) error {
 	if host == "" {
-		return errUndefined
+		return errors.New("host must not be empty")
 	}
 
 	if net.ParseIP(host) != nil {
@@ -317,42 +333,37 @@ func validateHost(host string) error {
 	}
 
 	n := len(host)
-
 	if host[0] == '.' || host[n-1] == '.' {
-		return errors.New("hostname must not begin or end with a dot")
+		return errors.New("host must not begin or end with a dot")
 	}
 
 	for _, r := range host {
 		if unicode.IsSpace(r) {
-			return errors.New("hostname must not contain whitespace")
+			return errors.New("host must not contain whitespace")
 		}
 	}
 
 	return nil
 }
 
-// validatePort returns an error if port is neither a numeric port number, nor a
-// valid IANA registered service name.
+// validateHost returns an error of port is not a valid numeric port or IANA
+// service name.
 func validatePort(port string) error {
 	if port == "" {
-		return errUndefined
+		return errors.New("port must not be empty")
 	}
 
 	n, err := strconv.ParseUint(port, 10, 16)
 
 	if errors.Is(err, strconv.ErrSyntax) {
-		if err := validateIANAServiceName(port); err != nil {
-			return fmt.Errorf("%q is not a valid IANA service name (%s)", port, err)
-		}
-
-		return nil
+		return validateIANAServiceName(port)
 	}
 
-	if err == nil && n != 0 {
-		return nil
+	if err != nil || n == 0 {
+		return errors.New("numeric ports must be between 1 and 65535")
 	}
 
-	return errors.New("numeric ports must be between 1 and 65535")
+	return nil
 }
 
 // validateIANAServiceName returns an error if name is not a valid IANA service
@@ -365,12 +376,12 @@ func validateIANAServiceName(name string) error {
 	// RFC-6335: MUST be at least 1 character and no more than 15 characters
 	// long.
 	if n == 0 || n > 15 {
-		return errors.New("must be between 1 and 15 characters")
+		return errors.New("IANA service name must be between 1 and 15 characters")
 	}
 
 	// RFC-6335: MUST NOT begin or end with a hyphen.
 	if name[0] == '-' || name[n-1] == '-' {
-		return errors.New("must not begin or end with a hyphen")
+		return errors.New("IANA service name must not begin or end with a hyphen")
 	}
 
 	hasLetter := false
@@ -378,9 +389,8 @@ func validateIANAServiceName(name string) error {
 	for i := range name {
 		ch := name[i] // iterate by byte (not rune)
 
-		// RFC-6335: MUST contain only US-ASCII [ANSI.X3.4-1986] letters 'A' -
-		// 'Z' and 'a' - 'z', digits '0' - '9', and hyphens ('-', ASCII 0x2D or
-		// decimal 45).
+		// RFC-6335: MUST contain only US-ASCII letters 'A' - 'Z' and 'a' - 'z',
+		// digits '0' - '9', and hyphens ('-', ASCII 0x2D or decimal 45).
 		switch {
 		case ch >= 'A' && ch <= 'Z':
 			hasLetter = true
@@ -391,44 +401,16 @@ func validateIANAServiceName(name string) error {
 		case ch == '-':
 			// RFC-6335: hyphens MUST NOT be adjacent to other hyphens.
 			if name[i-1] == '-' {
-				return errors.New("must not contain adjacent hyphens")
+				return errors.New("IANA service name must not contain adjacent hyphens")
 			}
 		default:
-			return errors.New("must contain only ASCII letters, digits and hyphen")
+			return errors.New("IANA service name must contain only ASCII letters, digits and hyphen")
 		}
 	}
 
-	//RFC-6335: MUST contain at least one letter ('A' - 'Z' or 'a' - 'z').
+	// RFC-6335: MUST contain at least one letter ('A' - 'Z' or 'a' - 'z').
 	if !hasLetter {
-		return errors.New("must contain at least one letter")
-	}
-
-	return nil
-}
-
-// validateKubernetesName returns an error if name is not a valid Kubernetes
-// resource name.
-func validateKubernetesName(name string) error {
-	if name == "" {
-		return errors.New("must not be empty")
-	}
-
-	n := len(name)
-
-	if name[0] == '-' || name[n-1] == '-' {
-		return errors.New("must not begin or end with a hyphen")
-	}
-
-	for i := range name {
-		ch := name[i] // iterate by byte (not rune)
-
-		switch {
-		case ch >= 'a' && ch <= 'z':
-		case ch >= '0' && ch <= '9':
-		case ch == '-':
-		default:
-			return errors.New("must contain only lowercase ASCII letters, digits and hyphen")
-		}
+		return errors.New("IANA service name must contain at least one letter")
 	}
 
 	return nil

@@ -1,511 +1,439 @@
 package ferrite_test
 
 import (
-	"errors"
 	"os"
 
 	. "github.com/dogmatiq/ferrite"
-	"github.com/dogmatiq/ferrite/schema"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("type KubeServiceSpec", func() {
-	var spec *KubeServiceSpec
+var _ = Describe("type KubernetesServiceBuilder", func() {
+	var builder KubernetesServiceBuilder
 
 	BeforeEach(func() {
-		spec = KubeService("ferrite-svc")
+		builder = KubernetesService("ferrite-svc")
 	})
 
 	AfterEach(func() {
 		tearDown()
 	})
 
-	When("the variable is required", func() {
-		When("the value is XXXXXXXXXXXX", func() {
-		})
-
-		When("the value is invalid", func() {
-
-		})
-
-		When("the value is empty", func() {
-			When("there is a default value", func() {
-
-			})
-
-			When("there is no default value", func() {
-
-			})
-		})
-	})
-
-	When("the variable is optional", func() {
-		When("the value is XXXXXXXXXXXXXXX", func() {
-		})
-
-		When("the value is invalid", func() {
-
-		})
-
-		When("the value is empty", func() {
-			When("there is a default value", func() {
-
-			})
-
-			When("there is no default value", func() {
-
-			})
-		})
-	})
-
-	Describe("func Describe()", func() {
-		It("describes the variables", func() {
-			Expect(spec.Describe()).To(ConsistOf(
-				VariableXXX{
-					Name:        "FERRITE_SVC_SERVICE_HOST",
-					Description: `Hostname or IP address of the "ferrite-svc" service.`,
-					Schema:      schema.Type[string](),
-				},
-				VariableXXX{
-					Name:        "FERRITE_SVC_SERVICE_PORT",
-					Description: `Network port of the "ferrite-svc" service.`,
-					Schema: schema.OneOf{
-						schema.Type[string](),
-						schema.Range{
-							Min: "1",
-							Max: "65535",
-						},
-					},
-				},
-			))
-		})
-	})
-
-	When("both the host and port environment variables are set", func() {
-		BeforeEach(func() {
-			os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
-			os.Setenv("FERRITE_SVC_SERVICE_PORT", "12345")
-		})
-
-		Describe("func Address(), Host() and Port()", func() {
-			It("return the network address", func() {
-				Expect(spec.Address()).To(Equal("host.example.org:12345"))
-				Expect(spec.Host()).To(Equal("host.example.org"))
-				Expect(spec.Port()).To(Equal("12345"))
-			})
-		})
-
-		When("the host is an IPv6 address", func() {
+	When("the variables are required", func() {
+		When("the the host and port are valid", func() {
 			BeforeEach(func() {
-				os.Setenv("FERRITE_SVC_SERVICE_HOST", "::1")
+				os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
+				os.Setenv("FERRITE_SVC_SERVICE_PORT", "12345")
 			})
 
-			Describe("func Address()", func() {
-				It("properly escapes the IP address", func() {
-					Expect(spec.Address()).To(Equal("[::1]:12345"))
+			It("returns the value", func() {
+				v := builder.
+					Required().
+					Value()
+
+				Expect(v).To(Equal(
+					KubernetesAddress{
+						Host: "host.example.org",
+						Port: "12345",
+					},
+				))
+			})
+		})
+
+		When("the host is invalid", func() {
+			Describe("func Value()", func() {
+				invalidHostTable(
+					"it panics",
+					func(value, expect string) {
+						os.Setenv("FERRITE_SVC_SERVICE_HOST", value) // note trailing dot
+						os.Setenv("FERRITE_SVC_SERVICE_PORT", "12345")
+
+						Expect(func() {
+							builder.
+								Required().
+								Value()
+						}).To(PanicWith(expect))
+					},
+				)
+			})
+		})
+
+		When("the port is invalid", func() {
+			Describe("func Value()", func() {
+				invalidPortTable(
+					"it panics",
+					func(value, expect string) {
+						Expect(func() {
+							os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
+							os.Setenv("FERRITE_SVC_SERVICE_PORT", value)
+
+							builder.
+								Required().
+								Value()
+						}).To(PanicWith(expect))
+					},
+				)
+			})
+		})
+
+		When("both values are empty", func() {
+			When("there is a default value", func() {
+				BeforeEach(func() {
+					builder = builder.WithDefault("default.example.org", "54321")
+				})
+
+				Describe("func Value()", func() {
+					It("returns the default", func() {
+						v := builder.
+							Required().
+							Value()
+
+						Expect(v).To(Equal(
+							KubernetesAddress{
+								Host: "default.example.org",
+								Port: "54321",
+							},
+						))
+					})
+				})
+			})
+
+			When("there is no default value", func() {
+				Describe("func Value()", func() {
+					It("panics", func() {
+						Expect(func() {
+							builder.
+								Required().
+								Value()
+						}).To(PanicWith(
+							"FERRITE_SVC_SERVICE_HOST is undefined and does not have a default value",
+						))
+					})
 				})
 			})
 		})
 
-		Describe("func Validate()", func() {
-			It("returns success results", func() {
-				Expect(spec.Validate()).To(ConsistOf(
-					ValidationResult{
-						Name:  "FERRITE_SVC_SERVICE_HOST",
-						Value: "host.example.org",
-					},
-					ValidationResult{
-						Name:  "FERRITE_SVC_SERVICE_PORT",
-						Value: "12345",
-					},
-				))
+		When("the host is empty", func() {
+			BeforeEach(func() {
+				os.Setenv("FERRITE_SVC_SERVICE_PORT", "12345")
+			})
+
+			When("there is a default value", func() {
+				BeforeEach(func() {
+					builder = builder.WithDefault("default.example.org", "54321")
+				})
+
+				Describe("func Value()", func() {
+					It("returns the value with a default host", func() {
+						v := builder.
+							Required().
+							Value()
+
+						Expect(v).To(Equal(
+							KubernetesAddress{
+								Host: "default.example.org",
+								Port: "12345",
+							},
+						))
+					})
+				})
+			})
+
+			When("there is no default value", func() {
+				Describe("func Value()", func() {
+					It("panics", func() {
+						Expect(func() {
+							builder.
+								Required().
+								Value()
+						}).To(PanicWith(
+							"FERRITE_SVC_SERVICE_HOST is undefined and does not have a default value",
+						))
+					})
+				})
+			})
+		})
+
+		When("the port is empty", func() {
+			BeforeEach(func() {
+				os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
+			})
+
+			When("there is a default value", func() {
+				BeforeEach(func() {
+					builder = builder.WithDefault("default.example.org", "54321")
+				})
+
+				Describe("func Value()", func() {
+					It("returns the value with a default port", func() {
+						v := builder.
+							Required().
+							Value()
+
+						Expect(v).To(Equal(
+							KubernetesAddress{
+								Host: "host.example.org",
+								Port: "54321",
+							},
+						))
+					})
+				})
+			})
+
+			When("there is no default value", func() {
+				Describe("func Value()", func() {
+					It("panics", func() {
+						Expect(func() {
+							builder.
+								Required().
+								Value()
+						}).To(PanicWith(
+							"FERRITE_SVC_SERVICE_PORT is undefined and does not have a default value",
+						))
+					})
+				})
 			})
 		})
 	})
 
-	When("the host is invalid", func() {
-		BeforeEach(func() {
-			os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org.") // note trailing dot
-			os.Setenv("FERRITE_SVC_SERVICE_PORT", "12345")
-		})
-
-		Describe("func Address()", func() {
-			It("panics", func() {
-				Expect(func() {
-					spec.Address()
-				}).To(PanicWith("FERRITE_SVC_SERVICE_HOST is invalid: hostname must not begin or end with a dot"))
+	When("the variables are optional", func() {
+		When("the the host and port are valid", func() {
+			BeforeEach(func() {
+				os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
+				os.Setenv("FERRITE_SVC_SERVICE_PORT", "12345")
 			})
-		})
 
-		Describe("func Host()", func() {
-			It("panics", func() {
-				Expect(func() {
-					spec.Host()
-				}).To(PanicWith("FERRITE_SVC_SERVICE_HOST is invalid: hostname must not begin or end with a dot"))
-			})
-		})
+			It("returns the value", func() {
+				v, ok := builder.
+					Optional().
+					Value()
 
-		Describe("func Validate()", func() {
-			It("returns a failure result for the port", func() {
-				Expect(spec.Validate()).To(ConsistOf(
-					ValidationResult{
-						Name:  "FERRITE_SVC_SERVICE_HOST",
-						Error: errors.New(`hostname must not begin or end with a dot`),
-					},
-					ValidationResult{
-						Name:  "FERRITE_SVC_SERVICE_PORT",
-						Value: "12345",
+				Expect(ok).To(BeTrue())
+				Expect(v).To(Equal(
+					KubernetesAddress{
+						Host: "host.example.org",
+						Port: "12345",
 					},
 				))
 			})
 		})
-	})
 
-	When("the port is invalid", func() {
-		BeforeEach(func() {
-			os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
-			os.Setenv("FERRITE_SVC_SERVICE_PORT", "foo-") // note trailing hyphen
-		})
+		When("the host is invalid", func() {
+			Describe("func Value()", func() {
+				invalidHostTable(
+					"it panics",
+					func(value, expect string) {
+						os.Setenv("FERRITE_SVC_SERVICE_HOST", value) // note trailing dot
+						os.Setenv("FERRITE_SVC_SERVICE_PORT", "12345")
 
-		Describe("func Address()", func() {
-			It("panics", func() {
-				Expect(func() {
-					spec.Address()
-				}).To(PanicWith(`FERRITE_SVC_SERVICE_PORT is invalid: "foo-" is not a valid IANA service name (must not begin or end with a hyphen)`))
+						Expect(func() {
+							builder.
+								Optional().
+								Value()
+						}).To(PanicWith(expect))
+					},
+				)
 			})
 		})
 
-		Describe("func Port()", func() {
-			It("panics", func() {
-				Expect(func() {
-					spec.Port()
-				}).To(PanicWith(`FERRITE_SVC_SERVICE_PORT is invalid: "foo-" is not a valid IANA service name (must not begin or end with a hyphen)`))
+		When("the port is invalid", func() {
+			Describe("func Value()", func() {
+				invalidPortTable(
+					"it panics",
+					func(value, expect string) {
+						Expect(func() {
+							os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
+							os.Setenv("FERRITE_SVC_SERVICE_PORT", value)
+
+							builder.
+								Optional().
+								Value()
+						}).To(PanicWith(expect))
+					},
+				)
 			})
 		})
 
-		Describe("func Validate()", func() {
-			It("returns a failure result for the port", func() {
-				Expect(spec.Validate()).To(ConsistOf(
-					ValidationResult{
-						Name:  "FERRITE_SVC_SERVICE_HOST",
-						Value: "host.example.org",
-					},
-					ValidationResult{
-						Name:  "FERRITE_SVC_SERVICE_PORT",
-						Error: errors.New(`"foo-" is not a valid IANA service name (must not begin or end with a hyphen)`),
-					},
-				))
+		When("both values are empty", func() {
+			When("there is a default value", func() {
+				BeforeEach(func() {
+					builder = builder.WithDefault("default.example.org", "54321")
+				})
+
+				Describe("func Value()", func() {
+					It("returns the default", func() {
+						v, ok := builder.
+							Optional().
+							Value()
+
+						Expect(ok).To(BeTrue())
+						Expect(v).To(Equal(
+							KubernetesAddress{
+								Host: "default.example.org",
+								Port: "54321",
+							},
+						))
+					})
+				})
+			})
+
+			When("there is no default value", func() {
+				Describe("func Value()", func() {
+					It("returns with ok == false", func() {
+						_, ok := builder.
+							Optional().
+							Value()
+
+						Expect(ok).To(BeFalse())
+					})
+				})
+			})
+		})
+
+		When("the host is empty", func() {
+			BeforeEach(func() {
+				os.Setenv("FERRITE_SVC_SERVICE_PORT", "12345")
+			})
+
+			When("there is a default value", func() {
+				BeforeEach(func() {
+					builder = builder.WithDefault("default.example.org", "54321")
+				})
+
+				Describe("func Value()", func() {
+					It("returns the value with a default host", func() {
+						v, ok := builder.
+							Optional().
+							Value()
+
+						Expect(ok).To(BeTrue())
+						Expect(v).To(Equal(
+							KubernetesAddress{
+								Host: "default.example.org",
+								Port: "12345",
+							},
+						))
+					})
+				})
+			})
+
+			When("there is no default value", func() {
+				Describe("func Value()", func() {
+					It("panics", func() {
+						Expect(func() {
+							builder.
+								Optional().
+								Value()
+						}).To(PanicWith(
+							`FERRITE_SVC_SERVICE_HOST is undefined: FERRITE_SVC_SERVICE_PORT is defined, define both or neither`,
+						))
+					})
+				})
+			})
+		})
+
+		When("the port is empty", func() {
+			BeforeEach(func() {
+				os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
+			})
+
+			When("there is a default value", func() {
+				BeforeEach(func() {
+					builder = builder.WithDefault("default.example.org", "54321")
+				})
+
+				Describe("func Value()", func() {
+					It("returns the value with a default port", func() {
+						v, ok := builder.
+							Optional().
+							Value()
+
+						Expect(ok).To(BeTrue())
+						Expect(v).To(Equal(
+							KubernetesAddress{
+								Host: "host.example.org",
+								Port: "54321",
+							},
+						))
+					})
+				})
+			})
+
+			When("there is no default value", func() {
+				Describe("func Value()", func() {
+					It("panics", func() {
+						Expect(func() {
+							builder.
+								Optional().
+								Value()
+						}).To(PanicWith(
+							`FERRITE_SVC_SERVICE_PORT is undefined: FERRITE_SVC_SERVICE_HOST is defined, define both or neither`,
+						))
+					})
+				})
 			})
 		})
 	})
 
 	When("using a named port", func() {
 		BeforeEach(func() {
-			spec.WithNamedPort("named-port")
+			builder = builder.WithNamedPort("named-port")
 
 			os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
 			os.Setenv("FERRITE_SVC_SERVICE_PORT_NAMED_PORT", "12345")
 		})
 
-		Describe("func Address(), Host() and Port()", func() {
-			It("return the network address", func() {
-				Expect(spec.Address()).To(Equal("host.example.org:12345"))
-				Expect(spec.Host()).To(Equal("host.example.org"))
-				Expect(spec.Port()).To(Equal("12345"))
-			})
-		})
+		Describe("func Value()", func() {
+			It("returns the value", func() {
+				v := builder.
+					Required().
+					Value()
 
-		Describe("func Validate()", func() {
-			It("returns success results", func() {
-				Expect(spec.Validate()).To(ConsistOf(
-					ValidationResult{
-						Name:  "FERRITE_SVC_SERVICE_HOST",
-						Value: "host.example.org",
-					},
-					ValidationResult{
-						Name:  "FERRITE_SVC_SERVICE_PORT_NAMED_PORT",
-						Value: "12345",
+				Expect(v).To(Equal(
+					KubernetesAddress{
+						Host: "host.example.org",
+						Port: "12345",
 					},
 				))
 			})
 		})
-	})
 
-	When("the host environment variable is empty", func() {
-		BeforeEach(func() {
-			os.Setenv("FERRITE_SVC_SERVICE_HOST", "")
-			os.Setenv("FERRITE_SVC_SERVICE_PORT", "12345")
-		})
-
-		When("there is a default value", func() {
-			BeforeEach(func() {
-				spec.WithDefault("default.example.org", "54321")
-			})
-
-			Describe("func Address(), Host() and Port()", func() {
-				It("return the network address with the default host", func() {
-					Expect(spec.Address()).To(Equal("default.example.org:12345"))
-					Expect(spec.Host()).To(Equal("default.example.org"))
-					Expect(spec.Port()).To(Equal("12345"))
-				})
-			})
-
-			Describe("func Describe()", func() {
-				It("describes the variables", func() {
-					Expect(spec.Describe()).To(ConsistOf(
-						VariableXXX{
-							Name:        "FERRITE_SVC_SERVICE_HOST",
-							Description: `Hostname or IP address of the "ferrite-svc" service.`,
-							Schema:      schema.Type[string](),
-							Default:     "default.example.org",
-						},
-						VariableXXX{
-							Name:        "FERRITE_SVC_SERVICE_PORT",
-							Description: `Network port of the "ferrite-svc" service.`,
-							Schema: schema.OneOf{
-								schema.Type[string](),
-								schema.Range{
-									Min: "1",
-									Max: "65535",
-								},
-							},
-							Default: "54321",
-						},
-					))
-				})
-			})
-
-			Describe("func Validate()", func() {
-				It("returns sucess results", func() {
-					Expect(spec.Validate()).To(ConsistOf(
-						ValidationResult{
-							Name:        "FERRITE_SVC_SERVICE_HOST",
-							Value:       "default.example.org",
-							UsedDefault: true,
-						},
-						ValidationResult{
-							Name:  "FERRITE_SVC_SERVICE_PORT",
-							Value: "12345",
-						},
-					))
-				})
-			})
-		})
-
-		When("there is no default value", func() {
-			Describe("func Address()", func() {
-				It("panics", func() {
-					Expect(func() {
-						spec.Address()
-					}).To(PanicWith("FERRITE_SVC_SERVICE_HOST is invalid: must not be empty"))
-				})
-			})
-
-			Describe("func Host()", func() {
-				It("panics", func() {
-					Expect(func() {
-						spec.Host()
-					}).To(PanicWith("FERRITE_SVC_SERVICE_HOST is invalid: must not be empty"))
-				})
-			})
-
-			Describe("func Validate()", func() {
-				It("returns a failure result for the host", func() {
-					Expect(spec.Validate()).To(ConsistOf(
-						ValidationResult{
-							Name:  "FERRITE_SVC_SERVICE_HOST",
-							Error: errors.New(`must not be empty`),
-						},
-						ValidationResult{
-							Name:  "FERRITE_SVC_SERVICE_PORT",
-							Value: "12345",
-						},
-					))
-				})
-			})
-		})
-	})
-
-	When("the port environment variable is empty", func() {
-		BeforeEach(func() {
-			os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
-			os.Setenv("FERRITE_SVC_SERVICE_PORT", "")
-		})
-
-		When("there is a default value", func() {
-			BeforeEach(func() {
-				spec.WithDefault("default.example.org", "54321")
-			})
-
-			Describe("func Address(), Host() and Port()", func() {
-				It("return the network address with the default port", func() {
-					Expect(spec.Address()).To(Equal("host.example.org:54321"))
-					Expect(spec.Host()).To(Equal("host.example.org"))
-					Expect(spec.Port()).To(Equal("54321"))
-				})
-			})
-
-			Describe("func Validate()", func() {
-				It("returns sucess results", func() {
-					Expect(spec.Validate()).To(ConsistOf(
-						ValidationResult{
-							Name:  "FERRITE_SVC_SERVICE_HOST",
-							Value: "host.example.org",
-						},
-						ValidationResult{
-							Name:        "FERRITE_SVC_SERVICE_PORT",
-							Value:       "54321",
-							UsedDefault: true,
-						},
-					))
-				})
-			})
-		})
-
-		When("there is no default value", func() {
-			Describe("func Address()", func() {
-				It("panics", func() {
-					Expect(func() {
-						spec.Address()
-					}).To(PanicWith("FERRITE_SVC_SERVICE_PORT is invalid: must not be empty"))
-				})
-			})
-
-			Describe("func Port()", func() {
-				It("panics", func() {
-					Expect(func() {
-						spec.Port()
-					}).To(PanicWith("FERRITE_SVC_SERVICE_PORT is invalid: must not be empty"))
-				})
-			})
-
-			Describe("func Validate()", func() {
-				It("returns a failure result for the port", func() {
-					Expect(spec.Validate()).To(ConsistOf(
-						ValidationResult{
-							Name:  "FERRITE_SVC_SERVICE_HOST",
-							Value: "host.example.org",
-						},
-						ValidationResult{
-							Name:  "FERRITE_SVC_SERVICE_PORT",
-							Error: errors.New(`must not be empty`),
-						},
-					))
-				})
-			})
-		})
-	})
-
-	When("both environment variables are empty", func() {
-		When("there is a default value", func() {
-			BeforeEach(func() {
-				spec.WithDefault("default.example.org", "54321")
-			})
-
-			Describe("func Address(), Host() and Port()", func() {
-				It("return the default network address", func() {
-					Expect(spec.Address()).To(Equal("default.example.org:54321"))
-					Expect(spec.Host()).To(Equal("default.example.org"))
-					Expect(spec.Port()).To(Equal("54321"))
-				})
-			})
-
-			Describe("func Validate()", func() {
-				It("returns success results", func() {
-					Expect(spec.Validate()).To(ConsistOf(
-						ValidationResult{
-							Name:        "FERRITE_SVC_SERVICE_HOST",
-							Value:       "default.example.org",
-							UsedDefault: true,
-						},
-						ValidationResult{
-							Name:        "FERRITE_SVC_SERVICE_PORT",
-							Value:       "54321",
-							UsedDefault: true,
-						},
-					))
-				})
-			})
-		})
-
-		When("there is no default value", func() {
-			Describe("func Address()", func() {
-				It("panics", func() {
-					Expect(func() {
-						spec.Address()
-					}).To(PanicWith("FERRITE_SVC_SERVICE_HOST is invalid: must not be empty"))
-				})
-			})
-
-			Describe("func Host()", func() {
-				It("panics", func() {
-					Expect(func() {
-						spec.Host()
-					}).To(PanicWith("FERRITE_SVC_SERVICE_HOST is invalid: must not be empty"))
-				})
-			})
-
-			Describe("func Port()", func() {
-				It("panics", func() {
-					Expect(func() {
-						spec.Port()
-					}).To(PanicWith("FERRITE_SVC_SERVICE_PORT is invalid: must not be empty"))
-				})
-			})
-
-			Describe("func Validate()", func() {
-				It("returns failure results", func() {
-					Expect(spec.Validate()).To(ConsistOf(
-						ValidationResult{
-							Name:  "FERRITE_SVC_SERVICE_HOST",
-							Error: errors.New(`must not be empty`),
-						},
-						ValidationResult{
-							Name:  "FERRITE_SVC_SERVICE_PORT",
-							Error: errors.New(`must not be empty`),
-						},
-					))
-				})
-			})
-		})
-	})
-
-	Describe("func WithNamedPort()", func() {
 		When("the port name is invalid", func() {
-			DescribeTable(
-				"it panics",
-				func(port, expect string) {
-					Expect(func() {
-						spec.WithNamedPort(port)
-					}).To(PanicWith(expect))
-				},
-				Entry(
-					"empty",
-					"",
-					"kubernetes port name is invalid: must not be empty",
-				),
-				Entry(
-					"starts with a hyphen",
-					"-foo",
-					"kubernetes port name is invalid: must not begin or end with a hyphen",
-				),
-				Entry(
-					"ends with a hyphen",
-					"foo-",
-					"kubernetes port name is invalid: must not begin or end with a hyphen",
-				),
-				Entry(
-					"contains an invalid character",
-					"foo*bar",
-					"kubernetes port name is invalid: must contain only lowercase ASCII letters, digits and hyphen",
-				),
-				Entry(
-					"contains an uppercase character",
-					"fooBar",
-					"kubernetes port name is invalid: must contain only lowercase ASCII letters, digits and hyphen",
-				),
-			)
+			Describe("func WithNamedPort()", func() {
+				DescribeTable(
+					"it panics",
+					func(port, expect string) {
+						Expect(func() {
+							builder.WithNamedPort(port)
+						}).To(PanicWith(expect))
+					},
+					Entry(
+						"empty",
+						"",
+						`specification of kubernetes "ferrite-svc" service is invalid: invalid named port: name must not be empty`,
+					),
+					Entry(
+						"starts with a hyphen",
+						"-foo",
+						`specification of kubernetes "ferrite-svc" service is invalid: invalid named port: name must not begin or end with a hyphen`,
+					),
+					Entry(
+						"ends with a hyphen",
+						"foo-",
+						`specification of kubernetes "ferrite-svc" service is invalid: invalid named port: name must not begin or end with a hyphen`,
+					),
+					Entry(
+						"contains an invalid character",
+						"foo*bar",
+						`specification of kubernetes "ferrite-svc" service is invalid: invalid named port: name must contain only lowercase ASCII letters, digits and hyphen`,
+					),
+					Entry(
+						"contains an uppercase character",
+						"fooBar",
+						`specification of kubernetes "ferrite-svc" service is invalid: invalid named port: name must contain only lowercase ASCII letters, digits and hyphen`,
+					),
+				)
+			})
 		})
 	})
 
@@ -515,7 +443,7 @@ var _ = Describe("type KubeServiceSpec", func() {
 				"it does not panic",
 				func(host string) {
 					Expect(func() {
-						spec.WithDefault(host, "12345")
+						builder.WithDefault(host, "12345")
 					}).NotTo(Panic())
 				},
 				Entry(
@@ -542,7 +470,7 @@ var _ = Describe("type KubeServiceSpec", func() {
 				"it does not panic",
 				func(port string) {
 					Expect(func() {
-						spec.WithDefault("default.example.org", port)
+						builder.WithDefault("default.example.org", port)
 					}).NotTo(Panic())
 				},
 				Entry(
@@ -550,23 +478,23 @@ var _ = Describe("type KubeServiceSpec", func() {
 					"12345",
 				),
 				Entry(
-					"lowercase",
+					"IANA service name in lowercase",
 					"https",
 				),
 				Entry(
-					"uppercase",
+					"IANA service name in uppercase",
 					"HTTPS",
 				),
 				Entry(
-					"mixed",
+					"IANA service name with mixedcase",
 					"HttpS",
 				),
 				Entry(
-					"hypenated",
+					"IANA service name contains hyphens",
 					"foo-bar-spam",
 				),
 				Entry(
-					"contains digits",
+					"IANA service name contains digits",
 					"0foo1bar2",
 				),
 			)
@@ -577,88 +505,163 @@ var _ = Describe("type KubeServiceSpec", func() {
 				"it panics",
 				func(host, port, expect string) {
 					Expect(func() {
-						spec.WithDefault(host, port)
+						builder.WithDefault(host, port)
 					}).To(PanicWith(expect))
 				},
 				Entry(
 					"empty host",
 					"",
 					"12345",
-					"default value of FERRITE_SVC_SERVICE_HOST is invalid: must not be empty",
+					`specification of kubernetes "ferrite-svc" service is invalid: host must not be empty`,
 				),
 				Entry(
 					"hostname begins with a dot",
 					".foo",
 					"12345",
-					"default value of FERRITE_SVC_SERVICE_HOST is invalid: hostname must not begin or end with a dot",
+					`specification of kubernetes "ferrite-svc" service is invalid: host must not begin or end with a dot`,
 				),
 				Entry(
 					"hostname ends with a dot",
 					"foo.",
 					"12345",
-					"default value of FERRITE_SVC_SERVICE_HOST is invalid: hostname must not begin or end with a dot",
+					`specification of kubernetes "ferrite-svc" service is invalid: host must not begin or end with a dot`,
 				),
 				Entry(
 					"hostname contains whitespace",
 					"foo .bar",
 					"12345",
-					"default value of FERRITE_SVC_SERVICE_HOST is invalid: hostname must not contain whitespace",
+					`specification of kubernetes "ferrite-svc" service is invalid: host must not contain whitespace`,
 				),
 				Entry(
 					"empty port",
 					"host.example.org",
 					"",
-					"default value of FERRITE_SVC_SERVICE_PORT is invalid: must not be empty",
+					`specification of kubernetes "ferrite-svc" service is invalid: port must not be empty`,
 				),
 				Entry(
 					"numeric port too low",
 					"host.example.org",
 					"0",
-					"default value of FERRITE_SVC_SERVICE_PORT is invalid: numeric ports must be between 1 and 65535",
+					`specification of kubernetes "ferrite-svc" service is invalid: numeric ports must be between 1 and 65535`,
 				),
 				Entry(
 					"numeric port too high",
 					"host.example.org",
 					"65536",
-					"default value of FERRITE_SVC_SERVICE_PORT is invalid: numeric ports must be between 1 and 65535",
+					`specification of kubernetes "ferrite-svc" service is invalid: numeric ports must be between 1 and 65535`,
 				),
 				Entry(
 					"IANA service name is too long",
 					"host.example.org",
 					"this-name-is-very-long",
-					`default value of FERRITE_SVC_SERVICE_PORT is invalid: "this-name-is-very-long" is not a valid IANA service name (must be between 1 and 15 characters)`,
+					`specification of kubernetes "ferrite-svc" service is invalid: IANA service name must be between 1 and 15 characters`,
 				),
 				Entry(
 					"IANA service name does not contain any letters",
 					"host.example.org",
 					"100-200",
-					`default value of FERRITE_SVC_SERVICE_PORT is invalid: "100-200" is not a valid IANA service name (must contain at least one letter)`,
+					`specification of kubernetes "ferrite-svc" service is invalid: IANA service name must contain at least one letter`,
 				),
 				Entry(
 					"IANA service name starts with a hyphen",
 					"host.example.org",
 					"-foo",
-					`default value of FERRITE_SVC_SERVICE_PORT is invalid: "-foo" is not a valid IANA service name (must not begin or end with a hyphen)`,
+					`specification of kubernetes "ferrite-svc" service is invalid: IANA service name must not begin or end with a hyphen`,
 				),
 				Entry(
 					"IANA service name ends with a hyphen",
 					"host.example.org",
 					"foo-",
-					`default value of FERRITE_SVC_SERVICE_PORT is invalid: "foo-" is not a valid IANA service name (must not begin or end with a hyphen)`,
+					`specification of kubernetes "ferrite-svc" service is invalid: IANA service name must not begin or end with a hyphen`,
 				),
 				Entry(
 					"IANA service name contains adjacent hyphens",
 					"host.example.org",
 					"foo--bar",
-					`default value of FERRITE_SVC_SERVICE_PORT is invalid: "foo--bar" is not a valid IANA service name (must not contain adjacent hyphens)`,
+					`specification of kubernetes "ferrite-svc" service is invalid: IANA service name must not contain adjacent hyphens`,
 				),
 				Entry(
 					"IANA service name contains an invalid character",
 					"host.example.org",
 					"foo*bar",
-					`default value of FERRITE_SVC_SERVICE_PORT is invalid: "foo*bar" is not a valid IANA service name (must contain only ASCII letters, digits and hyphen)`,
+					`specification of kubernetes "ferrite-svc" service is invalid: IANA service name must contain only ASCII letters, digits and hyphen`,
 				),
 			)
 		})
 	})
 })
+
+func invalidHostTable(
+	desc string,
+	fn func(value, expect string),
+) {
+	DescribeTable(
+		desc,
+		fn,
+		Entry(
+			"leading dot",
+			".host.example.org",
+			`FERRITE_SVC_SERVICE_HOST (".host.example.org") is invalid: host must not begin or end with a dot`,
+		),
+		Entry(
+			"trailing dot",
+			"host.example.org.",
+			`FERRITE_SVC_SERVICE_HOST ("host.example.org.") is invalid: host must not begin or end with a dot`,
+		),
+		Entry(
+			"whitespace",
+			"host.examp le.org",
+			`FERRITE_SVC_SERVICE_HOST ("host.examp le.org") is invalid: host must not contain whitespace`,
+		),
+	)
+}
+
+func invalidPortTable(
+	desc string,
+	fn func(value, expect string),
+) {
+	DescribeTable(
+		desc,
+		fn,
+		Entry(
+			"numeric port too low",
+			"0",
+			`FERRITE_SVC_SERVICE_PORT ("0") is invalid: numeric ports must be between 1 and 65535`,
+		),
+		Entry(
+			"numeric port too high",
+			"65536",
+			`FERRITE_SVC_SERVICE_PORT ("65536") is invalid: numeric ports must be between 1 and 65535`,
+		),
+		Entry(
+			"IANA service name is too long",
+			"this-name-is-very-long",
+			`FERRITE_SVC_SERVICE_PORT ("this-name-is-very-long") is invalid: IANA service name must be between 1 and 15 characters`,
+		),
+		Entry(
+			"IANA service name does not contain any letters",
+			"100-200",
+			`FERRITE_SVC_SERVICE_PORT ("100-200") is invalid: IANA service name must contain at least one letter`,
+		),
+		Entry(
+			"IANA service name starts with a hyphen",
+			"-foo",
+			`FERRITE_SVC_SERVICE_PORT ("-foo") is invalid: IANA service name must not begin or end with a hyphen`,
+		),
+		Entry(
+			"IANA service name ends with a hyphen",
+			"foo-",
+			`FERRITE_SVC_SERVICE_PORT ("foo-") is invalid: IANA service name must not begin or end with a hyphen`,
+		),
+		Entry(
+			"IANA service name contains adjacent hyphens",
+			"foo--bar",
+			`FERRITE_SVC_SERVICE_PORT ("foo--bar") is invalid: IANA service name must not contain adjacent hyphens`,
+		),
+		Entry(
+			"IANA service name contains an invalid character",
+			"foo*bar",
+			`FERRITE_SVC_SERVICE_PORT ("foo*bar") is invalid: IANA service name must contain only ASCII letters, digits and hyphen`,
+		),
+	)
+}
