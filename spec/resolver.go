@@ -44,13 +44,13 @@ func (r *Resolver[T]) Resolve() (Value[T], error) {
 
 // Value is the resolved value of an environment variable.
 type Value[T any] struct {
-	Parsed     T
-	Normalized string
-	IsDefault  bool
+	Go        T
+	Env       string
+	IsDefault bool
 }
 
 func (v Value[T]) String() string {
-	return v.Normalized
+	return v.Env
 }
 
 func (v Value[T]) isDefault() bool {

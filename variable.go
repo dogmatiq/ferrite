@@ -32,13 +32,13 @@ func (v Optional[T]) Value() (T, bool) {
 	value, err := v.resolver.Resolve()
 	if err != nil {
 		if errors.As(err, &UndefinedError{}) {
-			return value.Parsed, false
+			return value.Go, false
 		}
 
 		panic(err.Error())
 	}
 
-	return value.Parsed, true
+	return value.Go, true
 }
 
 // Required is the application-facing representation of an environment
@@ -58,5 +58,5 @@ func (v Required[T]) Value() T {
 		panic(err.Error())
 	}
 
-	return value.Parsed
+	return value.Go
 }

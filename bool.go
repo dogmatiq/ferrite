@@ -82,19 +82,19 @@ func (b BoolBuilder[T]) Optional() Optional[T] {
 }
 
 func (b BoolBuilder[T]) resolve() (spec.Value[T], error) {
-	switch str := os.Getenv(b.name); str {
+	switch env := os.Getenv(b.name); env {
 	case b.t, b.f:
 		return spec.Value[T]{
-			Parsed:     str == b.t,
-			Normalized: str,
+			Go:  env == b.t,
+			Env: env,
 		}, nil
 
 	case "":
-		if parsed, ok := b.def.TryGet(); ok {
+		if v, ok := b.def.TryGet(); ok {
 			return spec.Value[T]{
-				Parsed:     parsed,
-				Normalized: b.render(parsed),
-				IsDefault:  true,
+				Go:        v,
+				Env:       b.render(v),
+				IsDefault: true,
 			}, nil
 		}
 
@@ -106,7 +106,7 @@ func (b BoolBuilder[T]) resolve() (spec.Value[T], error) {
 			b.name,
 			b.t,
 			b.f,
-			str,
+			env,
 		)
 	}
 }

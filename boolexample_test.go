@@ -7,7 +7,7 @@ import (
 	"github.com/dogmatiq/ferrite"
 )
 
-func ExampleBool() {
+func ExampleBool_required() {
 	setUp()
 	defer tearDown()
 

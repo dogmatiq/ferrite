@@ -29,7 +29,7 @@ var _ = Describe("type BoolBuilder", func() {
 	})
 
 	When("the variable is required", func() {
-		When("the environment variable is set to one of the accepted literals", func() {
+		When("the value is one of the accepted literals", func() {
 			Describe("func Value()", func() {
 				DescribeTable(
 					"it returns the value associated with the literal",
@@ -48,7 +48,26 @@ var _ = Describe("type BoolBuilder", func() {
 			})
 		})
 
-		When("the environment variable is empty", func() {
+		When("the value is invalid", func() {
+			BeforeEach(func() {
+				// we don't accept true/false for the userDefinedBool type
+				os.Setenv("FERRITE_BOOL", "true")
+			})
+
+			Describe("func Value()", func() {
+				It("panics", func() {
+					Expect(func() {
+						builder.
+							Required().
+							Value()
+					}).To(PanicWith(
+						`FERRITE_BOOL must be either "yes" or "no", got "true"`,
+					))
+				})
+			})
+		})
+
+		When("the value is empty", func() {
 			When("there is a default value", func() {
 				Describe("func Value()", func() {
 					DescribeTable(
@@ -81,8 +100,10 @@ var _ = Describe("type BoolBuilder", func() {
 				})
 			})
 		})
+	})
 
-		When("the environment variable is invalid", func() {
+	When("the variable is optional", func() {
+		When("the value is invalid", func() {
 			BeforeEach(func() {
 				// we don't accept true/false for the userDefinedBool type
 				os.Setenv("FERRITE_BOOL", "true")
@@ -92,7 +113,7 @@ var _ = Describe("type BoolBuilder", func() {
 				It("panics", func() {
 					Expect(func() {
 						builder.
-							Required().
+							Optional().
 							Value()
 					}).To(PanicWith(
 						`FERRITE_BOOL must be either "yes" or "no", got "true"`,
@@ -100,30 +121,8 @@ var _ = Describe("type BoolBuilder", func() {
 				})
 			})
 		})
-	})
 
-	When("the variable is optional", func() {
-		When("the environment variable is set to one of the standard literals", func() {
-			Describe("func Value()", func() {
-				DescribeTable(
-					"it returns the value associated with the literal",
-					func(value string, expect userDefinedBool) {
-						os.Setenv("FERRITE_BOOL", value)
-
-						v, ok := builder.
-							Optional().
-							Value()
-
-						Expect(ok).To(BeTrue())
-						Expect(v).To(Equal(expect))
-					},
-					Entry("true", "yes", userDefinedBool(true)),
-					Entry("false", "no", userDefinedBool(false)),
-				)
-			})
-		})
-
-		When("the environment variable is empty", func() {
+		When("the value is empty", func() {
 			When("there is a default value", func() {
 				Describe("func Value()", func() {
 					DescribeTable(
@@ -152,25 +151,6 @@ var _ = Describe("type BoolBuilder", func() {
 
 						Expect(ok).To(BeFalse())
 					})
-				})
-			})
-		})
-
-		When("the environment variable is invalid", func() {
-			BeforeEach(func() {
-				// we don't accept true/false for the userDefinedBool type
-				os.Setenv("FERRITE_BOOL", "true")
-			})
-
-			Describe("func Value()", func() {
-				It("panics", func() {
-					Expect(func() {
-						builder.
-							Optional().
-							Value()
-					}).To(PanicWith(
-						`FERRITE_BOOL must be either "yes" or "no", got "true"`,
-					))
 				})
 			})
 		})

@@ -8,17 +8,18 @@ import (
 	"github.com/dogmatiq/ferrite"
 )
 
-func ExampleDuration() {
+func ExampleDuration_required() {
 	setUp()
 	defer tearDown()
 
-	value := ferrite.
-		Duration("FERRITE_DURATION", "example duration variable")
+	v := ferrite.
+		Duration("FERRITE_DURATION", "example duration variable").
+		Required()
 
 	os.Setenv("FERRITE_DURATION", "630s")
 	ferrite.ValidateEnvironment()
 
-	fmt.Println("value is", value.Value())
+	fmt.Println("value is", v.Value())
 
 	// Output:
 	// value is 10m30s
@@ -28,14 +29,35 @@ func ExampleDuration_default() {
 	setUp()
 	defer tearDown()
 
-	value := ferrite.
+	v := ferrite.
 		Duration("FERRITE_DURATION", "example duration variable").
-		WithDefault(630 * time.Second)
+		WithDefault(630 * time.Second).
+		Required()
 
 	ferrite.ValidateEnvironment()
 
-	fmt.Println("value is", value.Value())
+	fmt.Println("value is", v.Value())
 
 	// Output:
 	// value is 10m30s
+}
+
+func ExampleDuration_optional() {
+	setUp()
+	defer tearDown()
+
+	v := ferrite.
+		Duration("FERRITE_DURATION", "example duration variable").
+		Optional()
+
+	ferrite.ValidateEnvironment()
+
+	if x, ok := v.Value(); ok {
+		fmt.Println("value is", x)
+	} else {
+		fmt.Println("value is undefined")
+	}
+
+	// Output:
+	// value is undefined
 }
