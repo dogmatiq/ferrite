@@ -39,20 +39,16 @@ func (b DurationBuilder) WithDefault(v time.Duration) DurationBuilder {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b DurationBuilder) Required() Required[time.Duration] {
-	return Required[time.Duration]{
-		b.resolver(false),
-	}
+	return registerRequired(b.spec(), b.resolve)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b DurationBuilder) Optional() Optional[time.Duration] {
-	return Optional[time.Duration]{
-		b.resolver(true),
-	}
+	return registerOptional(b.spec(), b.resolve)
 }
 
-func (b DurationBuilder) resolver(opt bool) *spec.Resolver[time.Duration] {
+func (b DurationBuilder) spec() spec.Spec {
 	s := spec.Spec{
 		Name:        b.name,
 		Description: b.desc,
@@ -62,29 +58,22 @@ func (b DurationBuilder) resolver(opt bool) *spec.Resolver[time.Duration] {
 		},
 	}
 
-	if v, ok := b.def.TryGet(); ok {
+	if v, ok := b.def.Get(); ok {
 		s.Necessity = spec.Defaulted
 		s.Default = v.String()
 	}
 
-	if opt {
-		s.Necessity = spec.Optional
-	}
-
-	r := spec.NewResolver(s, b.resolve)
-	spec.Register(r)
-
-	return r
+	return s
 }
 
 func (b DurationBuilder) resolve() (spec.Value[time.Duration], error) {
 	env := os.Getenv(b.name)
 
 	if env == "" {
-		if d, ok := b.def.TryGet(); ok {
+		if v, ok := b.def.Get(); ok {
 			return spec.Value[time.Duration]{
-				Go:        d,
-				Env:       d.String(),
+				Go:        v,
+				Env:       v.String(),
 				IsDefault: true,
 			}, nil
 		}

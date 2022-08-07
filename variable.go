@@ -60,3 +60,25 @@ func (v Required[T]) Value() T {
 
 	return value.Go
 }
+
+func registerRequired[T any](
+	s spec.Spec,
+	r func() (spec.Value[T], error),
+) Required[T] {
+	res := spec.NewResolver(s, r)
+	spec.Register(res)
+
+	return Required[T]{res}
+}
+
+func registerOptional[T any](
+	s spec.Spec,
+	r func() (spec.Value[T], error),
+) Optional[T] {
+	s.Necessity = spec.Optional
+
+	res := spec.NewResolver(s, r)
+	spec.Register(res)
+
+	return Optional[T]{res}
+}

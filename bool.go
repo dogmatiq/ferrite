@@ -23,12 +23,10 @@ func Bool(name, desc string) BoolBuilder[bool] {
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
 func BoolAs[T ~bool](name, desc string) BoolBuilder[T] {
-	b := &BoolBuilder[T]{
+	return BoolBuilder[T]{
 		name: name,
 		desc: desc,
-	}
-
-	return b.WithLiterals(
+	}.WithLiterals(
 		fmt.Sprint(T(true)),
 		fmt.Sprint(T(false)),
 	)
@@ -48,7 +46,10 @@ type BoolBuilder[T ~bool] struct {
 // custom literals.
 func (b BoolBuilder[T]) WithLiterals(t, f string) BoolBuilder[T] {
 	if t == "" || f == "" {
-		panic("boolean literals must not be zero-length")
+		panic(fmt.Sprintf(
+			"specification for %s is invalid: boolean literals must not be zero-length",
+			b.name,
+		))
 	}
 
 	b.t = t
@@ -68,17 +69,32 @@ func (b BoolBuilder[T]) WithDefault(v T) BoolBuilder[T] {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b BoolBuilder[T]) Required() Required[T] {
-	return Required[T]{
-		b.resolver(false),
-	}
+	return registerRequired(b.spec(), b.resolve)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b BoolBuilder[T]) Optional() Optional[T] {
-	return Optional[T]{
-		b.resolver(true),
+	return registerOptional(b.spec(), b.resolve)
+}
+
+func (b BoolBuilder[T]) spec() spec.Spec {
+	s := spec.Spec{
+		Name:        b.name,
+		Description: b.desc,
+		Necessity:   spec.Required,
+		Schema: schema.OneOf{
+			schema.Literal(b.t),
+			schema.Literal(b.f),
+		},
 	}
+
+	if v, ok := b.def.Get(); ok {
+		s.Necessity = spec.Defaulted
+		s.Default = b.render(v)
+	}
+
+	return s
 }
 
 func (b BoolBuilder[T]) resolve() (spec.Value[T], error) {
@@ -90,7 +106,7 @@ func (b BoolBuilder[T]) resolve() (spec.Value[T], error) {
 		}, nil
 
 	case "":
-		if v, ok := b.def.TryGet(); ok {
+		if v, ok := b.def.Get(); ok {
 			return spec.Value[T]{
 				Go:        v,
 				Env:       b.render(v),
@@ -109,32 +125,6 @@ func (b BoolBuilder[T]) resolve() (spec.Value[T], error) {
 			env,
 		)
 	}
-}
-
-func (b BoolBuilder[T]) resolver(opt bool) *spec.Resolver[T] {
-	s := spec.Spec{
-		Name:        b.name,
-		Description: b.desc,
-		Necessity:   spec.Required,
-		Schema: schema.OneOf{
-			schema.Literal(b.t),
-			schema.Literal(b.f),
-		},
-	}
-
-	if v, ok := b.def.TryGet(); ok {
-		s.Necessity = spec.Defaulted
-		s.Default = b.render(v)
-	}
-
-	if opt {
-		s.Necessity = spec.Optional
-	}
-
-	r := spec.NewResolver(s, b.resolve)
-	spec.Register(r)
-
-	return r
 }
 
 func (b BoolBuilder[T]) render(v T) string {

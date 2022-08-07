@@ -2,8 +2,12 @@ package ferrite
 
 import (
 	"fmt"
+	"os"
 
+	"github.com/dogmatiq/ferrite/internal/optional"
 	"github.com/dogmatiq/ferrite/schema"
+	"github.com/dogmatiq/ferrite/spec"
+	"golang.org/x/exp/slices"
 )
 
 // Enum configures an environment variable as an enumeration with members of
@@ -11,97 +15,144 @@ import (
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func Enum[T any](name, desc string) *EnumSpec[T] {
-	s := &EnumSpec[T]{}
-	s.init(s, name, desc)
-	return s
+func Enum[T any](name, desc string) EnumBuilder[T] {
+	return EnumBuilder[T]{
+		name: name,
+		desc: desc,
+	}.WithRenderer(
+		func(v T) string {
+			return fmt.Sprint(v)
+		},
+	)
 }
 
-// EnumSpec is the specification for an enumeration.
-type EnumSpec[T any] struct {
-	impl[T, *EnumSpec[T]]
-	members map[string]T
-	order   []string
+// EnumBuilder is the specification for an enumeration.
+type EnumBuilder[T any] struct {
+	name   string
+	desc   string
+	render func(T) string
+	values []T
+	def    optional.Optional[T]
 }
 
 // WithMembers adds members to the enum.
 //
 // The environment variable must be set to the string representation of one of
 // the member values. WithMembers must not have an empty string representation.
-func (s *EnumSpec[T]) WithMembers(members ...T) *EnumSpec[T] {
-	return s.with(func() {
-		for _, v := range members {
-			k := s.keyOf(v)
-
-			if k == "" {
-				panic("enum member must not have an empty string representation")
-			}
-
-			if _, ok := s.members[k]; ok {
-				panic(fmt.Sprintf(
-					"enum already has a %q member",
-					k,
-				))
-			}
-
-			if s.members == nil {
-				s.members = map[string]T{}
-			}
-
-			s.members[k] = v
-			s.order = append(s.order, k)
-		}
-	})
+func (b EnumBuilder[T]) WithMembers(values ...T) EnumBuilder[T] {
+	b.values = values
+	return b
 }
 
-// parses parses and validates the value of the environment variable.
+// WithRenderer sets the function used to generate the literal string
+// representation of the enum's member values.
+func (b EnumBuilder[T]) WithRenderer(fn func(T) string) EnumBuilder[T] {
+	b.render = fn
+	return b
+}
+
+// WithDefault sets a default value of the variable.
 //
-// validate() must be called on the result, as the parsed value does not
-// necessarily meet all of the requirements.
-func (s *EnumSpec[T]) parse(value string) (T, error) {
-	if v, ok := s.members[value]; ok {
-		return v, nil
+// It is used when the environment variable is undefined or empty.
+func (b EnumBuilder[T]) WithDefault(v T) EnumBuilder[T] {
+	b.def = optional.With(v)
+	return b
+}
+
+// Required completes the build process and registers a required variable with
+// Ferrite's validation system.
+func (b EnumBuilder[T]) Required() Required[T] {
+	return registerRequired(b.spec(), b.resolve)
+}
+
+// Optional completes the build process and registers an optional variable with
+// Ferrite's validation system.
+func (b EnumBuilder[T]) Optional() Optional[T] {
+	return registerOptional(b.spec(), b.resolve)
+}
+
+func (b *EnumBuilder[T]) spec() spec.Spec {
+	if len(b.values) == 0 {
+		panic(fmt.Sprintf(
+			"specification for %s is invalid: no enum members are defined",
+			b.name,
+		))
 	}
 
-	var zero T
-	return zero, fmt.Errorf("%s is not a member of the enum", value)
-}
+	var (
+		oneOf    schema.OneOf
+		literals []string
+	)
 
-// validate validates a parsed or default value.
-func (s *EnumSpec[T]) validate(value T) error {
-	k := s.keyOf(value)
+	for _, v := range b.values {
+		lit := b.render(v)
 
-	if _, ok := s.members[k]; !ok {
-		return fmt.Errorf("%s is not a member of the enum", k)
+		if slices.Contains(literals, lit) {
+			panic(fmt.Sprintf(
+				"specification for %s is invalid: multiple members use %q as their literal representation",
+				b.name,
+				lit,
+			))
+		}
+
+		if lit == "" {
+			b.def = b.def.Coalesce(v)
+		}
+
+		literals = append(literals, lit)
+		oneOf = append(oneOf, schema.Literal(lit))
 	}
 
-	return nil
-}
-
-// schema returns the schema that describes the environment variable's
-// valid values.
-func (s *EnumSpec[T]) schema() schema.Schema {
-	var oneOf schema.OneOf
-	for _, m := range s.order {
-		oneOf = append(oneOf, schema.Literal(m))
+	s := spec.Spec{
+		Name:        b.name,
+		Description: b.desc,
+		Necessity:   spec.Required,
+		Schema:      oneOf,
 	}
 
-	return oneOf
+	if v, ok := b.def.Get(); ok {
+		s.Necessity = spec.Defaulted
+		s.Default = b.render(v)
+
+		if !slices.Contains(literals, s.Default) {
+			panic(fmt.Sprintf(
+				"specification for %s is invalid: the default value must be one of the enum members, got %q",
+				b.name,
+				s.Default,
+			))
+		}
+	}
+
+	return s
 }
 
-// renderParsed returns a string representation of the parsed value as it should
-// appear in validation reports.
-func (s *EnumSpec[T]) renderParsed(value T) string {
-	return s.keyOf(value)
-}
+func (b EnumBuilder[T]) resolve() (spec.Value[T], error) {
+	env := os.Getenv(b.name)
 
-// renderRaw returns a string representation of the raw string value as it
-// should appear in validation reports.
-func (s *EnumSpec[T]) renderRaw(value string) string {
-	return value
-}
+	if env == "" {
+		if v, ok := b.def.Get(); ok {
+			return spec.Value[T]{
+				Go:        v,
+				Env:       b.render(v),
+				IsDefault: true,
+			}, nil
+		}
 
-// keyOf returns the key to use for the given enum member.
-func (s *EnumSpec[T]) keyOf(member T) string {
-	return fmt.Sprint(member)
+		return spec.Value[T]{}, UndefinedError{Name: b.name}
+	}
+
+	for _, v := range b.values {
+		if b.render(v) == env {
+			return spec.Value[T]{
+				Go:  v,
+				Env: env,
+			}, nil
+		}
+	}
+
+	return spec.Value[T]{}, fmt.Errorf(
+		"%s must be one of one of the enum members, got %q",
+		b.name,
+		env,
+	)
 }

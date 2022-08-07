@@ -7,18 +7,19 @@ import (
 	"github.com/dogmatiq/ferrite"
 )
 
-func ExampleEnum() {
+func ExampleEnum_required() {
 	setUp()
 	defer tearDown()
 
-	value := ferrite.
+	v := ferrite.
 		Enum[string]("FERRITE_ENUM", "example enum variable").
-		WithMembers("red", "green", "blue")
+		WithMembers("red", "green", "blue").
+		Required()
 
 	os.Setenv("FERRITE_ENUM", "red")
 	ferrite.ValidateEnvironment()
 
-	fmt.Println("value is", value.Value())
+	fmt.Println("value is", v.Value())
 
 	// Output:
 	// value is red
@@ -28,15 +29,36 @@ func ExampleEnum_default() {
 	setUp()
 	defer tearDown()
 
-	value := ferrite.
+	v := ferrite.
 		Enum[string]("FERRITE_ENUM", "example enum variable").
 		WithMembers("red", "green", "blue").
-		WithDefault("green")
+		WithDefault("green").
+		Required()
 
 	ferrite.ValidateEnvironment()
 
-	fmt.Println("value is", value.Value())
+	fmt.Println("value is", v.Value())
 
 	// Output:
 	// value is green
+}
+
+func ExampleEnum_optional() {
+	setUp()
+	defer tearDown()
+
+	v := ferrite.
+		Enum[string]("FERRITE_ENUM", "example enum variable").
+		WithMembers("red", "green", "blue").
+		Optional()
+
+	ferrite.ValidateEnvironment()
+	if x, ok := v.Value(); ok {
+		fmt.Println("value is", x)
+	} else {
+		fmt.Println("value is undefined")
+	}
+
+	// Output:
+	// value is undefined
 }

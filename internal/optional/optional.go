@@ -11,21 +11,22 @@ func With[T any](v T) Optional[T] {
 	return Optional[T]{v, true}
 }
 
-// without returns an empty optional value of type T.
-func without[T any]() Optional[T] {
+// Without returns an empty optional value of type T.
+func Without[T any]() Optional[T] {
 	return Optional[T]{}
 }
 
-// TryGet returns the optional value if it is present.
-func (o Optional[T]) TryGet() (T, bool) {
+// Get returns the optional value if it is present.
+func (o Optional[T]) Get() (T, bool) {
 	return o.v, o.ok
 }
 
-// Get returns the optional value, or panics if the value is not present.
-func (o Optional[T]) Get() T {
-	if !o.ok {
-		panic("value is not present")
+// Coalesce returns o if it has a value, otherwise it returns an optional
+// populated with v.
+func (o Optional[T]) Coalesce(v T) Optional[T] {
+	if o.ok {
+		return o
 	}
 
-	return o.v
+	return With(v)
 }

@@ -25,18 +25,18 @@ type Spec struct {
 
 // Necessity is an enumeration describing the necessity (or "optionalness") of
 // an environment variable.
-type Necessity int
+type Necessity string
 
 const (
 	// Required indicates that the application always requires a value and that
 	// it must be set explicitly as an environment variable.
-	Required Necessity = iota
+	Required Necessity = "required"
 
 	// Defaulted indicates that the application always requires a value but an
 	// explicit value is not mandatory because a default is provided.
-	Defaulted
+	Defaulted Necessity = "defaulted"
 
 	// Optional indicates that the application places meaning on the presence or
 	// absence of the environment variable and it is therefore truly optional.
-	Optional
+	Optional Necessity = "optional"
 )

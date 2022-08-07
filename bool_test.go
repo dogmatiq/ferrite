@@ -177,7 +177,9 @@ var _ = Describe("type BoolBuilder", func() {
 			It("panics", func() {
 				Expect(func() {
 					builder.WithLiterals("", "no")
-				}).To(PanicWith("boolean literals must not be zero-length"))
+				}).To(PanicWith(
+					"specification for FERRITE_BOOL is invalid: boolean literals must not be zero-length",
+				))
 			})
 		})
 
@@ -185,7 +187,9 @@ var _ = Describe("type BoolBuilder", func() {
 			It("panics", func() {
 				Expect(func() {
 					builder.WithLiterals("yes", "")
-				}).To(PanicWith("boolean literals must not be zero-length"))
+				}).To(PanicWith(
+					"specification for FERRITE_BOOL is invalid: boolean literals must not be zero-length",
+				))
 			})
 		})
 	})

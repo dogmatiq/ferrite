@@ -1,183 +1,15 @@
 package ferrite_test
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
+	"github.com/dogmatiq/ferrite"
 	. "github.com/dogmatiq/ferrite"
-	"github.com/dogmatiq/ferrite/schema"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("type EnumSpec", func() {
-	var spec *EnumSpec[enumMember]
-
-	BeforeEach(func() {
-		spec = Enum[enumMember]("FERRITE_ENUM", "<desc>").
-			WithMembers(
-				member0,
-				member1,
-				member2,
-			)
-	})
-
-	AfterEach(func() {
-		tearDown()
-	})
-
-	Describe("func Describe()", func() {
-		It("describes the variable", func() {
-			Expect(spec.Describe()).To(ConsistOf(
-				VariableXXX{
-					Name:        "FERRITE_ENUM",
-					Description: "<desc>",
-					Schema: schema.OneOf{
-						schema.Literal("<member-0>"),
-						schema.Literal("<member-1>"),
-						schema.Literal("<member-2>"),
-					},
-				},
-			))
-		})
-	})
-
-	When("the environment variable is set to one of the enum members", func() {
-		Describe("func Value()", func() {
-			DescribeTable(
-				"it returns the value associated with the member",
-				func(value string, expect enumMember) {
-					os.Setenv("FERRITE_ENUM", value)
-
-					Expect(spec.Value()).To(Equal(expect))
-				},
-				Entry("member 0", "<member-0>", member0),
-				Entry("member 1", "<member-1>", member1),
-				Entry("member 2", "<member-2>", member2),
-			)
-		})
-
-		Describe("func Validate()", func() {
-			It("returns a successful result", func() {
-				os.Setenv("FERRITE_ENUM", "<member-1>")
-
-				Expect(spec.Validate()).To(ConsistOf(
-					ValidationResult{
-						Name:  "FERRITE_ENUM",
-						Value: "<member-1>",
-					},
-				))
-			})
-		})
-	})
-
-	When("the environment variable is empty", func() {
-		When("there is a default value", func() {
-			BeforeEach(func() {
-				spec = spec.WithDefault(member1)
-			})
-
-			Describe("func Value()", func() {
-				When("the variable is not defined", func() {
-					It("returns the default", func() {
-						Expect(spec.Value()).To(Equal(member1))
-					})
-				})
-			})
-
-			Describe("func Describe()", func() {
-				It("describes the variable", func() {
-					Expect(spec.Describe()).To(ConsistOf(
-						VariableXXX{
-							Name:        "FERRITE_ENUM",
-							Description: "<desc>",
-							Schema: schema.OneOf{
-								schema.Literal("<member-0>"),
-								schema.Literal("<member-1>"),
-								schema.Literal("<member-2>"),
-							},
-							Default: "<member-1>",
-						},
-					))
-				})
-			})
-
-			Describe("func Validate()", func() {
-				It("returns a success result", func() {
-					Expect(spec.Validate()).To(ConsistOf(
-						ValidationResult{
-							Name:        "FERRITE_ENUM",
-							Value:       "<member-1>",
-							UsedDefault: true,
-						},
-					))
-				})
-			})
-		})
-
-		When("there is no default value", func() {
-			Describe("func Value()", func() {
-				It("panics", func() {
-					Expect(func() {
-						spec.Value()
-					}).To(PanicWith("FERRITE_ENUM is invalid: must not be empty"))
-				})
-			})
-
-			Describe("func Validate()", func() {
-				It("returns a failure result", func() {
-					Expect(spec.Validate()).To(ConsistOf(
-						ValidationResult{
-							Name:  "FERRITE_ENUM",
-							Error: errors.New(`must not be empty`),
-						},
-					))
-				})
-			})
-		})
-	})
-
-	When("the environment variable is set to some other value", func() {
-		Describe("func Validate()", func() {
-			It("returns an failure result", func() {
-				os.Setenv("FERRITE_ENUM", "<invalid>")
-
-				Expect(spec.Validate()).To(ConsistOf(
-					ValidationResult{
-						Name:  "FERRITE_ENUM",
-						Error: errors.New(`<invalid> is not a member of the enum`),
-					},
-				))
-			})
-		})
-	})
-
-	Describe("func WithMembers()", func() {
-		When("one of the members has an empty string representation", func() {
-			It("panics", func() {
-				Expect(func() {
-					Enum[string](
-						"FERRITE_ENUM",
-						"<desc>",
-					).WithMembers("")
-				}).To(PanicWith("enum member must not have an empty string representation"))
-			})
-		})
-	})
-
-	Describe("func WithDefault()", func() {
-		When("the default value is not a member of the enum", func() {
-			It("panics", func() {
-				Expect(func() {
-					spec.WithDefault(enumMember(100))
-				}).To(PanicWith("default value of FERRITE_ENUM is invalid: <member-100> is not a member of the enum"))
-			})
-		})
-	})
-})
-
-// enumMember is used to test enumerations.
 type enumMember int
 
 const (
@@ -190,3 +22,217 @@ const (
 func (m enumMember) String() string {
 	return fmt.Sprintf("<member-%d>", m)
 }
+
+var _ = Describe("type EnumSpec", func() {
+	var builder EnumBuilder[enumMember]
+
+	BeforeEach(func() {
+		builder = Enum[enumMember]("FERRITE_ENUM", "<desc>").
+			WithMembers(
+				member0,
+				member1,
+				member2,
+			)
+	})
+
+	AfterEach(func() {
+		tearDown()
+	})
+
+	When("the variable is required", func() {
+		When("the value is one of the accepted literals", func() {
+			Describe("func Value()", func() {
+				DescribeTable(
+					"it returns the value associated with the literal",
+					func(value string, expect enumMember) {
+						os.Setenv("FERRITE_ENUM", value)
+
+						v := builder.
+							Required().
+							Value()
+
+						Expect(v).To(Equal(expect))
+					},
+					Entry("member 0", "<member-0>", member0),
+					Entry("member 1", "<member-1>", member1),
+					Entry("member 2", "<member-2>", member2),
+				)
+			})
+		})
+
+		When("the value is invalid", func() {
+			BeforeEach(func() {
+				os.Setenv("FERRITE_ENUM", "<non-member>")
+			})
+
+			Describe("func Value()", func() {
+				It("panics", func() {
+					Expect(func() {
+						builder.
+							Required().
+							Value()
+					}).To(PanicWith(
+						`FERRITE_ENUM must be one of one of the enum members, got "<non-member>"`,
+					))
+				})
+			})
+		})
+
+		When("the value is empty", func() {
+			When("there is a default value", func() {
+				Describe("func Value()", func() {
+					It("returns the default", func() {
+						v := builder.
+							WithDefault(member1).
+							Required().
+							Value()
+
+						Expect(v).To(Equal(member1))
+					})
+				})
+			})
+
+			When("there is no default value", func() {
+				Describe("func Value()", func() {
+					It("panics", func() {
+						Expect(func() {
+							builder.
+								Required().
+								Value()
+						}).To(PanicWith(
+							"FERRITE_ENUM is undefined and does not have a default value",
+						))
+					})
+				})
+			})
+		})
+	})
+
+	When("the variable is optional", func() {
+		When("the value is one of the accepted literals", func() {
+			Describe("func Value()", func() {
+				DescribeTable(
+					"it returns the value associated with the literal",
+					func(value string, expect enumMember) {
+						os.Setenv("FERRITE_ENUM", value)
+
+						v, ok := builder.
+							Optional().
+							Value()
+
+						Expect(ok).To(BeTrue())
+						Expect(v).To(Equal(expect))
+					},
+					Entry("member 0", "<member-0>", member0),
+					Entry("member 1", "<member-1>", member1),
+					Entry("member 2", "<member-2>", member2),
+				)
+			})
+		})
+
+		When("the value is invalid", func() {
+			BeforeEach(func() {
+				os.Setenv("FERRITE_ENUM", "<non-member>")
+			})
+
+			Describe("func Value()", func() {
+				It("panics", func() {
+					Expect(func() {
+						builder.
+							Optional().
+							Value()
+					}).To(PanicWith(
+						`FERRITE_ENUM must be one of one of the enum members, got "<non-member>"`,
+					))
+				})
+			})
+		})
+
+		When("the value is empty", func() {
+			When("there is a default value", func() {
+				Describe("func Value()", func() {
+					It("returns the default", func() {
+						v, ok := builder.
+							WithDefault(member1).
+							Optional().
+							Value()
+
+						Expect(ok).To(BeTrue())
+						Expect(v).To(Equal(member1))
+					})
+				})
+			})
+
+			When("there is no default value", func() {
+				Describe("func Value()", func() {
+					It("returns with ok == false", func() {
+						_, ok := builder.
+							Optional().
+							Value()
+
+						Expect(ok).To(BeFalse())
+					})
+				})
+			})
+		})
+	})
+
+	When("one of the members has an empty literal representation", func() {
+		It("uses that member as the default", func() {
+			v := ferrite.
+				Enum[string]("FERRITE_ENUM", "<desc>").
+				WithMembers("foo", "", "bar").
+				Required().
+				Value()
+
+			Expect(v).To(Equal(""))
+		})
+
+		It("does not take precedence over an explicit default", func() {
+			v := ferrite.
+				Enum[string]("FERRITE_ENUM", "<desc>").
+				WithDefault("foo").
+				WithMembers("foo", "", "bar").
+				Required().
+				Value()
+
+			Expect(v).To(Equal("foo"))
+		})
+	})
+
+	When("multiple members have the same literal representation", func() {
+		It("panics", func() {
+			Expect(func() {
+				builder.
+					WithMembers(member1, member1).
+					Required()
+			}).To(PanicWith(
+				`specification for FERRITE_ENUM is invalid: multiple members use "<member-1>" as their literal representation`,
+			))
+		})
+	})
+
+	When("there are no members", func() {
+		It("panics", func() {
+			Expect(func() {
+				ferrite.
+					Enum[string]("FERRITE_ENUM", "<desc>").
+					Required()
+			}).To(PanicWith(
+				`specification for FERRITE_ENUM is invalid: no enum members are defined`,
+			))
+		})
+	})
+
+	When("the default value is not a member of the enum", func() {
+		It("panics", func() {
+			Expect(func() {
+				builder.
+					WithDefault(enumMember(100)).
+					Required()
+			}).To(PanicWith(
+				`specification for FERRITE_ENUM is invalid: the default value must be one of the enum members, got "<member-100>"`,
+			))
+		})
+	})
+})
