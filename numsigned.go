@@ -2,9 +2,12 @@ package ferrite
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 
+	"github.com/dogmatiq/ferrite/internal/optional"
 	"github.com/dogmatiq/ferrite/schema"
+	"github.com/dogmatiq/ferrite/spec"
 	"golang.org/x/exp/constraints"
 )
 
@@ -12,74 +15,96 @@ import (
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func Signed[T constraints.Signed](name, desc string) *SignedSpec[T] {
+func Signed[T constraints.Signed](name, desc string) SignedBuilder[T] {
 	shift := bitSize[T]() - 1
 
-	s := &SignedSpec[T]{
-		min: -1 << shift,
-		max: (1 << shift) - 1,
+	return SignedBuilder[T]{
+		name: name,
+		desc: desc,
+		min:  -1 << shift,
+		max:  (1 << shift) - 1,
+	}
+}
+
+// SignedBuilder builds a specification for a signed integer value.
+type SignedBuilder[T constraints.Signed] struct {
+	name     string
+	desc     string
+	min, max T
+	def      optional.Optional[T]
+}
+
+// WithDefault sets a default value of the variable.
+//
+// It is used when the environment variable is undefined or empty.
+func (b SignedBuilder[T]) WithDefault(v T) SignedBuilder[T] {
+	b.def = optional.With(v)
+	return b
+}
+
+// Required completes the build process and registers a required variable with
+// Ferrite's validation system.
+func (b SignedBuilder[T]) Required() Required[T] {
+	return registerRequired(b.spec(), b.resolve)
+}
+
+// Optional completes the build process and registers an optional variable with
+// Ferrite's validation system.
+func (b SignedBuilder[T]) Optional() Optional[T] {
+	return registerOptional(b.spec(), b.resolve)
+}
+
+func (b SignedBuilder[T]) spec() spec.Spec {
+	s := spec.Spec{
+		Name:        b.name,
+		Description: b.desc,
+		Necessity:   spec.Required,
+		Schema: schema.Range{
+			Min: b.render(b.min),
+			Max: b.render(b.max),
+		},
 	}
 
-	s.init(s, name, desc)
+	if v, ok := b.def.Get(); ok {
+		s.Necessity = spec.Defaulted
+		s.Default = b.render(v)
+	}
+
 	return s
 }
 
-// SignedSpec is the specification for a signed integer.
-type SignedSpec[T constraints.Signed] struct {
-	impl[T, *SignedSpec[T]]
+func (b SignedBuilder[T]) resolve() (spec.Value[T], error) {
+	env := os.Getenv(b.name)
 
-	min, max T
-}
+	if env == "" {
+		if v, ok := b.def.Get(); ok {
+			return spec.Value[T]{
+				Go:        v,
+				Env:       b.render(v),
+				IsDefault: true,
+			}, nil
+		}
 
-// parses parses and validates the value of the environment variable.
-//
-// validate() must be called on the result, as the parsed value does not
-// necessarily meet all of the requirements.
-func (s *SignedSpec[T]) parse(value string) (T, error) {
-	n, err := strconv.ParseInt(value, 10, bitSize[T]())
+		return spec.Value[T]{}, UndefinedError{Name: b.name}
+	}
+
+	n, err := strconv.ParseInt(env, 10, bitSize[T]())
 	v := T(n)
-
-	if err != nil {
-		return 0, fmt.Errorf(
-			"must be an integer between %+d and %+d",
-			s.min,
-			s.max,
+	if err != nil || v < b.min || v > b.max {
+		return spec.Value[T]{}, fmt.Errorf(
+			"%s must be an integer between %s and %s",
+			b.name,
+			b.render(b.min),
+			b.render(b.max),
 		)
 	}
 
-	return v, err
+	return spec.Value[T]{
+		Go:  v,
+		Env: env,
+	}, nil
 }
 
-// validate validates a parsed or default value.
-func (s *SignedSpec[T]) validate(value T) error {
-	if value < s.min || value > s.max {
-		return fmt.Errorf(
-			"must be an integer between %+d and %+d",
-			s.min,
-			s.max,
-		)
-	}
-
-	return nil
-}
-
-// schema returns the schema that describes the environment variable's
-// valid values.
-func (s *SignedSpec[T]) schema() schema.Schema {
-	return schema.Range{
-		Min: s.renderParsed(s.min),
-		Max: s.renderParsed(s.max),
-	}
-}
-
-// renderParsed returns a string representation of the parsed value as it should
-// appear in validation reports.
-func (s *SignedSpec[T]) renderParsed(value T) string {
-	return fmt.Sprintf("%+d", value)
-}
-
-// renderRaw returns a string representation of the raw string value as it
-// should appear in validation reports.
-func (s *SignedSpec[T]) renderRaw(value string) string {
-	return value
+func (b SignedBuilder[T]) render(v T) string {
+	return fmt.Sprintf("%+d", v)
 }

@@ -23,7 +23,7 @@ var _ = Describe("type DurationBuilder", func() {
 	When("the variable is required", func() {
 		When("the value is a valid duration", func() {
 			Describe("func Value()", func() {
-				It("returns the value associated with the literal", func() {
+				It("returns the value", func() {
 					os.Setenv("FERRITE_DURATION", "630s")
 
 					v := builder.
@@ -97,7 +97,7 @@ var _ = Describe("type DurationBuilder", func() {
 	When("the variable is optional", func() {
 		When("the value is a valid duration", func() {
 			Describe("func Value()", func() {
-				It("returns the value associated with the literal", func() {
+				It("returns the value", func() {
 					os.Setenv("FERRITE_DURATION", "630s")
 
 					v, ok := builder.

@@ -1,22 +1,20 @@
 package ferrite_test
 
 import (
-	"errors"
 	"os"
 
 	. "github.com/dogmatiq/ferrite"
-	"github.com/dogmatiq/ferrite/schema"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("type SignedSpec", func() {
-	type customNumeric int16
+type userDefinedSigned int16
 
-	var spec *SignedSpec[customNumeric]
+var _ = Describe("type SignedSpec", func() {
+	var builder SignedBuilder[userDefinedSigned]
 
 	BeforeEach(func() {
-		spec = Signed[customNumeric]("FERRITE_SIGNED", "<desc>")
+		builder = Signed[userDefinedSigned]("FERRITE_SIGNED", "<desc>")
 	})
 
 	AfterEach(func() {
@@ -24,208 +22,176 @@ var _ = Describe("type SignedSpec", func() {
 	})
 
 	When("the variable is required", func() {
-		When("the value is XXXXXXXXXXXX", func() {
+		When("the value is valid", func() {
+			Describe("func Value()", func() {
+				DescribeTable(
+					"returns the value",
+					func(value string, expect int) {
+						os.Setenv("FERRITE_SIGNED", value)
+
+						v := builder.
+							Required().
+							Value()
+
+						Expect(v).To(Equal(userDefinedSigned(expect)))
+					},
+					Entry("zero", "0", 0),
+					Entry("positive", "+123", +123),
+					Entry("negative", "-123", -123),
+				)
+			})
 		})
 
 		When("the value is invalid", func() {
+			Describe("func Value()", func() {
+				DescribeTable(
+					"it panics",
+					func(value, expect string) {
+						os.Setenv("FERRITE_SIGNED", value)
 
+						Expect(func() {
+							builder.
+								Required().
+								Value()
+						}).To(PanicWith(expect))
+					},
+					Entry(
+						"underflow",
+						"-32769",
+						`FERRITE_SIGNED must be an integer between -32768 and +32767`,
+					),
+					Entry(
+						"overflow",
+						"32768",
+						`FERRITE_SIGNED must be an integer between -32768 and +32767`,
+					),
+					Entry(
+						"decimal",
+						"123.45",
+						`FERRITE_SIGNED must be an integer between -32768 and +32767`,
+					),
+					Entry(
+						"invalid characters",
+						"123!",
+						`FERRITE_SIGNED must be an integer between -32768 and +32767`,
+					),
+				)
+			})
 		})
 
 		When("the value is empty", func() {
 			When("there is a default value", func() {
+				Describe("func Value()", func() {
+					It("returns the default", func() {
+						v := builder.
+							WithDefault(-123).
+							Required().
+							Value()
 
+						Expect(v).To(Equal(userDefinedSigned(-123)))
+					})
+				})
 			})
 
 			When("there is no default value", func() {
-
+				Describe("func Value()", func() {
+					It("panics", func() {
+						Expect(func() {
+							builder.
+								Required().
+								Value()
+						}).To(PanicWith(
+							"FERRITE_SIGNED is undefined and does not have a default value",
+						))
+					})
+				})
 			})
 		})
 	})
 
 	When("the variable is optional", func() {
-		When("the value is XXXXXXXXXXXXXXX", func() {
+		When("the value is valid", func() {
+			Describe("func Value()", func() {
+				DescribeTable(
+					"returns the value",
+					func(value string, expect int) {
+						os.Setenv("FERRITE_SIGNED", value)
+
+						v, ok := builder.
+							Optional().
+							Value()
+
+						Expect(ok).To(BeTrue())
+						Expect(v).To(Equal(userDefinedSigned(expect)))
+					},
+					Entry("zero", "0", 0),
+					Entry("positive", "+123", +123),
+					Entry("negative", "-123", -123),
+				)
+			})
 		})
 
 		When("the value is invalid", func() {
+			Describe("func Value()", func() {
+				DescribeTable(
+					"it panics",
+					func(value, expect string) {
+						os.Setenv("FERRITE_SIGNED", value)
 
+						Expect(func() {
+							builder.
+								Optional().
+								Value()
+						}).To(PanicWith(expect))
+					},
+					Entry(
+						"underflow",
+						"-32769",
+						`FERRITE_SIGNED must be an integer between -32768 and +32767`,
+					),
+					Entry(
+						"overflow",
+						"32768",
+						`FERRITE_SIGNED must be an integer between -32768 and +32767`,
+					),
+					Entry(
+						"decimal",
+						"123.45",
+						`FERRITE_SIGNED must be an integer between -32768 and +32767`,
+					),
+					Entry(
+						"invalid characters",
+						"123!",
+						`FERRITE_SIGNED must be an integer between -32768 and +32767`,
+					),
+				)
+			})
 		})
 
 		When("the value is empty", func() {
 			When("there is a default value", func() {
+				Describe("func Value()", func() {
+					It("returns the default", func() {
+						v, ok := builder.
+							WithDefault(-123).
+							Optional().
+							Value()
 
+						Expect(ok).To(BeTrue())
+						Expect(v).To(Equal(userDefinedSigned(-123)))
+					})
+				})
 			})
 
 			When("there is no default value", func() {
+				Describe("func Value()", func() {
+					It("returns with ok == false", func() {
+						_, ok := builder.
+							Optional().
+							Value()
 
-			})
-		})
-	})
-
-	Describe("func Describe()", func() {
-		It("describes the variable", func() {
-			Expect(spec.Describe()).To(ConsistOf(
-				VariableXXX{
-					Name:        "FERRITE_SIGNED",
-					Description: "<desc>",
-					Schema: schema.Range{
-						Min: "-32768",
-						Max: "+32767",
-					},
-				},
-			))
-		})
-	})
-
-	When("the environment variable is not empty", func() {
-		BeforeEach(func() {
-			os.Setenv("FERRITE_SIGNED", "-123")
-		})
-
-		Describe("func Value()", func() {
-			It("returns the numeric value", func() {
-				Expect(spec.Value()).To(Equal(customNumeric(-123)))
-			})
-		})
-
-		Describe("func Validate()", func() {
-			It("returns a successful result", func() {
-				Expect(spec.Validate()).To(ConsistOf(
-					ValidationResult{
-						Name:  "FERRITE_SIGNED",
-						Value: "-123",
-					},
-				))
-			})
-		})
-	})
-
-	When("the environment variable is invalid", func() {
-		Describe("func Value()", func() {
-			DescribeTable(
-				"it panics",
-				func(value, expect string) {
-					os.Setenv("FERRITE_SIGNED", value)
-					Expect(func() {
-						spec.Value()
-					}).To(PanicWith(expect))
-				},
-				Entry(
-					"underflow",
-					"-32769",
-					`FERRITE_SIGNED is invalid: must be an integer between -32768 and +32767`,
-				),
-				Entry(
-					"overflow",
-					"32768",
-					`FERRITE_SIGNED is invalid: must be an integer between -32768 and +32767`,
-				),
-				Entry(
-					"decimal",
-					"123.45",
-					`FERRITE_SIGNED is invalid: must be an integer between -32768 and +32767`,
-				),
-				Entry(
-					"invalid characters",
-					"123!",
-					`FERRITE_SIGNED is invalid: must be an integer between -32768 and +32767`,
-				),
-			)
-		})
-
-		Describe("func Validate()", func() {
-			DescribeTable(
-				"it returns a failure result",
-				func(value, expect string) {
-					os.Setenv("FERRITE_SIGNED", value)
-					Expect(spec.Validate()).To(ConsistOf(
-						ValidationResult{
-							Name:  "FERRITE_SIGNED",
-							Error: errors.New(expect),
-						},
-					))
-				},
-				Entry(
-					"underflow",
-					"-32769",
-					`must be an integer between -32768 and +32767`,
-				),
-				Entry(
-					"overflow",
-					"32768",
-					`must be an integer between -32768 and +32767`,
-				),
-				Entry(
-					"decimal",
-					"123.45",
-					`must be an integer between -32768 and +32767`,
-				),
-				Entry(
-					"invalid characters",
-					"123!",
-					`must be an integer between -32768 and +32767`,
-				),
-			)
-		})
-	})
-
-	When("the environment variable is empty", func() {
-		When("there is a default value", func() {
-			BeforeEach(func() {
-				spec.WithDefault(-123)
-			})
-
-			Describe("func Value()", func() {
-				It("returns the default", func() {
-					Expect(spec.Value()).To(Equal(customNumeric(-123)))
-				})
-			})
-
-			Describe("func Describe()", func() {
-				It("describes the variable", func() {
-					Expect(spec.Describe()).To(ConsistOf(
-						VariableXXX{
-							Name:        "FERRITE_SIGNED",
-							Description: "<desc>",
-							Schema: schema.Range{
-								Min: "-32768",
-								Max: "+32767",
-							},
-							Default: "-123",
-						},
-					))
-				})
-			})
-
-			Describe("func Validate()", func() {
-				It("returns a success result", func() {
-					Expect(spec.Validate()).To(ConsistOf(
-						ValidationResult{
-							Name:        "FERRITE_SIGNED",
-							Value:       "-123",
-							UsedDefault: true,
-						},
-					))
-				})
-			})
-		})
-
-		When("there is no default value", func() {
-			Describe("func Value()", func() {
-				It("panics", func() {
-					Expect(func() {
-						spec.Value()
-					}).To(PanicWith("FERRITE_SIGNED is invalid: must not be empty"))
-				})
-			})
-
-			Describe("func Validate()", func() {
-				It("returns a failure result", func() {
-					Expect(spec.Validate()).To(ConsistOf(
-						ValidationResult{
-							Name:  "FERRITE_SIGNED",
-							Error: errors.New(`must not be empty`),
-						},
-					))
+						Expect(ok).To(BeFalse())
+					})
 				})
 			})
 		})
