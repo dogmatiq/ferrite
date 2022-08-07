@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/dogmatiq/ferrite/internal/optional"
-	"github.com/dogmatiq/ferrite/schema"
 	"github.com/dogmatiq/ferrite/spec"
 	"golang.org/x/exp/constraints"
 )
@@ -59,7 +58,7 @@ func (b SignedBuilder[T]) spec() spec.Spec {
 		Name:        b.name,
 		Description: b.desc,
 		Necessity:   spec.Required,
-		Schema: schema.Range{
+		Schema: spec.Range{
 			Min: b.render(b.min),
 			Max: b.render(b.max),
 		},

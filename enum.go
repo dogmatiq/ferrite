@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/dogmatiq/ferrite/internal/optional"
-	"github.com/dogmatiq/ferrite/schema"
 	"github.com/dogmatiq/ferrite/spec"
 	"golang.org/x/exp/slices"
 )
@@ -80,7 +79,7 @@ func (b *EnumBuilder[T]) spec() spec.Spec {
 	}
 
 	var (
-		oneOf    schema.OneOf
+		oneOf    spec.OneOf
 		literals []string
 	)
 
@@ -100,7 +99,7 @@ func (b *EnumBuilder[T]) spec() spec.Spec {
 		}
 
 		literals = append(literals, lit)
-		oneOf = append(oneOf, schema.Literal(lit))
+		oneOf = append(oneOf, spec.Literal(lit))
 	}
 
 	s := spec.Spec{

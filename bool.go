@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/dogmatiq/ferrite/internal/optional"
-	"github.com/dogmatiq/ferrite/schema"
 	"github.com/dogmatiq/ferrite/spec"
 )
 
@@ -83,9 +82,9 @@ func (b BoolBuilder[T]) spec() spec.Spec {
 		Name:        b.name,
 		Description: b.desc,
 		Necessity:   spec.Required,
-		Schema: schema.OneOf{
-			schema.Literal(b.t),
-			schema.Literal(b.f),
+		Schema: spec.OneOf{
+			spec.Literal(b.t),
+			spec.Literal(b.f),
 		},
 	}
 

@@ -1,9 +1,5 @@
 package spec
 
-import (
-	"github.com/dogmatiq/ferrite/schema"
-)
-
 // Spec is a specification that describes an environment variable.
 type Spec struct {
 	// Name is the name of the environment variable.
@@ -17,7 +13,7 @@ type Spec struct {
 	Necessity Necessity
 
 	// Schema describes the valid values of the environment variable.
-	Schema schema.Schema
+	Schema Schema
 
 	// Default is the environment variable's default value.
 	Default string

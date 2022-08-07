@@ -10,7 +10,6 @@ import (
 	"unicode"
 
 	"github.com/dogmatiq/ferrite/internal/optional"
-	"github.com/dogmatiq/ferrite/schema"
 	"github.com/dogmatiq/ferrite/spec"
 )
 
@@ -200,7 +199,7 @@ func (b KubernetesServiceBuilder) hostSpec() spec.Spec {
 			b.service,
 		),
 		Necessity: spec.Required,
-		Schema:    schema.Type[string](),
+		Schema:    spec.OfType[string](),
 	}
 
 	if v, ok := b.def.Get(); ok {
@@ -219,9 +218,9 @@ func (b KubernetesServiceBuilder) portSpec() spec.Spec {
 			b.service,
 		),
 		Necessity: spec.Required,
-		Schema: schema.OneOf{
-			schema.Type[string](),
-			schema.Range{
+		Schema: spec.OneOf{
+			spec.OfType[string](),
+			spec.Range{
 				Min: "1",
 				Max: "65535",
 			},

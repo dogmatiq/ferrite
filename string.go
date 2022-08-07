@@ -4,7 +4,6 @@ import (
 	"os"
 
 	"github.com/dogmatiq/ferrite/internal/optional"
-	"github.com/dogmatiq/ferrite/schema"
 	"github.com/dogmatiq/ferrite/spec"
 )
 
@@ -60,7 +59,7 @@ func (b StringBuilder[T]) spec() spec.Spec {
 		Name:        b.name,
 		Description: b.desc,
 		Necessity:   spec.Required,
-		Schema:      schema.Type[T](),
+		Schema:      spec.OfType[T](),
 	}
 
 	if v, ok := b.def.Get(); ok {

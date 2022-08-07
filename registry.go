@@ -8,7 +8,7 @@ import (
 	"sync"
 
 	"github.com/dogmatiq/ferrite/internal/table"
-	"github.com/dogmatiq/ferrite/schema"
+	"github.com/dogmatiq/ferrite/spec"
 	"golang.org/x/exp/slices"
 )
 
@@ -136,7 +136,7 @@ type validateSchemaRenderer struct {
 	Output strings.Builder
 }
 
-func (r *validateSchemaRenderer) VisitOneOf(s schema.OneOf) {
+func (r *validateSchemaRenderer) VisitOneOf(s spec.OneOf) {
 	for i, c := range s {
 		if i > 0 {
 			r.Output.WriteString("|")
@@ -146,15 +146,15 @@ func (r *validateSchemaRenderer) VisitOneOf(s schema.OneOf) {
 	}
 }
 
-func (r *validateSchemaRenderer) VisitLiteral(s schema.Literal) {
+func (r *validateSchemaRenderer) VisitLiteral(s spec.Literal) {
 	r.Output.WriteString(string(s))
 }
 
-func (r *validateSchemaRenderer) VisitType(s schema.TypeSchema) {
+func (r *validateSchemaRenderer) VisitType(s spec.Type) {
 	fmt.Fprintf(&r.Output, "[%s]", s.Type)
 }
 
-func (r *validateSchemaRenderer) VisitRange(s schema.Range) {
+func (r *validateSchemaRenderer) VisitRange(s spec.Range) {
 	if s.Min != "" && s.Max != "" {
 		fmt.Fprintf(&r.Output, "(%s..%s)", s.Min, s.Max)
 	} else if s.Max != "" {
@@ -183,7 +183,7 @@ type VariableXXX struct {
 	Description string
 
 	// Schema describes the valid values for this environment variable.
-	Schema schema.Schema
+	Schema spec.Schema
 
 	// Default is the environment variable's default value.
 	//

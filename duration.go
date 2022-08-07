@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/dogmatiq/ferrite/internal/optional"
-	"github.com/dogmatiq/ferrite/schema"
 	"github.com/dogmatiq/ferrite/spec"
 )
 
@@ -53,7 +52,7 @@ func (b DurationBuilder) spec() spec.Spec {
 		Name:        b.name,
 		Description: b.desc,
 		Necessity:   spec.Required,
-		Schema: schema.Range{
+		Schema: spec.Range{
 			Min: time.Nanosecond.String(),
 		},
 	}
