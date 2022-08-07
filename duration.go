@@ -21,7 +21,7 @@ func Duration(name, desc string) DurationBuilder {
 	}
 }
 
-// DurationBuilder builds a specification for a duration value.
+// DurationBuilder builds a specification for a duration variable.
 type DurationBuilder struct {
 	name string
 	desc string

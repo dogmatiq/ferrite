@@ -1,16 +1,18 @@
 package ferrite
 
 import (
-	"fmt"
+	"os"
 
+	"github.com/dogmatiq/ferrite/internal/optional"
 	"github.com/dogmatiq/ferrite/schema"
+	"github.com/dogmatiq/ferrite/spec"
 )
 
 // String configures an environment variable as a string.
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func String(name, desc string) *StringSpec[string] {
+func String(name, desc string) StringBuilder[string] {
 	return StringAs[string](name, desc)
 }
 
@@ -19,44 +21,73 @@ func String(name, desc string) *StringSpec[string] {
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func StringAs[T ~string](name, desc string) *StringSpec[T] {
-	s := &StringSpec[T]{}
-	s.init(s, name, desc)
+func StringAs[T ~string](name, desc string) StringBuilder[T] {
+	return StringBuilder[T]{
+		name: name,
+		desc: desc,
+	}
+}
+
+// StringBuilder builds a specification for a string variable.
+type StringBuilder[T ~string] struct {
+	name string
+	desc string
+	def  optional.Optional[T]
+}
+
+// WithDefault sets a default value of the variable.
+//
+// It is used when the environment variable is undefined or empty.
+func (b StringBuilder[T]) WithDefault(v T) StringBuilder[T] {
+	b.def = optional.With(v)
+	return b
+}
+
+// Required completes the build process and registers a required variable with
+// Ferrite's validation system.
+func (b StringBuilder[T]) Required() Required[T] {
+	return registerRequired(b.spec(), b.resolve)
+}
+
+// Optional completes the build process and registers an optional variable with
+// Ferrite's validation system.
+func (b StringBuilder[T]) Optional() Optional[T] {
+	return registerOptional(b.spec(), b.resolve)
+}
+
+func (b StringBuilder[T]) spec() spec.Spec {
+	s := spec.Spec{
+		Name:        b.name,
+		Description: b.desc,
+		Necessity:   spec.Required,
+		Schema:      schema.Type[T](),
+	}
+
+	if v, ok := b.def.Get(); ok {
+		s.Necessity = spec.Defaulted
+		s.Default = string(v)
+	}
+
 	return s
 }
 
-// StringSpec is the specification for a string.
-type StringSpec[T ~string] struct {
-	impl[T, *StringSpec[T]]
-}
+func (b StringBuilder[T]) resolve() (spec.Value[T], error) {
+	env := os.Getenv(b.name)
 
-// parses parses and validates the value of the environment variable.
-//
-// validate() must be called on the result, as the parsed value does not
-// necessarily meet all of the requirements.
-func (s *StringSpec[T]) parse(value string) (T, error) {
-	return T(value), nil
-}
+	if env == "" {
+		if v, ok := b.def.Get(); ok {
+			return spec.Value[T]{
+				Go:        v,
+				Env:       string(v),
+				IsDefault: true,
+			}, nil
+		}
 
-// validate validates a parsed or default value.
-func (s *StringSpec[T]) validate(value T) error {
-	return nil
-}
+		return spec.Value[T]{}, UndefinedError{Name: b.name}
+	}
 
-// schema returns the schema that describes the environment variable's
-// valid values.
-func (s *StringSpec[T]) schema() schema.Schema {
-	return schema.Type[T]()
-}
-
-// renderParsed returns a string representation of the parsed value as it should
-// appear in validation reports.
-func (s *StringSpec[T]) renderParsed(value T) string {
-	return string(value)
-}
-
-// renderRaw returns a string representation of the raw string value as it
-// should appear in validation reports.
-func (s *StringSpec[T]) renderRaw(value string) string {
-	return fmt.Sprintf("%q", value)
+	return spec.Value[T]{
+		Go:  T(env),
+		Env: env,
+	}, nil
 }

@@ -1,118 +1,111 @@
 package ferrite_test
 
 import (
-	"errors"
 	"os"
 
 	. "github.com/dogmatiq/ferrite"
-	"github.com/dogmatiq/ferrite/schema"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("type StringSpec", func() {
-	type customString string
+type userDefinedString string
 
-	var spec *StringSpec[customString]
+var _ = Describe("type StringSpec", func() {
+	var builder StringBuilder[userDefinedString]
 
 	BeforeEach(func() {
-		spec = StringAs[customString]("FERRITE_STRING", "<desc>")
+		builder = StringAs[userDefinedString]("FERRITE_STRING", "<desc>")
 	})
 
 	AfterEach(func() {
 		tearDown()
 	})
 
-	Describe("func Describe()", func() {
-		It("describes the variable", func() {
-			Expect(spec.Describe()).To(ConsistOf(
-				VariableXXX{
-					Name:        "FERRITE_STRING",
-					Description: "<desc>",
-					Schema:      schema.Type[customString](),
-				},
-			))
+	When("the variable is required", func() {
+		When("the value is not empty", func() {
+			Describe("func Value()", func() {
+				It("returns the value ", func() {
+					os.Setenv("FERRITE_STRING", "<value>")
+
+					v := builder.
+						Required().
+						Value()
+
+					Expect(v).To(Equal(userDefinedString("<value>")))
+				})
+			})
+		})
+
+		When("the value is empty", func() {
+			When("there is a default value", func() {
+				Describe("func Value()", func() {
+					It("returns the default", func() {
+						v := builder.
+							WithDefault("<value>").
+							Required().
+							Value()
+
+						Expect(v).To(Equal(userDefinedString("<value>")))
+					})
+				})
+			})
+
+			When("there is no default value", func() {
+				Describe("func Value()", func() {
+					It("panics", func() {
+						Expect(func() {
+							builder.
+								Required().
+								Value()
+						}).To(PanicWith(
+							"FERRITE_STRING is undefined and does not have a default value",
+						))
+					})
+				})
+			})
 		})
 	})
 
-	When("the environment variable is not empty", func() {
-		BeforeEach(func() {
-			os.Setenv("FERRITE_STRING", "<value>")
-		})
-
-		Describe("func Value()", func() {
-			It("returns the raw string value", func() {
-				Expect(spec.Value()).To(Equal(customString("<value>")))
-			})
-		})
-
-		Describe("func Validate()", func() {
-			It("returns a successful result", func() {
-				Expect(spec.Validate()).To(ConsistOf(
-					ValidationResult{
-						Name:  "FERRITE_STRING",
-						Value: `<value>`,
-					},
-				))
-			})
-		})
-	})
-
-	When("the environment variable is empty", func() {
-		When("there is a default value", func() {
-			BeforeEach(func() {
-				spec.WithDefault("<value>")
-			})
-
+	When("the variable is optional", func() {
+		When("the value is not empty", func() {
 			Describe("func Value()", func() {
-				It("returns the default", func() {
-					Expect(spec.Value()).To(Equal(customString("<value>")))
-				})
-			})
+				It("returns the value ", func() {
+					os.Setenv("FERRITE_STRING", "<value>")
 
-			Describe("func Describe()", func() {
-				It("describes the variable", func() {
-					Expect(spec.Describe()).To(ConsistOf(
-						VariableXXX{
-							Name:        "FERRITE_STRING",
-							Description: "<desc>",
-							Schema:      schema.Type[customString](),
-							Default:     "<value>",
-						},
-					))
-				})
-			})
+					v, ok := builder.
+						Optional().
+						Value()
 
-			Describe("func Validate()", func() {
-				It("returns a success result", func() {
-					Expect(spec.Validate()).To(ConsistOf(
-						ValidationResult{
-							Name:        "FERRITE_STRING",
-							Value:       "<value>",
-							UsedDefault: true,
-						},
-					))
+					Expect(ok).To(BeTrue())
+					Expect(v).To(Equal(userDefinedString("<value>")))
 				})
 			})
 		})
 
-		When("there is no default value", func() {
-			Describe("func Value()", func() {
-				It("panics", func() {
-					Expect(func() {
-						spec.Value()
-					}).To(PanicWith("FERRITE_STRING is invalid: must not be empty"))
+		When("the value is empty", func() {
+			When("there is a default value", func() {
+				Describe("func Value()", func() {
+					It("returns the default", func() {
+						v, ok := builder.
+							WithDefault("<value>").
+							Optional().
+							Value()
+
+						Expect(ok).To(BeTrue())
+						Expect(v).To(Equal(userDefinedString("<value>")))
+					})
 				})
 			})
 
-			Describe("func Validate()", func() {
-				It("returns a failure result", func() {
-					Expect(spec.Validate()).To(ConsistOf(
-						ValidationResult{
-							Name:  "FERRITE_STRING",
-							Error: errors.New(`must not be empty`),
-						},
-					))
+			When("there is no default value", func() {
+				Describe("func Value()", func() {
+					It("returns with ok == false", func() {
+						_, ok := builder.
+							Optional().
+							Value()
+
+						Expect(ok).To(BeFalse())
+					})
 				})
 			})
 		})

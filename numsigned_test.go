@@ -23,6 +23,44 @@ var _ = Describe("type SignedSpec", func() {
 		tearDown()
 	})
 
+	When("the variable is required", func() {
+		When("the value is XXXXXXXXXXXX", func() {
+		})
+
+		When("the value is invalid", func() {
+
+		})
+
+		When("the value is empty", func() {
+			When("there is a default value", func() {
+
+			})
+
+			When("there is no default value", func() {
+
+			})
+		})
+	})
+
+	When("the variable is optional", func() {
+		When("the value is XXXXXXXXXXXXXXX", func() {
+		})
+
+		When("the value is invalid", func() {
+
+		})
+
+		When("the value is empty", func() {
+			When("there is a default value", func() {
+
+			})
+
+			When("there is no default value", func() {
+
+			})
+		})
+	})
+
 	Describe("func Describe()", func() {
 		It("describes the variable", func() {
 			Expect(spec.Describe()).To(ConsistOf(
