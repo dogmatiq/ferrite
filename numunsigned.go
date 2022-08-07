@@ -2,9 +2,12 @@ package ferrite
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 
+	"github.com/dogmatiq/ferrite/internal/optional"
 	"github.com/dogmatiq/ferrite/schema"
+	"github.com/dogmatiq/ferrite/spec"
 	"golang.org/x/exp/constraints"
 )
 
@@ -12,72 +15,94 @@ import (
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func Unsigned[T constraints.Unsigned](name, desc string) *UnsignedSpec[T] {
-	s := &UnsignedSpec[T]{
-		min: 0,
-		max: T(0) - 1,
+func Unsigned[T constraints.Unsigned](name, desc string) UnsignedBuilder[T] {
+	return UnsignedBuilder[T]{
+		name: name,
+		desc: desc,
+		min:  0,
+		max:  T(0) - 1,
+	}
+}
+
+// UnsignedBuilder builds a specification for an unsigned integer value.
+type UnsignedBuilder[T constraints.Unsigned] struct {
+	name     string
+	desc     string
+	min, max T
+	def      optional.Optional[T]
+}
+
+// WithDefault sets a default value of the variable.
+//
+// It is used when the environment variable is undefined or empty.
+func (b UnsignedBuilder[T]) WithDefault(v T) UnsignedBuilder[T] {
+	b.def = optional.With(v)
+	return b
+}
+
+// Required completes the build process and registers a required variable with
+// Ferrite's validation system.
+func (b UnsignedBuilder[T]) Required() Required[T] {
+	return registerRequired(b.spec(), b.resolve)
+}
+
+// Optional completes the build process and registers an optional variable with
+// Ferrite's validation system.
+func (b UnsignedBuilder[T]) Optional() Optional[T] {
+	return registerOptional(b.spec(), b.resolve)
+}
+
+func (b UnsignedBuilder[T]) spec() spec.Spec {
+	s := spec.Spec{
+		Name:        b.name,
+		Description: b.desc,
+		Necessity:   spec.Required,
+		Schema: schema.Range{
+			Min: b.render(b.min),
+			Max: b.render(b.max),
+		},
 	}
 
-	s.init(s, name, desc)
+	if v, ok := b.def.Get(); ok {
+		s.Necessity = spec.Defaulted
+		s.Default = b.render(v)
+	}
+
 	return s
 }
 
-// UnsignedSpec is the specification for a signed integer.
-type UnsignedSpec[T constraints.Unsigned] struct {
-	impl[T, *UnsignedSpec[T]]
+func (b UnsignedBuilder[T]) resolve() (spec.Value[T], error) {
+	env := os.Getenv(b.name)
 
-	min, max T
-}
+	if env == "" {
+		if v, ok := b.def.Get(); ok {
+			return spec.Value[T]{
+				Go:        v,
+				Env:       b.render(v),
+				IsDefault: true,
+			}, nil
+		}
 
-// parses parses and validates the value of the environment variable.
-//
-// validate() must be called on the result, as the parsed value does not
-// necessarily meet all of the requirements.
-func (s *UnsignedSpec[T]) parse(value string) (T, error) {
-	n, err := strconv.ParseUint(value, 10, bitSize[T]())
+		return spec.Value[T]{}, UndefinedError{Name: b.name}
+	}
+
+	n, err := strconv.ParseUint(env, 10, bitSize[T]())
 	v := T(n)
-
-	if err != nil || v < s.min || v > s.max {
-		return 0, fmt.Errorf(
-			"must be an integer between %d and %d",
-			s.min,
-			s.max,
+	if err != nil || v < b.min || v > b.max {
+		return spec.Value[T]{}, fmt.Errorf(
+			"%s must be an integer between %s and %s",
+			b.name,
+			b.render(b.min),
+			b.render(b.max),
 		)
 	}
 
-	return v, err
+	return spec.Value[T]{
+		Go:  v,
+		Env: env,
+	}, nil
 }
 
-// validate validates a parsed or default value.
-func (s *UnsignedSpec[T]) validate(value T) error {
-	if value < s.min || value > s.max {
-		return fmt.Errorf(
-			"must be an integer between %d and %d",
-			s.min,
-			s.max,
-		)
-	}
-
-	return nil
-}
-
-// schema returns the schema that describes the environment variable's
-// valid values.
-func (s *UnsignedSpec[T]) schema() schema.Schema {
-	return schema.Range{
-		Min: s.renderParsed(s.min),
-		Max: s.renderParsed(s.max),
-	}
-}
-
-// renderParsed returns a string representation of the parsed value as it should
-// appear in validation reports.
-func (s *UnsignedSpec[T]) renderParsed(value T) string {
-	return strconv.FormatUint(uint64(value), 10)
-}
-
-// renderRaw returns a string representation of the raw string value as it
-// should appear in validation reports.
-func (s *UnsignedSpec[T]) renderRaw(value string) string {
-	return value
+func (b UnsignedBuilder[T]) render(v T) string {
+	return fmt.Sprintf("%d", v)
 }
