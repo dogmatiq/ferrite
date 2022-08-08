@@ -113,7 +113,7 @@ func (b BoolBuilder[T]) resolve() (spec.ValueOf[T], error) {
 			}, nil
 		}
 
-		return spec.ValueOf[T]{}, UndefinedError{Name: b.name}
+		return spec.Undefined[T](b.name)
 
 	default:
 		return spec.ValueOf[T]{}, fmt.Errorf(

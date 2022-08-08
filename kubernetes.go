@@ -166,7 +166,7 @@ func (b KubernetesServiceBuilder) Optional() Optional[KubernetesAddress] {
 
 			if hostErr != nil {
 				if portErr == nil {
-					var undef UndefinedError
+					var undef spec.UndefinedError
 					if errors.As(hostErr, &undef) {
 						undef.Cause = fmt.Errorf("%s is defined, define both or neither", b.portVar)
 						hostErr = undef
@@ -177,7 +177,7 @@ func (b KubernetesServiceBuilder) Optional() Optional[KubernetesAddress] {
 			}
 
 			if portErr != nil {
-				var undef UndefinedError
+				var undef spec.UndefinedError
 				if errors.As(portErr, &undef) {
 					undef.Cause = fmt.Errorf("%s is defined, define both or neither", b.hostVar)
 					portErr = undef
@@ -247,11 +247,11 @@ func (b KubernetesServiceBuilder) resolveHost() (spec.ValueOf[string], error) {
 			}, nil
 		}
 
-		return undefined[string](b.hostVar)
+		return spec.Undefined[string](b.hostVar)
 	}
 
 	if err := validateHost(env); err != nil {
-		return invalid[string](b.hostVar, env, "%w", err)
+		return spec.Invalid[string](b.hostVar, env, "%w", err)
 	}
 
 	return spec.ValueOf[string]{
@@ -272,11 +272,11 @@ func (b KubernetesServiceBuilder) resolvePort() (spec.ValueOf[string], error) {
 			}, nil
 		}
 
-		return undefined[string](b.portVar)
+		return spec.Undefined[string](b.portVar)
 	}
 
 	if err := validatePort(env); err != nil {
-		return invalid[string](b.portVar, env, "%w", err)
+		return spec.Invalid[string](b.portVar, env, "%w", err)
 	}
 
 	return spec.ValueOf[string]{

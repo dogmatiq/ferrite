@@ -77,7 +77,7 @@ func (b DurationBuilder) resolve() (spec.ValueOf[time.Duration], error) {
 			}, nil
 		}
 
-		return spec.ValueOf[time.Duration]{}, UndefinedError{Name: b.name}
+		return spec.Undefined[time.Duration](b.name)
 	}
 
 	v, err := time.ParseDuration(env)

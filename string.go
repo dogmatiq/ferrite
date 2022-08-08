@@ -82,7 +82,7 @@ func (b StringBuilder[T]) resolve() (spec.ValueOf[T], error) {
 			}, nil
 		}
 
-		return spec.ValueOf[T]{}, UndefinedError{Name: b.name}
+		return spec.Undefined[T](b.name)
 	}
 
 	return spec.ValueOf[T]{

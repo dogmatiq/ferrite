@@ -1,9 +1,7 @@
-package ferrite
+package spec
 
 import (
 	"fmt"
-
-	"github.com/dogmatiq/ferrite/spec"
 )
 
 // UndefinedError indicates that an environment variable has neither an explicit
@@ -45,22 +43,22 @@ func (e ValidationError) Error() string {
 	)
 }
 
-// undefined returns a new UndefinedError.
-func undefined[T any](
+// Undefined returns a new UndefinedError.
+func Undefined[T any](
 	name string,
-) (spec.ValueOf[T], error) {
-	return spec.ValueOf[T]{}, UndefinedError{
+) (ValueOf[T], error) {
+	return ValueOf[T]{}, UndefinedError{
 		Name: name,
 	}
 }
 
-// invalid returns a new ValidationError.
-func invalid[T any](
+// Invalid returns a new ValidationError.
+func Invalid[T any](
 	name string,
 	value string,
 	f string, v ...any,
-) (spec.ValueOf[T], error) {
-	return spec.ValueOf[T]{}, ValidationError{
+) (ValueOf[T], error) {
+	return ValueOf[T]{}, ValidationError{
 		Name:  name,
 		Value: value,
 		Cause: fmt.Errorf(f, v...),
