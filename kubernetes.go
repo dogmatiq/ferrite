@@ -166,10 +166,11 @@ func (b KubernetesServiceBuilder) Optional() Optional[KubernetesAddress] {
 
 			if hostErr != nil {
 				if portErr == nil {
-					var undef spec.UndefinedError
-					if errors.As(hostErr, &undef) {
-						undef.Cause = fmt.Errorf("%s is defined, define both or neither", b.portVar)
-						hostErr = undef
+					if errors.As(hostErr, &spec.UndefinedError{}) {
+						return KubernetesAddress{}, spec.ValidationError{
+							Name:  hostSpec.Name,
+							Cause: fmt.Errorf("%s is defined, define both or neither", b.portVar),
+						}
 					}
 				}
 
@@ -177,16 +178,20 @@ func (b KubernetesServiceBuilder) Optional() Optional[KubernetesAddress] {
 			}
 
 			if portErr != nil {
-				var undef spec.UndefinedError
-				if errors.As(portErr, &undef) {
-					undef.Cause = fmt.Errorf("%s is defined, define both or neither", b.hostVar)
-					portErr = undef
+				if errors.As(portErr, &spec.UndefinedError{}) {
+					return KubernetesAddress{}, spec.ValidationError{
+						Name:  portSpec.Name,
+						Cause: fmt.Errorf("%s is defined, define both or neither", b.hostVar),
+					}
 				}
 
 				return KubernetesAddress{}, portErr
 			}
 
-			return KubernetesAddress{host.Go, port.Go}, nil
+			return KubernetesAddress{
+				host.Go,
+				port.Go,
+			}, nil
 		},
 	}
 }

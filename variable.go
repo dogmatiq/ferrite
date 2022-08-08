@@ -20,13 +20,8 @@ type Optional[T any] struct {
 func (v Optional[T]) Value() (T, bool) {
 	value, err := v.resolve()
 	if err != nil {
-		var undef spec.UndefinedError
-		if errors.As(err, &undef) {
-			// Only treat "normal" undefined errors as ok for optional
-			// variables. If there was some other causal error that's a problem.
-			if undef.Cause == nil {
-				return value, false
-			}
+		if errors.As(err, &spec.UndefinedError{}) {
+			return value, false
 		}
 
 		panic(err.Error())

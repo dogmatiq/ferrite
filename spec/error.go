@@ -7,19 +7,10 @@ import (
 // UndefinedError indicates that an environment variable has neither an explicit
 // nor a default value.
 type UndefinedError struct {
-	Name  string
-	Cause error
-}
-
-func (e UndefinedError) Unwrap() error {
-	return e.Cause
+	Name string
 }
 
 func (e UndefinedError) Error() string {
-	if e.Cause != nil {
-		return fmt.Sprintf("%s is undefined: %s", e.Name, e.Cause)
-	}
-
 	return fmt.Sprintf("%s is undefined and does not have a default value", e.Name)
 }
 
@@ -35,6 +26,14 @@ func (e ValidationError) Unwrap() error {
 }
 
 func (e ValidationError) Error() string {
+	if e.Value == "" {
+		return fmt.Sprintf(
+			"%s is undefined: %s",
+			e.Name,
+			e.Cause,
+		)
+	}
+
 	return fmt.Sprintf(
 		"%s (%q) is invalid: %s",
 		e.Name,
