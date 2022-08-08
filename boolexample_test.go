@@ -16,7 +16,7 @@ func ExampleBool_required() {
 		Required()
 
 	os.Setenv("FERRITE_BOOL", "true")
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	fmt.Println("value is", v.Value())
 
@@ -33,7 +33,7 @@ func ExampleBool_default() {
 		WithDefault(true).
 		Required()
 
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	fmt.Println("value is", v.Value())
 
@@ -49,7 +49,7 @@ func ExampleBool_optional() {
 		Bool("FERRITE_BOOL", "example boolean variable").
 		Optional()
 
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	if x, ok := v.Value(); ok {
 		fmt.Println("value is", x)
@@ -71,7 +71,7 @@ func ExampleBool_customLiterals() {
 		Required()
 
 	os.Setenv("FERRITE_BOOL", "yes")
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	fmt.Println("value is", v.Value())
 

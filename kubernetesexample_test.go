@@ -17,7 +17,7 @@ func ExampleKubernetesService_required() {
 
 	os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
 	os.Setenv("FERRITE_SVC_SERVICE_PORT", "12345")
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	fmt.Println("value is", v.Value())
 
@@ -34,7 +34,7 @@ func ExampleKubernetesService_default() {
 		WithDefault("host.example.org", "12345").
 		Required()
 
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	fmt.Println("value is", v.Value())
 
@@ -50,7 +50,7 @@ func ExampleKubernetesService_optional() {
 		KubernetesService("ferrite-svc").
 		Optional()
 
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	if x, ok := v.Value(); ok {
 		fmt.Println("value is", x)
@@ -73,7 +73,7 @@ func ExampleKubernetesService_namedPort() {
 
 	os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
 	os.Setenv("FERRITE_SVC_SERVICE_PORT_API", "12345") // note _API suffix
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	fmt.Println("value is", v.Value())
 

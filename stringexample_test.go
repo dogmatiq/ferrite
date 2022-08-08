@@ -16,7 +16,7 @@ func ExampleString_required() {
 		Required()
 
 	os.Setenv("FERRITE_STRING", "<value>")
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	fmt.Println("value is", v.Value())
 
@@ -33,7 +33,7 @@ func ExampleString_default() {
 		WithDefault("<default>").
 		Required()
 
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	fmt.Println("value is", v.Value())
 
@@ -49,7 +49,7 @@ func ExampleString_optional() {
 		String("FERRITE_STRING", "example string variable").
 		Optional()
 
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	if x, ok := v.Value(); ok {
 		fmt.Println("value is", x)

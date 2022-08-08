@@ -3,6 +3,8 @@ package spec
 import (
 	"fmt"
 	"sync"
+
+	"golang.org/x/exp/slices"
 )
 
 var registry sync.Map // map[string]Resolver
@@ -29,4 +31,26 @@ func RangeRegistry(fn func(Resolver) bool) {
 	registry.Range(func(_, r any) bool {
 		return fn(r.(Resolver))
 	})
+}
+
+// SortedResolvers returns all resolves in the registry, sorted by environment
+// variable name.
+func SortedResolvers() []Resolver {
+	var resolvers []Resolver
+
+	RangeRegistry(
+		func(r Resolver) bool {
+			resolvers = append(resolvers, r)
+			return true
+		},
+	)
+
+	slices.SortFunc(
+		resolvers,
+		func(a, b Resolver) bool {
+			return a.Spec().Name < b.Spec().Name
+		},
+	)
+
+	return resolvers
 }

@@ -17,7 +17,7 @@ func ExampleDuration_required() {
 		Required()
 
 	os.Setenv("FERRITE_DURATION", "630s")
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	fmt.Println("value is", v.Value())
 
@@ -34,7 +34,7 @@ func ExampleDuration_default() {
 		WithDefault(630 * time.Second).
 		Required()
 
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	fmt.Println("value is", v.Value())
 
@@ -50,7 +50,7 @@ func ExampleDuration_optional() {
 		Duration("FERRITE_DURATION", "example duration variable").
 		Optional()
 
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	if x, ok := v.Value(); ok {
 		fmt.Println("value is", x)

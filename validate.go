@@ -3,55 +3,20 @@ package ferrite
 import (
 	"errors"
 	"fmt"
-	"io"
-	"os"
 	"strings"
 
 	"github.com/dogmatiq/ferrite/internal/table"
 	"github.com/dogmatiq/ferrite/spec"
-	"golang.org/x/exp/slices"
-)
-
-// ValidateEnvironment validates all environment variables.
-func ValidateEnvironment() {
-	if result, ok := validate(); !ok {
-		io.WriteString(output, result)
-		exit(1)
-	}
-}
-
-var (
-	// output is the writer to which the validation result is written.
-	output io.Writer = os.Stderr
-
-	// exit is called to exit the process when validation fails.
-	exit = os.Exit
 )
 
 // validate parses and validates all environment variables.
 func validate() (string, bool) {
-	var resolvers []spec.Resolver
-
-	spec.RangeRegistry(
-		func(r spec.Resolver) bool {
-			resolvers = append(resolvers, r)
-			return true
-		},
-	)
-
-	slices.SortFunc(
-		resolvers,
-		func(a, b spec.Resolver) bool {
-			return a.Spec().Name < b.Spec().Name
-		},
-	)
-
 	var (
 		t  table.Table
 		ok = true
 	)
 
-	for _, r := range resolvers {
+	for _, r := range spec.SortedResolvers() {
 		s := r.Spec()
 		v, err := r.Resolve()
 

@@ -17,7 +17,7 @@ func ExampleEnum_required() {
 		Required()
 
 	os.Setenv("FERRITE_ENUM", "red")
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	fmt.Println("value is", v.Value())
 
@@ -35,7 +35,7 @@ func ExampleEnum_default() {
 		WithDefault("green").
 		Required()
 
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	fmt.Println("value is", v.Value())
 
@@ -52,7 +52,7 @@ func ExampleEnum_optional() {
 		WithMembers("red", "green", "blue").
 		Optional()
 
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 	if x, ok := v.Value(); ok {
 		fmt.Println("value is", x)
 	} else {

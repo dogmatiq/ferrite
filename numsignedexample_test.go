@@ -16,7 +16,7 @@ func ExampleSigned_required() {
 		Required()
 
 	os.Setenv("FERRITE_SIGNED", "-123")
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	fmt.Println("value is", v.Value())
 
@@ -33,7 +33,7 @@ func ExampleSigned_default() {
 		WithDefault(-123).
 		Required()
 
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	fmt.Println("value is", v.Value())
 
@@ -49,7 +49,7 @@ func ExampleSigned_optional() {
 		Signed[int]("FERRITE_SIGNED", "example signed integer variable").
 		Optional()
 
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	if x, ok := v.Value(); ok {
 		fmt.Println("value is", x)

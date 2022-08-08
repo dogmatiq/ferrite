@@ -7,55 +7,68 @@ import (
 	"github.com/dogmatiq/ferrite"
 )
 
-func ExampleValidateEnvironment_undefined() {
+func ExampleInit_validation() {
 	setUp()
 	defer tearDown()
 
+	os.Setenv("FERRITE_BOOL", "true")
 	ferrite.
 		Bool("FERRITE_BOOL", "example bool").
 		Required()
 
+	os.Setenv("FERRITE_DURATION", "3h20m")
 	ferrite.
 		Duration("FERRITE_DURATION", "example duration").
 		Required()
 
+	os.Setenv("FERRITE_ENUM", "foo")
 	ferrite.
 		Enum("FERRITE_ENUM", "example enum").
 		WithMembers("foo", "bar").
 		Required()
 
+	os.Setenv("FERRITE_NUM_SIGNED", "-123")
 	ferrite.
 		Signed[int16]("FERRITE_NUM_SIGNED", "example signed integer").
 		Required()
 
+	os.Setenv("FERRITE_NUM_UNSIGNED", "456")
 	ferrite.
 		Unsigned[uint16]("FERRITE_NUM_UNSIGNED", "example unsigned integer").
 		Required()
 
+	os.Setenv("FERRITE_STRING", "hello, world!")
 	ferrite.
 		String("FERRITE_STRING", "example string").
 		Required()
 
+	os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
+	os.Setenv("FERRITE_SVC_SERVICE_PORT", "443")
 	ferrite.
 		KubernetesService("ferrite-svc").
 		Required()
 
-	ferrite.ValidateEnvironment()
+	ferrite.
+		String("FERRITE_XTRIGGER", "trigger failure").
+		Required()
+
+	ferrite.Init()
 
 	// Output:
 	// Environment Variables:
 	//
-	//  ❯ FERRITE_BOOL              example bool                      true | false             ✗ undefined
-	//  ❯ FERRITE_DURATION          example duration                  1ns ...                  ✗ undefined
-	//  ❯ FERRITE_ENUM              example enum                      foo | bar                ✗ undefined
-	//  ❯ FERRITE_NUM_SIGNED        example signed integer            -32768 .. +32767         ✗ undefined
-	//  ❯ FERRITE_NUM_UNSIGNED      example unsigned integer          0 .. 65535               ✗ undefined
-	//  ❯ FERRITE_STRING            example string                    <string>                 ✗ undefined
-	//  ❯ FERRITE_SVC_SERVICE_HOST  k8s "ferrite-svc" service host    <string>                 ✗ undefined
-	//  ❯ FERRITE_SVC_SERVICE_PORT  k8s "ferrite-svc" service port    <string> | 1 .. 65535    ✗ undefined
+	//    FERRITE_BOOL              example bool                      true | false             ✓ set to true
+	//    FERRITE_DURATION          example duration                  1ns ...                  ✓ set to 3h20m
+	//    FERRITE_ENUM              example enum                      foo | bar                ✓ set to foo
+	//    FERRITE_NUM_SIGNED        example signed integer            -32768 .. +32767         ✓ set to -123
+	//    FERRITE_NUM_UNSIGNED      example unsigned integer          0 .. 65535               ✓ set to 456
+	//    FERRITE_STRING            example string                    <string>                 ✓ set to 'hello, world!'
+	//    FERRITE_SVC_SERVICE_HOST  k8s "ferrite-svc" service host    <string>                 ✓ set to host.example.org
+	//    FERRITE_SVC_SERVICE_PORT  k8s "ferrite-svc" service port    <string> | 1 .. 65535    ✓ set to 443
+	//  ❯ FERRITE_XTRIGGER          trigger failure                   <string>                 ✗ undefined
 }
 
-func ExampleValidateEnvironment_defaultValues() {
+func ExampleInit_validationWithDefaultValues() {
 	setUp()
 	defer tearDown()
 
@@ -99,7 +112,7 @@ func ExampleValidateEnvironment_defaultValues() {
 		String("FERRITE_XTRIGGER", "trigger failure").
 		Required()
 
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	// Output:
 	// Environment Variables:
@@ -115,7 +128,7 @@ func ExampleValidateEnvironment_defaultValues() {
 	//  ❯ FERRITE_XTRIGGER          trigger failure                   <string>                       ✗ undefined
 }
 
-func ExampleValidateEnvironment_optional() {
+func ExampleInit_validationWithOptionalValues() {
 	setUp()
 	defer tearDown()
 
@@ -152,7 +165,7 @@ func ExampleValidateEnvironment_optional() {
 		String("FERRITE_XTRIGGER", "trigger failure").
 		Required()
 
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	// Output:
 	// Environment Variables:
@@ -168,7 +181,7 @@ func ExampleValidateEnvironment_optional() {
 	//  ❯ FERRITE_XTRIGGER          trigger failure                   <string>                 ✗ undefined
 }
 
-func ExampleValidateEnvironment_invalid() {
+func ExampleInit_validationWithInvalidValues() {
 	setUp()
 	defer tearDown()
 
@@ -209,7 +222,7 @@ func ExampleValidateEnvironment_invalid() {
 		KubernetesService("ferrite-svc").
 		Required()
 
-	ferrite.ValidateEnvironment()
+	ferrite.Init()
 
 	// Output:
 	// Environment Variables:

@@ -5,8 +5,8 @@ package ferrite
 
 import "io"
 
-// SetExitBehavior sets the behavior of the ValidateEnvironment() function when
-// the environment is invalid.
+// SetExitBehavior sets the behavior of the Init() function when it wants to
+// exit the process.
 //
 // w is the writer to which the validation result is written. fn is a function
 // that is called with the process's exit code.
