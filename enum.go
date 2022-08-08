@@ -118,13 +118,13 @@ func (b *EnumBuilder[T]) spec() spec.Spec {
 
 	if v, ok := b.def.Get(); ok {
 		s.HasDefault = true
-		s.DefaultX = b.render(v)
+		s.Default = b.render(v)
 
-		if !slices.Contains(literals, s.DefaultX) {
+		if !slices.Contains(literals, s.Default) {
 			panic(fmt.Sprintf(
 				"specification for %s is invalid: the default value must be one of the enum members, got %s",
 				b.name,
-				spec.Escape(s.DefaultX),
+				spec.Escape(s.Default),
 			))
 		}
 	}

@@ -52,7 +52,7 @@ func renderSchema(s spec.Spec) string {
 		return fmt.Sprintf(
 			"[ %s ] = %s",
 			renderer.Output.String(),
-			spec.Escape(s.DefaultX),
+			spec.Escape(s.Default),
 		)
 	}
 

@@ -89,7 +89,7 @@ func (b BoolBuilder[T]) spec() spec.Spec {
 
 	if v, ok := b.def.Get(); ok {
 		s.HasDefault = true
-		s.DefaultX = b.render(v)
+		s.Default = b.render(v)
 	}
 
 	return s

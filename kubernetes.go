@@ -208,7 +208,7 @@ func (b KubernetesServiceBuilder) hostSpec() spec.Spec {
 
 	if v, ok := b.def.Get(); ok {
 		s.HasDefault = true
-		s.DefaultX = v.Host
+		s.Default = v.Host
 	}
 
 	return s
@@ -232,7 +232,7 @@ func (b KubernetesServiceBuilder) portSpec() spec.Spec {
 
 	if v, ok := b.def.Get(); ok {
 		s.HasDefault = true
-		s.DefaultX = v.Port
+		s.Default = v.Port
 	}
 
 	return s

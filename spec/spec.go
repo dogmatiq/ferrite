@@ -17,7 +17,7 @@ type Spec struct {
 	HasDefault bool
 
 	// Default is the environment variable's default value.
-	DefaultX string
+	Default string
 
 	// Schema describes the valid values of the environment variable.
 	Schema Schema

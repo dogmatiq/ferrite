@@ -63,7 +63,7 @@ func (b StringBuilder[T]) spec() spec.Spec {
 
 	if v, ok := b.def.Get(); ok {
 		s.HasDefault = true
-		s.DefaultX = string(v)
+		s.Default = string(v)
 	}
 
 	return s

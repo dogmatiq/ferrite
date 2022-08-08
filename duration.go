@@ -59,7 +59,7 @@ func (b DurationBuilder) spec() spec.Spec {
 
 	if v, ok := b.def.Get(); ok {
 		s.HasDefault = true
-		s.DefaultX = v.String()
+		s.Default = v.String()
 	}
 
 	return s
