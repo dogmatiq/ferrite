@@ -129,12 +129,12 @@ func (b KubernetesServiceBuilder) Required() Required[KubernetesAddress] {
 
 	return Required[KubernetesAddress]{
 		func() (KubernetesAddress, error) {
-			host, err := hostRes.Resolve()
+			host, err := hostRes.ResolveTyped()
 			if err != nil {
 				return KubernetesAddress{}, err
 			}
 
-			port, err := portRes.Resolve()
+			port, err := portRes.ResolveTyped()
 			if err != nil {
 				return KubernetesAddress{}, err
 			}
@@ -161,8 +161,8 @@ func (b KubernetesServiceBuilder) Optional() Optional[KubernetesAddress] {
 
 	return Optional[KubernetesAddress]{
 		func() (KubernetesAddress, error) {
-			host, hostErr := hostRes.Resolve()
-			port, portErr := portRes.Resolve()
+			host, hostErr := hostRes.ResolveTyped()
+			port, portErr := portRes.ResolveTyped()
 
 			if hostErr != nil {
 				if portErr == nil {
@@ -235,15 +235,15 @@ func (b KubernetesServiceBuilder) portSpec() spec.Spec {
 	return s
 }
 
-func (b KubernetesServiceBuilder) resolveHost() (spec.Value[string], error) {
+func (b KubernetesServiceBuilder) resolveHost() (spec.ValueOf[string], error) {
 	env := os.Getenv(b.hostVar)
 
 	if env == "" {
 		if v, ok := b.def.Get(); ok {
-			return spec.Value[string]{
-				Go:        v.Host,
-				Env:       v.Host,
-				IsDefault: true,
+			return spec.ValueOf[string]{
+				Go:    v.Host,
+				Env:   v.Host,
+				IsDef: true,
 			}, nil
 		}
 
@@ -254,21 +254,21 @@ func (b KubernetesServiceBuilder) resolveHost() (spec.Value[string], error) {
 		return invalid[string](b.hostVar, env, "%w", err)
 	}
 
-	return spec.Value[string]{
+	return spec.ValueOf[string]{
 		Go:  env,
 		Env: env,
 	}, nil
 }
 
-func (b KubernetesServiceBuilder) resolvePort() (spec.Value[string], error) {
+func (b KubernetesServiceBuilder) resolvePort() (spec.ValueOf[string], error) {
 	env := os.Getenv(b.portVar)
 
 	if env == "" {
 		if v, ok := b.def.Get(); ok {
-			return spec.Value[string]{
-				Go:        v.Port,
-				Env:       v.Port,
-				IsDefault: true,
+			return spec.ValueOf[string]{
+				Go:    v.Port,
+				Env:   v.Port,
+				IsDef: true,
 			}, nil
 		}
 
@@ -279,7 +279,7 @@ func (b KubernetesServiceBuilder) resolvePort() (spec.Value[string], error) {
 		return invalid[string](b.portVar, env, "%w", err)
 	}
 
-	return spec.Value[string]{
+	return spec.ValueOf[string]{
 		Go:  env,
 		Env: env,
 	}, nil

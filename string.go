@@ -70,22 +70,22 @@ func (b StringBuilder[T]) spec() spec.Spec {
 	return s
 }
 
-func (b StringBuilder[T]) resolve() (spec.Value[T], error) {
+func (b StringBuilder[T]) resolve() (spec.ValueOf[T], error) {
 	env := os.Getenv(b.name)
 
 	if env == "" {
 		if v, ok := b.def.Get(); ok {
-			return spec.Value[T]{
-				Go:        v,
-				Env:       string(v),
-				IsDefault: true,
+			return spec.ValueOf[T]{
+				Go:    v,
+				Env:   string(v),
+				IsDef: true,
 			}, nil
 		}
 
-		return spec.Value[T]{}, UndefinedError{Name: b.name}
+		return spec.ValueOf[T]{}, UndefinedError{Name: b.name}
 	}
 
-	return spec.Value[T]{
+	return spec.ValueOf[T]{
 		Go:  T(env),
 		Env: env,
 	}, nil

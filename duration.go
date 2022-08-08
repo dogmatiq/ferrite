@@ -65,29 +65,29 @@ func (b DurationBuilder) spec() spec.Spec {
 	return s
 }
 
-func (b DurationBuilder) resolve() (spec.Value[time.Duration], error) {
+func (b DurationBuilder) resolve() (spec.ValueOf[time.Duration], error) {
 	env := os.Getenv(b.name)
 
 	if env == "" {
 		if v, ok := b.def.Get(); ok {
-			return spec.Value[time.Duration]{
-				Go:        v,
-				Env:       v.String(),
-				IsDefault: true,
+			return spec.ValueOf[time.Duration]{
+				Go:    v,
+				Env:   v.String(),
+				IsDef: true,
 			}, nil
 		}
 
-		return spec.Value[time.Duration]{}, UndefinedError{Name: b.name}
+		return spec.ValueOf[time.Duration]{}, UndefinedError{Name: b.name}
 	}
 
 	v, err := time.ParseDuration(env)
 	if err != nil {
-		return spec.Value[time.Duration]{}, fmt.Errorf("%s is invalid: %w", b.name, err)
+		return spec.ValueOf[time.Duration]{}, fmt.Errorf("%s is invalid: %w", b.name, err)
 	}
 
 	min := time.Nanosecond
 	if v < min {
-		return spec.Value[time.Duration]{}, fmt.Errorf(
+		return spec.ValueOf[time.Duration]{}, fmt.Errorf(
 			"%s must be %s or greater, got %s",
 			b.name,
 			min,
@@ -95,7 +95,7 @@ func (b DurationBuilder) resolve() (spec.Value[time.Duration], error) {
 		)
 	}
 
-	return spec.Value[time.Duration]{
+	return spec.ValueOf[time.Duration]{
 		Go:  v,
 		Env: env,
 	}, nil

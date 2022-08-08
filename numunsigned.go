@@ -70,25 +70,25 @@ func (b UnsignedBuilder[T]) spec() spec.Spec {
 	return s
 }
 
-func (b UnsignedBuilder[T]) resolve() (spec.Value[T], error) {
+func (b UnsignedBuilder[T]) resolve() (spec.ValueOf[T], error) {
 	env := os.Getenv(b.name)
 
 	if env == "" {
 		if v, ok := b.def.Get(); ok {
-			return spec.Value[T]{
-				Go:        v,
-				Env:       b.render(v),
-				IsDefault: true,
+			return spec.ValueOf[T]{
+				Go:    v,
+				Env:   b.render(v),
+				IsDef: true,
 			}, nil
 		}
 
-		return spec.Value[T]{}, UndefinedError{Name: b.name}
+		return spec.ValueOf[T]{}, UndefinedError{Name: b.name}
 	}
 
 	n, err := strconv.ParseUint(env, 10, bitSize[T]())
 	v := T(n)
 	if err != nil || v < b.min || v > b.max {
-		return spec.Value[T]{}, fmt.Errorf(
+		return spec.ValueOf[T]{}, fmt.Errorf(
 			"%s must be an integer between %s and %s",
 			b.name,
 			b.render(b.min),
@@ -96,7 +96,7 @@ func (b UnsignedBuilder[T]) resolve() (spec.Value[T], error) {
 		)
 	}
 
-	return spec.Value[T]{
+	return spec.ValueOf[T]{
 		Go:  v,
 		Env: env,
 	}, nil

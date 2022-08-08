@@ -48,8 +48,8 @@ func (e ValidationError) Error() string {
 // undefined returns a new UndefinedError.
 func undefined[T any](
 	name string,
-) (spec.Value[T], error) {
-	return spec.Value[T]{}, UndefinedError{
+) (spec.ValueOf[T], error) {
+	return spec.ValueOf[T]{}, UndefinedError{
 		Name: name,
 	}
 }
@@ -59,8 +59,8 @@ func invalid[T any](
 	name string,
 	value string,
 	f string, v ...any,
-) (spec.Value[T], error) {
-	return spec.Value[T]{}, ValidationError{
+) (spec.ValueOf[T], error) {
+	return spec.ValueOf[T]{}, ValidationError{
 		Name:  name,
 		Value: value,
 		Cause: fmt.Errorf(f, v...),

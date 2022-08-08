@@ -96,27 +96,27 @@ func (b BoolBuilder[T]) spec() spec.Spec {
 	return s
 }
 
-func (b BoolBuilder[T]) resolve() (spec.Value[T], error) {
+func (b BoolBuilder[T]) resolve() (spec.ValueOf[T], error) {
 	switch env := os.Getenv(b.name); env {
 	case b.t, b.f:
-		return spec.Value[T]{
+		return spec.ValueOf[T]{
 			Go:  env == b.t,
 			Env: env,
 		}, nil
 
 	case "":
 		if v, ok := b.def.Get(); ok {
-			return spec.Value[T]{
-				Go:        v,
-				Env:       b.render(v),
-				IsDefault: true,
+			return spec.ValueOf[T]{
+				Go:    v,
+				Env:   b.render(v),
+				IsDef: true,
 			}, nil
 		}
 
-		return spec.Value[T]{}, UndefinedError{Name: b.name}
+		return spec.ValueOf[T]{}, UndefinedError{Name: b.name}
 
 	default:
-		return spec.Value[T]{}, fmt.Errorf(
+		return spec.ValueOf[T]{}, fmt.Errorf(
 			`%s must be either "%s" or "%s", got "%s"`,
 			b.name,
 			b.t,

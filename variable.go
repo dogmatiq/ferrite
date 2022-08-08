@@ -57,14 +57,14 @@ func (v Required[T]) Value() T {
 
 func registerRequired[T any](
 	s spec.Spec,
-	r func() (spec.Value[T], error),
+	r func() (spec.ValueOf[T], error),
 ) Required[T] {
 	res := spec.NewResolver(s, r)
 	spec.Register(res)
 
 	return Required[T]{
 		func() (T, error) {
-			v, err := res.Resolve()
+			v, err := res.ResolveTyped()
 			return v.Go, err
 		},
 	}
@@ -72,7 +72,7 @@ func registerRequired[T any](
 
 func registerOptional[T any](
 	s spec.Spec,
-	r func() (spec.Value[T], error),
+	r func() (spec.ValueOf[T], error),
 ) Optional[T] {
 	s.Necessity = spec.Optional
 
@@ -81,7 +81,7 @@ func registerOptional[T any](
 
 	return Optional[T]{
 		func() (T, error) {
-			v, err := res.Resolve()
+			v, err := res.ResolveTyped()
 			return v.Go, err
 		},
 	}
