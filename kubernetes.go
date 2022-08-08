@@ -200,7 +200,7 @@ func (b KubernetesServiceBuilder) hostSpec() spec.Spec {
 	s := spec.Spec{
 		Name: b.hostVar,
 		Description: fmt.Sprintf(
-			"%q service host",
+			"k8s %q service host",
 			b.service,
 		),
 		Schema: spec.OfType[string](),
@@ -218,7 +218,7 @@ func (b KubernetesServiceBuilder) portSpec() spec.Spec {
 	s := spec.Spec{
 		Name: b.portVar,
 		Description: fmt.Sprintf(
-			"%q service port",
+			"k8s %q service port",
 			b.service,
 		),
 		Schema: spec.OneOf{

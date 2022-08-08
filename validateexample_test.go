@@ -25,10 +25,6 @@ func ExampleValidateEnvironment_undefined() {
 		Required()
 
 	ferrite.
-		KubernetesService("ferrite-svc").
-		Required()
-
-	ferrite.
 		Signed[int16]("FERRITE_NUM_SIGNED", "example signed integer").
 		Required()
 
@@ -40,19 +36,23 @@ func ExampleValidateEnvironment_undefined() {
 		String("FERRITE_STRING", "example string").
 		Required()
 
+	ferrite.
+		KubernetesService("ferrite-svc").
+		Required()
+
 	ferrite.ValidateEnvironment()
 
 	// Output:
 	// Environment Variables:
 	//
-	//  ❯ FERRITE_BOOL              example bool                  true | false             ✗ undefined
-	//  ❯ FERRITE_DURATION          example duration              1ns ...                  ✗ undefined
-	//  ❯ FERRITE_ENUM              example enum                  foo | bar                ✗ undefined
-	//  ❯ FERRITE_NUM_SIGNED        example signed integer        -32768 .. +32767         ✗ undefined
-	//  ❯ FERRITE_NUM_UNSIGNED      example unsigned integer      0 .. 65535               ✗ undefined
-	//  ❯ FERRITE_STRING            example string                <string>                 ✗ undefined
-	//  ❯ FERRITE_SVC_SERVICE_HOST  "ferrite-svc" service host    <string>                 ✗ undefined
-	//  ❯ FERRITE_SVC_SERVICE_PORT  "ferrite-svc" service port    <string> | 1 .. 65535    ✗ undefined
+	//  ❯ FERRITE_BOOL              example bool                      true | false             ✗ undefined
+	//  ❯ FERRITE_DURATION          example duration                  1ns ...                  ✗ undefined
+	//  ❯ FERRITE_ENUM              example enum                      foo | bar                ✗ undefined
+	//  ❯ FERRITE_NUM_SIGNED        example signed integer            -32768 .. +32767         ✗ undefined
+	//  ❯ FERRITE_NUM_UNSIGNED      example unsigned integer          0 .. 65535               ✗ undefined
+	//  ❯ FERRITE_STRING            example string                    <string>                 ✗ undefined
+	//  ❯ FERRITE_SVC_SERVICE_HOST  k8s "ferrite-svc" service host    <string>                 ✗ undefined
+	//  ❯ FERRITE_SVC_SERVICE_PORT  k8s "ferrite-svc" service port    <string> | 1 .. 65535    ✗ undefined
 }
 
 func ExampleValidateEnvironment_defaultValues() {
@@ -76,11 +76,6 @@ func ExampleValidateEnvironment_defaultValues() {
 		Required()
 
 	ferrite.
-		KubernetesService("ferrite-svc").
-		WithDefault("host.example.org", "443").
-		Optional()
-
-	ferrite.
 		Signed[int16]("FERRITE_NUM_SIGNED", "example signed integer").
 		WithDefault(-123).
 		Required()
@@ -96,6 +91,11 @@ func ExampleValidateEnvironment_defaultValues() {
 		Required()
 
 	ferrite.
+		KubernetesService("ferrite-svc").
+		WithDefault("host.example.org", "443").
+		Optional()
+
+	ferrite.
 		String("FERRITE_XTRIGGER", "trigger failure").
 		Required()
 
@@ -104,15 +104,15 @@ func ExampleValidateEnvironment_defaultValues() {
 	// Output:
 	// Environment Variables:
 	//
-	//    FERRITE_BOOL              example bool                [ true | false ] = true          ✓ using default value
-	//    FERRITE_DURATION          example duration            [ 1ns ... ] = 10s                ✓ using default value
-	//    FERRITE_ENUM              example enum                [ foo | bar ] = bar              ✓ using default value
-	//    FERRITE_NUM_SIGNED        example signed integer      [ -32768 .. +32767 ] = -123      ✓ using default value
-	//    FERRITE_NUM_UNSIGNED      example unsigned integer    [ 0 .. 65535 ] = 123             ✓ using default value
-	//    FERRITE_STRING            example string              [ <string> ] = 'hello, world!'   ✓ using default value
-	//    FERRITE_SVC_SERVICE_HOST  "ferrite-svc" service host  [ <string> ] = host.example.org  ✓ using default value
-	//    FERRITE_SVC_SERVICE_PORT  "ferrite-svc" service port  [ <string> | 1 .. 65535 ] = 443  ✓ using default value
-	//  ❯ FERRITE_XTRIGGER          trigger failure               <string>                       ✗ undefined
+	//    FERRITE_BOOL              example bool                    [ true | false ] = true          ✓ using default value
+	//    FERRITE_DURATION          example duration                [ 1ns ... ] = 10s                ✓ using default value
+	//    FERRITE_ENUM              example enum                    [ foo | bar ] = bar              ✓ using default value
+	//    FERRITE_NUM_SIGNED        example signed integer          [ -32768 .. +32767 ] = -123      ✓ using default value
+	//    FERRITE_NUM_UNSIGNED      example unsigned integer        [ 0 .. 65535 ] = 123             ✓ using default value
+	//    FERRITE_STRING            example string                  [ <string> ] = 'hello, world!'   ✓ using default value
+	//    FERRITE_SVC_SERVICE_HOST  k8s "ferrite-svc" service host  [ <string> ] = host.example.org  ✓ using default value
+	//    FERRITE_SVC_SERVICE_PORT  k8s "ferrite-svc" service port  [ <string> | 1 .. 65535 ] = 443  ✓ using default value
+	//  ❯ FERRITE_XTRIGGER          trigger failure                   <string>                       ✗ undefined
 }
 
 func ExampleValidateEnvironment_optional() {
@@ -133,10 +133,6 @@ func ExampleValidateEnvironment_optional() {
 		Optional()
 
 	ferrite.
-		KubernetesService("ferrite-svc").
-		Optional()
-
-	ferrite.
 		Signed[int16]("FERRITE_NUM_SIGNED", "example signed integer").
 		Optional()
 
@@ -149,6 +145,10 @@ func ExampleValidateEnvironment_optional() {
 		Optional()
 
 	ferrite.
+		KubernetesService("ferrite-svc").
+		Optional()
+
+	ferrite.
 		String("FERRITE_XTRIGGER", "trigger failure").
 		Required()
 
@@ -157,15 +157,15 @@ func ExampleValidateEnvironment_optional() {
 	// Output:
 	// Environment Variables:
 	//
-	//    FERRITE_BOOL              example bool                [ true | false ]           • undefined
-	//    FERRITE_DURATION          example duration            [ 1ns ... ]                • undefined
-	//    FERRITE_ENUM              example enum                [ foo | bar ]              • undefined
-	//    FERRITE_NUM_SIGNED        example signed integer      [ -32768 .. +32767 ]       • undefined
-	//    FERRITE_NUM_UNSIGNED      example unsigned integer    [ 0 .. 65535 ]             • undefined
-	//    FERRITE_STRING            example string              [ <string> ]               • undefined
-	//    FERRITE_SVC_SERVICE_HOST  "ferrite-svc" service host  [ <string> ]               • undefined
-	//    FERRITE_SVC_SERVICE_PORT  "ferrite-svc" service port  [ <string> | 1 .. 65535 ]  • undefined
-	//  ❯ FERRITE_XTRIGGER          trigger failure               <string>                 ✗ undefined
+	//    FERRITE_BOOL              example bool                    [ true | false ]           • undefined
+	//    FERRITE_DURATION          example duration                [ 1ns ... ]                • undefined
+	//    FERRITE_ENUM              example enum                    [ foo | bar ]              • undefined
+	//    FERRITE_NUM_SIGNED        example signed integer          [ -32768 .. +32767 ]       • undefined
+	//    FERRITE_NUM_UNSIGNED      example unsigned integer        [ 0 .. 65535 ]             • undefined
+	//    FERRITE_STRING            example string                  [ <string> ]               • undefined
+	//    FERRITE_SVC_SERVICE_HOST  k8s "ferrite-svc" service host  [ <string> ]               • undefined
+	//    FERRITE_SVC_SERVICE_PORT  k8s "ferrite-svc" service port  [ <string> | 1 .. 65535 ]  • undefined
+	//  ❯ FERRITE_XTRIGGER          trigger failure                   <string>                 ✗ undefined
 }
 
 func ExampleValidateEnvironment_invalid() {
@@ -214,12 +214,12 @@ func ExampleValidateEnvironment_invalid() {
 	// Output:
 	// Environment Variables:
 	//
-	//  ❯ FERRITE_BOOL              example bool                  true | false             ✗ set to yes, must be either true or false
-	//  ❯ FERRITE_DURATION          example duration              1ns ...                  ✗ set to -+10s, must be a valid duration, e.g. 10m30s
-	//  ❯ FERRITE_ENUM              example enum                  foo | bar                ✗ set to baz, must be one of the enum members
-	//  ❯ FERRITE_NUM_SIGNED        example signed integer        -32768 .. +32767         ✗ set to 123.3, must be an integer between -32768 and +32767
-	//  ❯ FERRITE_NUM_UNSIGNED      example unsigned integer      0 .. 65535               ✗ set to -123, must be an integer between 0 and 65535
-	//  ❯ FERRITE_STRING            example string                <string>                 ✗ undefined
-	//  ❯ FERRITE_SVC_SERVICE_HOST  "ferrite-svc" service host    <string>                 ✗ set to .local, host must not begin or end with a dot
-	//  ❯ FERRITE_SVC_SERVICE_PORT  "ferrite-svc" service port    <string> | 1 .. 65535    ✗ set to https-, IANA service name must not begin or end with a hyphen
+	//  ❯ FERRITE_BOOL              example bool                      true | false             ✗ set to yes, must be either true or false
+	//  ❯ FERRITE_DURATION          example duration                  1ns ...                  ✗ set to -+10s, must be a valid duration, e.g. 10m30s
+	//  ❯ FERRITE_ENUM              example enum                      foo | bar                ✗ set to baz, must be one of the enum members
+	//  ❯ FERRITE_NUM_SIGNED        example signed integer            -32768 .. +32767         ✗ set to 123.3, must be an integer between -32768 and +32767
+	//  ❯ FERRITE_NUM_UNSIGNED      example unsigned integer          0 .. 65535               ✗ set to -123, must be an integer between 0 and 65535
+	//  ❯ FERRITE_STRING            example string                    <string>                 ✗ undefined
+	//  ❯ FERRITE_SVC_SERVICE_HOST  k8s "ferrite-svc" service host    <string>                 ✗ set to .local, host must not begin or end with a dot
+	//  ❯ FERRITE_SVC_SERVICE_PORT  k8s "ferrite-svc" service port    <string> | 1 .. 65535    ✗ set to https-, IANA service name must not begin or end with a hyphen
 }
