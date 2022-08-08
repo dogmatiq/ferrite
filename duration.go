@@ -1,7 +1,6 @@
 package ferrite
 
 import (
-	"fmt"
 	"os"
 	"time"
 
@@ -82,16 +81,21 @@ func (b DurationBuilder) resolve() (spec.ValueOf[time.Duration], error) {
 
 	v, err := time.ParseDuration(env)
 	if err != nil {
-		return spec.ValueOf[time.Duration]{}, fmt.Errorf("%s is invalid: %w", b.name, err)
+		return spec.Invalid[time.Duration](
+			b.name,
+			env,
+			"%w",
+			err,
+		)
 	}
 
 	min := time.Nanosecond
 	if v < min {
-		return spec.ValueOf[time.Duration]{}, fmt.Errorf(
-			"%s must be %s or greater, got %s",
+		return spec.Invalid[time.Duration](
 			b.name,
+			v.String(),
+			"must be %s or greater",
 			min,
-			v,
 		)
 	}
 

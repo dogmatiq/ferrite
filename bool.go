@@ -116,12 +116,12 @@ func (b BoolBuilder[T]) resolve() (spec.ValueOf[T], error) {
 		return spec.Undefined[T](b.name)
 
 	default:
-		return spec.ValueOf[T]{}, fmt.Errorf(
-			`%s must be either "%s" or "%s", got "%s"`,
+		return spec.Invalid[T](
 			b.name,
+			env,
+			`must be either "%s" or "%s"`,
 			b.t,
 			b.f,
-			env,
 		)
 	}
 }

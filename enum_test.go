@@ -72,7 +72,7 @@ var _ = Describe("type EnumSpec", func() {
 							Required().
 							Value()
 					}).To(PanicWith(
-						`FERRITE_ENUM must be one of one of the enum members, got "<non-member>"`,
+						`FERRITE_ENUM ("<non-member>") is invalid: must be one of the enum members (e.g. "<member-0>")`,
 					))
 				})
 			})
@@ -142,7 +142,7 @@ var _ = Describe("type EnumSpec", func() {
 							Optional().
 							Value()
 					}).To(PanicWith(
-						`FERRITE_ENUM must be one of one of the enum members, got "<non-member>"`,
+						`FERRITE_ENUM ("<non-member>") is invalid: must be one of the enum members (e.g. "<member-0>")`,
 					))
 				})
 			})

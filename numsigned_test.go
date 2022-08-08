@@ -58,22 +58,22 @@ var _ = Describe("type SignedSpec", func() {
 					Entry(
 						"underflow",
 						"-32769",
-						`FERRITE_SIGNED must be an integer between -32768 and +32767`,
+						`FERRITE_SIGNED ("-32769") is invalid: must be an integer between -32768 and +32767`,
 					),
 					Entry(
 						"overflow",
 						"32768",
-						`FERRITE_SIGNED must be an integer between -32768 and +32767`,
+						`FERRITE_SIGNED ("32768") is invalid: must be an integer between -32768 and +32767`,
 					),
 					Entry(
 						"decimal",
 						"123.45",
-						`FERRITE_SIGNED must be an integer between -32768 and +32767`,
+						`FERRITE_SIGNED ("123.45") is invalid: must be an integer between -32768 and +32767`,
 					),
 					Entry(
 						"invalid characters",
 						"123!",
-						`FERRITE_SIGNED must be an integer between -32768 and +32767`,
+						`FERRITE_SIGNED ("123!") is invalid: must be an integer between -32768 and +32767`,
 					),
 				)
 			})
@@ -147,22 +147,22 @@ var _ = Describe("type SignedSpec", func() {
 					Entry(
 						"underflow",
 						"-32769",
-						`FERRITE_SIGNED must be an integer between -32768 and +32767`,
+						`FERRITE_SIGNED ("-32769") is invalid: must be an integer between -32768 and +32767`,
 					),
 					Entry(
 						"overflow",
 						"32768",
-						`FERRITE_SIGNED must be an integer between -32768 and +32767`,
+						`FERRITE_SIGNED ("32768") is invalid: must be an integer between -32768 and +32767`,
 					),
 					Entry(
 						"decimal",
 						"123.45",
-						`FERRITE_SIGNED must be an integer between -32768 and +32767`,
+						`FERRITE_SIGNED ("123.45") is invalid: must be an integer between -32768 and +32767`,
 					),
 					Entry(
 						"invalid characters",
 						"123!",
-						`FERRITE_SIGNED must be an integer between -32768 and +32767`,
+						`FERRITE_SIGNED ("123!") is invalid: must be an integer between -32768 and +32767`,
 					),
 				)
 			})

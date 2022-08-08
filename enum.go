@@ -157,9 +157,10 @@ func (b EnumBuilder[T]) resolve() (spec.ValueOf[T], error) {
 		}
 	}
 
-	return spec.ValueOf[T]{}, fmt.Errorf(
-		"%s must be one of one of the enum members, got %q",
+	return spec.Invalid[T](
 		b.name,
 		env,
+		"must be one of the enum members (e.g. %q)",
+		b.render(b.values[0]),
 	)
 }

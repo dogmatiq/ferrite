@@ -90,9 +90,10 @@ func (b SignedBuilder[T]) resolve() (spec.ValueOf[T], error) {
 	n, err := strconv.ParseInt(env, 10, bitSize[T]())
 	v := T(n)
 	if err != nil || v < b.min || v > b.max {
-		return spec.ValueOf[T]{}, fmt.Errorf(
-			"%s must be an integer between %s and %s",
+		return spec.Invalid[T](
 			b.name,
+			env,
+			"must be an integer between %s and %s",
 			b.render(b.min),
 			b.render(b.max),
 		)

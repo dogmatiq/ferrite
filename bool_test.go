@@ -61,7 +61,7 @@ var _ = Describe("type BoolBuilder", func() {
 							Required().
 							Value()
 					}).To(PanicWith(
-						`FERRITE_BOOL must be either "yes" or "no", got "true"`,
+						`FERRITE_BOOL ("true") is invalid: must be either "yes" or "no"`,
 					))
 				})
 			})
@@ -116,7 +116,7 @@ var _ = Describe("type BoolBuilder", func() {
 							Optional().
 							Value()
 					}).To(PanicWith(
-						`FERRITE_BOOL must be either "yes" or "no", got "true"`,
+						`FERRITE_BOOL ("true") is invalid: must be either "yes" or "no"`,
 					))
 				})
 			})
