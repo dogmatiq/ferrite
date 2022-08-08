@@ -1,3 +1,4 @@
+// Package optional provides a generic optional type.
 package optional
 
 // Optional holds an Optional value of type T.

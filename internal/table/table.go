@@ -1,3 +1,4 @@
+// Package table renders a column-aligned table in plain-text.
 package table
 
 import (
