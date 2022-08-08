@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"unicode/utf8"
 )
 
 // Table renders a column-aligned table.
@@ -19,8 +20,9 @@ func (t *Table) AddRow(columns ...string) {
 	}
 
 	for i, col := range columns {
-		if len(col) > t.widths[i] {
-			t.widths[i] = len(col)
+		n := utf8.RuneCountInString(col)
+		if n > t.widths[i] {
+			t.widths[i] = n
 		}
 	}
 
