@@ -69,13 +69,13 @@ func (b EnumBuilder[T]) WithDefault(v T) EnumBuilder[T] {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b EnumBuilder[T]) Required() Required[T] {
-	return registerRequired(b.spec(), b.resolve)
+	return spec.RegisterRequired(b.spec(), b.resolve)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b EnumBuilder[T]) Optional() Optional[T] {
-	return registerOptional(b.spec(), b.resolve)
+	return spec.RegisterOptional(b.spec(), b.resolve)
 }
 
 func (b *EnumBuilder[T]) spec() spec.Spec {

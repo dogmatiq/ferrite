@@ -68,13 +68,13 @@ func (b BoolBuilder[T]) WithDefault(v T) BoolBuilder[T] {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b BoolBuilder[T]) Required() Required[T] {
-	return registerRequired(b.spec(), b.resolve)
+	return spec.RegisterRequired(b.spec(), b.resolve)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b BoolBuilder[T]) Optional() Optional[T] {
-	return registerOptional(b.spec(), b.resolve)
+	return spec.RegisterOptional(b.spec(), b.resolve)
 }
 
 func (b BoolBuilder[T]) spec() spec.Spec {

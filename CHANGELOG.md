@@ -10,6 +10,12 @@ The format is based on [Keep a Changelog], and this project adheres to
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+## [Unreleased]
+
+### Changed
+
+- `Optional[T]` and `Required[T]` are now interfaces, the methods are unchanged
+
 ## [0.2.0] - 2022-08-08
 
 This is a fairly substantial refactor from the initial prototype, though usage

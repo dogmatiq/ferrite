@@ -127,8 +127,8 @@ func (b KubernetesServiceBuilder) Required() Required[KubernetesAddress] {
 	spec.Register(hostRes)
 	spec.Register(portRes)
 
-	return Required[KubernetesAddress]{
-		func() (KubernetesAddress, error) {
+	return spec.Required[KubernetesAddress]{
+		Resolve: func() (KubernetesAddress, error) {
 			host, err := hostRes.ResolveTyped()
 			if err != nil {
 				return KubernetesAddress{}, err
@@ -159,8 +159,8 @@ func (b KubernetesServiceBuilder) Optional() Optional[KubernetesAddress] {
 	spec.Register(hostRes)
 	spec.Register(portRes)
 
-	return Optional[KubernetesAddress]{
-		func() (KubernetesAddress, error) {
+	return spec.Optional[KubernetesAddress]{
+		Resolve: func() (KubernetesAddress, error) {
 			host, hostErr := hostRes.ResolveTyped()
 			port, portErr := portRes.ResolveTyped()
 

@@ -44,13 +44,13 @@ func (b SignedBuilder[T]) WithDefault(v T) SignedBuilder[T] {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b SignedBuilder[T]) Required() Required[T] {
-	return registerRequired(b.spec(), b.resolve)
+	return spec.RegisterRequired(b.spec(), b.resolve)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b SignedBuilder[T]) Optional() Optional[T] {
-	return registerOptional(b.spec(), b.resolve)
+	return spec.RegisterOptional(b.spec(), b.resolve)
 }
 
 func (b SignedBuilder[T]) spec() spec.Spec {

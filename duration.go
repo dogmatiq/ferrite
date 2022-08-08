@@ -39,13 +39,13 @@ func (b DurationBuilder) WithDefault(v time.Duration) DurationBuilder {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b DurationBuilder) Required() Required[time.Duration] {
-	return registerRequired(b.spec(), b.resolve)
+	return spec.RegisterRequired(b.spec(), b.resolve)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b DurationBuilder) Optional() Optional[time.Duration] {
-	return registerOptional(b.spec(), b.resolve)
+	return spec.RegisterOptional(b.spec(), b.resolve)
 }
 
 func (b DurationBuilder) spec() spec.Spec {
