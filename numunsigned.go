@@ -55,7 +55,6 @@ func (b UnsignedBuilder[T]) spec() spec.Spec {
 	s := spec.Spec{
 		Name:        b.name,
 		Description: b.desc,
-		Necessity:   spec.Required,
 		Schema: spec.Range{
 			Min: b.render(b.min),
 			Max: b.render(b.max),
@@ -63,8 +62,8 @@ func (b UnsignedBuilder[T]) spec() spec.Spec {
 	}
 
 	if v, ok := b.def.Get(); ok {
-		s.Necessity = spec.Defaulted
-		s.Default = b.render(v)
+		s.HasDefault = true
+		s.DefaultX = b.render(v)
 	}
 
 	return s

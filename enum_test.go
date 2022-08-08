@@ -72,7 +72,7 @@ var _ = Describe("type EnumSpec", func() {
 							Required().
 							Value()
 					}).To(PanicWith(
-						`FERRITE_ENUM ("<non-member>") is invalid: must be one of the enum members (e.g. "<member-0>")`,
+						`FERRITE_ENUM ('<non-member>') is invalid: must be one of the enum members`,
 					))
 				})
 			})
@@ -142,7 +142,7 @@ var _ = Describe("type EnumSpec", func() {
 							Optional().
 							Value()
 					}).To(PanicWith(
-						`FERRITE_ENUM ("<non-member>") is invalid: must be one of the enum members (e.g. "<member-0>")`,
+						`FERRITE_ENUM ('<non-member>') is invalid: must be one of the enum members`,
 					))
 				})
 			})
@@ -207,7 +207,7 @@ var _ = Describe("type EnumSpec", func() {
 					WithMembers(member1, member1).
 					Required()
 			}).To(PanicWith(
-				`specification for FERRITE_ENUM is invalid: multiple members use "<member-1>" as their literal representation`,
+				`specification for FERRITE_ENUM is invalid: multiple members use '<member-1>' as their literal representation`,
 			))
 		})
 	})
@@ -231,7 +231,7 @@ var _ = Describe("type EnumSpec", func() {
 					WithDefault(enumMember(100)).
 					Required()
 			}).To(PanicWith(
-				`specification for FERRITE_ENUM is invalid: the default value must be one of the enum members, got "<member-100>"`,
+				`specification for FERRITE_ENUM is invalid: the default value must be one of the enum members, got '<member-100>'`,
 			))
 		})
 	})

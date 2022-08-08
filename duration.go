@@ -1,7 +1,9 @@
 package ferrite
 
 import (
+	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/dogmatiq/ferrite/internal/optional"
@@ -50,15 +52,14 @@ func (b DurationBuilder) spec() spec.Spec {
 	s := spec.Spec{
 		Name:        b.name,
 		Description: b.desc,
-		Necessity:   spec.Required,
 		Schema: spec.Range{
 			Min: time.Nanosecond.String(),
 		},
 	}
 
 	if v, ok := b.def.Get(); ok {
-		s.Necessity = spec.Defaulted
-		s.Default = v.String()
+		s.HasDefault = true
+		s.DefaultX = v.String()
 	}
 
 	return s
@@ -81,11 +82,24 @@ func (b DurationBuilder) resolve() (spec.ValueOf[time.Duration], error) {
 
 	v, err := time.ParseDuration(env)
 	if err != nil {
+		if strings.Contains(err.Error(), "unit") || strings.Contains(err.Error(), "unit") {
+			return spec.Invalid[time.Duration](
+				b.name,
+				env,
+				"%s",
+				strings.Replace(
+					strings.TrimPrefix(err.Error(), "time: "),
+					fmt.Sprintf(` in duration %q`, env),
+					"",
+					1,
+				),
+			)
+		}
+
 		return spec.Invalid[time.Duration](
 			b.name,
 			env,
-			"%w",
-			err,
+			"must be a valid duration, e.g. 10m30s",
 		)
 	}
 

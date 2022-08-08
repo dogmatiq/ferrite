@@ -18,10 +18,3 @@ func SetExitBehavior(w io.Writer, fn func(code int)) {
 	output = w
 	exit = fn
 }
-
-// ClearValidators removes all registered validators.
-func ClearValidators() {
-	specsM.Lock()
-	specs = nil
-	specsM.Unlock()
-}

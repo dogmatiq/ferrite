@@ -81,7 +81,6 @@ func (b BoolBuilder[T]) spec() spec.Spec {
 	s := spec.Spec{
 		Name:        b.name,
 		Description: b.desc,
-		Necessity:   spec.Required,
 		Schema: spec.OneOf{
 			spec.Literal(b.t),
 			spec.Literal(b.f),
@@ -89,8 +88,8 @@ func (b BoolBuilder[T]) spec() spec.Spec {
 	}
 
 	if v, ok := b.def.Get(); ok {
-		s.Necessity = spec.Defaulted
-		s.Default = b.render(v)
+		s.HasDefault = true
+		s.DefaultX = b.render(v)
 	}
 
 	return s
@@ -119,9 +118,9 @@ func (b BoolBuilder[T]) resolve() (spec.ValueOf[T], error) {
 		return spec.Invalid[T](
 			b.name,
 			env,
-			`must be either "%s" or "%s"`,
-			b.t,
-			b.f,
+			`must be either %s or %s`,
+			spec.Escape(b.t),
+			spec.Escape(b.f),
 		)
 	}
 }

@@ -58,13 +58,12 @@ func (b StringBuilder[T]) spec() spec.Spec {
 	s := spec.Spec{
 		Name:        b.name,
 		Description: b.desc,
-		Necessity:   spec.Required,
 		Schema:      spec.OfType[T](),
 	}
 
 	if v, ok := b.def.Get(); ok {
-		s.Necessity = spec.Defaulted
-		s.Default = string(v)
+		s.HasDefault = true
+		s.DefaultX = string(v)
 	}
 
 	return s

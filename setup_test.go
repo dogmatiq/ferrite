@@ -21,7 +21,6 @@ func setUp() {
 // tearDown resets the global state after a test.
 func tearDown() {
 	ferrite.SetExitBehavior(os.Stderr, os.Exit)
-	ferrite.ClearValidators()
 	spec.ResetRegistry()
 
 	for _, env := range os.Environ() {

@@ -150,8 +150,8 @@ func (b KubernetesServiceBuilder) Optional() Optional[KubernetesAddress] {
 	hostSpec := b.hostSpec()
 	portSpec := b.portSpec()
 
-	hostSpec.Necessity = spec.Optional
-	portSpec.Necessity = spec.Optional
+	hostSpec.IsOptional = true
+	portSpec.IsOptional = true
 
 	hostRes := spec.NewResolver(hostSpec, b.resolveHost)
 	portRes := spec.NewResolver(portSpec, b.resolvePort)
@@ -200,16 +200,15 @@ func (b KubernetesServiceBuilder) hostSpec() spec.Spec {
 	s := spec.Spec{
 		Name: b.hostVar,
 		Description: fmt.Sprintf(
-			"hostname or IP address of the %q service",
+			"%q service host",
 			b.service,
 		),
-		Necessity: spec.Required,
-		Schema:    spec.OfType[string](),
+		Schema: spec.OfType[string](),
 	}
 
 	if v, ok := b.def.Get(); ok {
-		s.Necessity = spec.Defaulted
-		s.Default = v.Host
+		s.HasDefault = true
+		s.DefaultX = v.Host
 	}
 
 	return s
@@ -219,10 +218,9 @@ func (b KubernetesServiceBuilder) portSpec() spec.Spec {
 	s := spec.Spec{
 		Name: b.portVar,
 		Description: fmt.Sprintf(
-			"network port of the %q service",
+			"%q service port",
 			b.service,
 		),
-		Necessity: spec.Required,
 		Schema: spec.OneOf{
 			spec.OfType[string](),
 			spec.Range{
@@ -233,8 +231,8 @@ func (b KubernetesServiceBuilder) portSpec() spec.Spec {
 	}
 
 	if v, ok := b.def.Get(); ok {
-		s.Necessity = spec.Defaulted
-		s.Default = v.Port
+		s.HasDefault = true
+		s.DefaultX = v.Port
 	}
 
 	return s

@@ -35,9 +35,9 @@ func (e ValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"%s (%q) is invalid: %s",
+		"%s (%s) is invalid: %s",
 		e.Name,
-		e.Value,
+		Escape(e.Value),
 		e.Cause,
 	)
 }

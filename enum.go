@@ -96,9 +96,9 @@ func (b *EnumBuilder[T]) spec() spec.Spec {
 
 		if slices.Contains(literals, lit) {
 			panic(fmt.Sprintf(
-				"specification for %s is invalid: multiple members use %q as their literal representation",
+				"specification for %s is invalid: multiple members use %s as their literal representation",
 				b.name,
-				lit,
+				spec.Escape(lit),
 			))
 		}
 
@@ -113,19 +113,18 @@ func (b *EnumBuilder[T]) spec() spec.Spec {
 	s := spec.Spec{
 		Name:        b.name,
 		Description: b.desc,
-		Necessity:   spec.Required,
 		Schema:      oneOf,
 	}
 
 	if v, ok := b.def.Get(); ok {
-		s.Necessity = spec.Defaulted
-		s.Default = b.render(v)
+		s.HasDefault = true
+		s.DefaultX = b.render(v)
 
-		if !slices.Contains(literals, s.Default) {
+		if !slices.Contains(literals, s.DefaultX) {
 			panic(fmt.Sprintf(
-				"specification for %s is invalid: the default value must be one of the enum members, got %q",
+				"specification for %s is invalid: the default value must be one of the enum members, got %s",
 				b.name,
-				s.Default,
+				spec.Escape(s.DefaultX),
 			))
 		}
 	}
@@ -160,7 +159,6 @@ func (b EnumBuilder[T]) resolve() (spec.ValueOf[T], error) {
 	return spec.Invalid[T](
 		b.name,
 		env,
-		"must be one of the enum members (e.g. %q)",
-		b.render(b.values[0]),
+		"must be one of the enum members",
 	)
 }

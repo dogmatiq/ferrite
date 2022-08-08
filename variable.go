@@ -69,7 +69,7 @@ func registerOptional[T any](
 	s spec.Spec,
 	r func() (spec.ValueOf[T], error),
 ) Optional[T] {
-	s.Necessity = spec.Optional
+	s.IsOptional = true
 
 	res := spec.NewResolver(s, r)
 	spec.Register(res)
