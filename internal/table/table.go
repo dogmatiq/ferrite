@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"io"
 	"strings"
-	"unicode/utf8"
+
+	"github.com/mattn/go-runewidth"
 )
 
 // Table renders a column-aligned table.
@@ -20,7 +21,7 @@ func (t *Table) AddRow(columns ...string) {
 	}
 
 	for i, col := range columns {
-		n := utf8.RuneCountInString(col)
+		n := runewidth.StringWidth(col)
 		if n > t.widths[i] {
 			t.widths[i] = n
 		}
