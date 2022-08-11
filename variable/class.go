@@ -15,6 +15,6 @@ type ClassVisitor interface {
 type ClassOf[T any] interface {
 	Class
 
-	Marshal(v T) String
-	Unmarshal(n Name, s String) (T, String, ValidationError)
+	Marshal(v T) Literal
+	Unmarshal(n Name, v Literal) (native T, canonical Literal, err ValidationError)
 }

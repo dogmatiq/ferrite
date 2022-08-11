@@ -24,8 +24,8 @@ func BoolAs[T ~bool](name, desc string) BoolBuilder[T] {
 	return BoolBuilder[T]{
 		spec: variable.NewSpec[T](name, desc),
 	}.WithLiterals(
-		fmt.Sprint(T(true)),
-		fmt.Sprint(T(false)),
+		variable.Literal(fmt.Sprint(T(true))),
+		variable.Literal(fmt.Sprint(T(false))),
 	)
 }
 
@@ -38,13 +38,13 @@ type BoolBuilder[T ~bool] struct {
 //
 // The default literals "true" and "false" are no longer valid values when using
 // custom literals.
-func (b BoolBuilder[T]) WithLiterals(t, f string) BoolBuilder[T] {
+func (b BoolBuilder[T]) WithLiterals(t, f variable.Literal) BoolBuilder[T] {
 	set, err := variable.NewSet(
-		func(v T) variable.String {
+		func(v T) variable.Literal {
 			if v {
-				return variable.String(t)
+				return t
 			}
-			return variable.String(f)
+			return f
 		},
 		true,
 		false,

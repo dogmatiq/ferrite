@@ -51,6 +51,6 @@ type Example struct {
 	// Description is a description of the example and/or the value.
 	Description string
 
-	// String is the example value.
-	String String
+	// Literal is the example value.
+	Literal Literal
 }

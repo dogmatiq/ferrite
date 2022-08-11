@@ -38,8 +38,9 @@ func (e SpecError) Error() string {
 type ValidationError interface {
 	Error
 
-	// Verbatim returns the offending value.
-	Verbatim() String
+	// Verbatim returns the offending value exactly as it was specified in the
+	// environment.
+	Verbatim() Literal
 
 	// Reason returns a human-readable explanation of why the value is invalid.
 	Reason() string

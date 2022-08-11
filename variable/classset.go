@@ -8,19 +8,19 @@ import (
 // Set is a class that only allows a specific set of static values.
 type Set interface {
 	// Members returns the members of the set.
-	Members() []String
+	Members() []Literal
 }
 
 // SetOf is a Set containing values of type T.
 type SetOf[T any] struct {
-	ordered   []String
-	marshal   func(T) String
-	unmarshal map[String]T
+	ordered   []Literal
+	marshal   func(T) Literal
+	unmarshal map[Literal]T
 }
 
 // NewSet contains a new set containing the given values.
 func NewSet[T any](
-	marshal func(T) String,
+	marshal func(T) Literal,
 	values ...T,
 ) (SetOf[T], error) {
 	if len(values) == 0 {
@@ -29,24 +29,24 @@ func NewSet[T any](
 
 	c := SetOf[T]{
 		marshal:   marshal,
-		unmarshal: make(map[String]T, len(values)),
+		unmarshal: make(map[Literal]T, len(values)),
 	}
 
 	for _, v := range values {
-		s := marshal(v)
-		if s == "" {
+		lit := marshal(v)
+		if lit == "" {
 			return SetOf[T]{}, errors.New("members must not have empty string representations")
 		}
 
-		c.ordered = append(c.ordered, s)
-		c.unmarshal[s] = v
+		c.ordered = append(c.ordered, lit)
+		c.unmarshal[lit] = v
 	}
 
 	return c, nil
 }
 
 // Members returns the members of the set.
-func (c SetOf[T]) Members() []String {
+func (c SetOf[T]) Members() []Literal {
 	return c.ordered
 }
 
@@ -56,28 +56,28 @@ func (c SetOf[T]) AcceptVisitor(v ClassVisitor) {
 }
 
 // Marshal marshals v to its string representation.
-func (c SetOf[T]) Marshal(v T) String {
-	s := c.marshal(v)
+func (c SetOf[T]) Marshal(v T) Literal {
+	lit := c.marshal(v)
 
-	if _, ok := c.unmarshal[s]; !ok {
-		panic(fmt.Sprintf("cannot marshal non-member (%s)", s))
+	if _, ok := c.unmarshal[lit]; !ok {
+		panic(fmt.Sprintf("cannot marshal non-member (%s)", lit))
 	}
 
-	return s
+	return lit
 }
 
 // Unmarshal unmarshals a string representation of a value.
 //
 // It returns the native value and the canonical string representation.
-func (c SetOf[T]) Unmarshal(n Name, s String) (T, String, ValidationError) {
-	if v, ok := c.unmarshal[s]; ok {
-		return v, s, nil
+func (c SetOf[T]) Unmarshal(n Name, v Literal) (T, Literal, ValidationError) {
+	if n, ok := c.unmarshal[v]; ok {
+		return n, v, nil
 	}
 
 	var zero T
 	return zero, "", SetError{
 		name:     n,
-		verbatim: s,
+		verbatim: v,
 		set:      c,
 	}
 }
@@ -86,7 +86,7 @@ func (c SetOf[T]) Unmarshal(n Name, s String) (T, String, ValidationError) {
 // specific set.
 type SetError struct {
 	name     Name
-	verbatim String
+	verbatim Literal
 	set      Set
 }
 
@@ -96,7 +96,7 @@ func (e SetError) Name() Name {
 }
 
 // Verbatim returns the offending value.
-func (e SetError) Verbatim() String {
+func (e SetError) Verbatim() Literal {
 	return e.verbatim
 }
 

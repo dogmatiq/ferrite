@@ -11,22 +11,22 @@ import (
 // Name is the name of an environment variable.
 type Name string
 
-// String the string representation of a value, as used in the shell.
-type String string
+// Literal the string representation of an environment variable value.
+type Literal string
 
-// needsQuotes is a pattern that matches values that require shell  escaping.
+// needsQuotes is a pattern that matches values that require shell escaping.
 var needsQuotes = regexp.MustCompile(`[^\w@%+=:,./-]`)
 
 // String returns an escaped string representation of the value that can be used
 // directly in the shell.
-func (s String) String() string {
-	raw := string(s)
+func (l Literal) String() string {
+	s := string(l)
 
-	if needsQuotes.MatchString(raw) {
-		return `'` + strings.ReplaceAll(raw, `'`, `'"'"'`) + `'`
+	if needsQuotes.MatchString(s) {
+		return `'` + strings.ReplaceAll(s, `'`, `'"'"'`) + `'`
 	}
 
-	return raw
+	return s
 }
 
 // Variable is an interface for an environment variable.
@@ -41,14 +41,14 @@ type Variable interface {
 	Class() Class
 
 	// Default returns the string representation of the default value.
-	Default() maybe.Value[String]
+	Default() maybe.Value[Literal]
 
 	// Canonical returns the canonical string representation of the variable.
-	Canonical() (maybe.Value[String], ValidationError)
+	Canonical() (maybe.Value[Literal], ValidationError)
 
 	// Verbatim returns the string representation of the variable as it appears
 	// in the environment.
-	Verbatim() String
+	Verbatim() Literal
 
 	// IsOptional returns true if the application can handle the absence of a
 	// value for this variable.
@@ -66,7 +66,7 @@ type TypedVariable[T any] struct {
 
 	once      sync.Once
 	value     maybe.Value[T]
-	canonical maybe.Value[String]
+	canonical maybe.Value[Literal]
 	isDefault bool
 	err       ValidationError
 }
@@ -87,8 +87,8 @@ func (v *TypedVariable[T]) Class() Class {
 }
 
 // Default returns the string representation of the default value.
-func (v *TypedVariable[T]) Default() maybe.Value[String] {
-	return maybe.Map(v.spec.Default, func(def T) String {
+func (v *TypedVariable[T]) Default() maybe.Value[Literal] {
+	return maybe.Map(v.spec.Default, func(def T) Literal {
 		return v.spec.Class.Marshal(def)
 	})
 }
@@ -99,15 +99,15 @@ func (v *TypedVariable[T]) Value() (maybe.Value[T], ValidationError) {
 	return v.value, v.err
 }
 
-// Canonical returns the canonical string representation of the variable.
-func (v *TypedVariable[T]) Canonical() (maybe.Value[String], ValidationError) {
+// Canonical returns the canonicalized literal value.
+func (v *TypedVariable[T]) Canonical() (maybe.Value[Literal], ValidationError) {
 	v.resolve()
 	return v.canonical, v.err
 }
 
-// Verbatim returns the string representation of the variable as it appears in
-// the environment.
-func (v *TypedVariable[T]) Verbatim() String {
+// Verbatim returns the (potentially non-canonical) literal value exactly as
+// specified in the environment.
+func (v *TypedVariable[T]) Verbatim() Literal {
 	return v.env.Get(v.spec.Name)
 }
 
@@ -126,8 +126,8 @@ func (v *TypedVariable[T]) IsDefault() bool {
 
 func (v *TypedVariable[T]) resolve() {
 	v.once.Do(func() {
-		if s := v.Verbatim(); s != "" {
-			n, c, err := v.spec.Class.Unmarshal(v.spec.Name, s)
+		if lit := v.Verbatim(); lit != "" {
+			n, c, err := v.spec.Class.Unmarshal(v.spec.Name, lit)
 			if err != nil {
 				v.err = err
 				return
