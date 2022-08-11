@@ -6,44 +6,105 @@ import (
 	"github.com/dogmatiq/ferrite/maybe"
 )
 
-// Spec builds a specification for a variable depicted by type T.
-type Spec[T any] struct {
-	Name        Name
-	Description string
-	Class       ClassOf[T]
-	Default     maybe.Value[T]
-	IsOptional  bool
+// Spec is a specification of a variable.
+type Spec interface {
+	// Name returns the name of the variable.
+	Name() Name
+
+	// Description returns a human-readable description of the variable.
+	Description() string
+
+	// Class returns the environment variable's class.
+	Class() Class
+
+	// Default returns the string representation of the default value.
+	Default() maybe.Value[Literal]
+
+	// IsOptional returns true if the application can handle the absence of a
+	// value for this variable.
+	IsOptional() bool
+}
+
+// SpecFor builds a specification for a variable depicted by type T.
+type SpecFor[T any] struct {
+	name       Name
+	desc       string
+	class      ClassOf[T]
+	def        maybe.Value[T]
+	isOptional bool
 }
 
 // NewSpec creates a new specification for a variable depicted by type T.
 func NewSpec[T any](
 	name string,
 	desc string,
-) Spec[T] {
-	s := Spec[T]{
-		Name:        Name(name),
-		Description: desc,
+) SpecFor[T] {
+	s := SpecFor[T]{
+		name: Name(name),
+		desc: desc,
 	}
 
-	if s.Name == "" {
+	if s.name == "" {
 		s.Invalid("variable name must not be empty")
 	}
 
-	if s.Description == "" {
+	if s.desc == "" {
 		s.Invalid("variable description must not be empty")
 	}
 
 	return s
 }
 
+// Name returns the name of the variable.
+func (s SpecFor[T]) Name() Name {
+	return s.name
+}
+
+// Description returns a human-readable description of the variable.
+func (s SpecFor[T]) Description() string {
+	return s.desc
+}
+
+// Class returns the environment variable's class.
+func (s SpecFor[T]) Class() Class {
+	return s.class
+}
+
+// Default returns the string representation of the default value.
+func (s SpecFor[T]) Default() maybe.Value[Literal] {
+	return maybe.Map(s.def, s.class.Marshal)
+}
+
+// IsOptional returns true if the application can handle the absence of a
+// value for this variable.
+func (s SpecFor[T]) IsOptional() bool {
+	return s.isOptional
+}
+
 // InvalidErr marks the specification as invalid.
-func (s *Spec[T]) InvalidErr(err error) {
-	panic(SpecError{s.Name, err}.Error())
+func (s SpecFor[T]) InvalidErr(err error) {
+	panic(SpecError{s.name, err}.Error())
 }
 
 // Invalid marks the specification as invalid.
-func (s *Spec[T]) Invalid(f string, v ...any) {
+func (s SpecFor[T]) Invalid(f string, v ...any) {
 	s.InvalidErr(fmt.Errorf(f, v...))
+}
+
+// SetClass sets the class of the environment variable.
+func (s *SpecFor[T]) SetClass(c ClassOf[T]) {
+	s.class = c
+}
+
+// SetDefault sets the environment variable's default value.
+func (s *SpecFor[T]) SetDefault(v T) {
+	s.def = maybe.Some(v)
+}
+
+// MarkOptional marks the environment variable as optional, meaning that the
+// application can operate without any value for the variable.
+func (s *SpecFor[T]) MarkOptional() {
+	s.isOptional = true
 }
 
 // Example is an example environment variable value.

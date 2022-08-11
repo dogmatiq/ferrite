@@ -3,7 +3,6 @@ package ferrite
 import (
 	"fmt"
 
-	"github.com/dogmatiq/ferrite/maybe"
 	"github.com/dogmatiq/ferrite/variable"
 )
 
@@ -31,7 +30,7 @@ func BoolAs[T ~bool](name, desc string) BoolBuilder[T] {
 
 // BoolBuilder builds a specification for a boolean value.
 type BoolBuilder[T ~bool] struct {
-	spec variable.Spec[T]
+	spec variable.SpecFor[T]
 }
 
 // WithLiterals overrides the default literals used to represent true and false.
@@ -53,7 +52,7 @@ func (b BoolBuilder[T]) WithLiterals(t, f variable.Literal) BoolBuilder[T] {
 		b.spec.InvalidErr(err)
 	}
 
-	b.spec.Class = set
+	b.spec.SetClass(set)
 	return b
 }
 
@@ -61,7 +60,7 @@ func (b BoolBuilder[T]) WithLiterals(t, f variable.Literal) BoolBuilder[T] {
 //
 // It is used when the environment variable is undefined or empty.
 func (b BoolBuilder[T]) WithDefault(v T) BoolBuilder[T] {
-	b.spec.Default = maybe.Some(v)
+	b.spec.SetDefault(v)
 	return b
 }
 
@@ -74,6 +73,6 @@ func (b BoolBuilder[T]) Required(options ...variable.RegisterOption) Required[T]
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b BoolBuilder[T]) Optional(options ...variable.RegisterOption) Optional[T] {
-	b.spec.IsOptional = true
+	b.spec.MarkOptional()
 	return opt[T]{variable.Register(b.spec, options)}
 }

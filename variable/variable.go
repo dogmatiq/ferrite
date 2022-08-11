@@ -29,119 +29,96 @@ func (l Literal) String() string {
 	return s
 }
 
-// Variable is an interface for an environment variable.
-type Variable interface {
-	// Name returns the name of the variable.
-	Name() Name
+// Any is an interface for an environment variable of any type.
+type Any interface {
+	// Spec returns the variable's specification.
+	Spec() Spec
 
-	// Description returns a human-readable description of the variable.
-	Description() string
+	// IsValid returns true if the variable is valid.
+	IsValid() bool
 
-	// Class returns the environment variable's class.
-	Class() Class
-
-	// Default returns the string representation of the default value.
-	Default() maybe.Value[Literal]
-
-	// Canonical returns the canonical string representation of the variable.
-	Canonical() (maybe.Value[Literal], ValidationError)
-
-	// Verbatim returns the string representation of the variable as it appears
-	// in the environment.
-	Verbatim() Literal
-
-	// IsOptional returns true if the application can handle the absence of a
-	// value for this variable.
-	IsOptional() bool
-
-	// IsDefault returns true if the value is the default, as opposed to being
-	// set explicitly in the environment.
-	IsDefault() bool
+	// Value returns the variable's value.
+	Value() (maybe.Value[Value], ValidationError)
 }
 
-// TypedVariable is a variable depicted by type T.
-type TypedVariable[T any] struct {
-	spec Spec[T]
+// OfType is an environment variable depicted by type T.
+type OfType[T any] struct {
+	spec SpecFor[T]
 	env  Environment
 
-	once      sync.Once
-	value     maybe.Value[T]
-	canonical maybe.Value[Literal]
-	isDefault bool
-	err       ValidationError
+	once  sync.Once
+	value maybe.Value[valueOf[T]]
+	err   ValidationError
 }
 
-// Name returns the name of the variable.
-func (v *TypedVariable[T]) Name() Name {
-	return v.spec.Name
+// Spec returns the variable's specification.
+func (v *OfType[T]) Spec() Spec {
+	return v.spec
 }
 
-// Description returns a human-readable description of the variable.
-func (v *TypedVariable[T]) Description() string {
-	return v.spec.Description
-}
-
-// Class the environment varible's class.
-func (v *TypedVariable[T]) Class() Class {
-	return v.spec.Class
-}
-
-// Default returns the string representation of the default value.
-func (v *TypedVariable[T]) Default() maybe.Value[Literal] {
-	return maybe.Map(v.spec.Default, func(def T) Literal {
-		return v.spec.Class.Marshal(def)
-	})
-}
-
-// Value returns the native representation of the variable.
-func (v *TypedVariable[T]) Value() (maybe.Value[T], ValidationError) {
+// IsValid returns true if the variable is valid.
+func (v *OfType[T]) IsValid() bool {
 	v.resolve()
-	return v.value, v.err
+
+	if v.err != nil {
+		return false
+	}
+
+	if v.value.IsEmpty() {
+		return v.spec.isOptional
+	}
+
+	return true
 }
 
-// Canonical returns the canonicalized literal value.
-func (v *TypedVariable[T]) Canonical() (maybe.Value[Literal], ValidationError) {
+// Value returns the variable's value.
+func (v *OfType[T]) Value() (maybe.Value[Value], ValidationError) {
 	v.resolve()
-	return v.canonical, v.err
+	return maybe.Map(
+		v.value,
+		func(v valueOf[T]) Value {
+			return v
+		},
+	), v.err
 }
 
-// Verbatim returns the (potentially non-canonical) literal value exactly as
-// specified in the environment.
-func (v *TypedVariable[T]) Verbatim() Literal {
-	return v.env.Get(v.spec.Name)
-}
-
-// IsOptional returns true if the application can handle the absence of a value
-// for this variable.
-func (v *TypedVariable[T]) IsOptional() bool {
-	return v.spec.IsOptional
-}
-
-// IsDefault returns true if the value is the default, as opposed to being set
-// explicitly in the environment.
-func (v *TypedVariable[T]) IsDefault() bool {
+// NativeValue returns the variable's native value.
+func (v *OfType[T]) NativeValue() (maybe.Value[T], ValidationError) {
 	v.resolve()
-	return v.isDefault
+	return maybe.Map(
+		v.value,
+		func(v valueOf[T]) T {
+			return v.native
+		},
+	), v.err
 }
 
-func (v *TypedVariable[T]) resolve() {
+func (v *OfType[T]) resolve() {
 	v.once.Do(func() {
-		if lit := v.Verbatim(); lit != "" {
-			n, c, err := v.spec.Class.Unmarshal(v.spec.Name, lit)
-			if err != nil {
-				v.err = err
-				return
+		lit := v.env.Get(v.spec.name)
+
+		if lit == "" {
+			if n, ok := v.spec.def.Get(); ok {
+				v.value = maybe.Some(valueOf[T]{
+					native:    n,
+					canonical: v.spec.class.Marshal(n),
+					isDefault: true,
+				})
 			}
 
-			v.value = maybe.Some(n)
-			v.canonical = maybe.Some(c)
 			return
 		}
 
-		if !v.spec.Default.IsEmpty() {
-			v.value = v.spec.Default
-			v.canonical = maybe.Map(v.value, v.spec.Class.Marshal)
-			v.isDefault = true
+		n, c, err := v.spec.class.Unmarshal(v.spec.name, lit)
+		if err != nil {
+			v.err = err
+			return
 		}
+
+		v.value = maybe.Some(valueOf[T]{
+			verbatim:  lit,
+			native:    n,
+			canonical: c,
+		})
 	})
 }

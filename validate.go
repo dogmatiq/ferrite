@@ -15,22 +15,30 @@ func validate() (string, bool) {
 	ok := true
 	t := table.Table{
 		Less: func(a, b []string) bool {
-			return a[0][3:] < b[0][3:]
+			ra := []rune(a[0])
+			rb := []rune(b[0])
+
+			// Trim the indicator icon/indenting from the start to sort by name.
+			return string(ra[3:]) < string(rb[3:])
 		},
 	}
 
-	for _, v := range variable.DefaultRegistry.Variables() {
-		if _, err := v.Canonical(); err != nil {
-			ok = false
-		}
+	variable.DefaultRegistry.Range(
+		func(v variable.Any) bool {
+			t.AddRow(
+				renderName(v),
+				v.Spec().Description(),
+				renderSpec(v.Spec()),
+				renderValue(v),
+			)
 
-		t.AddRow(
-			renderName(v),
-			v.Description(),
-			renderSchema(v),
-			renderValue(v),
-		)
-	}
+			if !v.IsValid() {
+				ok = false
+			}
+
+			return true
+		},
+	)
 
 	for _, r := range spec.SortedResolvers() {
 		s := r.Spec()
@@ -52,19 +60,19 @@ func validate() (string, bool) {
 	return "Environment Variables:\n\n" + t.String(), ok
 }
 
-func renderName(v variable.Variable) string {
-	if _, err := v.Canonical(); err != nil {
-		return fmt.Sprintf(" %s %s", attentionIcon, v.Name())
+func renderName(v variable.Any) string {
+	if v.IsValid() {
+		return fmt.Sprintf("   %s", v.Spec().Name())
 	}
 
-	return fmt.Sprintf("   %s", v.Name())
+	return fmt.Sprintf(" %s %s", attentionIcon, v.Spec().Name())
 }
 
-func renderSchema(v variable.Variable) string {
+func renderSpec(s variable.Spec) string {
 	var r classRenderer
-	v.Class().AcceptVisitor(&r)
+	s.Class().AcceptVisitor(&r)
 
-	if def, ok := v.Default().Get(); ok {
+	if def, ok := s.Default().Get(); ok {
 		return fmt.Sprintf(
 			"[ %s ] = %s",
 			r.Output.String(),
@@ -72,7 +80,7 @@ func renderSchema(v variable.Variable) string {
 		)
 	}
 
-	if v.IsOptional() {
+	if s.IsOptional() {
 		return fmt.Sprintf(
 			"[ %s ]",
 			r.Output.String(),
@@ -85,34 +93,35 @@ func renderSchema(v variable.Variable) string {
 	)
 }
 
-func renderValue(v variable.Variable) string {
-	m, err := v.Canonical()
+func renderValue(v variable.Any) string {
+	m, err := v.Value()
 	if err != nil {
 		return fmt.Sprintf(
 			"%s set to %s, %s",
 			invalidIcon,
-			v.Verbatim(),
+			err.Verbatim(),
 			err.Reason(),
 		)
 	}
 
-	if s, ok := m.Get(); ok {
-		if v.IsDefault() {
+	if value, ok := m.Get(); ok {
+		if value.IsDefault() {
 			return fmt.Sprintf("%s using default value", validIcon)
 		}
 
 		return fmt.Sprintf(
 			"%s set to %s",
 			validIcon,
-			s,
+			value.Canonical(),
 		)
 	}
 
-	if v.IsOptional() {
-		return fmt.Sprintf("%s undefined", neutralIcon)
+	icon := invalidIcon
+	if v.Spec().IsOptional() {
+		icon = neutralIcon
 	}
 
-	return fmt.Sprintf("%s undefined", invalidIcon)
+	return fmt.Sprintf("%s undefined", icon)
 }
 
 func renderNameXXX(s spec.Spec, valid bool) string {

@@ -29,28 +29,31 @@ type Optional[T any] interface {
 }
 
 type req[T any] struct {
-	v *variable.TypedVariable[T]
+	v *variable.OfType[T]
 }
 
 func (r req[T]) Value() T {
-	m, err := r.v.Value()
+	v, err := r.v.NativeValue()
 	if err != nil {
 		panic(err.Error())
 	}
 
-	if v, ok := m.Get(); ok {
+	if v, ok := v.Get(); ok {
 		return v
 	}
 
-	panic(fmt.Sprintf("%s is undefined and does not have a default value", r.v.Name()))
+	panic(fmt.Sprintf(
+		"%s is undefined and does not have a default value",
+		r.v.Spec().Name(),
+	))
 }
 
 type opt[T any] struct {
-	v *variable.TypedVariable[T]
+	v *variable.OfType[T]
 }
 
 func (o opt[T]) Value() (T, bool) {
-	v, err := o.v.Value()
+	v, err := o.v.NativeValue()
 	if err != nil {
 		panic(err.Error())
 	}

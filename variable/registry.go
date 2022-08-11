@@ -11,16 +11,13 @@ type Registry struct {
 	vars sync.Map // map[String]Variable
 }
 
-// Variables returns the variables in the registry.
-func (r *Registry) Variables() []Variable {
-	var vars []Variable
-
+// Range calls fn for each variable in the registry.
+//
+// It stops iterating if fn returns false.
+func (r *Registry) Range(fn func(Any) bool) {
 	r.vars.Range(func(_, value any) bool {
-		vars = append(vars, value.(Variable))
-		return true
+		return fn(value.(Any))
 	})
-
-	return vars
 }
 
 // Reset removes all variables from the registry.
@@ -38,9 +35,9 @@ var DefaultRegistry = Registry{
 
 // Register registers a new variable.
 func Register[T any](
-	spec Spec[T],
+	spec SpecFor[T],
 	options []RegisterOption,
-) *TypedVariable[T] {
+) *OfType[T] {
 	opts := registerOptions{
 		Registry: &DefaultRegistry,
 	}
@@ -48,12 +45,12 @@ func Register[T any](
 		opt(&opts)
 	}
 
-	v := &TypedVariable[T]{
+	v := &OfType[T]{
 		spec: spec,
 		env:  opts.Registry.Environment,
 	}
 
-	opts.Registry.vars.Store(spec.Name, v)
+	opts.Registry.vars.Store(spec.name, v)
 
 	return v
 }
