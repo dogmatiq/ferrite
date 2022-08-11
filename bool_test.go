@@ -178,7 +178,7 @@ var _ = Describe("type BoolBuilder", func() {
 				Expect(func() {
 					builder.WithLiterals("", "no")
 				}).To(PanicWith(
-					"specification for FERRITE_BOOL is invalid: boolean literals must not be zero-length",
+					"invalid specification for FERRITE_BOOL: members must not have empty string representations",
 				))
 			})
 		})
@@ -188,7 +188,7 @@ var _ = Describe("type BoolBuilder", func() {
 				Expect(func() {
 					builder.WithLiterals("yes", "")
 				}).To(PanicWith(
-					"specification for FERRITE_BOOL is invalid: boolean literals must not be zero-length",
+					"invalid specification for FERRITE_BOOL: members must not have empty string representations",
 				))
 			})
 		})
