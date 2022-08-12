@@ -99,8 +99,8 @@ func renderValue(v variable.Any) string {
 		return fmt.Sprintf(
 			"%s set to %s, %s",
 			invalidIcon,
-			err.Verbatim(),
-			err.Reason(),
+			err.Literal(),
+			err.Unwrap(),
 		)
 	}
 
@@ -109,9 +109,18 @@ func renderValue(v variable.Any) string {
 			return fmt.Sprintf("%s using default value", validIcon)
 		}
 
+		if value.Verbatim() == value.Canonical() {
+			return fmt.Sprintf(
+				"%s set to %s",
+				validIcon,
+				value.Canonical(),
+			)
+		}
+
 		return fmt.Sprintf(
-			"%s set to %s",
+			"%s set to %s (i.e. %s)",
 			validIcon,
+			value.Verbatim(),
 			value.Canonical(),
 		)
 	}
@@ -241,5 +250,18 @@ func (r *schemaRenderer) VisitSet(s variable.Set) {
 		}
 
 		r.Output.WriteString(m.String())
+	}
+}
+
+func (r *schemaRenderer) VisitNumeric(s variable.Number) {
+	min, hasMin := s.Min().Get()
+	max, hasMax := s.Max().Get()
+
+	if !hasMin {
+		fmt.Fprintf(&r.Output, "... %s", max)
+	} else if !hasMax {
+		fmt.Fprintf(&r.Output, "%s ...", min)
+	} else {
+		fmt.Fprintf(&r.Output, "%s .. %s", min, max)
 	}
 }

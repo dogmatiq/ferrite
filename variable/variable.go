@@ -98,27 +98,29 @@ func (v *OfType[T]) resolve() {
 		lit := v.env.Get(v.spec.name)
 
 		if lit == "" {
-			if n, ok := v.spec.def.Get(); ok {
-				v.value = maybe.Some(valueOf[T]{
-					native:    n,
-					canonical: v.spec.schema.Marshal(n),
-					isDefault: true,
-				})
-			}
-
+			v.value = v.spec.def
 			return
 		}
 
-		n, err := v.spec.schema.Unmarshal(v.spec.name, lit)
+		n, err := v.spec.schema.Unmarshal(lit)
 		if err != nil {
-			v.err = err
+			v.err = validationError{
+				name:    v.spec.name,
+				literal: lit,
+				reason:  err,
+			}
 			return
+		}
+
+		c, err := v.spec.schema.Marshal(n)
+		if err != nil {
+			panic(err)
 		}
 
 		v.value = maybe.Some(valueOf[T]{
 			verbatim:  lit,
 			native:    n,
-			canonical: v.spec.schema.Marshal(n),
+			canonical: c,
 		})
 	})
 }

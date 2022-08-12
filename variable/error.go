@@ -6,6 +6,8 @@ import "fmt"
 // environment variable.
 type Error interface {
 	error
+
+	// Name returns the name of the environment variable.
 	Name() Name
 }
 
@@ -33,25 +35,40 @@ func (e SpecError) Error() string {
 	return fmt.Sprintf("invalid specification for %s: %s", e.name, e.cause)
 }
 
-// ValidationError indicates a problem parsing or validating an environment
-// variable value.
+// ValidationError indicates that a well-formed variable value has other issues.
 type ValidationError interface {
 	Error
 
-	// Verbatim returns the offending value exactly as it was specified in the
-	// environment.
-	Verbatim() Literal
+	// Literal returns the invalid value.
+	Literal() Literal
 
-	// Reason returns a human-readable explanation of why the value is invalid.
-	Reason() string
+	// Unwrap returns the underlying error.
+	Unwrap() error
 }
 
-// formatValidationError formats the message of a validation error.
-func formatValidationError(err ValidationError) string {
+type validationError struct {
+	name    Name
+	literal Literal
+	reason  error
+}
+
+func (e validationError) Name() Name {
+	return e.name
+}
+
+func (e validationError) Literal() Literal {
+	return e.literal
+}
+
+func (e validationError) Unwrap() error {
+	return e.reason
+}
+
+func (e validationError) Error() string {
 	return fmt.Sprintf(
 		"%s (%s) is invalid: %s",
-		err.Name(),
-		err.Verbatim(),
-		err.Reason(),
+		e.name,
+		e.literal,
+		e.reason,
 	)
 }

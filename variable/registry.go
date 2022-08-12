@@ -35,7 +35,7 @@ var DefaultRegistry = Registry{
 
 // Register registers a new variable.
 func Register[T any](
-	spec SpecFor[T],
+	spec PendingSpecFor[T],
 	options []RegisterOption,
 ) *OfType[T] {
 	opts := registerOptions{
@@ -46,11 +46,11 @@ func Register[T any](
 	}
 
 	v := &OfType[T]{
-		spec: spec,
+		spec: finalizeSpec(spec),
 		env:  opts.Registry.Environment,
 	}
 
-	opts.Registry.vars.Store(spec.name, v)
+	opts.Registry.vars.Store(spec.Name, v)
 
 	return v
 }

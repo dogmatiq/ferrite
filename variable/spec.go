@@ -30,29 +30,47 @@ type SpecFor[T any] struct {
 	name       Name
 	desc       string
 	schema     SchemaFor[T]
-	def        maybe.Value[T]
+	def        maybe.Value[valueOf[T]]
 	isOptional bool
 }
 
-// NewSpec creates a new specification for a variable depicted by type T.
-func NewSpec[T any](
-	name string,
-	desc string,
-) SpecFor[T] {
-	s := SpecFor[T]{
-		name: Name(name),
-		desc: desc,
-	}
-
-	if s.name == "" {
+// finalizeSpec returns the completed specification.
+//
+// It panics if the specification is invalid.
+func finalizeSpec[T any](s PendingSpecFor[T]) SpecFor[T] {
+	if s.Name == "" {
 		s.Invalid("variable name must not be empty")
 	}
 
-	if s.desc == "" {
+	if s.Description == "" {
 		s.Invalid("variable description must not be empty")
 	}
 
-	return s
+	if s.Schema == nil {
+		s.Invalid("a schema must be specified")
+	}
+
+	spec := SpecFor[T]{
+		name:       s.Name,
+		desc:       s.Description,
+		schema:     s.Schema,
+		isOptional: s.IsOptional,
+	}
+
+	if v, ok := s.Default.Get(); ok {
+		lit, err := s.Schema.Marshal(v)
+		if err != nil {
+			s.Invalid("default value is invalid: %w", err)
+		}
+
+		spec.def = maybe.Some(valueOf[T]{
+			native:    v,
+			canonical: lit,
+			isDefault: true,
+		})
+	}
+
+	return spec
 }
 
 // Name returns the name of the variable.
@@ -72,7 +90,7 @@ func (s SpecFor[T]) Schema() Schema {
 
 // Default returns the string representation of the default value.
 func (s SpecFor[T]) Default() maybe.Value[Literal] {
-	return maybe.Map(s.def, s.schema.Marshal)
+	return maybe.Map(s.def, valueOf[T].Canonical)
 }
 
 // IsOptional returns true if the application can handle the absence of a
@@ -81,37 +99,21 @@ func (s SpecFor[T]) IsOptional() bool {
 	return s.isOptional
 }
 
+// PendingSpecFor is a specification for a variable that is not yet complete.
+type PendingSpecFor[T any] struct {
+	Name        Name
+	Description string
+	Schema      SchemaFor[T]
+	Default     maybe.Value[T]
+	IsOptional  bool
+}
+
 // InvalidErr marks the specification as invalid.
-func (s SpecFor[T]) InvalidErr(err error) {
-	panic(SpecError{s.name, err}.Error())
+func (s PendingSpecFor[T]) InvalidErr(err error) {
+	panic(SpecError{s.Name, err}.Error())
 }
 
 // Invalid marks the specification as invalid.
-func (s SpecFor[T]) Invalid(f string, v ...any) {
+func (s PendingSpecFor[T]) Invalid(f string, v ...any) {
 	s.InvalidErr(fmt.Errorf(f, v...))
-}
-
-// SetSchema sets the schema for the variable's values.
-func (s *SpecFor[T]) SetSchema(sc SchemaFor[T]) {
-	s.schema = sc
-}
-
-// SetDefault sets the environment variable's default value.
-func (s *SpecFor[T]) SetDefault(v T) {
-	s.def = maybe.Some(v)
-}
-
-// MarkOptional marks the environment variable as optional, meaning that the
-// application can operate without any value for the variable.
-func (s *SpecFor[T]) MarkOptional() {
-	s.isOptional = true
-}
-
-// Example is an example environment variable value.
-type Example struct {
-	// Description is a description of the example and/or the value.
-	Description string
-
-	// Literal is the example value.
-	Literal Literal
 }
