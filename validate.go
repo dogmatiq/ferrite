@@ -118,10 +118,10 @@ func renderValue(v variable.Any) string {
 		}
 
 		return fmt.Sprintf(
-			"%s set to %s (i.e. %s)",
+			"%s set to %s (specified non-canonically as %s)",
 			validIcon,
-			value.Verbatim(),
 			value.Canonical(),
+			value.Verbatim(),
 		)
 	}
 

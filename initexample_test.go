@@ -181,6 +181,28 @@ func ExampleInit_validationWithOptionalValues() {
 	//  ❯ FERRITE_XTRIGGER          trigger failure                   <string>                 ✗ undefined
 }
 
+func ExampleInit_validationWithNonCanonicalValues() {
+	setUp()
+	defer tearDown()
+
+	os.Setenv("FERRITE_DURATION", "3h 10m 0s")
+	ferrite.
+		Duration("FERRITE_DURATION", "example duration").
+		Required()
+
+	ferrite.
+		String("FERRITE_XTRIGGER", "trigger failure").
+		Required()
+
+	ferrite.Init()
+
+	// Output:
+	// Environment Variables:
+	//
+	//    FERRITE_DURATION  example duration    1ns ...     ✓ set to 3h10m (specified non-canonically as '3h 10m 0s')
+	//  ❯ FERRITE_XTRIGGER  trigger failure     <string>    ✗ undefined
+}
+
 func ExampleInit_validationWithInvalidValues() {
 	setUp()
 	defer tearDown()

@@ -66,20 +66,29 @@ type durationMarshaler struct{}
 
 func (durationMarshaler) Marshal(v time.Duration) (variable.Literal, error) {
 	runes := []rune(v.String())
+	i := len(runes) - 1
 
-	// Trim any trailing zero units, e.g. "10m0s" -> "10m".
-	for i := len(runes) - 2; i >= 0; i-- {
-		if runes[i+1] == '0' && !unicode.IsDigit(runes[i]) {
-			runes = runes[:i+1]
-			break
-		}
+	// Skip over the last units.
+	for !unicode.IsDigit(runes[i]) {
+		i--
 	}
 
-	return variable.Literal(runes), nil
+	// Look for the second-to-last units, if any non-zero digit is encountered
+	// then we need to keep the last units.
+	for unicode.IsDigit(runes[i]) {
+		if runes[i] != '0' {
+			return variable.Literal(runes), nil
+		}
+
+		i--
+	}
+
+	// Otherwise the last units have a zero value and we omit them.
+	return variable.Literal(runes[:i+1]), nil
 }
 
 func (durationMarshaler) Unmarshal(v variable.Literal) (time.Duration, error) {
-	d, err := time.ParseDuration(string(v))
+	d, err := time.ParseDuration(strings.ReplaceAll(string(v), " ", ""))
 	if err == nil {
 		return d, nil
 	}
