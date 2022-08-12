@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// Set is a class that only allows a specific set of static values.
+// Set is a schema that only allows a specific set of static values.
 type Set interface {
 	// Members returns the members of the set.
 	Members() []Literal
@@ -51,11 +51,11 @@ func (c SetOf[T]) Members() []Literal {
 }
 
 // AcceptVisitor passes c to the appropriate method of v.
-func (c SetOf[T]) AcceptVisitor(v ClassVisitor) {
+func (c SetOf[T]) AcceptVisitor(v SchemaVisitor) {
 	v.VisitSet(c)
 }
 
-// Marshal marshals v to its string representation.
+// Marshal converts a value to its literal representation.
 func (c SetOf[T]) Marshal(v T) Literal {
 	lit := c.marshal(v)
 
@@ -66,42 +66,40 @@ func (c SetOf[T]) Marshal(v T) Literal {
 	return lit
 }
 
-// Unmarshal unmarshals a string representation of a value.
-//
-// It returns the native value and the canonical string representation.
-func (c SetOf[T]) Unmarshal(n Name, v Literal) (T, Literal, ValidationError) {
+// Unmarshal converts a literal value to it's native representation.
+func (c SetOf[T]) Unmarshal(n Name, v Literal) (T, ValidationError) {
 	if n, ok := c.unmarshal[v]; ok {
-		return n, v, nil
+		return n, nil
 	}
 
 	var zero T
-	return zero, "", SetError{
+	return zero, SetMembershipError{
 		name:     n,
 		verbatim: v,
 		set:      c,
 	}
 }
 
-// SetError is a validation error that indicates a value is not a member of a
-// specific set.
-type SetError struct {
+// SetMembershipError is a validation error that indicates a value is not a
+// member of a specific set.
+type SetMembershipError struct {
 	name     Name
 	verbatim Literal
 	set      Set
 }
 
 // Name returns the name of the environment variable.
-func (e SetError) Name() Name {
+func (e SetMembershipError) Name() Name {
 	return e.name
 }
 
 // Verbatim returns the offending value.
-func (e SetError) Verbatim() Literal {
+func (e SetMembershipError) Verbatim() Literal {
 	return e.verbatim
 }
 
 // Reason returns a human-readable explanation of why the value is invalid.
-func (e SetError) Reason() string {
+func (e SetMembershipError) Reason() string {
 	members := e.set.Members()
 
 	if len(members) == 2 {
@@ -111,6 +109,6 @@ func (e SetError) Reason() string {
 	return "must be a member of the set"
 }
 
-func (e SetError) Error() string {
+func (e SetMembershipError) Error() string {
 	return formatValidationError(e)
 }

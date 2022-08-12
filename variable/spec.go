@@ -14,8 +14,8 @@ type Spec interface {
 	// Description returns a human-readable description of the variable.
 	Description() string
 
-	// Class returns the environment variable's class.
-	Class() Class
+	// Schema returns the schema that applies to the variable's value.
+	Schema() Schema
 
 	// Default returns the string representation of the default value.
 	Default() maybe.Value[Literal]
@@ -29,7 +29,7 @@ type Spec interface {
 type SpecFor[T any] struct {
 	name       Name
 	desc       string
-	class      ClassOf[T]
+	schema     SchemaFor[T]
 	def        maybe.Value[T]
 	isOptional bool
 }
@@ -65,14 +65,14 @@ func (s SpecFor[T]) Description() string {
 	return s.desc
 }
 
-// Class returns the environment variable's class.
-func (s SpecFor[T]) Class() Class {
-	return s.class
+// Schema returns the schema that applies to the variable's value.
+func (s SpecFor[T]) Schema() Schema {
+	return s.schema
 }
 
 // Default returns the string representation of the default value.
 func (s SpecFor[T]) Default() maybe.Value[Literal] {
-	return maybe.Map(s.def, s.class.Marshal)
+	return maybe.Map(s.def, s.schema.Marshal)
 }
 
 // IsOptional returns true if the application can handle the absence of a
@@ -91,9 +91,9 @@ func (s SpecFor[T]) Invalid(f string, v ...any) {
 	s.InvalidErr(fmt.Errorf(f, v...))
 }
 
-// SetClass sets the class of the environment variable.
-func (s *SpecFor[T]) SetClass(c ClassOf[T]) {
-	s.class = c
+// SetSchema sets the schema for the variable's values.
+func (s *SpecFor[T]) SetSchema(sc SchemaFor[T]) {
+	s.schema = sc
 }
 
 // SetDefault sets the environment variable's default value.

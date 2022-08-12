@@ -101,7 +101,7 @@ func (v *OfType[T]) resolve() {
 			if n, ok := v.spec.def.Get(); ok {
 				v.value = maybe.Some(valueOf[T]{
 					native:    n,
-					canonical: v.spec.class.Marshal(n),
+					canonical: v.spec.schema.Marshal(n),
 					isDefault: true,
 				})
 			}
@@ -109,7 +109,7 @@ func (v *OfType[T]) resolve() {
 			return
 		}
 
-		n, c, err := v.spec.class.Unmarshal(v.spec.name, lit)
+		n, err := v.spec.schema.Unmarshal(v.spec.name, lit)
 		if err != nil {
 			v.err = err
 			return
@@ -118,7 +118,7 @@ func (v *OfType[T]) resolve() {
 		v.value = maybe.Some(valueOf[T]{
 			verbatim:  lit,
 			native:    n,
-			canonical: c,
+			canonical: v.spec.schema.Marshal(n),
 		})
 	})
 }

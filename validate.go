@@ -69,8 +69,8 @@ func renderName(v variable.Any) string {
 }
 
 func renderSpec(s variable.Spec) string {
-	var r classRenderer
-	s.Class().AcceptVisitor(&r)
+	var r schemaRenderer
+	s.Schema().AcceptVisitor(&r)
 
 	if def, ok := s.Default().Get(); ok {
 		return fmt.Sprintf(
@@ -230,11 +230,11 @@ func (r *validateSchemaRendererXXX) VisitRange(s spec.Range) {
 	}
 }
 
-type classRenderer struct {
+type schemaRenderer struct {
 	Output strings.Builder
 }
 
-func (r *classRenderer) VisitSet(s variable.Set) {
+func (r *schemaRenderer) VisitSet(s variable.Set) {
 	for i, m := range s.Members() {
 		if i > 0 {
 			r.Output.WriteString(" | ")

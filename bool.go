@@ -52,7 +52,7 @@ func (b BoolBuilder[T]) WithLiterals(t, f variable.Literal) BoolBuilder[T] {
 		b.spec.InvalidErr(err)
 	}
 
-	b.spec.SetClass(set)
+	b.spec.SetSchema(set)
 	return b
 }
 
