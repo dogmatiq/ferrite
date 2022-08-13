@@ -61,7 +61,7 @@ var _ = Describe("type BoolBuilder", func() {
 							Required().
 							Value()
 					}).To(PanicWith(
-						`FERRITE_BOOL (true) is invalid: must be either yes or no`,
+						`value of FERRITE_BOOL (true) is invalid: expected either yes or no`,
 					))
 				})
 			})
@@ -116,7 +116,7 @@ var _ = Describe("type BoolBuilder", func() {
 							Optional().
 							Value()
 					}).To(PanicWith(
-						`FERRITE_BOOL (true) is invalid: must be either yes or no`,
+						`value of FERRITE_BOOL (true) is invalid: expected either yes or no`,
 					))
 				})
 			})
@@ -178,7 +178,7 @@ var _ = Describe("type BoolBuilder", func() {
 				Expect(func() {
 					builder.WithLiterals("", "no")
 				}).To(PanicWith(
-					"invalid specification for FERRITE_BOOL: members must not have empty string representations",
+					"specification for FERRITE_BOOL is invalid: literals can not be an empty string",
 				))
 			})
 		})
@@ -188,7 +188,7 @@ var _ = Describe("type BoolBuilder", func() {
 				Expect(func() {
 					builder.WithLiterals("yes", "")
 				}).To(PanicWith(
-					"invalid specification for FERRITE_BOOL: members must not have empty string representations",
+					"specification for FERRITE_BOOL is invalid: literals can not be an empty string",
 				))
 			})
 		})

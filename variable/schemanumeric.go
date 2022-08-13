@@ -7,8 +7,10 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-// Number is a schema that allows numeric values.
-type Number interface {
+// Numeric is a schema that allows numeric values.
+type Numeric interface {
+	Schema
+
 	// Min is the minimum allowed value.
 	Min() maybe.Value[Literal]
 
@@ -16,8 +18,8 @@ type Number interface {
 	Max() maybe.Value[Literal]
 }
 
-// NumberAs is a numeric value depicted by type T.
-type NumberAs[T constraints.Ordered] struct {
+// TypedNumber is a numeric value depicted by type T.
+type TypedNumber[T constraints.Ordered] struct {
 	marshaler Marshaler[T]
 	min, max  maybe.Value[valueOf[T]]
 }
@@ -26,18 +28,18 @@ type NumberAs[T constraints.Ordered] struct {
 func NewNumber[T constraints.Ordered, M Marshaler[T]](
 	m M,
 	min, max maybe.Value[T],
-) (NumberAs[T], error) {
+) (TypedNumber[T], error) {
 	vmin, err := marshal(m, min)
 	if err != nil {
-		return NumberAs[T]{}, err
+		return TypedNumber[T]{}, err
 	}
 
 	vmax, err := marshal(m, max)
 	if err != nil {
-		return NumberAs[T]{}, err
+		return TypedNumber[T]{}, err
 	}
 
-	return NumberAs[T]{
+	return TypedNumber[T]{
 		marshaler: m,
 		min:       vmin,
 		max:       vmax,
@@ -45,22 +47,22 @@ func NewNumber[T constraints.Ordered, M Marshaler[T]](
 }
 
 // AcceptVisitor passes s to the appropriate method of v.
-func (s NumberAs[T]) AcceptVisitor(v SchemaVisitor) {
+func (s TypedNumber[T]) AcceptVisitor(v SchemaVisitor) {
 	v.VisitNumeric(s)
 }
 
 // Min is the minimum allowed value.
-func (s NumberAs[T]) Min() maybe.Value[Literal] {
+func (s TypedNumber[T]) Min() maybe.Value[Literal] {
 	return maybe.Map(s.min, valueOf[T].Canonical)
 }
 
 // Max is the maximum allowed value.
-func (s NumberAs[T]) Max() maybe.Value[Literal] {
+func (s TypedNumber[T]) Max() maybe.Value[Literal] {
 	return maybe.Map(s.max, valueOf[T].Canonical)
 }
 
 // Marshal converts a value to its literal representation.
-func (s NumberAs[T]) Marshal(v T) (Literal, error) {
+func (s TypedNumber[T]) Marshal(v T) (Literal, error) {
 	if err := s.validate(v); err != nil {
 		return "", err
 	}
@@ -69,7 +71,7 @@ func (s NumberAs[T]) Marshal(v T) (Literal, error) {
 }
 
 // Unmarshal converts a literal value to it's native representation.
-func (s NumberAs[T]) Unmarshal(v Literal) (T, error) {
+func (s TypedNumber[T]) Unmarshal(v Literal) (T, error) {
 	n, err := s.marshaler.Unmarshal(v)
 	if err != nil {
 		return n, err
@@ -79,35 +81,73 @@ func (s NumberAs[T]) Unmarshal(v Literal) (T, error) {
 }
 
 // validate returns an error if v is invalid.
-func (s NumberAs[T]) validate(v T) error {
+func (s TypedNumber[T]) validate(v T) error {
 	min, hasMin := s.min.Get()
 	max, hasMax := s.max.Get()
 
-	if (hasMin && v < min.native) || (hasMax && v > max.native) {
-		return RangeError{
-			Schema: s,
-		}
+	if hasMin && v < min.native {
+		return MinError{s}
+	}
+
+	if hasMax && v > max.native {
+		return MaxError{s}
 	}
 
 	return nil
 }
 
-// RangeError indicates that a numeric value was outside of the expected range.
-type RangeError struct {
-	Schema Number
+// MinError indicates that a numeric value was less than the minimum allowed
+// value.
+type MinError struct {
+	Numeric Numeric
 }
 
-func (e RangeError) Error() string {
-	min, hasMin := e.Schema.Min().Get()
-	max, hasMax := e.Schema.Max().Get()
+var _ SchemaError = MinError{}
 
-	if !hasMax {
-		return fmt.Sprintf("must be %s or greater", min)
+// Schema returns the schema that was violated.
+func (e MinError) Schema() Schema {
+	return e.Numeric
+}
+
+// AcceptVisitor passes the error to the appropriate method of v.
+func (e MinError) AcceptVisitor(v SchemaErrorVisitor) {
+	v.VisitMinError(e)
+}
+
+func (e MinError) Error() string {
+	min := e.Numeric.Min().MustGet()
+
+	if max, ok := e.Numeric.Max().Get(); ok {
+		return fmt.Sprintf("too low, expected between %s and %s", min, max)
 	}
 
-	if !hasMin {
-		return fmt.Sprintf("must be %s or less", max)
+	return fmt.Sprintf("too low, expected %s or greater", min)
+}
+
+// MaxError indicates that a numeric value was greater than the maximum
+// allowed value.
+type MaxError struct {
+	Numeric Numeric
+}
+
+var _ SchemaError = MaxError{}
+
+// Schema returns the schema that was violated.
+func (e MaxError) Schema() Schema {
+	return e.Numeric
+}
+
+// AcceptVisitor passes the error to the appropriate method of v.
+func (e MaxError) AcceptVisitor(v SchemaErrorVisitor) {
+	v.VisitMaxError(e)
+}
+
+func (e MaxError) Error() string {
+	max := e.Numeric.Max().MustGet()
+
+	if min, ok := e.Numeric.Min().Get(); ok {
+		return fmt.Sprintf("too high, expected between %s and %s", min, max)
 	}
 
-	return fmt.Sprintf("must be between %s and %s", min, max)
+	return fmt.Sprintf("too high, expected %s or less", max)
 }

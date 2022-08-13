@@ -253,7 +253,7 @@ func (r *schemaRenderer) VisitSet(s variable.Set) {
 	}
 }
 
-func (r *schemaRenderer) VisitNumeric(s variable.Number) {
+func (r *schemaRenderer) VisitNumeric(s variable.Numeric) {
 	min, hasMin := s.Min().Get()
 	max, hasMax := s.Max().Get()
 

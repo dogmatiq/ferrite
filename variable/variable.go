@@ -38,17 +38,17 @@ type Any interface {
 	IsValid() bool
 
 	// Value returns the variable's value.
-	Value() (maybe.Value[Value], ValidationError)
+	Value() (maybe.Value[Value], ValueError)
 }
 
 // OfType is an environment variable depicted by type T.
 type OfType[T any] struct {
-	spec SpecFor[T]
+	spec TypedSpec[T]
 	env  Environment
 
 	once  sync.Once
 	value maybe.Value[valueOf[T]]
-	err   ValidationError
+	err   ValueError
 }
 
 // Spec returns the variable's specification.
@@ -72,7 +72,7 @@ func (v *OfType[T]) IsValid() bool {
 }
 
 // Value returns the variable's value.
-func (v *OfType[T]) Value() (maybe.Value[Value], ValidationError) {
+func (v *OfType[T]) Value() (maybe.Value[Value], ValueError) {
 	v.resolve()
 	return maybe.Map(
 		v.value,
@@ -83,7 +83,7 @@ func (v *OfType[T]) Value() (maybe.Value[Value], ValidationError) {
 }
 
 // NativeValue returns the variable's native value.
-func (v *OfType[T]) NativeValue() (maybe.Value[T], ValidationError) {
+func (v *OfType[T]) NativeValue() (maybe.Value[T], ValueError) {
 	v.resolve()
 	return maybe.Map(
 		v.value,
@@ -104,10 +104,10 @@ func (v *OfType[T]) resolve() {
 
 		n, err := v.spec.schema.Unmarshal(lit)
 		if err != nil {
-			v.err = validationError{
+			v.err = valueError{
 				name:    v.spec.name,
 				literal: lit,
-				reason:  err,
+				cause:   err,
 			}
 			return
 		}

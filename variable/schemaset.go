@@ -7,102 +7,131 @@ import (
 
 // Set is a schema that only allows a specific set of static values.
 type Set interface {
+	Schema
+
 	// Members returns the members of the set.
 	Members() []Literal
 }
 
-// SetOf is a Set containing values of type T.
-type SetOf[T any] struct {
-	marshal func(T) (Literal, error)
-	members []Literal
-	values  map[Literal]T
+// TypedSet is a Set containing values of type T.
+type TypedSet[T any] struct {
+	render  func(T) Literal
+	order   []Literal
+	members map[Literal]T
 }
 
 // NewSet contains a new set containing the given values.
 func NewSet[T any](
-	marshal func(T) (Literal, error),
-	values ...T,
-) (SetOf[T], error) {
-	if len(values) == 0 {
-		return SetOf[T]{}, errors.New("must have at least one member")
+	members []T,
+	render func(T) Literal,
+) (TypedSet[T], error) {
+	if len(members) < 2 {
+		return TypedSet[T]{}, errors.New("must allow at least two distinct values")
 	}
 
-	s := SetOf[T]{
-		marshal: marshal,
-		values:  make(map[Literal]T, len(values)),
+	s := TypedSet[T]{
+		render:  render,
+		members: make(map[Literal]T, len(members)),
 	}
 
-	for _, v := range values {
-		lit, err := marshal(v)
-		if err != nil {
-			return SetOf[T]{}, err
-		}
+	for _, v := range members {
+		lit := render(v)
 
 		if lit == "" {
-			return SetOf[T]{}, errors.New("members must not have empty string representations")
+			return TypedSet[T]{}, errors.New("literals can not be an empty string")
 		}
 
-		if _, ok := s.values[lit]; ok {
-			return SetOf[T]{}, errors.New("members literals must be unique")
+		if _, ok := s.members[lit]; ok {
+			return TypedSet[T]{}, fmt.Errorf("literals must be unique but multiple values are represented as %q", string(lit))
 		}
 
-		s.members = append(s.members, lit)
-		s.values[lit] = v
+		s.order = append(s.order, lit)
+		s.members[lit] = v
 	}
 
 	return s, nil
 }
 
 // Members returns the members of the set.
-func (s SetOf[T]) Members() []Literal {
-	return s.members
+func (s TypedSet[T]) Members() []Literal {
+	return s.order
 }
 
 // AcceptVisitor passes s to the appropriate method of v.
-func (s SetOf[T]) AcceptVisitor(v SchemaVisitor) {
+func (s TypedSet[T]) AcceptVisitor(v SchemaVisitor) {
 	v.VisitSet(s)
 }
 
 // Marshal converts a value to its literal representation.
-func (s SetOf[T]) Marshal(v T) (Literal, error) {
-	lit, err := s.marshal(v)
-	if err != nil {
-		return "", err
-	}
-
-	if _, ok := s.values[lit]; ok {
+func (s TypedSet[T]) Marshal(v T) (Literal, error) {
+	lit := s.render(v)
+	if _, ok := s.members[lit]; ok {
 		return lit, nil
 	}
 
-	return "", SetMembershipError{
-		Schema: s,
-	}
+	return "", SetMembershipError{s}
 }
 
 // Unmarshal converts a literal value to it's native representation.
-func (s SetOf[T]) Unmarshal(v Literal) (T, error) {
-	if n, ok := s.values[v]; ok {
+func (s TypedSet[T]) Unmarshal(v Literal) (T, error) {
+	if n, ok := s.members[v]; ok {
 		return n, nil
 	}
 
 	var zero T
-	return zero, SetMembershipError{
-		Schema: s,
-	}
+	return zero, SetMembershipError{s}
 }
 
 // SetMembershipError is a validation error that indicates a value is not a
 // member of a specific set.
 type SetMembershipError struct {
-	Schema Set
+	Set Set
+}
+
+var _ SchemaError = SetMembershipError{}
+
+// Schema returns the schema that was violated.
+func (e SetMembershipError) Schema() Schema {
+	return e.Set
+}
+
+// AcceptVisitor passes the error to the appropriate method of v.
+func (e SetMembershipError) AcceptVisitor(v SchemaErrorVisitor) {
+	v.VisitSetMembershipError(e)
 }
 
 func (e SetMembershipError) Error() string {
-	members := e.Schema.Members()
+	members := e.Set.Members()
 
-	if len(members) == 2 {
-		return fmt.Sprintf("must be either %s or %s", members[0], members[1])
+	switch n := len(members); n {
+	case 2:
+		return fmt.Sprintf(
+			"expected either %s or %s",
+			members[0],
+			members[1],
+		)
+	case 3:
+		return fmt.Sprintf(
+			"expected %s, %s or %s",
+			members[0],
+			members[1],
+			members[2],
+		)
+	case 4:
+		return fmt.Sprintf(
+			"expected %s, %s, %s or %s",
+			members[0],
+			members[1],
+			members[2],
+			members[3],
+		)
+	default: // 5 or more
+		return fmt.Sprintf(
+			"expected %s, %s ... %s, or one of %d other values",
+			members[0],
+			members[1],
+			members[n-1],
+			n-3,
+		)
 	}
-
-	return "must be a member of the set"
 }

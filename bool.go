@@ -22,7 +22,7 @@ func Bool(name, desc string) BoolBuilder[bool] {
 // human-readable description of the environment variable.
 func BoolAs[T ~bool](name, desc string) BoolBuilder[T] {
 	return BoolBuilder[T]{
-		spec: variable.PendingSpecFor[T]{
+		spec: variable.PendingSpec[T]{
 			Name:        variable.Name(name),
 			Description: desc,
 		},
@@ -34,7 +34,7 @@ func BoolAs[T ~bool](name, desc string) BoolBuilder[T] {
 
 // BoolBuilder builds a specification for a boolean value.
 type BoolBuilder[T ~bool] struct {
-	spec variable.PendingSpecFor[T]
+	spec variable.PendingSpec[T]
 }
 
 // WithLiterals overrides the default literals used to represent true and false.
@@ -43,14 +43,13 @@ type BoolBuilder[T ~bool] struct {
 // custom literals.
 func (b BoolBuilder[T]) WithLiterals(t, f string) BoolBuilder[T] {
 	s, err := variable.NewSet(
-		func(v T) (variable.Literal, error) {
+		[]T{true, false},
+		func(v T) variable.Literal {
 			if v {
-				return variable.Literal(t), nil
+				return variable.Literal(t)
 			}
-			return variable.Literal(f), nil
+			return variable.Literal(f)
 		},
-		T(true),
-		T(false),
 	)
 	if err != nil {
 		b.spec.InvalidErr(err)

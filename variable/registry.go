@@ -23,6 +23,7 @@ func (r *Registry) Range(fn func(Any) bool) {
 // Reset removes all variables from the registry.
 func (r *Registry) Reset() {
 	r.vars.Range(func(k, _ any) bool {
+		r.Environment.Unset(k.(Name))
 		r.vars.Delete(k)
 		return true
 	})
@@ -35,7 +36,7 @@ var DefaultRegistry = Registry{
 
 // Register registers a new variable.
 func Register[T any](
-	spec PendingSpecFor[T],
+	spec PendingSpec[T],
 	options []RegisterOption,
 ) *OfType[T] {
 	opts := registerOptions{

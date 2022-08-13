@@ -17,7 +17,7 @@ import (
 // human-readable description of the environment variable.
 func Duration(name, desc string) DurationBuilder {
 	b := DurationBuilder{
-		spec: variable.PendingSpecFor[time.Duration]{
+		spec: variable.PendingSpec[time.Duration]{
 			Name:        variable.Name(name),
 			Description: desc,
 		},
@@ -38,7 +38,7 @@ func Duration(name, desc string) DurationBuilder {
 
 // DurationBuilder builds a specification for a duration variable.
 type DurationBuilder struct {
-	spec variable.PendingSpecFor[time.Duration]
+	spec variable.PendingSpec[time.Duration]
 }
 
 // WithDefault sets a default value of the variable.
@@ -95,7 +95,7 @@ func (durationMarshaler) Unmarshal(v variable.Literal) (time.Duration, error) {
 
 	m := err.Error()
 	if !strings.Contains(m, "unit") {
-		return 0, errors.New("must be a valid duration, e.g. 10m30s")
+		return 0, errors.New("expected a valid duration, e.g. 10m30s")
 	}
 
 	return 0, errors.New(

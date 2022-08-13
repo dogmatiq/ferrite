@@ -51,17 +51,17 @@ var _ = Describe("type DurationBuilder", func() {
 					Entry(
 						"missing units",
 						"630",
-						`FERRITE_DURATION (630) is invalid: missing unit`,
+						`value of FERRITE_DURATION (630) is invalid: missing unit`,
 					),
 					Entry(
 						"unknown units",
 						"630q",
-						`FERRITE_DURATION (630q) is invalid: unknown unit "q"`,
+						`value of FERRITE_DURATION (630q) is invalid: unknown unit "q"`,
 					),
 					Entry(
 						"less than the minimum",
 						"0s",
-						`FERRITE_DURATION (0s) is invalid: must be 1ns or greater`,
+						`value of FERRITE_DURATION (0s) is invalid: too low, expected 1ns or greater`,
 					),
 				)
 			})
@@ -131,17 +131,17 @@ var _ = Describe("type DurationBuilder", func() {
 					Entry(
 						"missing units",
 						"630",
-						`FERRITE_DURATION (630) is invalid: missing unit`,
+						`value of FERRITE_DURATION (630) is invalid: missing unit`,
 					),
 					Entry(
 						"unknown units",
 						"630q",
-						`FERRITE_DURATION (630q) is invalid: unknown unit "q"`,
+						`value of FERRITE_DURATION (630q) is invalid: unknown unit "q"`,
 					),
 					Entry(
 						"less than the minimum",
 						"0s",
-						`FERRITE_DURATION (0s) is invalid: must be 1ns or greater`,
+						`value of FERRITE_DURATION (0s) is invalid: too low, expected 1ns or greater`,
 					),
 				)
 			})
