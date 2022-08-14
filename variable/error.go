@@ -6,5 +6,5 @@ type Error interface {
 	error
 
 	// Name returns the name of the environment variable.
-	Name() Name
+	Name() string
 }

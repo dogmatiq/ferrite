@@ -1,6 +1,28 @@
 package variable
 
-import "fmt"
+import (
+	"fmt"
+	"regexp"
+	"strings"
+)
+
+// Literal the string representation of an environment variable value.
+type Literal struct {
+	String string
+}
+
+// needsQuotes is a pattern that matches values that require shell escaping.
+var needsQuotes = regexp.MustCompile(`[^\w@%+=:,./-]`)
+
+// Quote returns an escaped string representation of the value that can be used
+// directly in the shell.
+func (l Literal) Quote() string {
+	if !needsQuotes.MatchString(l.String) {
+		return l.String
+	}
+
+	return `'` + strings.ReplaceAll(l.String, `'`, `'"'"'`) + `'`
+}
 
 // Value is the value of an environment variable.
 type Value interface {
@@ -64,12 +86,12 @@ type ValueErrorVisitor interface {
 
 // valueError indicates that there is a problem with a variable's value.
 type valueError struct {
-	name    Name
+	name    string
 	literal Literal
 	cause   error
 }
 
-func (e valueError) Name() Name {
+func (e valueError) Name() string {
 	return e.name
 }
 

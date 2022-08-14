@@ -1,33 +1,10 @@
 package variable
 
 import (
-	"regexp"
-	"strings"
 	"sync"
 
 	"github.com/dogmatiq/ferrite/maybe"
 )
-
-// Name is the name of an environment variable.
-type Name string
-
-// Literal the string representation of an environment variable value.
-type Literal struct {
-	String string
-}
-
-// needsQuotes is a pattern that matches values that require shell escaping.
-var needsQuotes = regexp.MustCompile(`[^\w@%+=:,./-]`)
-
-// Quote returns an escaped string representation of the value that can be used
-// directly in the shell.
-func (l Literal) Quote() string {
-	if !needsQuotes.MatchString(l.String) {
-		return l.String
-	}
-
-	return `'` + strings.ReplaceAll(l.String, `'`, `'"'"'`) + `'`
-}
 
 // Any is an interface for an environment variable of any type.
 type Any interface {

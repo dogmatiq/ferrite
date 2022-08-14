@@ -10,7 +10,7 @@ import (
 // Spec is a specification of a variable.
 type Spec interface {
 	// Name returns the name of the variable.
-	Name() Name
+	Name() string
 
 	// Description returns a human-readable description of the variable.
 	Description() string
@@ -28,7 +28,7 @@ type Spec interface {
 
 // TypedSpec builds a specification for a variable depicted by type T.
 type TypedSpec[T any] struct {
-	name       Name
+	name       string
 	desc       string
 	def        maybe.Value[valueOf[T]]
 	required   bool
@@ -44,9 +44,7 @@ func NewSpec[T any, S TypedSchema[T]](
 	schema S,
 	validators ...Validator[T],
 ) (TypedSpec[T], error) {
-	n := Name(name)
-
-	if n == "" {
+	if name == "" {
 		return TypedSpec[T]{}, SpecError{
 			cause: errors.New("variable name must not be empty"),
 		}
@@ -54,20 +52,20 @@ func NewSpec[T any, S TypedSchema[T]](
 
 	if desc == "" {
 		return TypedSpec[T]{}, SpecError{
-			name:  n,
+			name:  name,
 			cause: errors.New("variable description must not be empty"),
 		}
 	}
 
 	if err := schema.Finalize(); err != nil {
 		return TypedSpec[T]{}, SpecError{
-			name:  n,
+			name:  name,
 			cause: err,
 		}
 	}
 
 	spec := TypedSpec[T]{
-		name:       n,
+		name:       name,
 		desc:       desc,
 		schema:     schema,
 		required:   req,
@@ -78,7 +76,7 @@ func NewSpec[T any, S TypedSchema[T]](
 		for _, val := range validators {
 			if err := val.Validate(v); err != nil {
 				return TypedSpec[T]{}, SpecError{
-					name:  n,
+					name:  name,
 					cause: fmt.Errorf("default value: %w", err),
 				}
 			}
@@ -87,7 +85,7 @@ func NewSpec[T any, S TypedSchema[T]](
 		lit, err := schema.Marshal(v)
 		if err != nil {
 			return TypedSpec[T]{}, SpecError{
-				name:  n,
+				name:  name,
 				cause: fmt.Errorf("default value: %w", err),
 			}
 		}
@@ -103,7 +101,7 @@ func NewSpec[T any, S TypedSchema[T]](
 }
 
 // Name returns the name of the variable.
-func (s TypedSpec[T]) Name() Name {
+func (s TypedSpec[T]) Name() string {
 	return s.name
 }
 
@@ -131,12 +129,12 @@ func (s TypedSpec[T]) IsRequired() bool {
 // SpecError represents a problem with a variable specification itself, rather
 // than the variable's value.
 type SpecError struct {
-	name  Name
+	name  string
 	cause error
 }
 
 // Name returns the name of the environment variable.
-func (e SpecError) Name() Name {
+func (e SpecError) Name() string {
 	return e.name
 }
 
