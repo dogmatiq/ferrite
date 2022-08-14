@@ -13,14 +13,11 @@ func (r *renderer) renderSpecs() {
 
 func (r *renderer) renderSpec(s variable.Spec) {
 	r.line("### `%s`", s.Name())
+
 	r.line("")
 	r.line("> %s", s.Description())
+
 	r.line("")
-
-	if s.IsRequired() {
-		r.line("This variable is **required**, although a default is provided.")
-	}
-
 	s.Schema().AcceptVisitor(schemaRenderer{r, s})
 }
 
@@ -33,7 +30,17 @@ func (r schemaRenderer) VisitNumeric(variable.Numeric) {
 }
 
 func (r schemaRenderer) VisitSet(s variable.Set) {
-	r.line("It must be one of the values shown in the examples below.")
+	literals := s.Literals()
+
+	if len(literals) == 2 {
+		r.line(
+			"This variable **MAY** be set to either `%s` or `%s`. If it is undefined or",
+			literals[0].Quote(),
+			literals[1].Quote(),
+		)
+		r.line("empty a default value of `%s` is used.", r.spec.Default().MustGet().Quote())
+	}
+
 	r.line("")
 	r.line("```bash")
 
