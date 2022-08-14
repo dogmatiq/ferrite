@@ -13,7 +13,7 @@ type renderer struct {
 	Specs []variable.Spec
 
 	w    strings.Builder
-	refs map[string]string
+	refs map[string]struct{}
 }
 
 func (r *renderer) line(f string, v ...any) {
@@ -21,10 +21,6 @@ func (r *renderer) line(f string, v ...any) {
 }
 
 func (r *renderer) Render() string {
-	r.refs = map[string]string{
-		"dogmatiq/ferrite": "https://github.com/dogmatiq/ferrite",
-	}
-
 	r.line("# Environment Variables")
 	r.line("")
 	r.line("This document describes the environment variables used by `%s`.", r.App)
@@ -36,13 +32,15 @@ func (r *renderer) Render() string {
 
 	r.line("")
 	r.line("The application may consume other undocumented environment variables; this")
-	r.line("document only shows those variables defined using [dogmatiq/ferrite].")
+	r.line("document only shows those variables defined using %s.", r.link("Ferrite"))
 
 	if len(r.Specs) != 0 {
 		r.line("")
 		r.renderIndex()
 		r.line("")
 		r.renderSpecs()
+		r.line("")
+		r.renderUsage()
 	}
 
 	r.line("")
@@ -51,16 +49,10 @@ func (r *renderer) Render() string {
 	return r.w.String()
 }
 
-func (r *renderer) yaml(v any) {
-	r.line("```yaml")
-
-	enc := yaml.NewEncoder(&r.w)
-	enc.SetIndent(2)
-	defer enc.Close()
-
-	if err := enc.Encode(v); err != nil {
+func (r *renderer) yaml(v string) string {
+	data, err := yaml.Marshal(v)
+	if err != nil {
 		panic(err)
 	}
-
-	r.line("```")
+	return strings.TrimSpace(string(data))
 }

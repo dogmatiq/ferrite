@@ -27,9 +27,9 @@ func ExampleInit_markdownUsage() {
 	// **There do not appear to be any environment variables.**
 	//
 	// The application may consume other undocumented environment variables; this
-	// document only shows those variables defined using [dogmatiq/ferrite].
+	// document only shows those variables defined using [Ferrite].
 	//
 	// <!-- references -->
 	//
-	// [dogmatiq/ferrite]: https://github.com/dogmatiq/ferrite
+	// [ferrite]: https://github.com/dogmatiq/ferrite
 }

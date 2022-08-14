@@ -41,16 +41,21 @@ func (r schemaRenderer) VisitSet(s variable.Set) {
 
 	for _, m := range s.Literals() {
 		if m == def {
-			r.line("export %s=%s # default value", r.spec.Name(), m)
+			r.line(
+				"export %s=%s # default value",
+				r.spec.Name(),
+				m.Quote(),
+			)
 		} else {
-			r.line("export %s=%s", r.spec.Name(), m)
+			r.line(
+				"export %s=%s",
+				r.spec.Name(),
+				m.Quote(),
+			)
 		}
 	}
 
 	r.line("```")
-
-	r.line("")
-	r.renderUsageExamples(r.spec, s.Literals()[0])
 }
 
 func (r schemaRenderer) VisitString(variable.String) {

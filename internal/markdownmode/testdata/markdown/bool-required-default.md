@@ -3,7 +3,7 @@
 This document describes the environment variables used by `<app>`.
 
 The application may consume other undocumented environment variables; this
-document only shows those variables defined using [dogmatiq/ferrite].
+document only shows those variables defined using [Ferrite].
 
 ## Index
 
@@ -23,40 +23,74 @@ export DEBUG=true
 export DEBUG=false # default value
 ```
 
+## Usage Examples
+
 <details>
-<summary>Usage Examples</summary>
+<summary>Kubernetes</summary>
 
-#### Kubernetes Container
+This example shows how to define the environment variables needed by `<app>`
+on a [Kubernetes container] within a Kubenetes deployment manifest.
 
 ```yaml
-env:
-  - name: DEBUG
-    value: "true"
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-deployment
+spec:
+  template:
+    spec:
+      containers:
+        - name: example-container
+          env:
+            - name: DEBUG
+              value: "false" # enable or disable debugging features
 ```
 
-#### Kubernetes Config Map
+Alternatively, the environment variables can be defined within a [config map][kubernetes config map]
+then referenced a deployment manifest using `configMapRef`.
 
 ```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example-config-map
 data:
-  DEBUG: "true"
+  DEBUG: "false" # enable or disable debugging features
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-deployment
+spec:
+  template:
+    spec:
+      containers:
+        - name: example-container
+          envFrom:
+            - configMapRef:
+                name: example-config-map
 ```
 
-#### Docker Compose / Stack
+</details>
+
+<details>
+<summary>Docker</summary>
+
+This example shows how to define the environment variables needed by `<app>`
+when running as a [Docker service] defined in a Docker compose file.
 
 ```yaml
-environment:
-  DEBUG: "true"
-```
-
-#### GitHub Actions Workflow
-
-```yaml
-env:
-  DEBUG: "true"
+service:
+  example-service:
+    environment:
+      DEBUG: "false" # enable or disable debugging features
 ```
 
 </details>
 
 <!-- references -->
 
-[dogmatiq/ferrite]: https://github.com/dogmatiq/ferrite
+[docker service]: https://docs.docker.com/compose/environment-variables/#set-environment-variables-in-containers
+[ferrite]: https://github.com/dogmatiq/ferrite
+[kubernetes config map]: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables
+[kubernetes container]: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#define-an-environment-variable-for-a-container

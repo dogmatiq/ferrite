@@ -42,7 +42,7 @@ var _ = Describe("func Run()", func() {
 			"empty.md",
 			func(reg *variable.Registry) {},
 		),
-		XEntry(
+		Entry(
 			nil,
 			"bool-required-default.md",
 			func(reg *variable.Registry) {
