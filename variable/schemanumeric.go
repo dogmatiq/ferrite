@@ -162,13 +162,7 @@ func (e MinError) AcceptVisitor(v SchemaErrorVisitor) {
 }
 
 func (e MinError) Error() string {
-	min := e.Numeric.Min().MustGet()
-
-	if max, ok := e.Numeric.Max().Get(); ok {
-		return fmt.Sprintf("too low, expected between %s and %s", min, max)
-	}
-
-	return fmt.Sprintf("too low, expected %s or greater", min)
+	return fmt.Sprintf("too low, %s", explainRangeError(e.Numeric))
 }
 
 // MaxError indicates that a numeric value was greater than the maximum
@@ -190,11 +184,24 @@ func (e MaxError) AcceptVisitor(v SchemaErrorVisitor) {
 }
 
 func (e MaxError) Error() string {
-	max := e.Numeric.Max().MustGet()
+	return fmt.Sprintf("too high, %s", explainRangeError(e.Numeric))
+}
 
-	if min, ok := e.Numeric.Min().Get(); ok {
-		return fmt.Sprintf("too high, expected between %s and %s", min, max)
+func explainRangeError(s Numeric) string {
+	min, hasMin := s.Min().Get()
+	max, hasMax := s.Max().Get()
+
+	if !hasMin {
+		return fmt.Sprintf("expected %s or less", max)
 	}
 
-	return fmt.Sprintf("too high, expected %s or less", max)
+	if !hasMax {
+		return fmt.Sprintf("expected %s or greater", min)
+	}
+
+	if min == max {
+		return fmt.Sprintf("expected exactly %s", min)
+	}
+
+	return fmt.Sprintf("expected between %s and %s", min, max)
 }

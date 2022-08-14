@@ -31,27 +31,30 @@ type SchemaError interface {
 
 // SchemaVisitor dispatches based on a variable's schema.
 type SchemaVisitor interface {
-	VisitSet(Set)
 	VisitNumeric(Numeric)
+	VisitSet(Set)
+	VisitString(String)
 }
 
 // SchemaErrorVisitor dispatches based on the type of a SchemaError.
 type SchemaErrorVisitor interface {
-	VisitSetMembershipError(SetMembershipError)
+	// Numeric errors ...
 	VisitMinError(MinError)
 	VisitMaxError(MaxError)
+
+	// Set errors...
+	VisitSetMembershipError(SetMembershipError)
+
+	// String errors ...
+	VisitMinLengthError(MinLengthError)
+	VisitMaxLengthError(MaxLengthError)
 }
 
 // TypedSchema describes the valid values of an environment varible value
 // depicted by type T.
 type TypedSchema[T any] interface {
 	Schema
-
-	// Marshal converts a value to its literal representation.
-	Marshal(T) (Literal, error)
-
-	// Unmarshal converts a literal value to it's native representation.
-	Unmarshal(Literal) (T, error)
+	Marshaler[T]
 }
 
 // typeOf returns the type of T.

@@ -263,8 +263,12 @@ func (r *schemaRenderer) VisitNumeric(s variable.Numeric) {
 	} else if hasMax {
 		fmt.Fprintf(r.Output, "... %s", max)
 	} else {
-		fmt.Fprintf(r.Output, "<%s>", s.Type().Name())
+		fmt.Fprintf(r.Output, "<%s>", s.Type().Kind())
 	}
+}
+
+func (r *schemaRenderer) VisitString(s variable.String) {
+	fmt.Fprintf(r.Output, "<%s>", s.Type().Kind())
 }
 
 type errorRenderer struct {
@@ -308,5 +312,17 @@ func (r *errorRenderer) VisitMinError(err variable.MinError) {
 }
 
 func (r *errorRenderer) VisitMaxError(err variable.MaxError) {
+	r.Output.WriteString(err.Error())
+}
+
+func (r *errorRenderer) VisitString(s variable.String) {
+	r.Output.WriteString(r.Error.Unwrap().Error())
+}
+
+func (r *errorRenderer) VisitMinLengthError(err variable.MinLengthError) {
+	r.Output.WriteString(err.Error())
+}
+
+func (r *errorRenderer) VisitMaxLengthError(err variable.MaxLengthError) {
 	r.Output.WriteString(err.Error())
 }
