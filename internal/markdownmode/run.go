@@ -21,31 +21,36 @@ func Run(reg *variable.Registry) string {
 
 	fmt.Fprintln(w, "# Environment Variables")
 	fmt.Fprintln(w, "")
-	fmt.Fprintf(w, "This document describes the environment variables used by `%s`. ", filepath.Base(os.Args[0]))
-	fmt.Fprintln(w, "It is generated automatically by [dogmatiq/ferrite].")
+	fmt.Fprintf(w, "This document describes the environment variables used by `%s`.\n", filepath.Base(os.Args[0]))
 
-	// 	resolvers := spec.SortedResolvers()
+	variables := reg.Variables()
 
-	// 	if len(resolvers) == 0 {
-	// 		fmt.Fprintln(w, "")
-	// 		fmt.Fprintln(w, "This application does not currently use any environment variables via the [dogmatiq/ferrite] library.")
-	// 	} else {
-	// 		fmt.Fprintln(w, "")
-	// 		fmt.Fprintln(w, "## Index")
-	// 		fmt.Fprintln(w, "")
+	if len(variables) == 0 {
+		fmt.Fprintln(w, "")
+		fmt.Fprintln(w, "**There do not appear to be any environment variables.**")
+	}
 
-	// 		for _, r := range resolvers {
-	// 			renderMarkdownSpecLink(w, r.Spec())
-	// 		}
+	fmt.Fprintln(w, "")
+	fmt.Fprintln(w, "The application may consume other undocumented environment variables; this")
+	fmt.Fprintln(w, "document only shows those variables defined using [dogmatiq/ferrite].")
 
-	// 		fmt.Fprintln(w, "")
-	// 		fmt.Fprintln(w, "## Specification")
+	if len(variables) != 0 {
+		fmt.Fprintln(w, "")
+		fmt.Fprintln(w, "## Index")
+		fmt.Fprintln(w, "")
 
-	// 		for _, r := range resolvers {
-	// 			fmt.Fprintln(w, "")
-	// 			renderMarkdownSpec(w, r.Spec())
-	// 		}
-	// 	}
+		// 		for _, r := range resolvers {
+		// 			renderMarkdownSpecLink(w, r.Spec())
+		// 		}
+
+		// 		fmt.Fprintln(w, "")
+		// 		fmt.Fprintln(w, "## Specification")
+
+		// 		for _, r := range resolvers {
+		// 			fmt.Fprintln(w, "")
+		// 			renderMarkdownSpec(w, r.Spec())
+		// 		}
+	}
 
 	fmt.Fprintln(w, "")
 	renderReferences(w, references)

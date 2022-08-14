@@ -11,6 +11,7 @@ require (
 
 require (
 	github.com/google/go-cmp v0.5.8 // indirect
+	github.com/jmalloc/gomegax v0.0.0-20200507221434-64fca4c0e03a
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect

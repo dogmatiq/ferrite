@@ -1,6 +1,9 @@
 # Environment Variables
 
-This document describes the environment variables used by `ferrite.test`. It is generated automatically by [dogmatiq/ferrite].
+This document describes the environment variables used by `markdownmode.test`.
+
+The application may consume other undocumented environment variables; this
+document only shows those variables defined using [dogmatiq/ferrite].
 
 ## Index
 
@@ -10,7 +13,7 @@ This document describes the environment variables used by `ferrite.test`. It is 
 
 ### `DEBUG`
 
-> enable debug mode
+> enable or disable debugging features
 
 This variable is **required**, although a default is provided.
 

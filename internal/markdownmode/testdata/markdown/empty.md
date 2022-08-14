@@ -1,8 +1,11 @@
 # Environment Variables
 
-This document describes the environment variables used by `ferrite.test`. It is generated automatically by [dogmatiq/ferrite].
+This document describes the environment variables used by `markdownmode.test`.
 
-This application does not currently use any environment variables via the [dogmatiq/ferrite] library.
+**There do not appear to be any environment variables.**
+
+The application may consume other undocumented environment variables; this
+document only shows those variables defined using [dogmatiq/ferrite].
 
 <!-- references -->
 

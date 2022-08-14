@@ -3,6 +3,7 @@ package variable
 import (
 	"os"
 	"strings"
+	"sync"
 )
 
 // Environment is an interface for interacting with the environment.
@@ -62,6 +63,46 @@ func (osEnvironment) Range(fn func(Name, Literal) bool) {
 			return
 		}
 	}
+}
+
+// MemoryEnvironment is an Environment that stores environment variables in this
+// processes's memory, as opposed to using the operating system environment.
+type MemoryEnvironment struct {
+	m sync.Map // map[Name]Literal
+}
+
+// Get returns the value of an environment variable.
+func (e MemoryEnvironment) Get(n Name) Literal {
+	if v, ok := e.m.Load(n); ok {
+		return v.(Literal)
+	}
+
+	return ""
+}
+
+// Set sets the value of an environment variable.
+func (e MemoryEnvironment) Set(n Name, v Literal) {
+	e.m.Store(n, v)
+}
+
+// Unset removes an environment variable.
+func (e MemoryEnvironment) Unset(n Name) {
+	e.m.Delete(n)
+}
+
+// Range calls fn for each environment variable.
+//
+// It stops iterating if fn returns false. It returns true if iteration
+// reached the env.
+func (e MemoryEnvironment) Range(fn func(Name, Literal) bool) {
+	e.m.Range(
+		func(k, v any) bool {
+			return fn(
+				k.(Name),
+				v.(Literal),
+			)
+		},
+	)
 }
 
 // Snapshot is a snapshot of an environment.

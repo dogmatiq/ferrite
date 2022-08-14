@@ -2,7 +2,6 @@ package ferrite_test
 
 import (
 	"os"
-	"time"
 
 	"github.com/dogmatiq/ferrite"
 )
@@ -15,17 +14,20 @@ func ExampleInit_markdownUsage() {
 	// variables.
 	os.Setenv("FERRITE_MODE", "usage/markdown")
 
-	ferrite.
-		Duration("FERRITE_DURATION", "example duration").
-		WithDefault(10 * time.Minute).
-		Required()
-
 	ferrite.Init()
+
+	// In the interest of simplicity this example doesn't have any defined
+	// environment variables, which is explained in the markdown output.
 
 	// Output:
 	// # Environment Variables
 	//
-	// This document describes the environment variables used by `ferrite.test`. It is generated automatically by [dogmatiq/ferrite].
+	// This document describes the environment variables used by `ferrite.test`.
+	//
+	// **There do not appear to be any environment variables.**
+	//
+	// The application may consume other undocumented environment variables; this
+	// document only shows those variables defined using [dogmatiq/ferrite].
 	//
 	// <!-- references -->
 	//

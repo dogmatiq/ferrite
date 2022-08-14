@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/dogmatiq/ferrite/variable"
-	"golang.org/x/exp/slices"
 )
 
 // Run validates the variables in the given registry.
@@ -15,23 +14,10 @@ import (
 // usage contains human-readable usage and validation information intended for
 // display in the console.
 func Run(reg *variable.Registry) (usage string, ok bool) {
-	var variables []variable.Any
-	reg.Range(func(v variable.Any) bool {
-		variables = append(variables, v)
-		return true
-	})
-
-	slices.SortFunc(
-		variables,
-		func(a, b variable.Any) bool {
-			return a.Spec().Name() < b.Spec().Name()
-		},
-	)
-
 	ok = true
 	t := table{}
 
-	for _, v := range variables {
+	for _, v := range reg.Variables() {
 		t.AddRow(
 			renderName(v),
 			v.Spec().Description(),

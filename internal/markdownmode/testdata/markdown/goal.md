@@ -1,6 +1,10 @@
 # Environment Variables
 
-This document describes the environment variables used by `binary-name`. It is generated automatically by [dogmatiq/ferrite].
+This document describes the environment variables used by `markdownmode.test`.
+
+It is generated automatically by inspecting the specifications of variables
+consumed via [dogmatiq/ferrite]. The application may consume other undocumented
+or undiscoverable environment variables.
 
 ## Index
 

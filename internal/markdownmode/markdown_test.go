@@ -1,69 +1,63 @@
 package markdownmode_test
 
-// import (
-// 	"bytes"
-// 	"os"
-// 	"path/filepath"
-// 	"strings"
+import (
+	"bytes"
+	"os"
+	"path/filepath"
+	"strings"
 
-// 	. "github.com/dogmatiq/ferrite"
-// 	. "github.com/jmalloc/gomegax"
-// 	. "github.com/onsi/ginkgo/v2"
-// 	. "github.com/onsi/gomega"
-// )
+	"github.com/dogmatiq/ferrite"
+	. "github.com/dogmatiq/ferrite/internal/markdownmode"
+	"github.com/dogmatiq/ferrite/variable"
+	. "github.com/jmalloc/gomegax"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+)
 
-// var _ = Describe("func generateMarkdownUsage()", func() {
-// 	buffer := &bytes.Buffer{}
+var _ = Describe("func Run()", func() {
+	var reg *variable.Registry
 
-// 	BeforeEach(func() {
-// 		buffer.Reset()
+	BeforeEach(func() {
+		reg = &variable.Registry{
+			Environment: variable.MemoryEnvironment{},
+		}
+	})
 
-// 		SetExitBehavior(
-// 			buffer,
-// 			func(code int) {
-// 				Expect(code).To(Equal(0))
-// 			},
-// 		)
+	DescribeTable(
+		"it describes the environment variable",
+		func(
+			file string,
+			setup func(*variable.Registry),
+		) {
+			setup(reg)
 
-// 		os.Setenv("FERRITE_MODE", "usage/markdown")
-// 	})
+			expect, err := os.ReadFile(filepath.Join("testdata", "markdown", file))
+			Expect(err).ShouldNot(HaveOccurred())
 
-// 	AfterEach(func() {
-// 		tearDown()
-// 	})
+			actual := Run(reg)
+			ExpectWithOffset(1, actual).To(EqualX(string(expect)))
+		},
+		Entry(
+			nil,
+			"empty.md",
+			func(reg *variable.Registry) {},
+		),
+		XEntry(
+			nil,
+			"bool-required-default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Bool("DEBUG", "enable or disable debugging features").
+					WithDefault(false).
+					Required(variable.WithRegistry(reg))
+			},
+		),
+	)
+})
 
-// 	DescribeTable(
-// 		"it describes the environment variable",
-// 		func(file string, setup func(), lines ...string) {
-// 			expect, err := os.ReadFile(filepath.Join("testdata", "markdown", file))
-// 			Expect(err).ShouldNot(HaveOccurred())
-
-// 			setup()
-// 			Init()
-
-// 			actual := buffer.String()
-// 			ExpectWithOffset(1, actual).To(EqualX(string(expect)))
-// 		},
-// 		Entry(
-// 			nil,
-// 			"empty.md",
-// 			func() {},
-// 		),
-// 		Entry(
-// 			nil,
-// 			"bool-required-default.md",
-// 			func() {
-// 				Bool("DEBUG", "enable debug mode").
-// 					WithDefault(false).
-// 					Required()
-// 			},
-// 		),
-// 	)
-// })
-
-// // expectLines verifies that text consists of the given lines.
-// func expectLines(buf *bytes.Buffer, lines ...string) {
-// 	actual := buf.String()
-// 	expect := strings.Join(lines, "\n") + "\n"
-// 	ExpectWithOffset(1, actual).To(EqualX(expect))
-// }
+// expectLines verifies that text consists of the given lines.
+func expectLines(buf *bytes.Buffer, lines ...string) {
+	actual := buf.String()
+	expect := strings.Join(lines, "\n") + "\n"
+	ExpectWithOffset(1, actual).To(EqualX(expect))
+}
