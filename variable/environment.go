@@ -32,12 +32,14 @@ type osEnvironment struct{}
 
 // Get returns the value of an environment variable.
 func (osEnvironment) Get(n Name) Literal {
-	return Literal(os.Getenv(string(n)))
+	return Literal{
+		String: os.Getenv(string(n)),
+	}
 }
 
 // Set sets the value of an environment variable.
 func (osEnvironment) Set(n Name, v Literal) {
-	if err := os.Setenv(string(n), string(v)); err != nil {
+	if err := os.Setenv(string(n), v.String); err != nil {
 		panic(err)
 	}
 }
@@ -57,7 +59,9 @@ func (osEnvironment) Range(fn func(Name, Literal) bool) {
 	for _, env := range os.Environ() {
 		i := strings.IndexByte(env, '=')
 		n := Name(env[:i])
-		v := Literal(env[i+1:])
+		v := Literal{
+			String: env[i+1:],
+		}
 
 		if !fn(n, v) {
 			return
@@ -77,7 +81,7 @@ func (e MemoryEnvironment) Get(n Name) Literal {
 		return v.(Literal)
 	}
 
-	return ""
+	return Literal{}
 }
 
 // Set sets the value of an environment variable.

@@ -13,6 +13,18 @@ type Registry struct {
 	vars sync.Map // map[String]Variable
 }
 
+// Specs returns the specs of the variables in the library, sorted by name.
+func (r *Registry) Specs() []Spec {
+	variables := r.Variables()
+	specs := make([]Spec, len(variables))
+
+	for i, v := range variables {
+		specs[i] = v.Spec()
+	}
+
+	return specs
+}
+
 // Variables returns the variables in the registry, sorted by name.
 func (r *Registry) Variables() []Any {
 	var variables []Any

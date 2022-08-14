@@ -49,12 +49,15 @@ func (s TypedSet[T]) Finalize() error {
 	for _, v := range s.Members {
 		lit := s.ToLiteral(v)
 
-		if lit == "" {
+		if lit.String == "" {
 			return errors.New("literals can not be an empty string")
 		}
 
 		if slices.Contains(uniq, lit) {
-			return fmt.Errorf("literals must be unique but multiple values are represented as %q", string(lit))
+			return fmt.Errorf(
+				"literals must be unique but multiple values are represented as %q",
+				lit.String,
+			)
 		}
 
 		uniq = append(uniq, lit)
@@ -78,7 +81,7 @@ func (s TypedSet[T]) Marshal(v T) (Literal, error) {
 		}
 	}
 
-	return "", SetMembershipError{s}
+	return Literal{}, SetMembershipError{s}
 }
 
 // Unmarshal converts a literal value to it's native representation.
@@ -118,30 +121,30 @@ func (e SetMembershipError) Error() string {
 	case 2:
 		return fmt.Sprintf(
 			"expected either %s or %s",
-			members[0],
-			members[1],
+			members[0].Quote(),
+			members[1].Quote(),
 		)
 	case 3:
 		return fmt.Sprintf(
 			"expected %s, %s or %s",
-			members[0],
-			members[1],
-			members[2],
+			members[0].Quote(),
+			members[1].Quote(),
+			members[2].Quote(),
 		)
 	case 4:
 		return fmt.Sprintf(
 			"expected %s, %s, %s or %s",
-			members[0],
-			members[1],
-			members[2],
-			members[3],
+			members[0].Quote(),
+			members[1].Quote(),
+			members[2].Quote(),
+			members[3].Quote(),
 		)
 	default: // 5 or more
 		return fmt.Sprintf(
 			"expected %s, %s ... %s, or one of %d other values",
-			members[0],
-			members[1],
-			members[n-1],
+			members[0].Quote(),
+			members[1].Quote(),
+			members[n-1].Quote(),
 			n-3,
 		)
 	}

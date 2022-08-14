@@ -66,11 +66,13 @@ func (b UnsignedBuilder[T]) spec(req bool) variable.TypedSpec[T] {
 type unsignedMarshaler[T constraints.Unsigned] struct{}
 
 func (unsignedMarshaler[T]) Marshal(v T) (variable.Literal, error) {
-	return variable.Literal(fmt.Sprintf("%d", v)), nil
+	return variable.Literal{
+		String: fmt.Sprintf("%d", v),
+	}, nil
 }
 
 func (unsignedMarshaler[T]) Unmarshal(v variable.Literal) (T, error) {
-	n, err := strconv.ParseUint(string(v), 10, bitSize[T]())
+	n, err := strconv.ParseUint(v.String, 10, bitSize[T]())
 	if err != nil {
 		return 0, err
 	}

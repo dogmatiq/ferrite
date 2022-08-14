@@ -75,10 +75,14 @@ func (b BoolBuilder[T]) spec(req bool) variable.TypedSpec[T] {
 		variable.TypedSet[T]{
 			Members: []T{true, false},
 			ToLiteral: func(v T) variable.Literal {
+				s := b.f
 				if v {
-					return variable.Literal(b.t)
+					s = b.t
 				}
-				return variable.Literal(b.f)
+
+				return variable.Literal{
+					String: s,
+				}
 			},
 		},
 	)

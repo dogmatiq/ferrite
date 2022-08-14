@@ -66,11 +66,13 @@ func (b SignedBuilder[T]) spec(req bool) variable.TypedSpec[T] {
 type signedMarshaler[T constraints.Signed] struct{}
 
 func (signedMarshaler[T]) Marshal(v T) (variable.Literal, error) {
-	return variable.Literal(fmt.Sprintf("%+d", v)), nil
+	return variable.Literal{
+		String: fmt.Sprintf("%+d", v),
+	}, nil
 }
 
 func (signedMarshaler[T]) Unmarshal(v variable.Literal) (T, error) {
-	n, err := strconv.ParseInt(string(v), 10, bitSize[T]())
+	n, err := strconv.ParseInt(v.String, 10, bitSize[T]())
 	if err != nil {
 		return 0, err
 	}

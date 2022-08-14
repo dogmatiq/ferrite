@@ -114,7 +114,7 @@ func (s TypedNumeric[T]) AcceptVisitor(v SchemaVisitor) {
 // Marshal converts a value to its literal representation.
 func (s TypedNumeric[T]) Marshal(v T) (Literal, error) {
 	if err := s.validate(v); err != nil {
-		return "", err
+		return Literal{}, err
 	}
 
 	return s.Marshaler.Marshal(v)
@@ -192,16 +192,29 @@ func explainRangeError(s Numeric) string {
 	max, hasMax := s.Max().Get()
 
 	if !hasMin {
-		return fmt.Sprintf("expected %s or less", max)
+		return fmt.Sprintf(
+			"expected %s or less",
+			max.Quote(),
+		)
 	}
 
 	if !hasMax {
-		return fmt.Sprintf("expected %s or greater", min)
+		return fmt.Sprintf(
+			"expected %s or greater",
+			min.Quote(),
+		)
 	}
 
 	if min == max {
-		return fmt.Sprintf("expected exactly %s", min)
+		return fmt.Sprintf(
+			"expected exactly %s",
+			min.Quote(),
+		)
 	}
 
-	return fmt.Sprintf("expected between %s and %s", min, max)
+	return fmt.Sprintf(
+		"expected between %s and %s",
+		min.Quote(),
+		max.Quote(),
+	)
 }

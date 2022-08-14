@@ -25,9 +25,9 @@ func EnumAs[T any](name, desc string) EnumBuilder[T] {
 		name: name,
 		desc: desc,
 		toLiteral: func(v T) variable.Literal {
-			return variable.Literal(
-				fmt.Sprint(v),
-			)
+			return variable.Literal{
+				String: fmt.Sprint(v),
+			}
 		},
 	}
 }

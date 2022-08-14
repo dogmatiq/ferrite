@@ -48,7 +48,11 @@ func renderSpec(s variable.Spec) string {
 	})
 
 	if def, ok := s.Default().Get(); ok {
-		return fmt.Sprintf("[ %s ] = %s", out, def)
+		return fmt.Sprintf(
+			"[ %s ] = %s",
+			out,
+			def.Quote(),
+		)
 	}
 
 	if s.IsRequired() {
@@ -71,7 +75,7 @@ func renderValue(v variable.Any) string {
 		return fmt.Sprintf(
 			"%s set to %s, %s",
 			invalidIcon,
-			err.Literal(),
+			err.Literal().Quote(),
 			out.String(),
 		)
 	}
@@ -85,15 +89,15 @@ func renderValue(v variable.Any) string {
 			return fmt.Sprintf(
 				"%s set to %s",
 				validIcon,
-				value.Canonical(),
+				value.Canonical().Quote(),
 			)
 		}
 
 		return fmt.Sprintf(
 			"%s set to %s (specified non-canonically as %s)",
 			validIcon,
-			value.Canonical(),
-			value.Verbatim(),
+			value.Canonical().Quote(),
+			value.Verbatim().Quote(),
 		)
 	}
 
@@ -122,7 +126,7 @@ func (r *schemaRenderer) VisitSet(s variable.Set) {
 			r.Output.WriteString(" | ")
 		}
 
-		r.Output.WriteString(m.String())
+		r.Output.WriteString(m.Quote())
 	}
 }
 
@@ -131,13 +135,30 @@ func (r *schemaRenderer) VisitNumeric(s variable.Numeric) {
 	max, hasMax := s.Max().Get()
 
 	if hasMin && hasMax {
-		fmt.Fprintf(r.Output, "%s .. %s", min, max)
+		fmt.Fprintf(
+			r.Output,
+			"%s .. %s",
+			min.Quote(),
+			max.Quote(),
+		)
 	} else if hasMin {
-		fmt.Fprintf(r.Output, "%s ...", min)
+		fmt.Fprintf(
+			r.Output,
+			"%s ...",
+			min.Quote(),
+		)
 	} else if hasMax {
-		fmt.Fprintf(r.Output, "... %s", max)
+		fmt.Fprintf(
+			r.Output,
+			"... %s",
+			max.Quote(),
+		)
 	} else {
-		fmt.Fprintf(r.Output, "<%s>", s.Type().Kind())
+		fmt.Fprintf(
+			r.Output,
+			"<%s>",
+			s.Type().Kind(),
+		)
 	}
 }
 
@@ -177,7 +198,12 @@ func (r *errorRenderer) VisitNumeric(s variable.Numeric) {
 	const maxHumanReadableBits = 16
 	min, max, explicit := s.Limits()
 	if explicit || s.Bits() <= maxHumanReadableBits {
-		fmt.Fprintf(r.Output, " between %s and %s", min, max)
+		fmt.Fprintf(
+			r.Output,
+			" between %s and %s",
+			min.Quote(),
+			max.Quote(),
+		)
 	}
 }
 

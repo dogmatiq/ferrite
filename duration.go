@@ -81,18 +81,22 @@ func (durationMarshaler) Marshal(v time.Duration) (variable.Literal, error) {
 	// then we need to keep the last units.
 	for unicode.IsDigit(runes[i]) {
 		if runes[i] != '0' {
-			return variable.Literal(runes), nil
+			return variable.Literal{
+				String: string(runes),
+			}, nil
 		}
 
 		i--
 	}
 
 	// Otherwise the last units have a zero value and we omit them.
-	return variable.Literal(runes[:i+1]), nil
+	return variable.Literal{
+		String: string(runes[:i+1]),
+	}, nil
 }
 
 func (durationMarshaler) Unmarshal(v variable.Literal) (time.Duration, error) {
-	d, err := time.ParseDuration(strings.ReplaceAll(string(v), " ", ""))
+	d, err := time.ParseDuration(strings.ReplaceAll(v.String, " ", ""))
 	if err == nil {
 		return d, nil
 	}
@@ -105,7 +109,7 @@ func (durationMarshaler) Unmarshal(v variable.Literal) (time.Duration, error) {
 	return 0, errors.New(
 		strings.Replace(
 			strings.TrimPrefix(m, "time: "),
-			fmt.Sprintf(` in duration %q`, string(v)),
+			fmt.Sprintf(` in duration %q`, v.String),
 			"",
 			1,
 		),

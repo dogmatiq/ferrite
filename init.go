@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/dogmatiq/ferrite/internal/markdownmode"
 	"github.com/dogmatiq/ferrite/internal/validatemode"
@@ -22,7 +23,8 @@ import (
 func Init() {
 	switch m := os.Getenv("FERRITE_MODE"); m {
 	case "usage/markdown":
-		result := markdownmode.Run(&variable.DefaultRegistry)
+		app := filepath.Base(os.Args[0])
+		result := markdownmode.Run(app, &variable.DefaultRegistry)
 		io.WriteString(output, result)
 		exit(0)
 

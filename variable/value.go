@@ -94,7 +94,7 @@ func (e valueError) Error() string {
 	return fmt.Sprintf(
 		"value of %s (%s) is invalid: %s",
 		e.name,
-		e.literal,
+		e.literal.Quote(),
 		e.cause,
 	)
 }

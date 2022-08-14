@@ -12,21 +12,21 @@ import (
 type Name string
 
 // Literal the string representation of an environment variable value.
-type Literal string
+type Literal struct {
+	String string
+}
 
 // needsQuotes is a pattern that matches values that require shell escaping.
 var needsQuotes = regexp.MustCompile(`[^\w@%+=:,./-]`)
 
-// String returns an escaped string representation of the value that can be used
+// Quote returns an escaped string representation of the value that can be used
 // directly in the shell.
-func (l Literal) String() string {
-	s := string(l)
-
-	if needsQuotes.MatchString(s) {
-		return `'` + strings.ReplaceAll(s, `'`, `'"'"'`) + `'`
+func (l Literal) Quote() string {
+	if !needsQuotes.MatchString(l.String) {
+		return l.String
 	}
 
-	return s
+	return `'` + strings.ReplaceAll(l.String, `'`, `'"'"'`) + `'`
 }
 
 // Any is an interface for an environment variable of any type.
@@ -97,7 +97,7 @@ func (v *OfType[T]) resolve() {
 	v.once.Do(func() {
 		lit := v.env.Get(v.spec.name)
 
-		if lit == "" {
+		if lit.String == "" {
 			v.value = v.spec.def
 			return
 		}

@@ -67,12 +67,18 @@ func (s TypedString[T]) AcceptVisitor(v SchemaVisitor) {
 
 // Marshal converts a value to its literal representation.
 func (s TypedString[T]) Marshal(v T) (Literal, error) {
-	return Literal(v), s.validate(v)
+	if err := s.validate(v); err != nil {
+		return Literal{}, err
+	}
+
+	return Literal{
+		String: string(v),
+	}, nil
 }
 
 // Unmarshal converts a literal value to it's native representation.
 func (s TypedString[T]) Unmarshal(v Literal) (T, error) {
-	n := T(v)
+	n := T(v.String)
 	return n, s.validate(n)
 }
 

@@ -1,6 +1,6 @@
 # Environment Variables
 
-This document describes the environment variables used by `markdownmode.test`.
+This document describes the environment variables used by `<app>`.
 
 **There do not appear to be any environment variables.**
 
