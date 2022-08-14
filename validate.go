@@ -286,11 +286,15 @@ func (r *errorRenderer) VisitSetMembershipError(err variable.SetMembershipError)
 }
 
 func (r *errorRenderer) VisitNumeric(s variable.Numeric) {
-	typeName := strings.ToLower(
-		s.Type().Name(),
-	)
+	typeName := strings.ToLower(s.Type().Name())
 
-	fmt.Fprintf(r.Output, "expected a valid %s", typeName)
+	if s.Type().PkgPath() == "" {
+		if strings.Contains(typeName, "int") {
+			typeName = "integer"
+		}
+	}
+
+	fmt.Fprintf(r.Output, "expected %s", typeName)
 
 	const maxHumanReadableBits = 16
 	min, max, explicit := s.Limits()
