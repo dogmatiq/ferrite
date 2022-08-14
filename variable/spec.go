@@ -28,11 +28,12 @@ type Spec interface {
 
 // TypedSpec builds a specification for a variable depicted by type T.
 type TypedSpec[T any] struct {
-	name     Name
-	desc     string
-	schema   TypedSchema[T]
-	def      maybe.Value[valueOf[T]]
-	required bool
+	name       Name
+	desc       string
+	def        maybe.Value[valueOf[T]]
+	required   bool
+	schema     TypedSchema[T]
+	validators []Validator[T]
 }
 
 // NewSpec returns a new specification.
@@ -41,6 +42,7 @@ func NewSpec[T any, S TypedSchema[T]](
 	def maybe.Value[T],
 	req bool,
 	schema S,
+	validators ...Validator[T],
 ) (TypedSpec[T], error) {
 	n := Name(name)
 
@@ -65,13 +67,23 @@ func NewSpec[T any, S TypedSchema[T]](
 	}
 
 	spec := TypedSpec[T]{
-		name:     n,
-		desc:     desc,
-		schema:   schema,
-		required: req,
+		name:       n,
+		desc:       desc,
+		schema:     schema,
+		required:   req,
+		validators: validators,
 	}
 
 	if v, ok := def.Get(); ok {
+		for _, val := range validators {
+			if err := val.Validate(v); err != nil {
+				return TypedSpec[T]{}, SpecError{
+					name:  n,
+					cause: fmt.Errorf("default value: %w", err),
+				}
+			}
+		}
+
 		lit, err := schema.Marshal(v)
 		if err != nil {
 			return TypedSpec[T]{}, SpecError{

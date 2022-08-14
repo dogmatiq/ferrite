@@ -112,6 +112,17 @@ func (v *OfType[T]) resolve() {
 			return
 		}
 
+		for _, val := range v.spec.validators {
+			if err := val.Validate(n); err != nil {
+				v.err = valueError{
+					name:    v.spec.name,
+					literal: lit,
+					cause:   err,
+				}
+				return
+			}
+		}
+
 		c, err := v.spec.schema.Marshal(n)
 		if err != nil {
 			panic(err)
