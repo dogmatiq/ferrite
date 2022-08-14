@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/dogmatiq/ferrite"
-	"github.com/dogmatiq/ferrite/spec"
 	"github.com/dogmatiq/ferrite/variable"
 )
 
@@ -22,7 +21,6 @@ func setUp() {
 // tearDown resets the global state after a test.
 func tearDown() {
 	ferrite.SetExitBehavior(os.Stderr, os.Exit)
-	spec.ResetRegistry()
 	variable.DefaultRegistry.Reset()
 
 	for _, env := range os.Environ() {
