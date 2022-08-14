@@ -1,42 +1,50 @@
-package ferrite
+package validatemode
 
 import (
 	"fmt"
 	"strings"
 
-	"github.com/dogmatiq/ferrite/internal/table"
 	"github.com/dogmatiq/ferrite/variable"
+	"golang.org/x/exp/slices"
 )
 
-// validate parses and validates all environment variables.
-func validate() (string, bool) {
-	ok := true
-	t := table.Table{
-		Less: func(a, b []string) bool {
-			ra := []rune(a[0])
-			rb := []rune(b[0])
+// Run validates the variables in the given registry.
+//
+// ok is true if all variables are valid.
+//
+// usage contains human-readable usage and validation information intended for
+// display in the console.
+//
+// It writes a report to w, intended for display in the console.
+func Run(reg *variable.Registry) (usage string, ok bool) {
+	var variables []variable.Any
+	reg.Range(func(v variable.Any) bool {
+		variables = append(variables, v)
+		return true
+	})
 
-			// Trim the indicator icon/indenting from the start to sort by name.
-			return string(ra[3:]) < string(rb[3:])
-		},
-	}
-
-	variable.DefaultRegistry.Range(
-		func(v variable.Any) bool {
-			t.AddRow(
-				renderName(v),
-				v.Spec().Description(),
-				renderSpec(v.Spec()),
-				renderValue(v),
-			)
-
-			if !v.IsValid() {
-				ok = false
-			}
-
-			return true
+	slices.SortFunc(
+		variables,
+		func(a, b variable.Any) bool {
+			return a.Spec().Name() < b.Spec().Name()
 		},
 	)
+
+	ok = true
+	t := table{}
+
+	for _, v := range variables {
+		t.AddRow(
+			renderName(v),
+			v.Spec().Description(),
+			renderSpec(v.Spec()),
+			renderValue(v),
+		)
+
+		if !v.IsValid() {
+			ok = false
+		}
+	}
 
 	return "Environment Variables:\n\n" + t.String(), ok
 }

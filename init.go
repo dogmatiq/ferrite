@@ -3,6 +3,9 @@ package ferrite
 import (
 	"io"
 	"os"
+
+	"github.com/dogmatiq/ferrite/internal/validatemode"
+	"github.com/dogmatiq/ferrite/variable"
 )
 
 // Init initializes ferrite.
@@ -15,7 +18,7 @@ import (
 // information about the environment variables in Markdown format, then exists
 // the process successfully.
 func Init() {
-	if result, ok := validate(); !ok {
+	if result, ok := validatemode.Run(&variable.DefaultRegistry); !ok {
 		io.WriteString(output, result)
 		exit(1)
 	}

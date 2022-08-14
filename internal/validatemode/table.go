@@ -1,5 +1,4 @@
-// Package table renders a column-aligned table in plain-text.
-package table
+package validatemode
 
 import (
 	"fmt"
@@ -7,19 +6,16 @@ import (
 	"strings"
 
 	"github.com/mattn/go-runewidth"
-	"golang.org/x/exp/slices"
 )
 
-// Table renders a column-aligned table.
-type Table struct {
-	Less func(a, b []string) bool
-
+// table renders a column-aligned table.
+type table struct {
 	widths []int
 	rows   [][]string
 }
 
 // AddRow adds a row to the table.
-func (t *Table) AddRow(columns ...string) {
+func (t *table) AddRow(columns ...string) {
 	for len(t.widths) < len(columns) {
 		t.widths = append(t.widths, 0)
 	}
@@ -35,7 +31,7 @@ func (t *Table) AddRow(columns ...string) {
 }
 
 // WriteTo writes the table to w.
-func (t *Table) WriteTo(w io.Writer) (int64, error) {
+func (t *table) WriteTo(w io.Writer) (int64, error) {
 	var count int64
 
 	for _, columns := range t.rows {
@@ -64,11 +60,7 @@ func (t *Table) WriteTo(w io.Writer) (int64, error) {
 	return count, nil
 }
 
-func (t *Table) String() string {
-	if t.Less != nil {
-		slices.SortFunc(t.rows, t.Less)
-	}
-
+func (t *table) String() string {
 	var buf strings.Builder
 	t.WriteTo(&buf)
 	return buf.String()
