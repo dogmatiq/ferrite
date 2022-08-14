@@ -14,8 +14,6 @@ import (
 //
 // usage contains human-readable usage and validation information intended for
 // display in the console.
-//
-// It writes a report to w, intended for display in the console.
 func Run(reg *variable.Registry) (usage string, ok bool) {
 	var variables []variable.Any
 	reg.Range(func(v variable.Any) bool {

@@ -1,9 +1,11 @@
 package ferrite
 
 import (
+	"fmt"
 	"io"
 	"os"
 
+	"github.com/dogmatiq/ferrite/internal/markdownmode"
 	"github.com/dogmatiq/ferrite/internal/validatemode"
 	"github.com/dogmatiq/ferrite/variable"
 )
@@ -18,8 +20,20 @@ import (
 // information about the environment variables in Markdown format, then exists
 // the process successfully.
 func Init() {
-	if result, ok := validatemode.Run(&variable.DefaultRegistry); !ok {
+	switch m := os.Getenv("FERRITE_MODE"); m {
+	case "usage/markdown":
+		result := markdownmode.Run(&variable.DefaultRegistry)
 		io.WriteString(output, result)
+		exit(0)
+
+	case "validate", "":
+		if result, ok := validatemode.Run(&variable.DefaultRegistry); !ok {
+			io.WriteString(output, result)
+			exit(1)
+		}
+
+	default:
+		fmt.Fprintf(output, "unrecognized FERRITE_MODE (%s)\n", m)
 		exit(1)
 	}
 }
