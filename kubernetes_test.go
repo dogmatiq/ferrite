@@ -325,7 +325,7 @@ var _ = Describe("type KubernetesServiceBuilder", func() {
 								Optional().
 								Value()
 						}).To(PanicWith(
-							`FERRITE_SVC_SERVICE_HOST is undefined: FERRITE_SVC_SERVICE_PORT is defined, define both or neither`,
+							`FERRITE_SVC_SERVICE_PORT is defined but FERRITE_SVC_SERVICE_HOST is not, define both or neither`,
 						))
 					})
 				})
@@ -367,7 +367,7 @@ var _ = Describe("type KubernetesServiceBuilder", func() {
 								Optional().
 								Value()
 						}).To(PanicWith(
-							`FERRITE_SVC_SERVICE_PORT is undefined: FERRITE_SVC_SERVICE_HOST is defined, define both or neither`,
+							`FERRITE_SVC_SERVICE_HOST is defined but FERRITE_SVC_SERVICE_PORT is not, define both or neither`,
 						))
 					})
 				})
@@ -601,17 +601,17 @@ func invalidHostTable(
 		Entry(
 			"leading dot",
 			".host.example.org",
-			`FERRITE_SVC_SERVICE_HOST (.host.example.org) is invalid: host must not begin or end with a dot`,
+			`value of FERRITE_SVC_SERVICE_HOST (.host.example.org) is invalid: host must not begin or end with a dot`,
 		),
 		Entry(
 			"trailing dot",
 			"host.example.org.",
-			`FERRITE_SVC_SERVICE_HOST (host.example.org.) is invalid: host must not begin or end with a dot`,
+			`value of FERRITE_SVC_SERVICE_HOST (host.example.org.) is invalid: host must not begin or end with a dot`,
 		),
 		Entry(
 			"whitespace",
 			"host.examp le.org",
-			`FERRITE_SVC_SERVICE_HOST ('host.examp le.org') is invalid: host must not contain whitespace`,
+			`value of FERRITE_SVC_SERVICE_HOST ('host.examp le.org') is invalid: host must not contain whitespace`,
 		),
 	)
 }
@@ -626,42 +626,42 @@ func invalidPortTable(
 		Entry(
 			"numeric port too low",
 			"0",
-			`FERRITE_SVC_SERVICE_PORT (0) is invalid: numeric ports must be between 1 and 65535`,
+			`value of FERRITE_SVC_SERVICE_PORT (0) is invalid: numeric ports must be between 1 and 65535`,
 		),
 		Entry(
 			"numeric port too high",
 			"65536",
-			`FERRITE_SVC_SERVICE_PORT (65536) is invalid: numeric ports must be between 1 and 65535`,
+			`value of FERRITE_SVC_SERVICE_PORT (65536) is invalid: numeric ports must be between 1 and 65535`,
 		),
 		Entry(
 			"IANA service name is too long",
 			"this-name-is-very-long",
-			`FERRITE_SVC_SERVICE_PORT (this-name-is-very-long) is invalid: IANA service name must be between 1 and 15 characters`,
+			`value of FERRITE_SVC_SERVICE_PORT (this-name-is-very-long) is invalid: IANA service name must be between 1 and 15 characters`,
 		),
 		Entry(
 			"IANA service name does not contain any letters",
 			"100-200",
-			`FERRITE_SVC_SERVICE_PORT (100-200) is invalid: IANA service name must contain at least one letter`,
+			`value of FERRITE_SVC_SERVICE_PORT (100-200) is invalid: IANA service name must contain at least one letter`,
 		),
 		Entry(
 			"IANA service name starts with a hyphen",
 			"-foo",
-			`FERRITE_SVC_SERVICE_PORT (-foo) is invalid: IANA service name must not begin or end with a hyphen`,
+			`value of FERRITE_SVC_SERVICE_PORT (-foo) is invalid: IANA service name must not begin or end with a hyphen`,
 		),
 		Entry(
 			"IANA service name ends with a hyphen",
 			"foo-",
-			`FERRITE_SVC_SERVICE_PORT (foo-) is invalid: IANA service name must not begin or end with a hyphen`,
+			`value of FERRITE_SVC_SERVICE_PORT (foo-) is invalid: IANA service name must not begin or end with a hyphen`,
 		),
 		Entry(
 			"IANA service name contains adjacent hyphens",
 			"foo--bar",
-			`FERRITE_SVC_SERVICE_PORT (foo--bar) is invalid: IANA service name must not contain adjacent hyphens`,
+			`value of FERRITE_SVC_SERVICE_PORT (foo--bar) is invalid: IANA service name must not contain adjacent hyphens`,
 		),
 		Entry(
 			"IANA service name contains an invalid character",
 			"foo*bar",
-			`FERRITE_SVC_SERVICE_PORT ('foo*bar') is invalid: IANA service name must contain only ASCII letters, digits and hyphen`,
+			`value of FERRITE_SVC_SERVICE_PORT ('foo*bar') is invalid: IANA service name must contain only ASCII letters, digits and hyphen`,
 		),
 	)
 }

@@ -72,7 +72,7 @@ var _ = Describe("type EnumSpec", func() {
 							Required().
 							Value()
 					}).To(PanicWith(
-						`FERRITE_ENUM ('<non-member>') is invalid: must be one of the enum members`,
+						`value of FERRITE_ENUM ('<non-member>') is invalid: expected '<member-0>', '<member-1>' or '<member-2>'`,
 					))
 				})
 			})
@@ -142,7 +142,7 @@ var _ = Describe("type EnumSpec", func() {
 							Optional().
 							Value()
 					}).To(PanicWith(
-						`FERRITE_ENUM ('<non-member>') is invalid: must be one of the enum members`,
+						`value of FERRITE_ENUM ('<non-member>') is invalid: expected '<member-0>', '<member-1>' or '<member-2>'`,
 					))
 				})
 			})
@@ -177,29 +177,6 @@ var _ = Describe("type EnumSpec", func() {
 		})
 	})
 
-	When("one of the members has an empty literal representation", func() {
-		It("uses that member as the default", func() {
-			v := ferrite.
-				EnumAs[string]("FERRITE_ENUM", "<desc>").
-				WithMembers("foo", "", "bar").
-				Required().
-				Value()
-
-			Expect(v).To(Equal(""))
-		})
-
-		It("does not take precedence over an explicit default", func() {
-			v := ferrite.
-				EnumAs[string]("FERRITE_ENUM", "<desc>").
-				WithDefault("foo").
-				WithMembers("foo", "", "bar").
-				Required().
-				Value()
-
-			Expect(v).To(Equal("foo"))
-		})
-	})
-
 	When("multiple members have the same literal representation", func() {
 		It("panics", func() {
 			Expect(func() {
@@ -207,7 +184,7 @@ var _ = Describe("type EnumSpec", func() {
 					WithMembers(member1, member1).
 					Required()
 			}).To(PanicWith(
-				`specification for FERRITE_ENUM is invalid: multiple members use '<member-1>' as their literal representation`,
+				`specification for FERRITE_ENUM is invalid: literals must be unique but multiple values are represented as "<member-1>"`,
 			))
 		})
 	})
@@ -219,7 +196,7 @@ var _ = Describe("type EnumSpec", func() {
 					EnumAs[string]("FERRITE_ENUM", "<desc>").
 					Required()
 			}).To(PanicWith(
-				`specification for FERRITE_ENUM is invalid: no enum members are defined`,
+				`specification for FERRITE_ENUM is invalid: must allow at least two distinct values`,
 			))
 		})
 	})
@@ -231,7 +208,7 @@ var _ = Describe("type EnumSpec", func() {
 					WithDefault(enumMember(100)).
 					Required()
 			}).To(PanicWith(
-				`specification for FERRITE_ENUM is invalid: the default value must be one of the enum members, got '<member-100>'`,
+				`specification for FERRITE_ENUM is invalid: default value: expected '<member-0>', '<member-1>' or '<member-2>'`,
 			))
 		})
 	})

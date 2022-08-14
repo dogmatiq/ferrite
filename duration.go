@@ -1,13 +1,14 @@
 package ferrite
 
 import (
+	"errors"
 	"fmt"
-	"os"
 	"strings"
 	"time"
+	"unicode"
 
-	"github.com/dogmatiq/ferrite/internal/optional"
-	"github.com/dogmatiq/ferrite/spec"
+	"github.com/dogmatiq/ferrite/maybe"
+	"github.com/dogmatiq/ferrite/variable"
 )
 
 // Duration configures an environment variable as a duration.
@@ -23,98 +24,90 @@ func Duration(name, desc string) DurationBuilder {
 
 // DurationBuilder builds a specification for a duration variable.
 type DurationBuilder struct {
-	name string
-	desc string
-	def  optional.Optional[time.Duration]
+	name, desc string
+	def        maybe.Value[time.Duration]
 }
 
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b DurationBuilder) WithDefault(v time.Duration) DurationBuilder {
-	b.def = optional.With(v)
+	b.def = maybe.Some(v)
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b DurationBuilder) Required() Required[time.Duration] {
-	return registerRequired(b.spec(), b.resolve)
+func (b DurationBuilder) Required(options ...variable.RegisterOption) Required[time.Duration] {
+	return registerRequired(b.spec(true), options)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b DurationBuilder) Optional() Optional[time.Duration] {
-	return registerOptional(b.spec(), b.resolve)
+func (b DurationBuilder) Optional(options ...variable.RegisterOption) Optional[time.Duration] {
+	return registerOptional(b.spec(false), options)
 }
 
-func (b DurationBuilder) spec() spec.Spec {
-	s := spec.Spec{
-		Name:        b.name,
-		Description: b.desc,
-		Schema: spec.Range{
-			Min: time.Nanosecond.String(),
+func (b DurationBuilder) spec(req bool) variable.TypedSpec[time.Duration] {
+	s, err := variable.NewSpec(
+		b.name,
+		b.desc,
+		b.def,
+		req,
+		variable.TypedNumeric[time.Duration]{
+			Marshaler: durationMarshaler{},
+			NativeMin: maybe.Some(1 * time.Nanosecond),
 		},
-	}
-
-	if v, ok := b.def.Get(); ok {
-		s.HasDefault = true
-		s.Default = v.String()
+	)
+	if err != nil {
+		panic(err.Error())
 	}
 
 	return s
 }
 
-func (b DurationBuilder) resolve() (spec.ValueOf[time.Duration], error) {
-	env := os.Getenv(b.name)
+type durationMarshaler struct{}
 
-	if env == "" {
-		if v, ok := b.def.Get(); ok {
-			return spec.ValueOf[time.Duration]{
-				Go:    v,
-				Env:   v.String(),
-				IsDef: true,
-			}, nil
+func (durationMarshaler) Marshal(v time.Duration) (variable.Literal, error) {
+	runes := []rune(v.String())
+	i := len(runes) - 1
+
+	// Skip over the last units.
+	for !unicode.IsDigit(runes[i]) {
+		i--
+	}
+
+	// Look for the second-to-last units, if any non-zero digit is encountered
+	// then we need to keep the last units.
+	for unicode.IsDigit(runes[i]) {
+		if runes[i] != '0' {
+			return variable.Literal(runes), nil
 		}
 
-		return spec.Undefined[time.Duration](b.name)
+		i--
 	}
 
-	v, err := time.ParseDuration(env)
-	if err != nil {
-		if strings.Contains(err.Error(), "unit") || strings.Contains(err.Error(), "unit") {
-			return spec.Invalid[time.Duration](
-				b.name,
-				env,
-				"%s",
-				strings.Replace(
-					strings.TrimPrefix(err.Error(), "time: "),
-					fmt.Sprintf(` in duration %q`, env),
-					"",
-					1,
-				),
-			)
-		}
+	// Otherwise the last units have a zero value and we omit them.
+	return variable.Literal(runes[:i+1]), nil
+}
 
-		return spec.Invalid[time.Duration](
-			b.name,
-			env,
-			"must be a valid duration, e.g. 10m30s",
-		)
+func (durationMarshaler) Unmarshal(v variable.Literal) (time.Duration, error) {
+	d, err := time.ParseDuration(strings.ReplaceAll(string(v), " ", ""))
+	if err == nil {
+		return d, nil
 	}
 
-	min := time.Nanosecond
-	if v < min {
-		return spec.Invalid[time.Duration](
-			b.name,
-			v.String(),
-			"must be %s or greater",
-			min,
-		)
+	m := err.Error()
+	if !strings.Contains(m, "unit") {
+		return 0, err
 	}
 
-	return spec.ValueOf[time.Duration]{
-		Go:  v,
-		Env: env,
-	}, nil
+	return 0, errors.New(
+		strings.Replace(
+			strings.TrimPrefix(m, "time: "),
+			fmt.Sprintf(` in duration %q`, string(v)),
+			"",
+			1,
+		),
+	)
 }

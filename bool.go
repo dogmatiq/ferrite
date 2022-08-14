@@ -2,10 +2,9 @@ package ferrite
 
 import (
 	"fmt"
-	"os"
 
-	"github.com/dogmatiq/ferrite/internal/optional"
-	"github.com/dogmatiq/ferrite/spec"
+	"github.com/dogmatiq/ferrite/maybe"
+	"github.com/dogmatiq/ferrite/variable"
 )
 
 // Bool configures an environment variable as a boolean.
@@ -25,18 +24,16 @@ func BoolAs[T ~bool](name, desc string) BoolBuilder[T] {
 	return BoolBuilder[T]{
 		name: name,
 		desc: desc,
-	}.WithLiterals(
-		fmt.Sprint(T(true)),
-		fmt.Sprint(T(false)),
-	)
+		t:    fmt.Sprint(T(true)),
+		f:    fmt.Sprint(T(false)),
+	}
 }
 
 // BoolBuilder builds a specification for a boolean value.
 type BoolBuilder[T ~bool] struct {
-	name string
-	desc string
-	t, f string
-	def  optional.Optional[T]
+	name, desc string
+	t, f       string
+	def        maybe.Value[T]
 }
 
 // WithLiterals overrides the default literals used to represent true and false.
@@ -44,16 +41,8 @@ type BoolBuilder[T ~bool] struct {
 // The default literals "true" and "false" are no longer valid values when using
 // custom literals.
 func (b BoolBuilder[T]) WithLiterals(t, f string) BoolBuilder[T] {
-	if t == "" || f == "" {
-		panic(fmt.Sprintf(
-			"specification for %s is invalid: boolean literals must not be zero-length",
-			b.name,
-		))
-	}
-
 	b.t = t
 	b.f = f
-
 	return b
 }
 
@@ -61,73 +50,41 @@ func (b BoolBuilder[T]) WithLiterals(t, f string) BoolBuilder[T] {
 //
 // It is used when the environment variable is undefined or empty.
 func (b BoolBuilder[T]) WithDefault(v T) BoolBuilder[T] {
-	b.def = optional.With(v)
+	b.def = maybe.Some(v)
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b BoolBuilder[T]) Required() Required[T] {
-	return registerRequired(b.spec(), b.resolve)
+func (b BoolBuilder[T]) Required(options ...variable.RegisterOption) Required[T] {
+	return registerRequired(b.spec(true), options)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b BoolBuilder[T]) Optional() Optional[T] {
-	return registerOptional(b.spec(), b.resolve)
+func (b BoolBuilder[T]) Optional(options ...variable.RegisterOption) Optional[T] {
+	return registerOptional(b.spec(false), options)
 }
 
-func (b BoolBuilder[T]) spec() spec.Spec {
-	s := spec.Spec{
-		Name:        b.name,
-		Description: b.desc,
-		Schema: spec.OneOf{
-			spec.Literal(b.t),
-			spec.Literal(b.f),
+func (b BoolBuilder[T]) spec(req bool) variable.TypedSpec[T] {
+	s, err := variable.NewSpec(
+		b.name,
+		b.desc,
+		b.def,
+		req,
+		variable.TypedSet[T]{
+			Members: []T{true, false},
+			ToLiteral: func(v T) variable.Literal {
+				if v {
+					return variable.Literal(b.t)
+				}
+				return variable.Literal(b.f)
+			},
 		},
-	}
-
-	if v, ok := b.def.Get(); ok {
-		s.HasDefault = true
-		s.Default = b.render(v)
+	)
+	if err != nil {
+		panic(err.Error())
 	}
 
 	return s
-}
-
-func (b BoolBuilder[T]) resolve() (spec.ValueOf[T], error) {
-	switch env := os.Getenv(b.name); env {
-	case b.t, b.f:
-		return spec.ValueOf[T]{
-			Go:  env == b.t,
-			Env: env,
-		}, nil
-
-	case "":
-		if v, ok := b.def.Get(); ok {
-			return spec.ValueOf[T]{
-				Go:    v,
-				Env:   b.render(v),
-				IsDef: true,
-			}, nil
-		}
-
-		return spec.Undefined[T](b.name)
-
-	default:
-		return spec.Invalid[T](
-			b.name,
-			env,
-			`must be either %s or %s`,
-			spec.Escape(b.t),
-			spec.Escape(b.f),
-		)
-	}
-}
-
-func (b BoolBuilder[T]) render(v T) string {
-	if v {
-		return b.t
-	}
-	return b.f
 }

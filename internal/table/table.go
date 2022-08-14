@@ -7,10 +7,13 @@ import (
 	"strings"
 
 	"github.com/mattn/go-runewidth"
+	"golang.org/x/exp/slices"
 )
 
 // Table renders a column-aligned table.
 type Table struct {
+	Less func(a, b []string) bool
+
 	widths []int
 	rows   [][]string
 }
@@ -62,6 +65,10 @@ func (t *Table) WriteTo(w io.Writer) (int64, error) {
 }
 
 func (t *Table) String() string {
+	if t.Less != nil {
+		slices.SortFunc(t.rows, t.Less)
+	}
+
 	var buf strings.Builder
 	t.WriteTo(&buf)
 	return buf.String()

@@ -61,7 +61,7 @@ var _ = Describe("type BoolBuilder", func() {
 							Required().
 							Value()
 					}).To(PanicWith(
-						`FERRITE_BOOL (true) is invalid: must be either yes or no`,
+						`value of FERRITE_BOOL (true) is invalid: expected either yes or no`,
 					))
 				})
 			})
@@ -116,7 +116,7 @@ var _ = Describe("type BoolBuilder", func() {
 							Optional().
 							Value()
 					}).To(PanicWith(
-						`FERRITE_BOOL (true) is invalid: must be either yes or no`,
+						`value of FERRITE_BOOL (true) is invalid: expected either yes or no`,
 					))
 				})
 			})
@@ -176,9 +176,11 @@ var _ = Describe("type BoolBuilder", func() {
 		When("the true literal is empty", func() {
 			It("panics", func() {
 				Expect(func() {
-					builder.WithLiterals("", "no")
+					builder.
+						WithLiterals("", "no").
+						Optional()
 				}).To(PanicWith(
-					"specification for FERRITE_BOOL is invalid: boolean literals must not be zero-length",
+					"specification for FERRITE_BOOL is invalid: literals can not be an empty string",
 				))
 			})
 		})
@@ -186,9 +188,12 @@ var _ = Describe("type BoolBuilder", func() {
 		When("the true literal is empty", func() {
 			It("panics", func() {
 				Expect(func() {
-					builder.WithLiterals("yes", "")
+					builder.
+						WithLiterals("yes", "").
+						Optional()
+
 				}).To(PanicWith(
-					"specification for FERRITE_BOOL is invalid: boolean literals must not be zero-length",
+					"specification for FERRITE_BOOL is invalid: literals can not be an empty string",
 				))
 			})
 		})

@@ -1,83 +1,91 @@
 package ferrite
 
 import (
-	"errors"
+	"fmt"
 
-	"github.com/dogmatiq/ferrite/spec"
+	"github.com/dogmatiq/ferrite/variable"
 )
 
-// Optional is the application-facing representation of an environment variable
-// that may optionally be undefined.
-//
-// It is the standard implementation of ferrite.Optional.
-type Optional[T any] struct {
-	resolve func() (T, error)
-}
-
-// Value returns the parsed value of the environment value, if it is defined.
-//
-// It panics if the environment variable is defined but invalid.
-func (v Optional[T]) Value() (T, bool) {
-	value, err := v.resolve()
-	if err != nil {
-		if errors.As(err, &spec.UndefinedError{}) {
-			return value, false
-		}
-
-		panic(err.Error())
-	}
-
-	return value, true
-}
-
-// Required is the application-facing representation of an environment
-// variable that must always have a valid value.
-//
-// It is the standard implementation of ferrite.Required.
+// Required is the application-facing representation of an environment variable
+// that must have a value.
 type Required[T any] struct {
 	resolve func() (T, error)
 }
 
-// Value returns the parsed value of the environment value.
+// Value returns the parsed and validated value of the environment variable.
 //
 // It panics if the environment variable is undefined or invalid.
-func (v Required[T]) Value() T {
-	value, err := v.resolve()
+func (r Required[T]) Value() T {
+	x, err := r.resolve()
 	if err != nil {
 		panic(err.Error())
 	}
 
-	return value
+	return x
+}
+
+// Optional is the application-facing representation of an environment variable
+// that may optionally be undefined.
+type Optional[T any] struct {
+	resolve func() (T, bool, error)
+}
+
+// Value returns the parsed and validated value of the environment variable,
+// if it is defined.
+//
+// If the environment variable is not defined (and there is no default
+// value), ok is false; otherwise, ok is true and v is the value.
+//
+// It panics if the environment variable is defined but invalid.
+func (o Optional[T]) Value() (v T, ok bool) {
+	x, ok, err := o.resolve()
+	if err != nil {
+		panic(err.Error())
+	}
+
+	return x, ok
 }
 
 func registerRequired[T any](
-	s spec.Spec,
-	r func() (spec.ValueOf[T], error),
+	spec variable.TypedSpec[T],
+	options []variable.RegisterOption,
 ) Required[T] {
-	res := spec.NewResolver(s, r)
-	spec.Register(res)
+	v := variable.Register(spec, options)
 
 	return Required[T]{
-		func() (T, error) {
-			v, err := res.ResolveTyped()
-			return v.Go, err
+		func() (zero T, _ error) {
+			n, err := v.NativeValue()
+			if err != nil {
+				return zero, err
+			}
+
+			if x, ok := n.Get(); ok {
+				return x, nil
+			}
+
+			return zero, undefinedError(v)
 		},
 	}
 }
 
 func registerOptional[T any](
-	s spec.Spec,
-	r func() (spec.ValueOf[T], error),
+	spec variable.TypedSpec[T],
+	options []variable.RegisterOption,
 ) Optional[T] {
-	s.IsOptional = true
-
-	res := spec.NewResolver(s, r)
-	spec.Register(res)
+	v := variable.Register(spec, options)
 
 	return Optional[T]{
-		func() (T, error) {
-			v, err := res.ResolveTyped()
-			return v.Go, err
+		func() (T, bool, error) {
+			n, err := v.NativeValue()
+			x, ok := n.Get()
+			return x, ok, err
 		},
 	}
+}
+
+func undefinedError(v variable.Any) error {
+	return fmt.Errorf(
+		"%s is undefined and does not have a default value",
+		v.Spec().Name(),
+	)
 }

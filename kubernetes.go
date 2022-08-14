@@ -4,13 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"os"
 	"strconv"
 	"strings"
 	"unicode"
 
-	"github.com/dogmatiq/ferrite/internal/optional"
-	"github.com/dogmatiq/ferrite/spec"
+	"github.com/dogmatiq/ferrite/maybe"
+	"github.com/dogmatiq/ferrite/variable"
 )
 
 // KubernetesAddress is the address of a Kubernetes service.
@@ -55,7 +54,7 @@ func KubernetesService(svc string) KubernetesServiceBuilder {
 type KubernetesServiceBuilder struct {
 	service          string
 	hostVar, portVar string
-	def              optional.Optional[KubernetesAddress]
+	def              maybe.Value[KubernetesAddress]
 }
 
 // WithNamedPort uses a Kubernetes named port instead of the default service
@@ -110,182 +109,129 @@ func (b KubernetesServiceBuilder) WithDefault(host, port string) KubernetesServi
 		))
 	}
 
-	b.def = optional.With(KubernetesAddress{host, port})
-
+	b.def = maybe.Some(KubernetesAddress{host, port})
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b KubernetesServiceBuilder) Required() Required[KubernetesAddress] {
-	hostSpec := b.hostSpec()
-	portSpec := b.portSpec()
-
-	hostRes := spec.NewResolver(hostSpec, b.resolveHost)
-	portRes := spec.NewResolver(portSpec, b.resolvePort)
-
-	spec.Register(hostRes)
-	spec.Register(portRes)
+func (b KubernetesServiceBuilder) Required(options ...variable.RegisterOption) Required[KubernetesAddress] {
+	host := variable.Register(b.hostSpec(true), options)
+	port := variable.Register(b.portSpec(true), options)
 
 	return Required[KubernetesAddress]{
 		func() (KubernetesAddress, error) {
-			host, err := hostRes.ResolveTyped()
+			mh, err := host.NativeValue()
 			if err != nil {
 				return KubernetesAddress{}, err
 			}
 
-			port, err := portRes.ResolveTyped()
+			mp, err := port.NativeValue()
 			if err != nil {
 				return KubernetesAddress{}, err
 			}
 
-			return KubernetesAddress{host.Go, port.Go}, nil
+			h, ok := mh.Get()
+			if !ok {
+				return KubernetesAddress{}, undefinedError(host)
+			}
+
+			p, ok := mp.Get()
+			if !ok {
+				return KubernetesAddress{}, undefinedError(port)
+			}
+
+			return KubernetesAddress{h, p}, nil
 		},
 	}
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b KubernetesServiceBuilder) Optional() Optional[KubernetesAddress] {
-	hostSpec := b.hostSpec()
-	portSpec := b.portSpec()
-
-	hostSpec.IsOptional = true
-	portSpec.IsOptional = true
-
-	hostRes := spec.NewResolver(hostSpec, b.resolveHost)
-	portRes := spec.NewResolver(portSpec, b.resolvePort)
-
-	spec.Register(hostRes)
-	spec.Register(portRes)
+func (b KubernetesServiceBuilder) Optional(options ...variable.RegisterOption) Optional[KubernetesAddress] {
+	host := variable.Register(b.hostSpec(false), options)
+	port := variable.Register(b.portSpec(false), options)
 
 	return Optional[KubernetesAddress]{
-		func() (KubernetesAddress, error) {
-			host, hostErr := hostRes.ResolveTyped()
-			port, portErr := portRes.ResolveTyped()
-
-			if hostErr != nil {
-				if portErr == nil {
-					if errors.As(hostErr, &spec.UndefinedError{}) {
-						return KubernetesAddress{}, spec.ValidationError{
-							Name:  hostSpec.Name,
-							Cause: fmt.Errorf("%s is defined, define both or neither", b.portVar),
-						}
-					}
-				}
-
-				return KubernetesAddress{}, hostErr
+		func() (KubernetesAddress, bool, error) {
+			mh, err := host.NativeValue()
+			if err != nil {
+				return KubernetesAddress{}, false, err
 			}
 
-			if portErr != nil {
-				if errors.As(portErr, &spec.UndefinedError{}) {
-					return KubernetesAddress{}, spec.ValidationError{
-						Name:  portSpec.Name,
-						Cause: fmt.Errorf("%s is defined, define both or neither", b.hostVar),
-					}
-				}
-
-				return KubernetesAddress{}, portErr
+			mp, err := port.NativeValue()
+			if err != nil {
+				return KubernetesAddress{}, false, err
 			}
 
-			return KubernetesAddress{
-				host.Go,
-				port.Go,
-			}, nil
+			h, hostOk := mh.Get()
+			p, portOk := mp.Get()
+
+			if hostOk && portOk {
+				return KubernetesAddress{h, p}, true, nil
+			}
+
+			if hostOk {
+				return KubernetesAddress{}, false, fmt.Errorf(
+					"%s is defined but %s is not, define both or neither",
+					host.Spec().Name(),
+					port.Spec().Name(),
+				)
+			}
+
+			if portOk {
+				return KubernetesAddress{}, false, fmt.Errorf(
+					"%s is defined but %s is not, define both or neither",
+					port.Spec().Name(),
+					host.Spec().Name(),
+				)
+			}
+
+			return KubernetesAddress{}, false, nil
 		},
 	}
 }
 
-func (b KubernetesServiceBuilder) hostSpec() spec.Spec {
-	s := spec.Spec{
-		Name: b.hostVar,
-		Description: fmt.Sprintf(
+func (b KubernetesServiceBuilder) hostSpec(req bool) variable.TypedSpec[string] {
+	s, err := variable.NewSpec(
+		b.hostVar,
+		fmt.Sprintf(
 			"k8s %q service host",
 			b.service,
 		),
-		Schema: spec.OfType[string](),
-	}
-
-	if v, ok := b.def.Get(); ok {
-		s.HasDefault = true
-		s.Default = v.Host
+		maybe.Map(b.def, func(addr KubernetesAddress) string {
+			return addr.Host
+		}),
+		req,
+		variable.TypedString[string]{},
+		variable.ValidatorFunc(validateHost),
+	)
+	if err != nil {
+		panic(err.Error())
 	}
 
 	return s
 }
 
-func (b KubernetesServiceBuilder) portSpec() spec.Spec {
-	s := spec.Spec{
-		Name: b.portVar,
-		Description: fmt.Sprintf(
+func (b KubernetesServiceBuilder) portSpec(req bool) variable.TypedSpec[string] {
+	s, err := variable.NewSpec(
+		b.portVar,
+		fmt.Sprintf(
 			"k8s %q service port",
 			b.service,
 		),
-		Schema: spec.OneOf{
-			spec.OfType[string](),
-			spec.Range{
-				Min: "1",
-				Max: "65535",
-			},
-		},
-	}
-
-	if v, ok := b.def.Get(); ok {
-		s.HasDefault = true
-		s.Default = v.Port
+		maybe.Map(b.def, func(addr KubernetesAddress) string {
+			return addr.Port
+		}),
+		req,
+		variable.TypedString[string]{},
+		variable.ValidatorFunc(validatePort),
+	)
+	if err != nil {
+		panic(err.Error())
 	}
 
 	return s
-}
-
-func (b KubernetesServiceBuilder) resolveHost() (spec.ValueOf[string], error) {
-	env := os.Getenv(b.hostVar)
-
-	if env == "" {
-		if v, ok := b.def.Get(); ok {
-			return spec.ValueOf[string]{
-				Go:    v.Host,
-				Env:   v.Host,
-				IsDef: true,
-			}, nil
-		}
-
-		return spec.Undefined[string](b.hostVar)
-	}
-
-	if err := validateHost(env); err != nil {
-		return spec.Invalid[string](b.hostVar, env, "%w", err)
-	}
-
-	return spec.ValueOf[string]{
-		Go:  env,
-		Env: env,
-	}, nil
-}
-
-func (b KubernetesServiceBuilder) resolvePort() (spec.ValueOf[string], error) {
-	env := os.Getenv(b.portVar)
-
-	if env == "" {
-		if v, ok := b.def.Get(); ok {
-			return spec.ValueOf[string]{
-				Go:    v.Port,
-				Env:   v.Port,
-				IsDef: true,
-			}, nil
-		}
-
-		return spec.Undefined[string](b.portVar)
-	}
-
-	if err := validatePort(env); err != nil {
-		return spec.Invalid[string](b.portVar, env, "%w", err)
-	}
-
-	return spec.ValueOf[string]{
-		Go:  env,
-		Env: env,
-	}, nil
 }
 
 // kubernetesNameToEnv converts a kubernetes resource name to an environment variable

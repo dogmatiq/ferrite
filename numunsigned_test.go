@@ -58,22 +58,22 @@ var _ = Describe("type UnsignedSpec", func() {
 					Entry(
 						"underflow",
 						"-1",
-						`FERRITE_UNSIGNED (-1) is invalid: must be an integer between 0 and 65535`,
+						`value of FERRITE_UNSIGNED (-1) is invalid: strconv.ParseUint: parsing "-1": invalid syntax`,
 					),
 					Entry(
 						"overflow",
 						"65536",
-						`FERRITE_UNSIGNED (65536) is invalid: must be an integer between 0 and 65535`,
+						`value of FERRITE_UNSIGNED (65536) is invalid: strconv.ParseUint: parsing "65536": value out of range`,
 					),
 					Entry(
 						"decimal",
 						"123.45",
-						`FERRITE_UNSIGNED (123.45) is invalid: must be an integer between 0 and 65535`,
+						`value of FERRITE_UNSIGNED (123.45) is invalid: strconv.ParseUint: parsing "123.45": invalid syntax`,
 					),
 					Entry(
 						"invalid characters",
 						"123!",
-						`FERRITE_UNSIGNED ('123!') is invalid: must be an integer between 0 and 65535`,
+						`value of FERRITE_UNSIGNED ('123!') is invalid: strconv.ParseUint: parsing "123!": invalid syntax`,
 					),
 				)
 			})
@@ -148,22 +148,22 @@ var _ = Describe("type UnsignedSpec", func() {
 					Entry(
 						"underflow",
 						"-1",
-						`FERRITE_UNSIGNED (-1) is invalid: must be an integer between 0 and 65535`,
+						`value of FERRITE_UNSIGNED (-1) is invalid: strconv.ParseUint: parsing "-1": invalid syntax`,
 					),
 					Entry(
 						"overflow",
 						"65536",
-						`FERRITE_UNSIGNED (65536) is invalid: must be an integer between 0 and 65535`,
+						`value of FERRITE_UNSIGNED (65536) is invalid: strconv.ParseUint: parsing "65536": value out of range`,
 					),
 					Entry(
 						"decimal",
 						"123.45",
-						`FERRITE_UNSIGNED (123.45) is invalid: must be an integer between 0 and 65535`,
+						`value of FERRITE_UNSIGNED (123.45) is invalid: strconv.ParseUint: parsing "123.45": invalid syntax`,
 					),
 					Entry(
 						"invalid characters",
 						"123!",
-						`FERRITE_UNSIGNED ('123!') is invalid: must be an integer between 0 and 65535`,
+						`value of FERRITE_UNSIGNED ('123!') is invalid: strconv.ParseUint: parsing "123!": invalid syntax`,
 					),
 				)
 			})
