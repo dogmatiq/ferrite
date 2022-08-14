@@ -22,19 +22,18 @@ func Bool(name, desc string) BoolBuilder[bool] {
 // human-readable description of the environment variable.
 func BoolAs[T ~bool](name, desc string) BoolBuilder[T] {
 	return BoolBuilder[T]{
-		spec: variable.PendingSpec[T]{
-			Name:        variable.Name(name),
-			Description: desc,
-		},
-	}.WithLiterals(
-		fmt.Sprint(T(true)),
-		fmt.Sprint(T(false)),
-	)
+		name: name,
+		desc: desc,
+		t:    fmt.Sprint(T(true)),
+		f:    fmt.Sprint(T(false)),
+	}
 }
 
 // BoolBuilder builds a specification for a boolean value.
 type BoolBuilder[T ~bool] struct {
-	spec variable.PendingSpec[T]
+	name, desc string
+	t, f       string
+	def        maybe.Value[T]
 }
 
 // WithLiterals overrides the default literals used to represent true and false.
@@ -42,20 +41,8 @@ type BoolBuilder[T ~bool] struct {
 // The default literals "true" and "false" are no longer valid values when using
 // custom literals.
 func (b BoolBuilder[T]) WithLiterals(t, f string) BoolBuilder[T] {
-	s, err := variable.NewSet(
-		[]T{true, false},
-		func(v T) variable.Literal {
-			if v {
-				return variable.Literal(t)
-			}
-			return variable.Literal(f)
-		},
-	)
-	if err != nil {
-		b.spec.InvalidErr(err)
-	}
-
-	b.spec.Schema = s
+	b.t = t
+	b.f = f
 	return b
 }
 
@@ -63,19 +50,41 @@ func (b BoolBuilder[T]) WithLiterals(t, f string) BoolBuilder[T] {
 //
 // It is used when the environment variable is undefined or empty.
 func (b BoolBuilder[T]) WithDefault(v T) BoolBuilder[T] {
-	b.spec.Default = maybe.Some(v)
+	b.def = maybe.Some(v)
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b BoolBuilder[T]) Required(options ...variable.RegisterOption) Required[T] {
-	return req[T]{variable.Register(b.spec, options)}
+	return registerRequired(b.spec(true), options)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b BoolBuilder[T]) Optional(options ...variable.RegisterOption) Optional[T] {
-	b.spec.IsOptional = true
-	return opt[T]{variable.Register(b.spec, options)}
+	return registerOptional(b.spec(false), options)
+}
+
+func (b BoolBuilder[T]) spec(req bool) variable.TypedSpec[T] {
+	s, err := variable.NewSpec(
+		b.name,
+		b.desc,
+		b.def,
+		req,
+		variable.TypedSet[T]{
+			Members: []T{true, false},
+			ToLiteral: func(v T) variable.Literal {
+				if v {
+					return variable.Literal(b.t)
+				}
+				return variable.Literal(b.f)
+			},
+		},
+	)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	return s
 }

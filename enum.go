@@ -22,24 +22,22 @@ func Enum(name, desc string) EnumBuilder[string] {
 // human-readable description of the environment variable.
 func EnumAs[T any](name, desc string) EnumBuilder[T] {
 	return EnumBuilder[T]{
-		spec: variable.PendingSpec[T]{
-			Name:        variable.Name(name),
-			Description: desc,
-		},
-	}.WithRenderer(
-		func(v T) variable.Literal {
+		name: name,
+		desc: desc,
+		toLiteral: func(v T) variable.Literal {
 			return variable.Literal(
 				fmt.Sprint(v),
 			)
 		},
-	)
+	}
 }
 
 // EnumBuilder is the specification for an enumeration.
 type EnumBuilder[T any] struct {
-	spec    variable.PendingSpec[T]
-	render  func(T) variable.Literal
-	members []T
+	name, desc string
+	def        maybe.Value[T]
+	members    []T
+	toLiteral  func(T) variable.Literal
 }
 
 // WithMembers adds members to the enum.
@@ -54,7 +52,7 @@ func (b EnumBuilder[T]) WithMembers(members ...T) EnumBuilder[T] {
 // WithRenderer sets the function used to generate the literal string
 // representation of the enum's member values.
 func (b EnumBuilder[T]) WithRenderer(fn func(T) variable.Literal) EnumBuilder[T] {
-	b.render = fn
+	b.toLiteral = fn
 	return b
 }
 
@@ -62,30 +60,36 @@ func (b EnumBuilder[T]) WithRenderer(fn func(T) variable.Literal) EnumBuilder[T]
 //
 // It is used when the environment variable is undefined or empty.
 func (b EnumBuilder[T]) WithDefault(v T) EnumBuilder[T] {
-	b.spec.Default = maybe.Some(v)
+	b.def = maybe.Some(v)
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b EnumBuilder[T]) Required(options ...variable.RegisterOption) Required[T] {
-	b.finalize()
-	return req[T]{variable.Register(b.spec, options)}
+	return registerRequired(b.spec(true), options)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b EnumBuilder[T]) Optional(options ...variable.RegisterOption) Optional[T] {
-	b.spec.IsOptional = true
-	b.finalize()
-	return opt[T]{variable.Register(b.spec, options)}
+	return registerOptional(b.spec(false), options)
 }
 
-func (b *EnumBuilder[T]) finalize() {
-	s, err := variable.NewSet(b.members, b.render)
+func (b *EnumBuilder[T]) spec(req bool) variable.TypedSpec[T] {
+	s, err := variable.NewSpec(
+		b.name,
+		b.desc,
+		b.def,
+		req,
+		variable.TypedSet[T]{
+			Members:   b.members,
+			ToLiteral: b.toLiteral,
+		},
+	)
 	if err != nil {
-		b.spec.InvalidErr(err)
+		panic(err.Error())
 	}
 
-	b.spec.Schema = s
+	return s
 }

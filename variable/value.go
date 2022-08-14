@@ -59,7 +59,7 @@ type ValueError interface {
 type ValueErrorVisitor interface {
 	SchemaErrorVisitor
 
-	VisitGeneric(error)
+	VisitGenericError(error)
 }
 
 // valueError indicates that there is a problem with a variable's value.
@@ -82,11 +82,11 @@ func (e valueError) Unwrap() error {
 }
 
 func (e valueError) AcceptVisitor(v ValueErrorVisitor) {
-	switch c := e.cause.(type) {
+	switch err := e.cause.(type) {
 	case SchemaError:
-		c.AcceptVisitor(v)
+		err.AcceptVisitor(v)
 	default:
-		v.VisitGeneric(e.cause)
+		v.VisitGenericError(err)
 	}
 }
 

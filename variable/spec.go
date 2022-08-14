@@ -1,6 +1,7 @@
 package variable
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/dogmatiq/ferrite/maybe"
@@ -20,47 +21,63 @@ type Spec interface {
 	// Default returns the string representation of the default value.
 	Default() maybe.Value[Literal]
 
-	// IsOptional returns true if the application can handle the absence of a
-	// value for this variable.
-	IsOptional() bool
+	// IsRequired returns true if the application MUST have a value for this
+	// variable (even if it is fulfilled by a default value).
+	IsRequired() bool
 }
 
 // TypedSpec builds a specification for a variable depicted by type T.
 type TypedSpec[T any] struct {
-	name       Name
-	desc       string
-	schema     TypedSchema[T]
-	def        maybe.Value[valueOf[T]]
-	isOptional bool
+	name     Name
+	desc     string
+	schema   TypedSchema[T]
+	def      maybe.Value[valueOf[T]]
+	required bool
 }
 
-// finalizeSpec returns the completed specification.
-//
-// It panics if the specification is invalid.
-func finalizeSpec[T any](s PendingSpec[T]) TypedSpec[T] {
-	if s.Name == "" {
-		s.Invalid("variable name must not be empty")
+// NewSpec returns a new specification.
+func NewSpec[T any, S TypedSchema[T]](
+	name, desc string,
+	def maybe.Value[T],
+	req bool,
+	schema S,
+) (TypedSpec[T], error) {
+	n := Name(name)
+
+	if n == "" {
+		return TypedSpec[T]{}, SpecError{
+			cause: errors.New("variable name must not be empty"),
+		}
 	}
 
-	if s.Description == "" {
-		s.Invalid("variable description must not be empty")
+	if desc == "" {
+		return TypedSpec[T]{}, SpecError{
+			name:  n,
+			cause: errors.New("variable description must not be empty"),
+		}
 	}
 
-	if s.Schema == nil {
-		s.Invalid("a schema must be specified")
+	if err := schema.Finalize(); err != nil {
+		return TypedSpec[T]{}, SpecError{
+			name:  n,
+			cause: err,
+		}
 	}
 
 	spec := TypedSpec[T]{
-		name:       s.Name,
-		desc:       s.Description,
-		schema:     s.Schema,
-		isOptional: s.IsOptional,
+		name:     n,
+		desc:     desc,
+		schema:   schema,
+		required: req,
 	}
 
-	if v, ok := s.Default.Get(); ok {
-		lit, err := s.Schema.Marshal(v)
+	if v, ok := def.Get(); ok {
+		lit, err := schema.Marshal(v)
 		if err != nil {
-			s.Invalid("default value: %w", err)
+			return TypedSpec[T]{}, SpecError{
+				name:  n,
+				cause: fmt.Errorf("default value: %w", err),
+			}
 		}
 
 		spec.def = maybe.Some(valueOf[T]{
@@ -70,7 +87,7 @@ func finalizeSpec[T any](s PendingSpec[T]) TypedSpec[T] {
 		})
 	}
 
-	return spec
+	return spec, nil
 }
 
 // Name returns the name of the variable.
@@ -93,29 +110,10 @@ func (s TypedSpec[T]) Default() maybe.Value[Literal] {
 	return maybe.Map(s.def, valueOf[T].Canonical)
 }
 
-// IsOptional returns true if the application can handle the absence of a
-// value for this variable.
-func (s TypedSpec[T]) IsOptional() bool {
-	return s.isOptional
-}
-
-// PendingSpec is a specification for a variable that is not yet complete.
-type PendingSpec[T any] struct {
-	Name        Name
-	Description string
-	Schema      TypedSchema[T]
-	Default     maybe.Value[T]
-	IsOptional  bool
-}
-
-// InvalidErr marks the specification as invalid.
-func (s PendingSpec[T]) InvalidErr(err error) {
-	panic(SpecError{s.Name, err}.Error())
-}
-
-// Invalid marks the specification as invalid.
-func (s PendingSpec[T]) Invalid(f string, v ...any) {
-	s.InvalidErr(fmt.Errorf(f, v...))
+// IsRequired returns true if the application MUST have a value for this
+// variable (even if it is fulfilled by a default value).
+func (s TypedSpec[T]) IsRequired() bool {
+	return s.required
 }
 
 // SpecError represents a problem with a variable specification itself, rather

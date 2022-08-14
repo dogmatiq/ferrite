@@ -28,6 +28,22 @@ type Optional[T any] interface {
 	Value() (v T, ok bool)
 }
 
+func registerRequired[T any](
+	spec variable.TypedSpec[T],
+	options []variable.RegisterOption,
+) Required[T] {
+	v := variable.Register(spec, options)
+	return req[T]{v}
+}
+
+func registerOptional[T any](
+	spec variable.TypedSpec[T],
+	options []variable.RegisterOption,
+) Optional[T] {
+	v := variable.Register(spec, options)
+	return opt[T]{v}
+}
+
 type req[T any] struct {
 	v *variable.OfType[T]
 }

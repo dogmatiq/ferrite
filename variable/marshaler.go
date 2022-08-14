@@ -1,6 +1,8 @@
 package variable
 
-import "github.com/dogmatiq/ferrite/maybe"
+import (
+	"github.com/dogmatiq/ferrite/maybe"
+)
 
 // Marshaler converts values to/from their native/literal representations.
 type Marshaler[T any] interface {
@@ -14,19 +16,26 @@ type Marshaler[T any] interface {
 func marshal[T any, M Marshaler[T]](
 	m M,
 	v maybe.Value[T],
-) (maybe.Value[valueOf[T]], error) {
+) (maybe.Value[Literal], error) {
 	return maybe.TryMap(
 		v,
-		func(n T) (valueOf[T], error) {
+		m.Marshal,
+	)
+}
+
+func mustMarshal[T any, M Marshaler[T]](
+	m M,
+	v maybe.Value[T],
+) maybe.Value[Literal] {
+	return maybe.Map(
+		v,
+		func(n T) Literal {
 			lit, err := m.Marshal(n)
 			if err != nil {
-				return valueOf[T]{}, err
+				panic(err)
 			}
 
-			return valueOf[T]{
-				canonical: lit,
-				native:    n,
-			}, nil
+			return lit
 		},
 	)
 }

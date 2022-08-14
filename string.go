@@ -29,9 +29,8 @@ func StringAs[T ~string](name, desc string) StringBuilder[T] {
 
 // StringBuilder builds a specification for a string variable.
 type StringBuilder[T ~string] struct {
-	name string
-	desc string
-	def  optional.Optional[T]
+	name, desc string
+	def        optional.Optional[T]
 }
 
 // WithDefault sets a default value of the variable.

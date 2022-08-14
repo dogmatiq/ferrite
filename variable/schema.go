@@ -1,7 +1,19 @@
 package variable
 
+import (
+	"reflect"
+)
+
 // Schema describes the valid values of an environment value.
 type Schema interface {
+	// Type returns the type of the native value.
+	Type() reflect.Type
+
+	// Finalize prepares the schema for use.
+	//
+	// It returns an error if schema is invalid.
+	Finalize() error
+
 	// AcceptVisitor passes the schema to the appropriate method of v.
 	AcceptVisitor(SchemaVisitor)
 }
@@ -34,5 +46,15 @@ type SchemaErrorVisitor interface {
 // depicted by type T.
 type TypedSchema[T any] interface {
 	Schema
-	Marshaler[T]
+
+	// Marshal converts a value to its literal representation.
+	Marshal(T) (Literal, error)
+
+	// Unmarshal converts a literal value to it's native representation.
+	Unmarshal(Literal) (T, error)
+}
+
+// typeOf returns the type of T.
+func typeOf[T any]() reflect.Type {
+	return reflect.TypeOf([...]T{}).Elem()
 }

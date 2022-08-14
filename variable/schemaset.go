@@ -3,58 +3,64 @@ package variable
 import (
 	"errors"
 	"fmt"
+	"reflect"
+
+	"golang.org/x/exp/slices"
 )
 
 // Set is a schema that only allows a specific set of static values.
 type Set interface {
 	Schema
 
-	// Members returns the members of the set.
-	Members() []Literal
+	// Literals returns the members of the set as literals.
+	Literals() []Literal
 }
 
 // TypedSet is a Set containing values of type T.
 type TypedSet[T any] struct {
-	render  func(T) Literal
-	order   []Literal
-	members map[Literal]T
+	Members   []T
+	ToLiteral func(T) Literal
 }
 
-// NewSet contains a new set containing the given values.
-func NewSet[T any](
-	members []T,
-	render func(T) Literal,
-) (TypedSet[T], error) {
-	if len(members) < 2 {
-		return TypedSet[T]{}, errors.New("must allow at least two distinct values")
+// Literals returns the members of the set as literals.
+func (s TypedSet[T]) Literals() []Literal {
+	literals := make([]Literal, len(s.Members))
+	for i, m := range s.Members {
+		literals[i] = s.ToLiteral(m)
+	}
+	return literals
+}
+
+// Type returns the type of the native value.
+func (s TypedSet[T]) Type() reflect.Type {
+	return typeOf[T]()
+}
+
+// Finalize prepares the schema for use.
+//
+// It returns an error if schema is invalid.
+func (s TypedSet[T]) Finalize() error {
+	if len(s.Members) < 2 {
+		return errors.New("must allow at least two distinct values")
 	}
 
-	s := TypedSet[T]{
-		render:  render,
-		members: make(map[Literal]T, len(members)),
-	}
+	var uniq []Literal
 
-	for _, v := range members {
-		lit := render(v)
+	for _, v := range s.Members {
+		lit := s.ToLiteral(v)
 
 		if lit == "" {
-			return TypedSet[T]{}, errors.New("literals can not be an empty string")
+			return errors.New("literals can not be an empty string")
 		}
 
-		if _, ok := s.members[lit]; ok {
-			return TypedSet[T]{}, fmt.Errorf("literals must be unique but multiple values are represented as %q", string(lit))
+		if slices.Contains(uniq, lit) {
+			return fmt.Errorf("literals must be unique but multiple values are represented as %q", string(lit))
 		}
 
-		s.order = append(s.order, lit)
-		s.members[lit] = v
+		uniq = append(uniq, lit)
 	}
 
-	return s, nil
-}
-
-// Members returns the members of the set.
-func (s TypedSet[T]) Members() []Literal {
-	return s.order
+	return nil
 }
 
 // AcceptVisitor passes s to the appropriate method of v.
@@ -64,9 +70,12 @@ func (s TypedSet[T]) AcceptVisitor(v SchemaVisitor) {
 
 // Marshal converts a value to its literal representation.
 func (s TypedSet[T]) Marshal(v T) (Literal, error) {
-	lit := s.render(v)
-	if _, ok := s.members[lit]; ok {
-		return lit, nil
+	lit := s.ToLiteral(v)
+
+	for _, v := range s.Members {
+		if lit == s.ToLiteral(v) {
+			return lit, nil
+		}
 	}
 
 	return "", SetMembershipError{s}
@@ -74,8 +83,10 @@ func (s TypedSet[T]) Marshal(v T) (Literal, error) {
 
 // Unmarshal converts a literal value to it's native representation.
 func (s TypedSet[T]) Unmarshal(v Literal) (T, error) {
-	if n, ok := s.members[v]; ok {
-		return n, nil
+	for _, m := range s.Members {
+		if v == s.ToLiteral(m) {
+			return m, nil
+		}
 	}
 
 	var zero T
@@ -101,7 +112,7 @@ func (e SetMembershipError) AcceptVisitor(v SchemaErrorVisitor) {
 }
 
 func (e SetMembershipError) Error() string {
-	members := e.Set.Members()
+	members := e.Set.Literals()
 
 	switch n := len(members); n {
 	case 2:

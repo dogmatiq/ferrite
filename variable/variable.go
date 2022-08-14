@@ -64,8 +64,8 @@ func (v *OfType[T]) IsValid() bool {
 		return false
 	}
 
-	if v.value.IsEmpty() {
-		return v.spec.isOptional
+	if v.spec.required && v.value.IsEmpty() {
+		return false
 	}
 
 	return true

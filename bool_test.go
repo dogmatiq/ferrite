@@ -176,7 +176,9 @@ var _ = Describe("type BoolBuilder", func() {
 		When("the true literal is empty", func() {
 			It("panics", func() {
 				Expect(func() {
-					builder.WithLiterals("", "no")
+					builder.
+						WithLiterals("", "no").
+						Optional()
 				}).To(PanicWith(
 					"specification for FERRITE_BOOL is invalid: literals can not be an empty string",
 				))
@@ -186,7 +188,10 @@ var _ = Describe("type BoolBuilder", func() {
 		When("the true literal is empty", func() {
 			It("panics", func() {
 				Expect(func() {
-					builder.WithLiterals("yes", "")
+					builder.
+						WithLiterals("yes", "").
+						Optional()
+
 				}).To(PanicWith(
 					"specification for FERRITE_BOOL is invalid: literals can not be an empty string",
 				))
