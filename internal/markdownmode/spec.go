@@ -1,6 +1,10 @@
 package markdownmode
 
-import "github.com/dogmatiq/ferrite/variable"
+import (
+	"strings"
+
+	"github.com/dogmatiq/ferrite/variable"
+)
 
 func (r *renderer) renderSpecs() {
 	r.line("## Specification")
@@ -33,31 +37,48 @@ func (r schemaRenderer) VisitSet(s variable.Set) {
 	literals := s.Literals()
 
 	if len(literals) == 2 {
-		r.line(
-			"This variable **MAY** be set to either `%s` or `%s`. If it is undefined or",
-			literals[0].Quote(),
-			literals[1].Quote(),
-		)
-		r.line("empty a default value of `%s` is used.", r.spec.Default().MustGet().Quote())
+		if def, ok := r.spec.Default().Get(); ok {
+			r.line(
+				"This variable **MAY** be set to either `%s` or `%s`. If it is undefined or",
+				literals[0].Quote(),
+				literals[1].Quote(),
+			)
+			r.line("empty a default value of `%s` is used.", def.Quote())
+		} else {
+			r.line(
+				"This variable **MUST** be set to either `%s` or `%s`. If it is undefined or",
+				literals[0].Quote(),
+				literals[1].Quote(),
+			)
+			r.line("empty the application will print usage information to `STDERR` then exit with a")
+			r.line("non-zero exit code.")
+		}
 	}
 
 	r.line("")
 	r.line("```bash")
 
-	def, _ := r.spec.Default().Get()
+	for _, eg := range r.spec.Examples() {
+		var comments []string
+		if eg.Description != "" {
+			comments = append(comments, eg.Description)
+		}
+		if variable.IsDefault(r.spec, eg.Canonical) {
+			comments = append(comments, "default value")
+		}
 
-	for _, m := range s.Literals() {
-		if m == def {
-			r.line(
-				"export %s=%s # default value",
-				r.spec.Name(),
-				m.Quote(),
-			)
-		} else {
+		if len(comments) == 0 {
 			r.line(
 				"export %s=%s",
 				r.spec.Name(),
-				m.Quote(),
+				eg.Canonical.Quote(),
+			)
+		} else {
+			r.line(
+				"export %s=%s # %s",
+				r.spec.Name(),
+				eg.Canonical.Quote(),
+				strings.Join(comments, ", "),
 			)
 		}
 	}

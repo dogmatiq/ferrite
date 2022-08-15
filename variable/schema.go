@@ -55,6 +55,9 @@ type SchemaErrorVisitor interface {
 type TypedSchema[T any] interface {
 	Schema
 	Marshaler[T]
+
+	// Examples returns a (possibly empty) set of examples of valid values.
+	Examples(hasOtherExamples bool) []TypedExample[T]
 }
 
 // typeOf returns the type of T.

@@ -505,86 +505,88 @@ var _ = Describe("type KubernetesServiceBuilder", func() {
 				"it panics",
 				func(host, port, expect string) {
 					Expect(func() {
-						builder.WithDefault(host, port)
+						builder.
+							WithDefault(host, port).
+							Required()
 					}).To(PanicWith(expect))
 				},
 				Entry(
 					"empty host",
 					"",
 					"12345",
-					`specification of kubernetes "ferrite-svc" service is invalid: host must not be empty`,
+					`specification for FERRITE_SVC_SERVICE_HOST is invalid: default value: host must not be empty`,
 				),
 				Entry(
 					"hostname begins with a dot",
 					".foo",
 					"12345",
-					`specification of kubernetes "ferrite-svc" service is invalid: host must not begin or end with a dot`,
+					`specification for FERRITE_SVC_SERVICE_HOST is invalid: default value: host must not begin or end with a dot`,
 				),
 				Entry(
 					"hostname ends with a dot",
 					"foo.",
 					"12345",
-					`specification of kubernetes "ferrite-svc" service is invalid: host must not begin or end with a dot`,
+					`specification for FERRITE_SVC_SERVICE_HOST is invalid: default value: host must not begin or end with a dot`,
 				),
 				Entry(
 					"hostname contains whitespace",
 					"foo .bar",
 					"12345",
-					`specification of kubernetes "ferrite-svc" service is invalid: host must not contain whitespace`,
+					`specification for FERRITE_SVC_SERVICE_HOST is invalid: default value: host must not contain whitespace`,
 				),
 				Entry(
 					"empty port",
 					"host.example.org",
 					"",
-					`specification of kubernetes "ferrite-svc" service is invalid: port must not be empty`,
+					`specification for FERRITE_SVC_SERVICE_PORT is invalid: default value: port must not be empty`,
 				),
 				Entry(
 					"numeric port too low",
 					"host.example.org",
 					"0",
-					`specification of kubernetes "ferrite-svc" service is invalid: numeric ports must be between 1 and 65535`,
+					`specification for FERRITE_SVC_SERVICE_PORT is invalid: default value: numeric ports must be between 1 and 65535`,
 				),
 				Entry(
 					"numeric port too high",
 					"host.example.org",
 					"65536",
-					`specification of kubernetes "ferrite-svc" service is invalid: numeric ports must be between 1 and 65535`,
+					`specification for FERRITE_SVC_SERVICE_PORT is invalid: default value: numeric ports must be between 1 and 65535`,
 				),
 				Entry(
 					"IANA service name is too long",
 					"host.example.org",
 					"this-name-is-very-long",
-					`specification of kubernetes "ferrite-svc" service is invalid: IANA service name must be between 1 and 15 characters`,
+					`specification for FERRITE_SVC_SERVICE_PORT is invalid: default value: IANA service name must be between 1 and 15 characters`,
 				),
 				Entry(
 					"IANA service name does not contain any letters",
 					"host.example.org",
 					"100-200",
-					`specification of kubernetes "ferrite-svc" service is invalid: IANA service name must contain at least one letter`,
+					`specification for FERRITE_SVC_SERVICE_PORT is invalid: default value: IANA service name must contain at least one letter`,
 				),
 				Entry(
 					"IANA service name starts with a hyphen",
 					"host.example.org",
 					"-foo",
-					`specification of kubernetes "ferrite-svc" service is invalid: IANA service name must not begin or end with a hyphen`,
+					`specification for FERRITE_SVC_SERVICE_PORT is invalid: default value: IANA service name must not begin or end with a hyphen`,
 				),
 				Entry(
 					"IANA service name ends with a hyphen",
 					"host.example.org",
 					"foo-",
-					`specification of kubernetes "ferrite-svc" service is invalid: IANA service name must not begin or end with a hyphen`,
+					`specification for FERRITE_SVC_SERVICE_PORT is invalid: default value: IANA service name must not begin or end with a hyphen`,
 				),
 				Entry(
 					"IANA service name contains adjacent hyphens",
 					"host.example.org",
 					"foo--bar",
-					`specification of kubernetes "ferrite-svc" service is invalid: IANA service name must not contain adjacent hyphens`,
+					`specification for FERRITE_SVC_SERVICE_PORT is invalid: default value: IANA service name must not contain adjacent hyphens`,
 				),
 				Entry(
 					"IANA service name contains an invalid character",
 					"host.example.org",
 					"foo*bar",
-					`specification of kubernetes "ferrite-svc" service is invalid: IANA service name must contain only ASCII letters, digits and hyphen`,
+					`specification for FERRITE_SVC_SERVICE_PORT is invalid: default value: IANA service name must contain only ASCII letters, digits and hyphen`,
 				),
 			)
 		})

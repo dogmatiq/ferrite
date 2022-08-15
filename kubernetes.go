@@ -93,22 +93,6 @@ func (b KubernetesServiceBuilder) WithNamedPort(port string) KubernetesServiceBu
 // service name (such as "https"). The IANA name is not to be confused with the
 // Kubernetes servcice name or port name.
 func (b KubernetesServiceBuilder) WithDefault(host, port string) KubernetesServiceBuilder {
-	if err := validateHost(host); err != nil {
-		panic(fmt.Sprintf(
-			"specification of kubernetes %q service is invalid: %s",
-			b.service,
-			err,
-		))
-	}
-
-	if err := validatePort(port); err != nil {
-		panic(fmt.Sprintf(
-			"specification of kubernetes %q service is invalid: %s",
-			b.service,
-			err,
-		))
-	}
-
 	b.def = maybe.Some(KubernetesAddress{host, port})
 	return b
 }
@@ -204,7 +188,12 @@ func (b KubernetesServiceBuilder) hostSpec(req bool) variable.TypedSpec[string] 
 		}),
 		req,
 		variable.TypedString[string]{},
-		variable.ValidatorFunc(validateHost),
+		variable.WithConstraint(
+			"must be a valid hostname",
+			func(h string) variable.ConstraintError {
+				return validateHost(h)
+			},
+		),
 	)
 	if err != nil {
 		panic(err.Error())
@@ -225,7 +214,12 @@ func (b KubernetesServiceBuilder) portSpec(req bool) variable.TypedSpec[string] 
 		}),
 		req,
 		variable.TypedString[string]{},
-		variable.ValidatorFunc(validatePort),
+		variable.WithConstraint(
+			"must be a valid port",
+			func(p string) variable.ConstraintError {
+				return validatePort(p)
+			},
+		),
 	)
 	if err != nil {
 		panic(err.Error())

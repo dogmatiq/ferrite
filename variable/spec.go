@@ -24,16 +24,39 @@ type Spec interface {
 	// IsRequired returns true if the application MUST have a value for this
 	// variable (even if it is fulfilled by a default value).
 	IsRequired() bool
+
+	// Examples returns a list of additional examples.
+	//
+	// The implementation MUST return at least one example.
+	Examples() []Example
+}
+
+// IsDefault returns true if v is the default value of the given spec.
+func IsDefault(s Spec, v Literal) bool {
+	if def, ok := s.Default().Get(); ok {
+		return def == v
+	}
+
+	return false
+}
+
+// SpecOption is an option that changes the behavior of a spec.
+type SpecOption[T any] func(*specOptions[T]) error
+
+type specOptions[T any] struct {
+	Constraints []Constraint[T]
+	Examples    []TypedExample[T]
 }
 
 // TypedSpec builds a specification for a variable depicted by type T.
 type TypedSpec[T any] struct {
-	name       string
-	desc       string
-	def        maybe.Value[valueOf[T]]
-	required   bool
-	schema     TypedSchema[T]
-	validators []Validator[T]
+	name        string
+	desc        string
+	def         maybe.Value[valueOf[T]]
+	required    bool
+	schemax     TypedSchema[T]
+	examples    []Example
+	constraints []Constraint[T]
 }
 
 // NewSpec returns a new specification.
@@ -42,7 +65,7 @@ func NewSpec[T any, S TypedSchema[T]](
 	def maybe.Value[T],
 	req bool,
 	schema S,
-	validators ...Validator[T],
+	options ...SpecOption[T],
 ) (TypedSpec[T], error) {
 	if name == "" {
 		return TypedSpec[T]{}, SpecError{
@@ -64,25 +87,49 @@ func NewSpec[T any, S TypedSchema[T]](
 		}
 	}
 
-	spec := TypedSpec[T]{
-		name:       name,
-		desc:       desc,
-		schema:     schema,
-		required:   req,
-		validators: validators,
+	var opts specOptions[T]
+	for _, opt := range options {
+		opt(&opts)
 	}
 
-	if v, ok := def.Get(); ok {
-		for _, val := range validators {
-			if err := val.Validate(v); err != nil {
-				return TypedSpec[T]{}, SpecError{
-					name:  name,
-					cause: fmt.Errorf("default value: %w", err),
-				}
+	spec := TypedSpec[T]{
+		name:        name,
+		desc:        desc,
+		schemax:     schema,
+		required:    req,
+		constraints: opts.Constraints,
+	}
+
+	for _, eg := range opts.Examples {
+		lit, err := spec.Marshal(eg.Native)
+		if err != nil {
+			return TypedSpec[T]{}, SpecError{
+				name:  name,
+				cause: fmt.Errorf("example value: %w", err),
 			}
 		}
 
-		lit, err := schema.Marshal(v)
+		spec.examples = appendExample(spec.examples, Example{
+			Canonical:   lit,
+			Description: eg.Description,
+		})
+	}
+
+	for _, eg := range schema.Examples(len(spec.examples) != 0) {
+		lit, err := spec.Marshal(eg.Native)
+
+		// Append the example if it meets all of the constraints, otherwise just
+		// ignore it.
+		if err == nil {
+			spec.examples = appendExample(spec.examples, Example{
+				Canonical:   lit,
+				Description: eg.Description,
+			})
+		}
+	}
+
+	if v, ok := def.Get(); ok {
+		lit, err := spec.Marshal(v)
 		if err != nil {
 			return TypedSpec[T]{}, SpecError{
 				name:  name,
@@ -94,6 +141,11 @@ func NewSpec[T any, S TypedSchema[T]](
 			native:    v,
 			canonical: lit,
 			isDefault: true,
+		})
+
+		// Append an example of the default value if one is not already present.
+		spec.examples = appendExample(spec.examples, Example{
+			Canonical: lit,
 		})
 	}
 
@@ -112,7 +164,7 @@ func (s TypedSpec[T]) Description() string {
 
 // Schema returns the schema that applies to the variable's value.
 func (s TypedSpec[T]) Schema() Schema {
-	return s.schema
+	return s.schemax
 }
 
 // Default returns the string representation of the default value.
@@ -124,6 +176,58 @@ func (s TypedSpec[T]) Default() maybe.Value[Literal] {
 // variable (even if it is fulfilled by a default value).
 func (s TypedSpec[T]) IsRequired() bool {
 	return s.required
+}
+
+// Examples returns a list of examples of valid values.
+func (s TypedSpec[T]) Examples() []Example {
+	return s.examples
+}
+
+// CheckConstraints returns an error if v does not satisfy any one of the
+// specification's constraints.
+func (s TypedSpec[T]) CheckConstraints(v T) ConstraintError {
+	for _, c := range s.constraints {
+		if err := c.Check(v); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// Marshal converts a value to its literal representation.
+//
+// It returns an error if v does not meet the specification's constraints or
+// marshaling fails at the schema level.
+func (s TypedSpec[T]) Marshal(v T) (Literal, error) {
+	if err := s.CheckConstraints(v); err != nil {
+		return Literal{}, err
+	}
+
+	return s.schemax.Marshal(v)
+}
+
+// Unmarshal converts a literal value to it's native representation.
+//
+// It returns an error if v does not meet the specification's constraints or
+// unmarshaling fails at the schema level.
+func (s TypedSpec[T]) Unmarshal(v Literal) (T, Literal, error) {
+	n, err := s.schemax.Unmarshal(v)
+	if err != nil {
+		return n, Literal{}, err
+	}
+
+	if err := s.CheckConstraints(n); err != nil {
+		return n, Literal{}, err
+	}
+
+	c, err := s.schemax.Marshal(n)
+	if err != nil {
+		// Schema can't marshal a value it just successfully unmarshaled!
+		panic(err)
+	}
+
+	return n, c, err
 }
 
 // SpecError represents a problem with a variable specification itself, rather

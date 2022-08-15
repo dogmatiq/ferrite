@@ -85,6 +85,8 @@ func (b BoolBuilder[T]) spec(req bool) variable.TypedSpec[T] {
 				}
 			},
 		},
+		variable.WithExample(T(true), ""),
+		variable.WithExample(T(false), ""),
 	)
 	if err != nil {
 		panic(err.Error())

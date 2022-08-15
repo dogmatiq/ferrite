@@ -79,7 +79,7 @@ func (v *OfType[T]) resolve() {
 			return
 		}
 
-		n, err := v.spec.schema.Unmarshal(lit)
+		n, c, err := v.spec.Unmarshal(lit)
 		if err != nil {
 			v.err = valueError{
 				name:    v.spec.name,
@@ -87,22 +87,6 @@ func (v *OfType[T]) resolve() {
 				cause:   err,
 			}
 			return
-		}
-
-		for _, val := range v.spec.validators {
-			if err := val.Validate(n); err != nil {
-				v.err = valueError{
-					name:    v.spec.name,
-					literal: lit,
-					cause:   err,
-				}
-				return
-			}
-		}
-
-		c, err := v.spec.schema.Marshal(n)
-		if err != nil {
-			panic(err)
 		}
 
 		v.value = maybe.Some(valueOf[T]{

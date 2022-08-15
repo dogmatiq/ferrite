@@ -2,6 +2,7 @@ package variable
 
 import (
 	"fmt"
+	"math"
 	"reflect"
 
 	"github.com/dogmatiq/ferrite/maybe"
@@ -80,6 +81,53 @@ func (s TypedString[T]) Marshal(v T) (Literal, error) {
 func (s TypedString[T]) Unmarshal(v Literal) (T, error) {
 	n := T(v.String)
 	return n, s.validate(n)
+}
+
+// Examples returns a (possibly empty) set of examples of valid values.
+func (s TypedString[T]) Examples(hasOtherExamples bool) []TypedExample[T] {
+	if hasOtherExamples {
+		return nil
+	}
+
+	min, ok := s.MinLen.Get()
+	if !ok {
+		min = 1
+	}
+
+	max, ok := s.MaxLen.Get()
+	if !ok {
+		max = math.MaxInt
+	}
+
+	words := [...]T{
+		"foo", "bar", "baz",
+		"qux", "quux", "corge",
+		"grault", "garply", "waldo",
+		"fred", "plugh", "xyzzy",
+	}
+
+	var example T
+	word := 0
+
+	// Add enough words to meet the minimum requirement.
+	for len(example) < min {
+		example += words[word%len(words)]
+		example += " "
+		word++
+	}
+
+	// If the variable is too long truncate it to the max length, and ensure it
+	// doesn't end in a space.
+	if len(example) > max {
+		example = example[:max-1] + "x"
+	}
+
+	return []TypedExample[T]{
+		{
+			Native:      example,
+			Description: "randomly generated example",
+		},
+	}
 }
 
 // validate returns an error if v is invalid.

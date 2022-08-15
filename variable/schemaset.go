@@ -96,6 +96,19 @@ func (s TypedSet[T]) Unmarshal(v Literal) (T, error) {
 	return zero, SetMembershipError{s}
 }
 
+// Examples returns a (possibly empty) set of examples of valid values.
+func (s TypedSet[T]) Examples(hasOtherExamples bool) []TypedExample[T] {
+	var examples []TypedExample[T]
+
+	for _, m := range s.Members {
+		examples = append(examples, TypedExample[T]{
+			Native: m,
+		})
+	}
+
+	return examples
+}
+
 // SetMembershipError is a validation error that indicates a value is not a
 // member of a specific set.
 type SetMembershipError struct {

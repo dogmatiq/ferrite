@@ -15,12 +15,13 @@ document only shows those variables defined using [Ferrite].
 
 > enable or disable debugging features
 
-This variable **MAY** be set to either `true` or `false`. If it is undefined or
-empty a default value of `false` is used.
+This variable **MUST** be set to either `true` or `false`. If it is undefined or
+empty the application will print usage information to `STDERR` then exit with a
+non-zero exit code.
 
 ```bash
 export DEBUG=true
-export DEBUG=false # default value
+export DEBUG=false
 ```
 
 ## Usage Examples

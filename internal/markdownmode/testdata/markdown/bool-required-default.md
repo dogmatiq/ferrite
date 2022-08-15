@@ -42,8 +42,8 @@ spec:
       containers:
         - name: example-container
           env:
-            - name: DEBUG
-              value: "false" # enable or disable debugging features
+            - name: DEBUG # enable or disable debugging features
+              value: "false"
 ```
 
 Alternatively, the environment variables can be defined within a [config map][kubernetes config map]

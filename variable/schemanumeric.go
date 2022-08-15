@@ -32,7 +32,7 @@ type Numeric interface {
 }
 
 // TypedNumeric is a numeric value depicted by type T.
-type TypedNumeric[T constraints.Integer] struct {
+type TypedNumeric[T constraints.Integer | constraints.Float] struct {
 	Marshaler            Marshaler[T]
 	NativeMin, NativeMax maybe.Value[T]
 }
@@ -128,6 +128,25 @@ func (s TypedNumeric[T]) Unmarshal(v Literal) (T, error) {
 	}
 
 	return n, s.validate(n)
+}
+
+// Examples returns a (possibly empty) set of examples of valid values.
+func (s TypedNumeric[T]) Examples(hasOtherExamples bool) []TypedExample[T] {
+	if hasOtherExamples {
+		return nil
+	}
+
+	// If there are no other examples we do a linear interpolation at 25% of the
+	// (min, max) range in an attempt to provide _something_ that might be
+	// useful.
+	min, max := limits.Of[T]()
+
+	return []TypedExample[T]{
+		{
+			Native:      T(float64(min) + float64(max-min)*0.25),
+			Description: "randomly generated example",
+		},
+	}
 }
 
 // validate returns an error if v is invalid.
