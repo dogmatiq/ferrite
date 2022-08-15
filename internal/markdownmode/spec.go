@@ -32,16 +32,26 @@ type schemaRenderer struct {
 }
 
 func (r schemaRenderer) VisitNumeric(s variable.Numeric) {
-	min, _ := s.Min()
-
-	if def, ok := r.spec.Default(); ok {
-		r.line("This variable **MAY** be set to `%s` or greater.", min.Quote())
-		r.line("If left undefined the default value of `%s` is used.", def.Quote())
-	} else if r.spec.IsRequired() {
-		r.line("This variable **MUST** be set to `%s` or greater.", min.Quote())
-		r.renderUndefinedFailureWarning()
+	if min, ok := s.Min(); ok {
+		if def, ok := r.spec.Default(); ok {
+			r.line("This variable **MAY** be set to `%s` or greater.", min.Quote())
+			r.line("If left undefined the default value of `%s` is used.", def.Quote())
+		} else if r.spec.IsRequired() {
+			r.line("This variable **MUST** be set to `%s` or greater.", min.Quote())
+			r.renderUndefinedFailureWarning()
+		} else {
+			r.line("This variable **MAY** be set to `%s` or greater, or left undefined.", min.Quote())
+		}
 	} else {
-		r.line("This variable **MAY** be set to `%s` or greater, or left undefined.", min.Quote())
+		if def, ok := r.spec.Default(); ok {
+			r.line("This variable **MAY** be set to a `%s` value.", s.Type().Kind())
+			r.line("If left undefined the default value of `%s` is used.", def.Quote())
+		} else if r.spec.IsRequired() {
+			r.line("This variable **MUST** be set to a `%s` value.", s.Type().Kind())
+			r.renderUndefinedFailureWarning()
+		} else {
+			r.line("This variable **MAY** be set to a `%s` value or left undefined.", s.Type().Kind())
+		}
 	}
 }
 

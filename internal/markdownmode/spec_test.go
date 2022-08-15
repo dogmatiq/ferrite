@@ -187,6 +187,47 @@ var _ = Describe("func Run()", func() {
 			},
 		),
 
+		// NUMBER - UNSIGNED
+
+		Entry(
+			"unsigned + optional + default",
+			"number/unsigned/default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Unsigned[uint16]("PPROF_PORT", "HTTP port for serving pprof profiling data").
+					WithDefault(8080).
+					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"unsigned + optional",
+			"number/unsigned/optional.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Unsigned[uint16]("PPROF_PORT", "HTTP port for serving pprof profiling data").
+					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"unsigned + required + default",
+			"number/unsigned/default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Unsigned[uint16]("PPROF_PORT", "HTTP port for serving pprof profiling data").
+					WithDefault(8080).
+					Required(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"unsigned + required",
+			"number/unsigned/required.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Unsigned[uint16]("PPROF_PORT", "HTTP port for serving pprof profiling data").
+					Required(variable.WithRegistry(reg))
+			},
+		),
+
 		// STRING
 
 		Entry(
