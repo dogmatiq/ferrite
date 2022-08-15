@@ -187,6 +187,47 @@ var _ = Describe("func Run()", func() {
 			},
 		),
 
+		// NUMBER - SIGNED
+
+		Entry(
+			"signed + optional + default",
+			"number/signed/default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Signed[int]("WEIGHT", "weighting for this node").
+					WithDefault(100).
+					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"signed + optional",
+			"number/signed/optional.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Signed[int]("WEIGHT", "weighting for this node").
+					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"signed + required + default",
+			"number/signed/default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Signed[int]("WEIGHT", "weighting for this node").
+					WithDefault(100).
+					Required(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"signed + required",
+			"number/signed/required.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Signed[int]("WEIGHT", "weighting for this node").
+					Required(variable.WithRegistry(reg))
+			},
+		),
+
 		// NUMBER - UNSIGNED
 
 		Entry(
