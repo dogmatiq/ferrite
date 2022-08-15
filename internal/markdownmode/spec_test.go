@@ -187,6 +187,47 @@ var _ = Describe("func Run()", func() {
 			},
 		),
 
+		// KUBERNETES SERVICE
+
+		Entry(
+			"k8s service + optional + default",
+			"k8s-service/default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					KubernetesService("redis").
+					WithDefault("redis.example.org", "6379").
+					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"k8s service + optional",
+			"k8s-service/optional.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					KubernetesService("redis").
+					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"k8s service + required + default",
+			"k8s-service/default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					KubernetesService("redis").
+					WithDefault("redis.example.org", "6379").
+					Required(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"k8s service + required",
+			"k8s-service/required.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					KubernetesService("redis").
+					Required(variable.WithRegistry(reg))
+			},
+		),
+
 		// NUMBER - SIGNED
 
 		Entry(
