@@ -44,7 +44,7 @@ func (r schemaRenderer) VisitSet(s variable.Set) {
 				literals[1].Quote(),
 			)
 			r.line("empty a default value of `%s` is used.", def.Quote())
-		} else {
+		} else if r.spec.IsRequired() {
 			r.line(
 				"This variable **MUST** be set to either `%s` or `%s`. If it is undefined or",
 				literals[0].Quote(),
@@ -52,6 +52,12 @@ func (r schemaRenderer) VisitSet(s variable.Set) {
 			)
 			r.line("empty the application will print usage information to `STDERR` then exit with a")
 			r.line("non-zero exit code.")
+		} else {
+			r.line(
+				"This variable **MAY** be set to either `%s` or `%s`, or remain undefined.",
+				literals[0].Quote(),
+				literals[1].Quote(),
+			)
 		}
 	}
 

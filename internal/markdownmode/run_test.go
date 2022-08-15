@@ -54,6 +54,15 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			nil,
+			"bool-optional.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Bool("DEBUG", "enable or disable debugging features").
+					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			nil,
 			"bool-required-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
