@@ -111,8 +111,11 @@ func (s TypedString[T]) Examples(hasOtherExamples bool) []TypedExample[T] {
 
 	// Add enough words to meet the minimum requirement.
 	for len(example) < min {
+		if example != "" {
+			example += " "
+		}
+
 		example += words[word%len(words)]
-		example += " "
 		word++
 	}
 

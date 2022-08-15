@@ -47,7 +47,7 @@ var _ = Describe("func Run()", func() {
 
 		Entry(
 			"bool + optional + default",
-			"bool-default.md",
+			"bool/default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Bool("DEBUG", "enable or disable debugging features").
@@ -57,7 +57,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"bool + optional",
-			"bool-optional.md",
+			"bool/optional.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Bool("DEBUG", "enable or disable debugging features").
@@ -66,7 +66,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"bool + required + default",
-			"bool-default.md",
+			"bool/default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Bool("DEBUG", "enable or disable debugging features").
@@ -76,7 +76,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"bool + required",
-			"bool-required.md",
+			"bool/required.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Bool("DEBUG", "enable or disable debugging features").
@@ -88,7 +88,7 @@ var _ = Describe("func Run()", func() {
 
 		Entry(
 			"enum + optional + default",
-			"enum-default.md",
+			"enum/default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Enum("LOG_LEVEL", "the minimum log level to record").
@@ -103,7 +103,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"enum + optional",
-			"enum-optional.md",
+			"enum/optional.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Enum("LOG_LEVEL", "the minimum log level to record").
@@ -117,7 +117,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"enum + required + default",
-			"enum-default.md",
+			"enum/default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Enum("LOG_LEVEL", "the minimum log level to record").
@@ -132,7 +132,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"enum + required",
-			"enum-required.md",
+			"enum/required.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Enum("LOG_LEVEL", "the minimum log level to record").
@@ -141,6 +141,47 @@ var _ = Describe("func Run()", func() {
 					WithMember("warn", "important, but don't need individual human review").
 					WithMember("error", "a healthy application shouldn't produce any errors").
 					WithMember("fatal", "the application cannot proceed").
+					Required(variable.WithRegistry(reg))
+			},
+		),
+
+		// STRING
+
+		Entry(
+			"string + optional + default",
+			"string/default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					String("READ_DSN", "database connection string for read-models").
+					WithDefault("host=localhost dbname=readmodels user=projector").
+					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"string + optional",
+			"string/optional.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					String("READ_DSN", "database connection string for read-models").
+					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"string + required + default",
+			"string/default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					String("READ_DSN", "database connection string for read-models").
+					WithDefault("host=localhost dbname=readmodels user=projector").
+					Required(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"string + required",
+			"string/required.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					String("READ_DSN", "database connection string for read-models").
 					Required(variable.WithRegistry(reg))
 			},
 		),

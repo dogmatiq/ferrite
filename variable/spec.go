@@ -115,7 +115,9 @@ func NewSpec[T any, S TypedSchema[T]](
 		})
 	}
 
-	for _, eg := range schema.Examples(len(spec.examples) != 0) {
+	hasOtherExamples := len(spec.examples) > 0 || !def.IsEmpty()
+
+	for _, eg := range schema.Examples(hasOtherExamples) {
 		lit, err := spec.Marshal(eg.Native)
 
 		// Append the example if it meets all of the constraints, otherwise just

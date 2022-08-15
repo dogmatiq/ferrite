@@ -25,10 +25,13 @@ func (r *renderer) Render() string {
 	r.line("# Environment Variables")
 	r.line("")
 	r.line("This document describes the environment variables used by `%s`.", r.App)
+	r.line("")
 
 	if len(r.Specs) == 0 {
-		r.line("")
 		r.line("**There do not appear to be any environment variables.**")
+	} else {
+		r.line("Please note that **undefined** variables and **empty strings** are considered")
+		r.line("equivalent.")
 	}
 
 	r.line("")
