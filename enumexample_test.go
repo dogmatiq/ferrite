@@ -62,3 +62,23 @@ func ExampleEnum_optional() {
 	// Output:
 	// value is undefined
 }
+
+func ExampleEnum_descriptions() {
+	setUp()
+	defer tearDown()
+
+	v := ferrite.
+		Enum("FERRITE_ENUM", "example enum variable").
+		WithMember("red", "the color red").
+		WithMember("green", "the color green").
+		WithMember("blue", "the color blue").
+		Required()
+
+	os.Setenv("FERRITE_ENUM", "red")
+	ferrite.Init()
+
+	fmt.Println("value is", v.Value())
+
+	// Output:
+	// value is red
+}

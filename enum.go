@@ -5,6 +5,7 @@ import (
 
 	"github.com/dogmatiq/ferrite/maybe"
 	"github.com/dogmatiq/ferrite/variable"
+	"golang.org/x/exp/slices"
 )
 
 // Enum configures an environment variable as an enumeration.
@@ -36,16 +37,33 @@ func EnumAs[T any](name, desc string) EnumBuilder[T] {
 type EnumBuilder[T any] struct {
 	name, desc string
 	def        maybe.Value[T]
-	members    []T
+	members    []variable.SetMember[T]
 	toLiteral  func(T) variable.Literal
 }
 
 // WithMembers adds members to the enum.
 //
 // The environment variable must be set to the string representation of one of
-// the member values. WithMembers must not have an empty string representation.
-func (b EnumBuilder[T]) WithMembers(members ...T) EnumBuilder[T] {
-	b.members = members
+// the member values. The values must not have an empty string representation.
+func (b EnumBuilder[T]) WithMembers(values ...T) EnumBuilder[T] {
+	for _, v := range values {
+		b = b.WithMember(v, "")
+	}
+	return b
+}
+
+// WithMember adds a member to the enum.
+//
+// The environment variable must be set to the string representation of one of
+// the member values. v must not have an empty string representation.
+func (b EnumBuilder[T]) WithMember(v T, desc string) EnumBuilder[T] {
+	b.members = append(
+		slices.Clone(b.members),
+		variable.SetMember[T]{
+			Value:       v,
+			Description: desc,
+		},
+	)
 	return b
 }
 

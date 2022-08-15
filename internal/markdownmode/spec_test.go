@@ -42,9 +42,12 @@ var _ = Describe("func Run()", func() {
 			"empty.md",
 			func(reg *variable.Registry) {},
 		),
+
+		// BOOL
+
 		Entry(
-			nil,
-			"bool-optional-default.md",
+			"bool + optional + default",
+			"bool-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Bool("DEBUG", "enable or disable debugging features").
@@ -53,7 +56,7 @@ var _ = Describe("func Run()", func() {
 			},
 		),
 		Entry(
-			nil,
+			"bool + optional",
 			"bool-optional.md",
 			func(reg *variable.Registry) {
 				ferrite.
@@ -62,8 +65,8 @@ var _ = Describe("func Run()", func() {
 			},
 		),
 		Entry(
-			nil,
-			"bool-required-default.md",
+			"bool + required + default",
+			"bool-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Bool("DEBUG", "enable or disable debugging features").
@@ -72,11 +75,72 @@ var _ = Describe("func Run()", func() {
 			},
 		),
 		Entry(
-			nil,
+			"bool + required",
 			"bool-required.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Bool("DEBUG", "enable or disable debugging features").
+					Required(variable.WithRegistry(reg))
+			},
+		),
+
+		// ENUM
+
+		Entry(
+			"enum + optional + default",
+			"enum-default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Enum("LOG_LEVEL", "the minimum log level to record").
+					WithMember("debug", "show information for developers").
+					WithMember("info", "standard log messages").
+					WithMember("warn", "important, but don't need individual human review").
+					WithMember("error", "a healthy application shouldn't produce any errors").
+					WithMember("fatal", "the application cannot proceed").
+					WithDefault("error").
+					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"enum + optional",
+			"enum-optional.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Enum("LOG_LEVEL", "the minimum log level to record").
+					WithMember("debug", "show information for developers").
+					WithMember("info", "standard log messages").
+					WithMember("warn", "important, but don't need individual human review").
+					WithMember("error", "a healthy application shouldn't produce any errors").
+					WithMember("fatal", "the application cannot proceed").
+					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"enum + required + default",
+			"enum-default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Enum("LOG_LEVEL", "the minimum log level to record").
+					WithMember("debug", "show information for developers").
+					WithMember("info", "standard log messages").
+					WithMember("warn", "important, but don't need individual human review").
+					WithMember("error", "a healthy application shouldn't produce any errors").
+					WithMember("fatal", "the application cannot proceed").
+					WithDefault("error").
+					Required(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"enum + required",
+			"enum-required.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Enum("LOG_LEVEL", "the minimum log level to record").
+					WithMember("debug", "show information for developers").
+					WithMember("info", "standard log messages").
+					WithMember("warn", "important, but don't need individual human review").
+					WithMember("error", "a healthy application shouldn't produce any errors").
+					WithMember("fatal", "the application cannot proceed").
 					Required(variable.WithRegistry(reg))
 			},
 		),

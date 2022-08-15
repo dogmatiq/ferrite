@@ -73,7 +73,10 @@ func (b BoolBuilder[T]) spec(req bool) variable.TypedSpec[T] {
 		b.def,
 		req,
 		variable.TypedSet[T]{
-			Members: []T{true, false},
+			Members: []variable.SetMember[T]{
+				{Value: true},
+				{Value: false},
+			},
 			ToLiteral: func(v T) variable.Literal {
 				s := b.f
 				if v {

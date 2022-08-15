@@ -18,15 +18,21 @@ type Set interface {
 
 // TypedSet is a Set containing values of type T.
 type TypedSet[T any] struct {
-	Members   []T
+	Members   []SetMember[T]
 	ToLiteral func(T) Literal
+}
+
+// SetMember is a member of a TypedSet.
+type SetMember[T any] struct {
+	Value       T
+	Description string
 }
 
 // Literals returns the members of the set as literals.
 func (s TypedSet[T]) Literals() []Literal {
 	literals := make([]Literal, len(s.Members))
 	for i, m := range s.Members {
-		literals[i] = s.ToLiteral(m)
+		literals[i] = s.ToLiteral(m.Value)
 	}
 	return literals
 }
@@ -47,7 +53,7 @@ func (s TypedSet[T]) Finalize() error {
 	var uniq []Literal
 
 	for _, v := range s.Members {
-		lit := s.ToLiteral(v)
+		lit := s.ToLiteral(v.Value)
 
 		if lit.String == "" {
 			return errors.New("literals can not be an empty string")
@@ -76,7 +82,7 @@ func (s TypedSet[T]) Marshal(v T) (Literal, error) {
 	lit := s.ToLiteral(v)
 
 	for _, v := range s.Members {
-		if lit == s.ToLiteral(v) {
+		if lit == s.ToLiteral(v.Value) {
 			return lit, nil
 		}
 	}
@@ -87,8 +93,8 @@ func (s TypedSet[T]) Marshal(v T) (Literal, error) {
 // Unmarshal converts a literal value to it's native representation.
 func (s TypedSet[T]) Unmarshal(v Literal) (T, error) {
 	for _, m := range s.Members {
-		if v == s.ToLiteral(m) {
-			return m, nil
+		if v == s.ToLiteral(m.Value) {
+			return m.Value, nil
 		}
 	}
 
@@ -102,7 +108,8 @@ func (s TypedSet[T]) Examples(hasOtherExamples bool) []TypedExample[T] {
 
 	for _, m := range s.Members {
 		examples = append(examples, TypedExample[T]{
-			Native: m,
+			Native:      m.Value,
+			Description: m.Description,
 		})
 	}
 

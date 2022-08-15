@@ -28,11 +28,9 @@ var _ = Describe("type EnumSpec", func() {
 
 	BeforeEach(func() {
 		builder = EnumAs[enumMember]("FERRITE_ENUM", "<desc>").
-			WithMembers(
-				member0,
-				member1,
-				member2,
-			)
+			WithMember(member0, "<desc-of-0>").
+			WithMember(member1, "<desc-of-1>").
+			WithMember(member2, "<desc-of-2>")
 	})
 
 	AfterEach(func() {
@@ -181,7 +179,8 @@ var _ = Describe("type EnumSpec", func() {
 		It("panics", func() {
 			Expect(func() {
 				builder.
-					WithMembers(member1, member1).
+					WithMember(member1, "").
+					WithMember(member1, "").
 					Required()
 			}).To(PanicWith(
 				`specification for FERRITE_ENUM is invalid: literals must be unique but multiple values are represented as "<member-1>"`,
