@@ -136,11 +136,17 @@ func (s TypedNumeric[T]) Examples(hasOtherExamples bool) []TypedExample[T] {
 		return nil
 	}
 
+	min, max := limits.Of[T]()
+	if v, ok := s.NativeMin.Get(); ok {
+		min = v
+	}
+	if v, ok := s.NativeMax.Get(); ok {
+		max = v
+	}
+
 	// If there are no other examples we do a linear interpolation at 25% of the
 	// (min, max) range in an attempt to provide _something_ that might be
 	// useful.
-	min, max := limits.Of[T]()
-
 	return []TypedExample[T]{
 		{
 			Native:      T(float64(min) + float64(max-min)*0.25),

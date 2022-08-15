@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/dogmatiq/ferrite"
 	. "github.com/dogmatiq/ferrite/internal/markdownmode"
@@ -141,6 +142,47 @@ var _ = Describe("func Run()", func() {
 					WithMember("warn", "important, but don't need individual human review").
 					WithMember("error", "a healthy application shouldn't produce any errors").
 					WithMember("fatal", "the application cannot proceed").
+					Required(variable.WithRegistry(reg))
+			},
+		),
+
+		// DURATION
+
+		Entry(
+			"duration + optional + default",
+			"duration/default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Duration("GRPC_TIMEOUT", "gRPC request timeout").
+					WithDefault(10 * time.Millisecond).
+					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"duration + optional",
+			"duration/optional.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Duration("GRPC_TIMEOUT", "gRPC request timeout").
+					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"duration + required + default",
+			"duration/default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Duration("GRPC_TIMEOUT", "gRPC request timeout").
+					WithDefault(10 * time.Millisecond).
+					Required(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"duration + required",
+			"duration/required.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Duration("GRPC_TIMEOUT", "gRPC request timeout").
 					Required(variable.WithRegistry(reg))
 			},
 		),
