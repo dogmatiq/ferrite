@@ -37,7 +37,7 @@ func (r schemaRenderer) VisitSet(s variable.Set) {
 	literals := s.Literals()
 
 	if len(literals) == 2 {
-		if def, ok := r.spec.Default().Get(); ok {
+		if def, ok := r.spec.Default(); ok {
 			r.line(
 				"This variable **MAY** be set to either `%s` or `%s`. If it is undefined or",
 				literals[0].Quote(),

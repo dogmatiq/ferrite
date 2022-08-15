@@ -105,22 +105,20 @@ func (b KubernetesServiceBuilder) Required(options ...variable.RegisterOption) R
 
 	return Required[KubernetesAddress]{
 		func() (KubernetesAddress, error) {
-			mh, err := host.NativeValue()
+			h, ok, err := host.NativeValue()
 			if err != nil {
 				return KubernetesAddress{}, err
 			}
 
-			mp, err := port.NativeValue()
-			if err != nil {
-				return KubernetesAddress{}, err
-			}
-
-			h, ok := mh.Get()
 			if !ok {
 				return KubernetesAddress{}, undefinedError(host)
 			}
 
-			p, ok := mp.Get()
+			p, ok, err := port.NativeValue()
+			if err != nil {
+				return KubernetesAddress{}, err
+			}
+
 			if !ok {
 				return KubernetesAddress{}, undefinedError(port)
 			}
@@ -138,18 +136,15 @@ func (b KubernetesServiceBuilder) Optional(options ...variable.RegisterOption) O
 
 	return Optional[KubernetesAddress]{
 		func() (KubernetesAddress, bool, error) {
-			mh, err := host.NativeValue()
+			h, hostOk, err := host.NativeValue()
 			if err != nil {
 				return KubernetesAddress{}, false, err
 			}
 
-			mp, err := port.NativeValue()
+			p, portOk, err := port.NativeValue()
 			if err != nil {
 				return KubernetesAddress{}, false, err
 			}
-
-			h, hostOk := mh.Get()
-			p, portOk := mp.Get()
 
 			if hostOk && portOk {
 				return KubernetesAddress{h, p}, true, nil

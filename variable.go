@@ -54,13 +54,9 @@ func registerRequired[T any](
 
 	return Required[T]{
 		func() (zero T, _ error) {
-			n, err := v.NativeValue()
-			if err != nil {
-				return zero, err
-			}
-
-			if x, ok := n.Get(); ok {
-				return x, nil
+			n, ok, err := v.NativeValue()
+			if ok || err != nil {
+				return n, err
 			}
 
 			return zero, undefinedError(v)
@@ -76,9 +72,7 @@ func registerOptional[T any](
 
 	return Optional[T]{
 		func() (T, bool, error) {
-			n, err := v.NativeValue()
-			x, ok := n.Get()
-			return x, ok, err
+			return v.NativeValue()
 		},
 	}
 }

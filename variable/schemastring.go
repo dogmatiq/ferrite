@@ -13,10 +13,10 @@ type String interface {
 	Schema
 
 	// MinLength returns the minimum permitted length of the string.
-	MinLength() maybe.Value[int]
+	MinLength() (int, bool)
 
 	// MaxLength returns the maximum permitted length of the string.
-	MaxLength() maybe.Value[int]
+	MaxLength() (int, bool)
 }
 
 // TypedString is a string value depicted by type T.
@@ -25,13 +25,13 @@ type TypedString[T ~string] struct {
 }
 
 // MinLength returns the minimum permitted length of the string.
-func (s TypedString[T]) MinLength() maybe.Value[int] {
-	return s.MinLen
+func (s TypedString[T]) MinLength() (int, bool) {
+	return s.MinLen.Get()
 }
 
 // MaxLength returns the maximum permitted length of the string.
-func (s TypedString[T]) MaxLength() maybe.Value[int] {
-	return s.MaxLen
+func (s TypedString[T]) MaxLength() (int, bool) {
+	return s.MaxLen.Get()
 }
 
 // Type returns the type of the native value.
@@ -188,8 +188,8 @@ func (e MaxLengthError) Error() string {
 }
 
 func explainLengthError(s String) string {
-	min, hasMin := s.MinLength().Get()
-	max, hasMax := s.MaxLength().Get()
+	min, hasMin := s.MinLength()
+	max, hasMax := s.MaxLength()
 
 	if !hasMin {
 		return fmt.Sprintf("expected length to be %d bytes or fewer", max)

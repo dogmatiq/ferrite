@@ -15,7 +15,7 @@ type Any interface {
 	IsValid() bool
 
 	// Value returns the variable's value.
-	Value() (maybe.Value[Value], ValueError)
+	Value() (Value, bool, ValueError)
 }
 
 // OfType is an environment variable depicted by type T.
@@ -49,25 +49,17 @@ func (v *OfType[T]) IsValid() bool {
 }
 
 // Value returns the variable's value.
-func (v *OfType[T]) Value() (maybe.Value[Value], ValueError) {
+func (v *OfType[T]) Value() (Value, bool, ValueError) {
 	v.resolve()
-	return maybe.Map(
-		v.value,
-		func(v valueOf[T]) Value {
-			return v
-		},
-	), v.err
+	x, ok := v.value.Get()
+	return x, ok, v.err
 }
 
 // NativeValue returns the variable's native value.
-func (v *OfType[T]) NativeValue() (maybe.Value[T], ValueError) {
+func (v *OfType[T]) NativeValue() (T, bool, ValueError) {
 	v.resolve()
-	return maybe.Map(
-		v.value,
-		func(v valueOf[T]) T {
-			return v.native
-		},
-	), v.err
+	x, ok := v.value.Get()
+	return x.native, ok, v.err
 }
 
 func (v *OfType[T]) resolve() {

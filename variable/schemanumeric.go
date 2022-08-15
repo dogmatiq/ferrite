@@ -15,10 +15,10 @@ type Numeric interface {
 	Schema
 
 	// Min returns the minimum permitted value as a literal.
-	Min() maybe.Value[Literal]
+	Min() (Literal, bool)
 
 	// Max returns the maximum permitted value as a literal.
-	Max() maybe.Value[Literal]
+	Max() (Literal, bool)
 
 	// Limits returns the range of permitted values.
 	//
@@ -38,13 +38,13 @@ type TypedNumeric[T constraints.Integer | constraints.Float] struct {
 }
 
 // Min returns the minimum permitted value as a literal.
-func (s TypedNumeric[T]) Min() maybe.Value[Literal] {
-	return mustMarshal(s.Marshaler, s.NativeMin)
+func (s TypedNumeric[T]) Min() (Literal, bool) {
+	return mustMarshal(s.Marshaler, s.NativeMin).Get()
 }
 
 // Max returns the maximum permitted value as a literal.
-func (s TypedNumeric[T]) Max() maybe.Value[Literal] {
-	return mustMarshal(s.Marshaler, s.NativeMax)
+func (s TypedNumeric[T]) Max() (Literal, bool) {
+	return mustMarshal(s.Marshaler, s.NativeMax).Get()
 }
 
 // Limits returns the range of permitted values.
@@ -207,8 +207,8 @@ func (e MaxError) Error() string {
 }
 
 func explainRangeError(s Numeric) string {
-	min, hasMin := s.Min().Get()
-	max, hasMax := s.Max().Get()
+	min, hasMin := s.Min()
+	max, hasMax := s.Max()
 
 	if !hasMin {
 		return fmt.Sprintf(

@@ -47,7 +47,7 @@ func renderSpec(s variable.Spec) string {
 		Output: out,
 	})
 
-	if def, ok := s.Default().Get(); ok {
+	if def, ok := s.Default(); ok {
 		return fmt.Sprintf(
 			"[ %s ] = %s",
 			out,
@@ -63,7 +63,7 @@ func renderSpec(s variable.Spec) string {
 }
 
 func renderValue(v variable.Any) string {
-	m, err := v.Value()
+	value, ok, err := v.Value()
 	if err != nil {
 		out := &strings.Builder{}
 		err.AcceptVisitor(&errorRenderer{
@@ -80,7 +80,7 @@ func renderValue(v variable.Any) string {
 		)
 	}
 
-	if value, ok := m.Get(); ok {
+	if ok {
 		if value.IsDefault() {
 			return fmt.Sprintf("%s using default value", validIcon)
 		}
@@ -131,8 +131,8 @@ func (r *schemaRenderer) VisitSet(s variable.Set) {
 }
 
 func (r *schemaRenderer) VisitNumeric(s variable.Numeric) {
-	min, hasMin := s.Min().Get()
-	max, hasMax := s.Max().Get()
+	min, hasMin := s.Min()
+	max, hasMax := s.Max()
 
 	if hasMin && hasMax {
 		fmt.Fprintf(

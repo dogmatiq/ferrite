@@ -19,7 +19,7 @@ type Spec interface {
 	Schema() Schema
 
 	// Default returns the string representation of the default value.
-	Default() maybe.Value[Literal]
+	Default() (Literal, bool)
 
 	// IsRequired returns true if the application MUST have a value for this
 	// variable (even if it is fulfilled by a default value).
@@ -33,7 +33,7 @@ type Spec interface {
 
 // IsDefault returns true if v is the default value of the given spec.
 func IsDefault(s Spec, v Literal) bool {
-	if def, ok := s.Default().Get(); ok {
+	if def, ok := s.Default(); ok {
 		return def == v
 	}
 
@@ -168,8 +168,8 @@ func (s TypedSpec[T]) Schema() Schema {
 }
 
 // Default returns the string representation of the default value.
-func (s TypedSpec[T]) Default() maybe.Value[Literal] {
-	return maybe.Map(s.def, valueOf[T].Canonical)
+func (s TypedSpec[T]) Default() (Literal, bool) {
+	return maybe.Map(s.def, valueOf[T].Canonical).Get()
 }
 
 // IsRequired returns true if the application MUST have a value for this
