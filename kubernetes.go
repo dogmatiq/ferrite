@@ -175,7 +175,7 @@ func (b KubernetesServiceBuilder) hostSpec(req bool) variable.TypedSpec[string] 
 	s, err := variable.NewSpec(
 		b.hostVar,
 		fmt.Sprintf(
-			"k8s %q service host",
+			"kubernetes %q service host",
 			b.service,
 		),
 		maybe.Map(b.def, func(addr KubernetesAddress) string {
@@ -201,7 +201,7 @@ func (b KubernetesServiceBuilder) portSpec(req bool) variable.TypedSpec[string] 
 	s, err := variable.NewSpec(
 		b.portVar,
 		fmt.Sprintf(
-			"k8s %q service port",
+			"kubernetes %q service port",
 			b.service,
 		),
 		maybe.Map(b.def, func(addr KubernetesAddress) string {
