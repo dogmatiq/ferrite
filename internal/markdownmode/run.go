@@ -5,10 +5,11 @@ import (
 )
 
 // Run generates environment variable usage instructions in markdown format.
-func Run(app string, reg *variable.Registry) string {
+func Run(app string, reg *variable.Registry, usage bool) string {
 	r := renderer{
-		App:   app,
-		Specs: reg.Specs(),
+		App:         app,
+		RenderUsage: usage,
+		Specs:       reg.Specs(),
 	}
 
 	return r.Render()

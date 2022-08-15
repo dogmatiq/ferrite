@@ -23,8 +23,11 @@ import (
 func Init() {
 	switch m := os.Getenv("FERRITE_MODE"); m {
 	case "usage/markdown":
-		app := filepath.Base(os.Args[0])
-		result := markdownmode.Run(app, &variable.DefaultRegistry)
+		result := markdownmode.Run(
+			filepath.Base(os.Args[0]),
+			&variable.DefaultRegistry,
+			true, // render usage
+		)
 		io.WriteString(output, result)
 		exit(0)
 

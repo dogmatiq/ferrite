@@ -9,8 +9,9 @@ import (
 )
 
 type renderer struct {
-	App   string
-	Specs []variable.Spec
+	App         string
+	Specs       []variable.Spec
+	RenderUsage bool
 
 	w    strings.Builder
 	refs map[string]struct{}
@@ -39,8 +40,11 @@ func (r *renderer) Render() string {
 		r.renderIndex()
 		r.line("")
 		r.renderSpecs()
-		r.line("")
-		r.renderUsage()
+
+		if r.RenderUsage {
+			r.line("")
+			r.renderUsage()
+		}
 	}
 
 	r.line("")
