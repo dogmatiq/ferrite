@@ -35,6 +35,7 @@ The two most important changes in usage are:
 [unreleased]: https://github.com/dogmatiq/ferrite
 [0.1.0]: https://github.com/dogmatiq/ferrite/releases/tag/v0.1.0
 [0.2.0]: https://github.com/dogmatiq/ferrite/releases/tag/v0.2.0
+[0.3.0]: https://github.com/dogmatiq/ferrite/releases/tag/v0.3.0
 
 <!-- version template
 ## [0.0.1] - YYYY-MM-DD
