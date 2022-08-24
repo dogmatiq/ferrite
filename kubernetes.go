@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"strconv"
 	"strings"
 	"unicode"
 
@@ -278,76 +277,6 @@ func validateHost(host string) error {
 		if unicode.IsSpace(r) {
 			return errors.New("host must not contain whitespace")
 		}
-	}
-
-	return nil
-}
-
-// validateHost returns an error of port is not a valid numeric port or IANA
-// service name.
-func validatePort(port string) error {
-	if port == "" {
-		return errors.New("port must not be empty")
-	}
-
-	n, err := strconv.ParseUint(port, 10, 16)
-
-	if errors.Is(err, strconv.ErrSyntax) {
-		return validateIANAServiceName(port)
-	}
-
-	if err != nil || n == 0 {
-		return errors.New("numeric ports must be between 1 and 65535")
-	}
-
-	return nil
-}
-
-// validateIANAServiceName returns an error if name is not a valid IANA service
-// name.
-//
-// See https://www.rfc-editor.org/rfc/rfc6335.html#section-5.1.
-func validateIANAServiceName(name string) error {
-	n := len(name)
-
-	// RFC-6335: MUST be at least 1 character and no more than 15 characters
-	// long.
-	if n == 0 || n > 15 {
-		return errors.New("IANA service name must be between 1 and 15 characters")
-	}
-
-	// RFC-6335: MUST NOT begin or end with a hyphen.
-	if name[0] == '-' || name[n-1] == '-' {
-		return errors.New("IANA service name must not begin or end with a hyphen")
-	}
-
-	hasLetter := false
-
-	for i := range name {
-		ch := name[i] // iterate by byte (not rune)
-
-		// RFC-6335: MUST contain only US-ASCII letters 'A' - 'Z' and 'a' - 'z',
-		// digits '0' - '9', and hyphens ('-', ASCII 0x2D or decimal 45).
-		switch {
-		case ch >= 'A' && ch <= 'Z':
-			hasLetter = true
-		case ch >= 'a' && ch <= 'z':
-			hasLetter = true
-		case ch >= '0' && ch <= '9':
-			// digit ok!
-		case ch == '-':
-			// RFC-6335: hyphens MUST NOT be adjacent to other hyphens.
-			if name[i-1] == '-' {
-				return errors.New("IANA service name must not contain adjacent hyphens")
-			}
-		default:
-			return errors.New("IANA service name must contain only ASCII letters, digits and hyphen")
-		}
-	}
-
-	// RFC-6335: MUST contain at least one letter ('A' - 'Z' or 'a' - 'z').
-	if !hasLetter {
-		return errors.New("IANA service name must contain at least one letter")
 	}
 
 	return nil

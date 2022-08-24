@@ -23,7 +23,7 @@ func (m enumMember) String() string {
 	return fmt.Sprintf("<member-%d>", m)
 }
 
-var _ = Describe("type EnumSpec", func() {
+var _ = Describe("type EnumBuilder", func() {
 	var builder EnumBuilder[enumMember]
 
 	BeforeEach(func() {

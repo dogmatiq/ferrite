@@ -3,6 +3,7 @@ package ferrite
 import (
 	"github.com/dogmatiq/ferrite/maybe"
 	"github.com/dogmatiq/ferrite/variable"
+	"golang.org/x/exp/slices"
 )
 
 // String configures an environment variable as a string.
@@ -29,6 +30,7 @@ func StringAs[T ~string](name, desc string) StringBuilder[T] {
 type StringBuilder[T ~string] struct {
 	name, desc string
 	def        maybe.Value[T]
+	options    []variable.SpecOption[T]
 }
 
 // WithDefault sets a default value of the variable.
@@ -36,6 +38,21 @@ type StringBuilder[T ~string] struct {
 // It is used when the environment variable is undefined or empty.
 func (b StringBuilder[T]) WithDefault(v T) StringBuilder[T] {
 	b.def = maybe.Some(v)
+	return b
+}
+
+// WithConstraintFunc adds a constraint function to the variable.
+//
+// fn is called with the environment variable value after it is parsed. If fn
+// returns an error the value is considered invalid.
+func (b StringBuilder[T]) WithConstraintFunc(
+	desc string,
+	fn func(T) variable.ConstraintError,
+) StringBuilder[T] {
+	b.options = append(
+		slices.Clone(b.options),
+		variable.WithConstraint(desc, fn),
+	)
 	return b
 }
 
@@ -58,6 +75,7 @@ func (b StringBuilder[T]) spec(req bool) variable.TypedSpec[T] {
 		b.def,
 		req,
 		variable.TypedString[T]{},
+		b.options...,
 	)
 	if err != nil {
 		panic(err.Error())

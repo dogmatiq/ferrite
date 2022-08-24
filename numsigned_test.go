@@ -10,7 +10,7 @@ import (
 
 type userDefinedSigned int16
 
-var _ = Describe("type SignedSpec", func() {
+var _ = Describe("type SignedBuilder", func() {
 	var builder SignedBuilder[userDefinedSigned]
 
 	BeforeEach(func() {

@@ -8,13 +8,11 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-type userDefinedString string
-
-var _ = Describe("type StringBuilder", func() {
-	var builder StringBuilder[userDefinedString]
+var _ = Describe("func NetworkPort", func() {
+	var builder StringBuilder[string]
 
 	BeforeEach(func() {
-		builder = StringAs[userDefinedString]("FERRITE_STRING", "<desc>")
+		builder = NetworkPort("FERRITE_NETWORK_PORT", "<desc>")
 	})
 
 	AfterEach(func() {
@@ -25,13 +23,13 @@ var _ = Describe("type StringBuilder", func() {
 		When("the value is not empty", func() {
 			Describe("func Value()", func() {
 				It("returns the value ", func() {
-					os.Setenv("FERRITE_STRING", "<value>")
+					os.Setenv("FERRITE_NETWORK_PORT", "12345")
 
 					v := builder.
 						Required().
 						Value()
 
-					Expect(v).To(Equal(userDefinedString("<value>")))
+					Expect(v).To(Equal("12345"))
 				})
 			})
 		})
@@ -41,11 +39,11 @@ var _ = Describe("type StringBuilder", func() {
 				Describe("func Value()", func() {
 					It("returns the default", func() {
 						v := builder.
-							WithDefault("<value>").
+							WithDefault("https").
 							Required().
 							Value()
 
-						Expect(v).To(Equal(userDefinedString("<value>")))
+						Expect(v).To(Equal("https"))
 					})
 				})
 			})
@@ -58,7 +56,7 @@ var _ = Describe("type StringBuilder", func() {
 								Required().
 								Value()
 						}).To(PanicWith(
-							"FERRITE_STRING is undefined and does not have a default value",
+							"FERRITE_NETWORK_PORT is undefined and does not have a default value",
 						))
 					})
 				})
@@ -70,14 +68,14 @@ var _ = Describe("type StringBuilder", func() {
 		When("the value is not empty", func() {
 			Describe("func Value()", func() {
 				It("returns the value ", func() {
-					os.Setenv("FERRITE_STRING", "<value>")
+					os.Setenv("FERRITE_NETWORK_PORT", "12345")
 
 					v, ok := builder.
 						Optional().
 						Value()
 
 					Expect(ok).To(BeTrue())
-					Expect(v).To(Equal(userDefinedString("<value>")))
+					Expect(v).To(Equal("12345"))
 				})
 			})
 		})
@@ -87,12 +85,12 @@ var _ = Describe("type StringBuilder", func() {
 				Describe("func Value()", func() {
 					It("returns the default", func() {
 						v, ok := builder.
-							WithDefault("<value>").
+							WithDefault("12345").
 							Optional().
 							Value()
 
 						Expect(ok).To(BeTrue())
-						Expect(v).To(Equal(userDefinedString("<value>")))
+						Expect(v).To(Equal("12345"))
 					})
 				})
 			})

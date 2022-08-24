@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog], and this project adheres to
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+## [Unreleased]
+
+- Add `NetworkPort()`
+
 ## [0.3.0] - 2022-08-15
 
 ### Added

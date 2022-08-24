@@ -228,6 +228,47 @@ var _ = Describe("func Run()", func() {
 			},
 		),
 
+		// NETWORK PORT
+
+		Entry(
+			"network port + optional + default",
+			"network-port/default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					NetworkPort("PORT", "listen port for the HTTP server").
+					WithDefault("8080").
+					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"network port + optional",
+			"network-port/optional.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					NetworkPort("PORT", "listen port for the HTTP server").
+					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"network port + required + default",
+			"network-port/default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					NetworkPort("PORT", "listen port for the HTTP server").
+					WithDefault("8080").
+					Required(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"network port + required",
+			"network-port/required.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					NetworkPort("PORT", "listen port for the HTTP server").
+					Required(variable.WithRegistry(reg))
+			},
+		),
+
 		// NUMBER - SIGNED
 
 		Entry(

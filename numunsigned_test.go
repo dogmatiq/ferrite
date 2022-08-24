@@ -10,7 +10,7 @@ import (
 
 type userDefinedUnsigned uint16
 
-var _ = Describe("type UnsignedSpec", func() {
+var _ = Describe("type UnsignedBuilder", func() {
 
 	var builder UnsignedBuilder[userDefinedUnsigned]
 
