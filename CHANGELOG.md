@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [0.3.1] - 2022-08-24
 
+### Added
+
 - Add `NetworkPort()`
 
 ## [0.3.0] - 2022-08-15
