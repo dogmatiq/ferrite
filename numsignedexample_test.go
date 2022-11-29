@@ -60,3 +60,22 @@ func ExampleSigned_optional() {
 	// Output:
 	// value is undefined
 }
+
+func ExampleSigned_limits() {
+	setUp()
+	defer tearDown()
+
+	v := ferrite.
+		Signed[int]("FERRITE_SIGNED", "example signed integer variable").
+		WithMinimum(-5).
+		WithMaximum(10).
+		Required()
+
+	os.Setenv("FERRITE_SIGNED", "-2")
+	ferrite.Init()
+
+	fmt.Println("value is", v.Value())
+
+	// Output:
+	// value is -2
+}

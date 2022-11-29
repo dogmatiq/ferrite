@@ -22,8 +22,8 @@ func Signed[T constraints.Signed](name, desc string) SignedBuilder[T] {
 
 // SignedBuilder builds a specification for a signed integer value.
 type SignedBuilder[T constraints.Signed] struct {
-	name, desc string
-	def        maybe.Value[T]
+	name, desc    string
+	def, min, max maybe.Value[T]
 }
 
 // WithDefault sets a default value of the variable.
@@ -31,6 +31,18 @@ type SignedBuilder[T constraints.Signed] struct {
 // It is used when the environment variable is undefined or empty.
 func (b SignedBuilder[T]) WithDefault(v T) SignedBuilder[T] {
 	b.def = maybe.Some(v)
+	return b
+}
+
+// WithMinimum sets the minimum acceptable value of the variable.
+func (b SignedBuilder[T]) WithMinimum(v T) SignedBuilder[T] {
+	b.min = maybe.Some(v)
+	return b
+}
+
+// WithMaximum sets the maximum acceptable value of the variable.
+func (b SignedBuilder[T]) WithMaximum(v T) SignedBuilder[T] {
+	b.max = maybe.Some(v)
 	return b
 }
 
@@ -54,6 +66,8 @@ func (b SignedBuilder[T]) spec(req bool) variable.TypedSpec[T] {
 		req,
 		variable.TypedNumeric[T]{
 			Marshaler: signedMarshaler[T]{},
+			NativeMin: b.min,
+			NativeMax: b.max,
 		},
 	)
 	if err != nil {

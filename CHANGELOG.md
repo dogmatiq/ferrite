@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog], and this project adheres to
 ### Added
 
 - Add `DurationBuilder.WithMinimum()` and `WithMaximum()`
+- Add `SignedBuilder.WithMinimum()` and `WithMaximum()`
 
 ## [0.3.1] - 2022-08-24
 
