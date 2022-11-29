@@ -197,4 +197,34 @@ var _ = Describe("type UnsignedBuilder", func() {
 			})
 		})
 	})
+
+	When("the value is lower than the minimum limit", func() {
+		It("panics", func() {
+			Expect(func() {
+				os.Setenv("FERRITE_UNSIGNED", "1")
+
+				builder.
+					WithMinimum(5).
+					Required().
+					Value()
+			}).To(PanicWith(
+				`value of FERRITE_UNSIGNED (1) is invalid: too low, expected 5 or greater`,
+			))
+		})
+	})
+
+	When("the value is greater than the maximum limit", func() {
+		It("panics", func() {
+			Expect(func() {
+				os.Setenv("FERRITE_UNSIGNED", "10")
+
+				builder.
+					WithMaximum(5).
+					Required().
+					Value()
+			}).To(PanicWith(
+				`value of FERRITE_UNSIGNED (10) is invalid: too high, expected 5 or less`,
+			))
+		})
+	})
 })

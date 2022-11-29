@@ -60,3 +60,22 @@ func ExampleUnsigned_optional() {
 	// Output:
 	// value is undefined
 }
+
+func ExampleUnsigned_limits() {
+	setUp()
+	defer tearDown()
+
+	v := ferrite.
+		Unsigned[uint]("FERRITE_UNSIGNED", "example unsigned integer variable").
+		WithMinimum(5).
+		WithMaximum(10).
+		Required()
+
+	os.Setenv("FERRITE_UNSIGNED", "7")
+	ferrite.Init()
+
+	fmt.Println("value is", v.Value())
+
+	// Output:
+	// value is 7
+}

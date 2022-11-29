@@ -22,8 +22,8 @@ func Unsigned[T constraints.Unsigned](name, desc string) UnsignedBuilder[T] {
 
 // UnsignedBuilder builds a specification for an unsigned integer value.
 type UnsignedBuilder[T constraints.Unsigned] struct {
-	name, desc string
-	def        maybe.Value[T]
+	name, desc    string
+	def, min, max maybe.Value[T]
 }
 
 // WithDefault sets a default value of the variable.
@@ -31,6 +31,18 @@ type UnsignedBuilder[T constraints.Unsigned] struct {
 // It is used when the environment variable is undefined or empty.
 func (b UnsignedBuilder[T]) WithDefault(v T) UnsignedBuilder[T] {
 	b.def = maybe.Some(v)
+	return b
+}
+
+// WithMinimum sets the minimum acceptable value of the variable.
+func (b UnsignedBuilder[T]) WithMinimum(v T) UnsignedBuilder[T] {
+	b.min = maybe.Some(v)
+	return b
+}
+
+// WithMaximum sets the maximum acceptable value of the variable.
+func (b UnsignedBuilder[T]) WithMaximum(v T) UnsignedBuilder[T] {
+	b.max = maybe.Some(v)
 	return b
 }
 
@@ -54,6 +66,8 @@ func (b UnsignedBuilder[T]) spec(req bool) variable.TypedSpec[T] {
 		req,
 		variable.TypedNumeric[T]{
 			Marshaler: unsignedMarshaler[T]{},
+			NativeMin: b.min,
+			NativeMax: b.max,
 		},
 	)
 	if err != nil {
