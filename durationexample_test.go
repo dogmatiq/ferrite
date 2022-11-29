@@ -61,3 +61,22 @@ func ExampleDuration_optional() {
 	// Output:
 	// value is undefined
 }
+
+func ExampleDuration_limits() {
+	setUp()
+	defer tearDown()
+
+	v := ferrite.
+		Duration("FERRITE_DURATION", "example duration variable").
+		WithMinimum(5 * time.Minute).
+		WithMaximum(10 * time.Minute).
+		Required()
+
+	os.Setenv("FERRITE_DURATION", "5m")
+	ferrite.Init()
+
+	fmt.Println("value is", v.Value())
+
+	// Output:
+	// value is 5m0s
+}

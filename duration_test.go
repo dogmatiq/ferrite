@@ -177,4 +177,34 @@ var _ = Describe("type DurationBuilder", func() {
 			})
 		})
 	})
+
+	When("the value is lower than the minimum limit", func() {
+		It("panics", func() {
+			Expect(func() {
+				os.Setenv("FERRITE_DURATION", "1s")
+
+				builder.
+					WithMinimum(5 * time.Second).
+					Required().
+					Value()
+			}).To(PanicWith(
+				`value of FERRITE_DURATION (1s) is invalid: too low, expected 5s or greater`,
+			))
+		})
+	})
+
+	When("the value is greater than the maximum limit", func() {
+		It("panics", func() {
+			Expect(func() {
+				os.Setenv("FERRITE_DURATION", "10s")
+
+				builder.
+					WithMaximum(5 * time.Second).
+					Required().
+					Value()
+			}).To(PanicWith(
+				`value of FERRITE_DURATION (10s) is invalid: too high, expected between 1ns and 5s`,
+			))
+		})
+	})
 })

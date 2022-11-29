@@ -15,17 +15,20 @@ import (
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
+//
+// Durations have a minimum value of 1 nanosecond by default.
 func Duration(name, desc string) DurationBuilder {
 	return DurationBuilder{
 		name: name,
 		desc: desc,
+		min:  maybe.Some(1 * time.Nanosecond),
 	}
 }
 
 // DurationBuilder builds a specification for a duration variable.
 type DurationBuilder struct {
-	name, desc string
-	def        maybe.Value[time.Duration]
+	name, desc    string
+	def, min, max maybe.Value[time.Duration]
 }
 
 // WithDefault sets a default value of the variable.
@@ -33,6 +36,18 @@ type DurationBuilder struct {
 // It is used when the environment variable is undefined or empty.
 func (b DurationBuilder) WithDefault(v time.Duration) DurationBuilder {
 	b.def = maybe.Some(v)
+	return b
+}
+
+// WithMinimum sets the minimum acceptable value of the variable.
+func (b DurationBuilder) WithMinimum(v time.Duration) DurationBuilder {
+	b.min = maybe.Some(v)
+	return b
+}
+
+// WithMaximum sets the maximum acceptable value of the variable.
+func (b DurationBuilder) WithMaximum(v time.Duration) DurationBuilder {
+	b.max = maybe.Some(v)
 	return b
 }
 
@@ -56,7 +71,8 @@ func (b DurationBuilder) spec(req bool) variable.TypedSpec[time.Duration] {
 		req,
 		variable.TypedNumeric[time.Duration]{
 			Marshaler: durationMarshaler{},
-			NativeMin: maybe.Some(1 * time.Nanosecond),
+			NativeMin: b.min,
+			NativeMax: b.max,
 		},
 	)
 	if err != nil {
