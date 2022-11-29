@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Added
 
+- Add `Float()`
 - Add `DurationBuilder.WithMinimum()` and `WithMaximum()`
 - Add `SignedBuilder.WithMinimum()` and `WithMaximum()`
 - Add `UnsignedBuilder.WithMinimum()` and `WithMaximum()`
