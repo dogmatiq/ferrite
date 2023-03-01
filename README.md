@@ -1,13 +1,15 @@
+<div align="center">
+
 # Ferrite
 
-[![Build Status](https://github.com/dogmatiq/ferrite/actions/workflows/ci.yml/badge.svg)](https://github.com/dogmatiq/ferrite/actions/workflows/ci.yml)
-[![Code Coverage](https://img.shields.io/codecov/c/github/dogmatiq/ferrite/main.svg)](https://codecov.io/github/dogmatiq/ferrite)
-[![Latest Version](https://img.shields.io/github/tag/dogmatiq/ferrite.svg?label=semver)](https://semver.org)
-[![Documentation](https://img.shields.io/badge/go.dev-reference-007d9c)](https://pkg.go.dev/github.com/dogmatiq/ferrite)
-[![Go Report Card](https://goreportcard.com/badge/github.com/dogmatiq/ferrite)](https://goreportcard.com/report/github.com/dogmatiq/ferrite)
+A type-safe, declarative environment variable validation system for Go.
 
-Ferrite is a type-safe, declarative environment variable validation system for
-Go.
+[![Documentation](https://img.shields.io/badge/go.dev-documentation-007d9c?&style=for-the-badge)](https://pkg.go.dev/github.com/dogmatiq/ferrite)
+[![Latest Version](https://img.shields.io/github/tag/dogmatiq/ferrite.svg?&style=for-the-badge&label=semver)](https://github.com/dogmatiq/ferrite/releases)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/dogmatiq/ferrite/ci.yml?style=for-the-badge&branch=main)](https://github.com/dogmatiq/ferrite/actions/workflows/ci.yml)
+[![Code Coverage](https://img.shields.io/codecov/c/github/dogmatiq/ferrite/main.svg?style=for-the-badge)](https://codecov.io/github/dogmatiq/ferrite)
+
+</div>
 
 ## Getting Started
 
