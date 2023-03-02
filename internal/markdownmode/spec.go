@@ -79,6 +79,18 @@ func (r schemaRenderer) VisitString(variable.String) {
 	}
 }
 
+func (r schemaRenderer) VisitOther(variable.Other) {
+	if _, ok := r.spec.Default(); ok {
+		r.line("This variable **MAY** be set to a non-empty value.")
+		r.line("If left undefined the default value is used (see below).")
+	} else if r.spec.IsRequired() {
+		r.line("This variable **MUST** be set to a non-empty value.")
+		r.renderUndefinedFailureWarning()
+	} else {
+		r.line("This variable **MAY** be set to a non-empty value or left undefined.")
+	}
+}
+
 func (r *renderer) renderUndefinedFailureWarning() {
 	r.line("If left undefined the application will print usage information to `STDERR` then")
 	r.line("exit with a non-zero exit code.")

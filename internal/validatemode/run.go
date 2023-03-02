@@ -166,6 +166,10 @@ func (r *schemaRenderer) VisitString(s variable.String) {
 	fmt.Fprintf(r.Output, "<%s>", s.Type().Kind())
 }
 
+func (r *schemaRenderer) VisitOther(s variable.Other) {
+	s.RenderSchema(r.Output)
+}
+
 type errorRenderer struct {
 	Output *strings.Builder
 	Schema variable.Schema
@@ -225,4 +229,8 @@ func (r *errorRenderer) VisitMinLengthError(err variable.MinLengthError) {
 
 func (r *errorRenderer) VisitMaxLengthError(err variable.MaxLengthError) {
 	r.Output.WriteString(err.Error())
+}
+
+func (r *errorRenderer) VisitOther(s variable.Other) {
+	s.RenderValueError(r.Output, r.Error)
 }

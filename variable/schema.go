@@ -34,6 +34,7 @@ type SchemaVisitor interface {
 	VisitNumeric(Numeric)
 	VisitSet(Set)
 	VisitString(String)
+	VisitOther(Other)
 }
 
 // SchemaErrorVisitor dispatches based on the type of a SchemaError.
