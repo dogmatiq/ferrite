@@ -8,7 +8,9 @@ import (
 	"github.com/dogmatiq/ferrite/variable"
 )
 
-// URL configures an environment variable as a fully-qualified URL.
+// URL configures an environment variable as a URL.
+//
+// The URL must be fully-qualified (i.e. it must have a scheme and hostname).
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
@@ -31,6 +33,10 @@ func URL(name, desc string) URLBuilder {
 					return nil
 				},
 			),
+			variable.WithExample(
+				mustParseURL("https://example.org/path"),
+				"randomly generated example",
+			),
 		},
 	}
 }
@@ -46,11 +52,7 @@ type URLBuilder struct {
 //
 // It is used when the environment variable is undefined or empty.
 func (b URLBuilder) WithDefault(v string) URLBuilder {
-	u, err := url.Parse(v)
-	if err != nil {
-		panic(err)
-	}
-
+	u := mustParseURL(v)
 	b.def = maybe.Some(u)
 	return b
 }
@@ -95,4 +97,12 @@ func (urlMarshaler) Marshal(v *url.URL) (variable.Literal, error) {
 
 func (urlMarshaler) Unmarshal(v variable.Literal) (*url.URL, error) {
 	return url.Parse(v.String)
+}
+
+func mustParseURL(v string) *url.URL {
+	u, err := url.Parse(v)
+	if err != nil {
+		panic(err)
+	}
+	return u
 }

@@ -391,6 +391,37 @@ var _ = Describe("func Run()", func() {
 					Required(variable.WithRegistry(reg))
 			},
 		),
+
+		// URL
+
+		Entry(
+			"url + optional",
+			"url/optional.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					URL("API_URL", "URL of the REST API").
+					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"url + required + default",
+			"url/default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					URL("API_URL", "URL of the REST API").
+					WithDefault("http://localhost:8080").
+					Required(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"url + required",
+			"url/required.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					URL("API_URL", "URL of the REST API").
+					Required(variable.WithRegistry(reg))
+			},
+		),
 	)
 })
 
