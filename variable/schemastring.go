@@ -127,8 +127,7 @@ func (s TypedString[T]) Examples(hasOtherExamples bool) []TypedExample[T] {
 
 	return []TypedExample[T]{
 		{
-			Native:      example,
-			Description: "randomly generated example",
+			Native: example,
 		},
 	}
 }

@@ -32,7 +32,7 @@ var _ = Describe("func Run()", func() {
 			expect, err := os.ReadFile(filepath.Join("testdata", "markdown", file))
 			Expect(err).ShouldNot(HaveOccurred())
 
-			actual := Run("<app>", reg, true)
+			actual := Run("<app>", reg)
 			ExpectWithOffset(1, actual).To(EqualX(string(expect)))
 		},
 		Entry(

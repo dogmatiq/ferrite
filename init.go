@@ -26,7 +26,6 @@ func Init() {
 		result := markdownmode.Run(
 			filepath.Base(os.Args[0]),
 			&variable.DefaultRegistry,
-			true, // render usage
 		)
 		io.WriteString(output, result)
 		exit(0)

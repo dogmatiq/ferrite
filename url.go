@@ -33,9 +33,9 @@ func URL(name, desc string) URLBuilder {
 					return nil
 				},
 			),
-			variable.WithExample(
+			variable.WithNonNormativeExample(
 				mustParseURL("https://example.org/path"),
-				"randomly generated example",
+				"a typical URL for a web page",
 			),
 		},
 	}

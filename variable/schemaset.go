@@ -110,6 +110,7 @@ func (s TypedSet[T]) Examples(hasOtherExamples bool) []TypedExample[T] {
 		examples = append(examples, TypedExample[T]{
 			Native:      m.Value,
 			Description: m.Description,
+			IsNormative: true,
 		})
 	}
 

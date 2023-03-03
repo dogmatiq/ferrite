@@ -149,8 +149,7 @@ func (s TypedNumeric[T]) Examples(hasOtherExamples bool) []TypedExample[T] {
 	// useful.
 	return []TypedExample[T]{
 		{
-			Native:      T(float64(min) + float64(max-min)*0.25),
-			Description: "randomly generated example",
+			Native: T(float64(min) + float64(max-min)*0.25),
 		},
 	}
 }

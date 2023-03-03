@@ -9,12 +9,12 @@ import (
 )
 
 type renderer struct {
-	App         string
-	Specs       []variable.Spec
-	RenderUsage bool
+	App   string
+	Specs []variable.Spec
 
-	w    strings.Builder
-	refs map[string]struct{}
+	w                 strings.Builder
+	hideUsageExamples bool
+	refs              map[string]struct{}
 }
 
 func (r *renderer) line(f string, v ...any) {
@@ -25,18 +25,26 @@ func (r *renderer) Render() string {
 	r.line("# Environment Variables")
 	r.line("")
 	r.line("This document describes the environment variables used by `%s`.", r.App)
-	r.line("")
 
 	if len(r.Specs) == 0 {
+		r.line("")
 		r.line("**There do not appear to be any environment variables.**")
-	} else {
-		r.line("Please note that **undefined** variables and **empty strings** are considered")
-		r.line("equivalent.")
+	}
+
+	if r.hasNonNormativeExamples() {
+		r.line("")
+		r.renderNonNormativeExampleWarning()
 	}
 
 	r.line("")
-	r.line("The application may consume other undocumented environment variables; this")
-	r.line("document only shows those variables defined using %s.", r.link("Ferrite"))
+	r.line("⚠️ The application may consume other undocumented environment variables; this")
+	r.line("document only shows those variables declared using %s.", r.link("Ferrite"))
+
+	if len(r.Specs) != 0 {
+		r.line("")
+		r.line("Please note that **undefined** variables and **empty strings** are considered")
+		r.line("equivalent.")
+	}
 
 	if len(r.Specs) != 0 {
 		r.line("")
@@ -44,10 +52,11 @@ func (r *renderer) Render() string {
 		r.line("")
 		r.renderSpecs()
 
-		if r.RenderUsage {
+		if !r.hideUsageExamples {
 			r.line("")
 			r.renderUsage()
 		}
+
 	}
 
 	r.line("")
@@ -62,4 +71,16 @@ func (r *renderer) yaml(v string) string {
 		panic(err)
 	}
 	return strings.TrimSpace(string(data))
+}
+
+func (r *renderer) hasNonNormativeExamples() bool {
+	for _, s := range r.Specs {
+		for _, eg := range s.Examples() {
+			if !eg.IsNormative {
+				return true
+			}
+		}
+	}
+
+	return false
 }

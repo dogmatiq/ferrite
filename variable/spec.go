@@ -112,6 +112,7 @@ func NewSpec[T any, S TypedSchema[T]](
 		spec.examples = appendExample(spec.examples, Example{
 			Canonical:   lit,
 			Description: eg.Description,
+			IsNormative: eg.IsNormative,
 		})
 	}
 
@@ -126,6 +127,7 @@ func NewSpec[T any, S TypedSchema[T]](
 			spec.examples = appendExample(spec.examples, Example{
 				Canonical:   lit,
 				Description: eg.Description,
+				IsNormative: eg.IsNormative,
 			})
 		}
 	}
@@ -147,7 +149,8 @@ func NewSpec[T any, S TypedSchema[T]](
 
 		// Append an example of the default value if one is not already present.
 		spec.examples = appendExample(spec.examples, Example{
-			Canonical: lit,
+			Canonical:   lit,
+			IsNormative: true,
 		})
 	}
 

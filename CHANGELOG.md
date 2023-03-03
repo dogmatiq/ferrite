@@ -10,6 +10,13 @@ The format is based on [Keep a Changelog], and this project adheres to
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+## [Unreleased]
+
+### Added
+
+- Add `URL()`
+- Generated Markdown documentation now indicates whether example values are normative or non-normative
+
 ## [0.3.2] - 2022-11-30
 
 ### Added

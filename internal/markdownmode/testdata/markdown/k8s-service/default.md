@@ -2,11 +2,11 @@
 
 This document describes the environment variables used by `<app>`.
 
+⚠️ The application may consume other undocumented environment variables; this
+document only shows those variables declared using [Ferrite].
+
 Please note that **undefined** variables and **empty strings** are considered
 equivalent.
-
-The application may consume other undocumented environment variables; this
-document only shows those variables defined using [Ferrite].
 
 ## Index
 
