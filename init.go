@@ -18,7 +18,7 @@ import (
 // describing the problems and exits the process with a non-zero exit code.
 //
 // If the FERRITE_MODE environment variable is set to "usage/markdown" it prints
-// information about the environment variables in Markdown format, then exists
+// information about the environment variables in Markdown format, then exits
 // the process successfully.
 func Init() {
 	switch m := os.Getenv("FERRITE_MODE"); m {
