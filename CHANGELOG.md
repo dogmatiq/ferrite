@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 - Add `URL()`
 - Generated Markdown documentation now indicates whether example values are normative or non-normative
+- Generated Markdown documentation now describes the format of duration variables
 
 ## [0.3.2] - 2022-11-30
 

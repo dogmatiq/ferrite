@@ -17,10 +17,6 @@ type renderer struct {
 	refs              map[string]struct{}
 }
 
-func (r *renderer) line(f string, v ...any) {
-	fmt.Fprintf(&r.w, f+"\n", v...)
-}
-
 func (r *renderer) Render() string {
 	r.line("# Environment Variables")
 	r.line("")
@@ -65,14 +61,6 @@ func (r *renderer) Render() string {
 	return r.w.String()
 }
 
-func (r *renderer) yaml(v string) string {
-	data, err := yaml.Marshal(v)
-	if err != nil {
-		panic(err)
-	}
-	return strings.TrimSpace(string(data))
-}
-
 func (r *renderer) hasNonNormativeExamples() bool {
 	for _, s := range r.Specs {
 		for _, eg := range s.Examples() {
@@ -83,4 +71,37 @@ func (r *renderer) hasNonNormativeExamples() bool {
 	}
 
 	return false
+}
+
+func (r *renderer) line(f string, v ...any) {
+	fmt.Fprintf(&r.w, f+"\n", v...)
+}
+
+func (r *renderer) paragraph(text string) {
+	const width = 80
+
+	for len(text) > width {
+		for i := width; i >= 0; i-- {
+			if text[i] == ' ' {
+				r.w.WriteString(text[:i])
+				r.w.WriteByte('\n')
+				text = text[i+1:]
+				break
+			}
+		}
+	}
+
+	r.w.WriteString(text)
+	r.w.WriteByte('\n')
+
+	return
+
+}
+
+func (r *renderer) yaml(v string) string {
+	data, err := yaml.Marshal(v)
+	if err != nil {
+		panic(err)
+	}
+	return strings.TrimSpace(string(data))
 }

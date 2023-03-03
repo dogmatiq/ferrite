@@ -8,14 +8,12 @@ func (r *renderer) renderSpecs() {
 	r.line("## Specification")
 
 	for _, s := range r.Specs {
-		r.line("")
 		r.renderSpec(s)
-		r.line("")
-		r.renderExamples(s)
 	}
 }
 
 func (r *renderer) renderSpec(s variable.Spec) {
+	r.line("")
 	r.line("### `%s`", s.Name())
 
 	r.line("")
@@ -23,6 +21,14 @@ func (r *renderer) renderSpec(s variable.Spec) {
 
 	r.line("")
 	s.Schema().AcceptVisitor(schemaRenderer{r, s})
+
+	for _, docs := range s.Documentation() {
+		r.line("")
+		r.paragraph(docs)
+	}
+
+	r.line("")
+	r.renderExamples(s)
 }
 
 type schemaRenderer struct {

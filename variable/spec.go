@@ -29,6 +29,9 @@ type Spec interface {
 	//
 	// The implementation MUST return at least one example.
 	Examples() []Example
+
+	// Documentation returns a list of chunks of documentation text.
+	Documentation() []string
 }
 
 // IsDefault returns true if v is the default value of the given spec.
@@ -46,6 +49,7 @@ type SpecOption[T any] func(*specOptions[T]) error
 type specOptions[T any] struct {
 	Constraints []Constraint[T]
 	Examples    []TypedExample[T]
+	Docs        []string
 }
 
 // TypedSpec builds a specification for a variable depicted by type T.
@@ -56,6 +60,7 @@ type TypedSpec[T any] struct {
 	required    bool
 	schemax     TypedSchema[T]
 	examples    []Example
+	docs        []string
 	constraints []Constraint[T]
 }
 
@@ -154,6 +159,8 @@ func NewSpec[T any, S TypedSchema[T]](
 		})
 	}
 
+	spec.docs = opts.Docs
+
 	return spec, nil
 }
 
@@ -186,6 +193,11 @@ func (s TypedSpec[T]) IsRequired() bool {
 // Examples returns a list of examples of valid values.
 func (s TypedSpec[T]) Examples() []Example {
 	return s.examples
+}
+
+// Documentation returns a list of chunks of documentation text.
+func (s TypedSpec[T]) Documentation() []string {
+	return s.docs
 }
 
 // CheckConstraints returns an error if v does not satisfy any one of the
