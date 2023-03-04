@@ -2,11 +2,17 @@ package variable
 
 import "errors"
 
+// A Constraint represents a constraint on the variable value in addition to the
+// schema's requirements.
+type Constraint interface {
+	// Description returns a description of the constraint.
+	Description() string
+}
+
 // TypedConstraint places a constraint on the variable value in addition to the
 // schema's requirements.
 type TypedConstraint[T any] interface {
-	// Description returns a description of the constraint.
-	Description() string
+	Constraint
 
 	// Check returns an error if v does not satisfy the constraint.
 	Check(T) ConstraintError
