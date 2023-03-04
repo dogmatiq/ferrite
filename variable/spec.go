@@ -47,7 +47,7 @@ func IsDefault(s Spec, v Literal) bool {
 type SpecOption[T any] func(*specOptions[T]) error
 
 type specOptions[T any] struct {
-	Constraints []Constraint[T]
+	Constraints []TypedConstraint[T]
 	Examples    []TypedExample[T]
 	Docs        []string
 }
@@ -61,7 +61,7 @@ type TypedSpec[T any] struct {
 	schemax     TypedSchema[T]
 	examples    []Example
 	docs        []string
-	constraints []Constraint[T]
+	constraints []TypedConstraint[T]
 }
 
 // NewSpec returns a new specification.

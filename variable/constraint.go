@@ -2,9 +2,9 @@ package variable
 
 import "errors"
 
-// Constraint places a constraint on the variable value in addition to the
+// TypedConstraint places a constraint on the variable value in addition to the
 // schema's requirements.
-type Constraint[T any] interface {
+type TypedConstraint[T any] interface {
 	// Description returns a description of the constraint.
 	Description() string
 
