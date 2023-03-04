@@ -1,17 +1,5 @@
 # Environment Variables
 
-This document describes the environment variables used by `<app>`.
-
-⚠️ The application may consume other undocumented environment variables; this
-document only shows those variables declared using [Ferrite].
-
-Please note that **undefined** variables and **empty strings** are considered
-equivalent.
-
-## Index
-
-- [`DEBUG`](#DEBUG) — enable or disable debugging features
-
 ## Specification
 
 ### `DEBUG`
@@ -24,7 +12,3 @@ This variable **MAY** be set to one of the values below or left undefined.
 export DEBUG=true
 export DEBUG=false
 ```
-
-<!-- references -->
-
-[ferrite]: https://github.com/dogmatiq/ferrite

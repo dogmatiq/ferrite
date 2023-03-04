@@ -35,14 +35,15 @@ var _ = Describe("func Run()", func() {
 			expect, err := os.ReadFile(filepath.Join("testdata", "markdown", file))
 			Expect(err).ShouldNot(HaveOccurred())
 
-			actual := Run("<app>", reg, WithoutUsageExamples())
+			actual := Run(
+				"<app>",
+				reg,
+				WithoutPreamble(),
+				WithoutIndex(),
+				WithoutUsageExamples(),
+			)
 			ExpectWithOffset(1, actual).To(EqualX(string(expect)))
 		},
-		Entry(
-			nil,
-			"empty.md",
-			func(reg *variable.Registry) {},
-		),
 
 		// BOOL
 
@@ -394,6 +395,16 @@ var _ = Describe("func Run()", func() {
 
 		// URL
 
+		Entry(
+			"url + optional + default",
+			"url/default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					URL("API_URL", "URL of the REST API").
+					WithDefault("http://localhost:8080").
+					Optional(variable.WithRegistry(reg))
+			},
+		),
 		Entry(
 			"url + optional",
 			"url/optional.md",

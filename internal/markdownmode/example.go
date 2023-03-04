@@ -50,8 +50,3 @@ func (r *renderer) renderExamples(s variable.Spec) {
 
 	r.line("```")
 }
-
-func (r *renderer) renderNonNormativeExampleWarning() {
-	r.line("⚠️ Some of the variables have **non-normative** examples. These examples are")
-	r.line("syntactically correct but may not be meaningful values for this application.")
-}

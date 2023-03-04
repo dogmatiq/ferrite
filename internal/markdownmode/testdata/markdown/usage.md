@@ -2,11 +2,13 @@
 
 This document describes the environment variables used by `<app>`.
 
+If any of the environment variable values do not meet the requirements herein,
+the application will print usage information to `STDERR` then exit with a
+non-zero exit code. Please note that **undefined** variables and **empty**
+values are considered equivalent.
+
 ⚠️ The application may consume other undocumented environment variables; this
 document only shows those variables declared using [Ferrite].
-
-Please note that **undefined** variables and **empty strings** are considered
-equivalent.
 
 ## Index
 

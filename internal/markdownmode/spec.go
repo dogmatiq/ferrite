@@ -43,7 +43,6 @@ func (r schemaRenderer) VisitNumeric(s variable.Numeric) {
 			r.line("If left undefined the default value of `%s` is used.", def.Quote())
 		} else if r.spec.IsRequired() {
 			r.line("This variable **MUST** be set to `%s` or greater.", min.Quote())
-			r.renderUndefinedFailureWarning()
 		} else {
 			r.line("This variable **MAY** be set to `%s` or greater, or left undefined.", min.Quote())
 		}
@@ -53,7 +52,6 @@ func (r schemaRenderer) VisitNumeric(s variable.Numeric) {
 			r.line("If left undefined the default value of `%s` is used.", def.Quote())
 		} else if r.spec.IsRequired() {
 			r.line("This variable **MUST** be set to a `%s` value.", s.Type().Kind())
-			r.renderUndefinedFailureWarning()
 		} else {
 			r.line("This variable **MAY** be set to a `%s` value or left undefined.", s.Type().Kind())
 		}
@@ -66,7 +64,6 @@ func (r schemaRenderer) VisitSet(s variable.Set) {
 		r.line("If left undefined the default value of `%s` is used.", def.Quote())
 	} else if r.spec.IsRequired() {
 		r.line("This variable **MUST** be set to one of the values below.")
-		r.renderUndefinedFailureWarning()
 	} else {
 		r.line("This variable **MAY** be set to one of the values below or left undefined.")
 	}
@@ -78,7 +75,6 @@ func (r schemaRenderer) VisitString(variable.String) {
 		r.line("If left undefined the default value is used (see below).")
 	} else if r.spec.IsRequired() {
 		r.line("This variable **MUST** be set to a non-empty string.")
-		r.renderUndefinedFailureWarning()
 	} else {
 		r.line("This variable **MAY** be set to a non-empty string or left undefined.")
 	}
@@ -90,13 +86,7 @@ func (r schemaRenderer) VisitOther(variable.Other) {
 		r.line("If left undefined the default value is used (see below).")
 	} else if r.spec.IsRequired() {
 		r.line("This variable **MUST** be set to a non-empty value.")
-		r.renderUndefinedFailureWarning()
 	} else {
 		r.line("This variable **MAY** be set to a non-empty value or left undefined.")
 	}
-}
-
-func (r *renderer) renderUndefinedFailureWarning() {
-	r.line("If left undefined the application will print usage information to `STDERR` then")
-	r.line("exit with a non-zero exit code.")
 }

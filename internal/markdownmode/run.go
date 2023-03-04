@@ -29,6 +29,21 @@ type Option func(*renderer)
 // output.
 func WithoutUsageExamples() Option {
 	return func(r *renderer) {
-		r.hideUsageExamples = true
+		r.withoutUsageExamples = true
+	}
+}
+
+// WithoutPreamble disables the inclusion of the preamble in the rendered
+// output.
+func WithoutPreamble() Option {
+	return func(r *renderer) {
+		r.withoutPreamble = true
+	}
+}
+
+// WithoutIndex disables the inclusion of the index in the rendered output.
+func WithoutIndex() Option {
+	return func(r *renderer) {
+		r.withoutIndex = true
 	}
 }
