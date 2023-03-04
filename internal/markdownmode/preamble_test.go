@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/dogmatiq/ferrite"
 	. "github.com/dogmatiq/ferrite/internal/markdownmode"
 	"github.com/dogmatiq/ferrite/variable"
 	. "github.com/jmalloc/gomegax"
@@ -21,14 +22,21 @@ var _ = Describe("func Run()", func() {
 	})
 
 	DescribeTable(
-		"it generates a useful preamble",
+		"it generates the correct preamble",
 		func(
 			file string,
 			setup func(*variable.Registry),
 		) {
 			setup(reg)
 
-			expect, err := os.ReadFile(filepath.Join("testdata", "markdown", file))
+			expect, err := os.ReadFile(
+				filepath.Join(
+					"testdata",
+					"markdown",
+					"preamble",
+					file,
+				),
+			)
 			Expect(err).ShouldNot(HaveOccurred())
 
 			actual := Run(
@@ -39,9 +47,18 @@ var _ = Describe("func Run()", func() {
 			ExpectWithOffset(1, actual).To(EqualX(string(expect)))
 		},
 		Entry(
-			nil,
+			"no variables",
 			"empty.md",
 			func(reg *variable.Registry) {},
+		),
+		Entry(
+			"non-normative examples",
+			"non-normative.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					String("READ_DSN", "database connection string for read-models").
+					Required(variable.WithRegistry(reg))
+			},
 		),
 	)
 })
