@@ -8,14 +8,6 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-// func renderLink(w *strings.Builder, text, ref string) {
-// 	if text == ref || ref == "" {
-// 		fmt.Fprintf(w, "[%s]", text)
-// 	} else {
-// 		fmt.Fprintf(w, "[%s](%s)", text, ref)
-// 	}
-// }
-
 func (r *renderer) renderRefs() {
 	r.line("<!-- references -->")
 	r.line("")
