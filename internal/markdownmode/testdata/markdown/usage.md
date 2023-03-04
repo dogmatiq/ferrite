@@ -10,6 +10,10 @@ values are considered equivalent.
 ⚠️ The application may consume other undocumented environment variables; this
 document only shows those variables declared using [Ferrite].
 
+The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**,
+**SHOULD**, **SHOULD NOT**, **RECOMMENDED**, **MAY**, and **OPTIONAL** in this
+document are to be interpreted as described in [RFC 2119].
+
 ## Index
 
 - [`DEBUG`](#DEBUG) — enable or disable debugging features
@@ -98,3 +102,4 @@ service:
 [ferrite]: https://github.com/dogmatiq/ferrite
 [kubernetes config map]: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables
 [kubernetes container]: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#define-an-environment-variable-for-a-container
+[rfc 2119]: https://www.rfc-editor.org/rfc/rfc2119.html

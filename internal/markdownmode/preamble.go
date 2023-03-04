@@ -22,4 +22,11 @@ func (r *renderer) renderPreamble() {
 	r.line("")
 	r.line("⚠️ The application may consume other undocumented environment variables; this")
 	r.line("document only shows those variables declared using %s.", r.link("Ferrite"))
+
+	if len(r.Specs) != 0 {
+		r.line("")
+		r.line("The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**,")
+		r.line("**SHOULD**, **SHOULD NOT**, **RECOMMENDED**, **MAY**, and **OPTIONAL** in this")
+		r.line("document are to be interpreted as described in %s.", r.link("RFC 2119"))
+	}
 }

@@ -28,7 +28,17 @@ func (r *renderer) renderRefs() {
 	)
 
 	for _, k := range keys {
-		r.line("[%s]: %s", k, urls[k])
+		u, ok := urls[k]
+		if !ok {
+			n, ok := strings.CutPrefix(k, "rfc ")
+			if !ok {
+				panic("unknown reference: " + k)
+			}
+
+			u = fmt.Sprintf("https://www.rfc-editor.org/rfc/rfc%s.html", n)
+		}
+
+		r.line("[%s]: %s", k, u)
 	}
 }
 
