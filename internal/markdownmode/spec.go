@@ -72,8 +72,7 @@ func (r schemaRenderer) VisitSet(s variable.Set) {
 
 func (r schemaRenderer) VisitString(variable.String) {
 	if _, ok := r.spec.Default(); ok {
-		r.line("This variable **MAY** be set to a non-empty string.")
-		r.line("If left undefined the default value is used (see below).")
+		r.renderDefaultClause()
 	} else if r.spec.IsRequired() {
 		r.line("This variable **MUST** be set to a non-empty string.")
 	} else {
@@ -82,8 +81,8 @@ func (r schemaRenderer) VisitString(variable.String) {
 }
 
 func (r schemaRenderer) VisitOther(variable.Other) {
-	if v, ok := r.spec.Default(); ok {
-		r.line("This variable **MAY** be left undefined, in which case the default value of `%s` is used.", v.String)
+	if _, ok := r.spec.Default(); ok {
+		r.renderDefaultClause()
 		r.renderConstraints(r.spec)
 	} else if r.spec.IsRequired() {
 		r.renderConstraints(r.spec)
@@ -91,4 +90,10 @@ func (r schemaRenderer) VisitOther(variable.Other) {
 		r.line("This variable **MAY** be left undefined.")
 		r.renderConstraints(r.spec)
 	}
+}
+
+func (r schemaRenderer) renderDefaultClause() {
+	v, _ := r.spec.Default()
+	r.line("This variable **MAY** be left undefined, in which case the default value")
+	r.line("of `%s` is used.", v.String)
 }

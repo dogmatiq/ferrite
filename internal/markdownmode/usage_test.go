@@ -29,7 +29,14 @@ var _ = Describe("func Run()", func() {
 		) {
 			setup(reg)
 
-			expect, err := os.ReadFile(filepath.Join("testdata", "markdown", file))
+			expect, err := os.ReadFile(
+				filepath.Join(
+					"testdata",
+					"markdown",
+					"usage",
+					file,
+				),
+			)
 			Expect(err).ShouldNot(HaveOccurred())
 
 			actual := Run("<app>", reg)

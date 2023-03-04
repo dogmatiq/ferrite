@@ -6,8 +6,8 @@
 
 > listen port for the HTTP server
 
-This variable **MAY** be set to a non-empty string.
-If left undefined the default value is used (see below).
+This variable **MAY** be left undefined, in which case the default value
+of `8080` is used.
 
 ```bash
 export PORT=8080 # (default)
