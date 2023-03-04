@@ -20,7 +20,7 @@ func URL(name, desc string) URLBuilder {
 		desc: desc,
 		options: []variable.SpecOption[*url.URL]{
 			variable.WithConstraint(
-				"must be a fully-qualified URL",
+				"MUST be a fully-qualified URL",
 				func(v *url.URL) variable.ConstraintError {
 					if v.Scheme == "" {
 						return errors.New("URL must have a scheme")

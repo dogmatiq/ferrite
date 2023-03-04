@@ -20,11 +20,12 @@ func (r *renderer) renderSpec(s variable.Spec) {
 	r.line("> %s", s.Description())
 
 	r.line("")
+
 	s.Schema().AcceptVisitor(schemaRenderer{r, s})
 
-	for _, docs := range s.Documentation() {
+	for _, d := range s.Documentation() {
 		r.line("")
-		r.paragraph(docs)
+		r.paragraph(d)
 	}
 
 	r.line("")
@@ -81,12 +82,13 @@ func (r schemaRenderer) VisitString(variable.String) {
 }
 
 func (r schemaRenderer) VisitOther(variable.Other) {
-	if _, ok := r.spec.Default(); ok {
-		r.line("This variable **MAY** be set to a non-empty value.")
-		r.line("If left undefined the default value is used (see below).")
+	if v, ok := r.spec.Default(); ok {
+		r.line("This variable **MAY** be left undefined, in which case the default value of `%s` is used.", v.String)
+		r.renderConstraints(r.spec)
 	} else if r.spec.IsRequired() {
-		r.line("This variable **MUST** be set to a non-empty value.")
+		r.renderConstraints(r.spec)
 	} else {
-		r.line("This variable **MAY** be set to a non-empty value or left undefined.")
+		r.line("This variable **MAY** be left undefined.")
+		r.renderConstraints(r.spec)
 	}
 }

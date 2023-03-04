@@ -2,6 +2,7 @@ package markdownmode
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/dogmatiq/ferrite/variable"
@@ -95,4 +96,14 @@ func (r *renderer) yaml(v string) string {
 		panic(err)
 	}
 	return strings.TrimSpace(string(data))
+}
+
+// rfc2119Keywords is a pattern that matches the keywords defined in RFC 2199.
+//
+// See https://www.rfc-editor.org/rfc/rfc2119.
+var rfc2119Keywords = regexp.MustCompile(`\b((?:MUST|REQUIRED|SHALL|SHOULD|RECOMMENDED|MAY)(?:\s+NOT)?)\b`)
+
+// asMarkdown converts plain text to Markdown.
+func asMarkdown(text string) string {
+	return rfc2119Keywords.ReplaceAllString(text, "**$1**")
 }
