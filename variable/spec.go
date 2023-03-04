@@ -25,6 +25,10 @@ type Spec interface {
 	// variable (even if it is fulfilled by a default value).
 	IsRequired() bool
 
+	// Constraints returns a list of additional constraints on the variable's
+	// value.
+	Constraints() []Constraint
+
 	// Examples returns a list of additional examples.
 	//
 	// The implementation MUST return at least one example.
@@ -188,6 +192,16 @@ func (s TypedSpec[T]) Default() (Literal, bool) {
 // variable (even if it is fulfilled by a default value).
 func (s TypedSpec[T]) IsRequired() bool {
 	return s.required
+}
+
+// Constraints returns a list of additional constraints on the variable's
+// value.
+func (s TypedSpec[T]) Constraints() []Constraint {
+	constraints := make([]Constraint, len(s.constraints))
+	for i, c := range s.constraints {
+		constraints[i] = c
+	}
+	return constraints
 }
 
 // Examples returns a list of examples of valid values.
