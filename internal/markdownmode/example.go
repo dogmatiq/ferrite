@@ -5,21 +5,35 @@ import (
 	"github.com/mattn/go-runewidth"
 )
 
-func (r *renderer) renderExamples(s variable.Spec) {
-	r.line("")
-	r.line("```bash")
+// hasNonNormativeExamples returns true if any of the specs have non-normative
+// examples.
+func (r *renderer) hasNonNormativeExamples() bool {
+	for _, s := range r.Specs {
+		for _, eg := range s.Examples() {
+			if !eg.IsNormative {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func (r *specRenderer) renderExamples() {
+	r.ren.gap()
+	r.ren.line("```bash")
 
 	width := 0
-	for _, eg := range s.Examples() {
+	for _, eg := range r.spec.Examples() {
 		w := runewidth.StringWidth(eg.Canonical.Quote())
 		if w > width {
 			width = w
 		}
 	}
 
-	for _, eg := range s.Examples() {
+	for _, eg := range r.spec.Examples() {
 		comment := ""
-		if variable.IsDefault(s, eg.Canonical) {
+		if variable.IsDefault(r.spec, eg.Canonical) {
 			comment = "(default)"
 		} else if !eg.IsNormative {
 			comment = "(non-normative)"
@@ -33,15 +47,15 @@ func (r *renderer) renderExamples(s variable.Spec) {
 		}
 
 		if len(comment) == 0 {
-			r.line(
+			r.ren.line(
 				"export %s=%s",
-				s.Name(),
+				r.spec.Name(),
 				eg.Canonical.Quote(),
 			)
 		} else {
-			r.line(
+			r.ren.line(
 				"export %s=%-*s # %s",
-				s.Name(),
+				r.spec.Name(),
 				width,
 				eg.Canonical.Quote(),
 				comment,
@@ -49,5 +63,5 @@ func (r *renderer) renderExamples(s variable.Spec) {
 		}
 	}
 
-	r.line("```")
+	r.ren.line("```")
 }

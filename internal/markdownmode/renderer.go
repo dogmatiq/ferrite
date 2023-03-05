@@ -24,47 +24,40 @@ func (r *renderer) Render() string {
 	r.line("# Environment Variables")
 
 	if !r.withoutPreamble {
-		r.line("")
+		r.gap()
 		r.renderPreamble()
 	}
 
 	if len(r.Specs) != 0 {
 		if !r.withoutIndex {
-			r.line("")
+			r.gap()
 			r.renderIndex()
 		}
 
-		r.line("")
-		r.renderSpecs()
+		r.gap()
+		r.line("## Specification")
+
+		for _, s := range r.Specs {
+			sr := specRenderer{r, s}
+			sr.Render()
+		}
 
 		if !r.withoutUsageExamples {
-			r.line("")
+			r.gap()
 			r.renderUsage()
 		}
 	}
 
 	if len(r.refs) != 0 {
-		r.line("")
+		r.gap()
 		r.renderRefs()
 	}
 
 	return r.w.String()
 }
 
-func (r *renderer) hasNonNormativeExamples() bool {
-	for _, s := range r.Specs {
-		for _, eg := range s.Examples() {
-			if !eg.IsNormative {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
 func (r *renderer) gap() {
-	r.line("")
+	r.w.WriteByte('\n')
 }
 
 func (r *renderer) line(f string, v ...any) {

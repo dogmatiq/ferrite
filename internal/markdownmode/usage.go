@@ -6,9 +6,9 @@ import (
 
 func (r *renderer) renderUsage() {
 	r.line("## Usage Examples")
-	r.line("")
+	r.gap()
 	r.renderKubernetesUsage()
-	r.line("")
+	r.gap()
 	r.renderDockerUsage()
 }
 
@@ -16,10 +16,10 @@ func (r *renderer) renderKubernetesUsage() {
 	r.line("<details>")
 	r.line("<summary>Kubernetes</summary>")
 
-	r.line("")
+	r.gap()
 	r.line("This example shows how to define the environment variables needed by `%s`", r.App)
 	r.line("on a %s within a Kubenetes deployment manifest.", r.link("Kubernetes container"))
-	r.line("")
+	r.gap()
 
 	r.line("```yaml")
 	r.line("apiVersion: apps/v1")
@@ -42,10 +42,10 @@ func (r *renderer) renderKubernetesUsage() {
 
 	r.line("```")
 
-	r.line("")
+	r.gap()
 	r.line("Alternatively, the environment variables can be defined within a %s", r.link("config map", "kubernetes config map"))
 	r.line("then referenced a deployment manifest using `configMapRef`.")
-	r.line("")
+	r.gap()
 
 	r.line("```yaml")
 	r.line("apiVersion: v1")
@@ -80,17 +80,17 @@ func (r *renderer) renderKubernetesUsage() {
 	r.line("                name: example-config-map")
 	r.line("```")
 
-	r.line("")
+	r.gap()
 	r.line("</details>")
 }
 
 func (r *renderer) renderDockerUsage() {
 	r.line("<details>")
 	r.line("<summary>Docker</summary>")
-	r.line("")
+	r.gap()
 	r.line("This example shows how to define the environment variables needed by `%s`", r.App)
 	r.line("when running as a %s defined in a Docker compose file.", r.link("Docker service"))
-	r.line("")
+	r.gap()
 
 	r.line("```yaml")
 	r.line("service:")
@@ -110,7 +110,7 @@ func (r *renderer) renderDockerUsage() {
 
 	r.line("```")
 
-	r.line("")
+	r.gap()
 	r.line("</details>")
 }
 

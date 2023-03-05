@@ -10,7 +10,7 @@ import (
 
 func (r *renderer) renderRefs() {
 	r.line("<!-- references -->")
-	r.line("")
+	r.gap()
 
 	urls := map[string]string{
 		"docker service":        "https://docs.docker.com/compose/environment-variables/#set-environment-variables-in-containers",

@@ -6,7 +6,7 @@ import (
 
 func (r *renderer) renderIndex() {
 	r.line("## Index")
-	r.line("")
+	r.gap()
 
 	for _, v := range r.Specs {
 		r.renderIndexItem(v)
