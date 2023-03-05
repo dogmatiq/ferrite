@@ -69,19 +69,6 @@ type schemaRenderer struct {
 }
 
 func (r schemaRenderer) VisitNumeric(s variable.Numeric) {
-	switch s.Type().Kind() {
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		r.renderSigned(s)
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		r.renderUnsigned(s)
-	case reflect.Float32, reflect.Float64:
-		r.renderFloat(s)
-	default:
-		panic("unsupported numeric type")
-	}
-}
-
-func (r schemaRenderer) renderSigned(s variable.Numeric) {
 	min, hasMin := s.Min()
 	max, hasMax := s.Max()
 
@@ -92,37 +79,16 @@ func (r schemaRenderer) renderSigned(s variable.Numeric) {
 	} else if hasMax {
 		r.renderPrimaryConstrant("**MUST** be `%s` or less", max.String)
 	} else {
-		r.renderPrimaryConstrant("**MUST** be a whole number")
-	}
-}
-
-func (r schemaRenderer) renderUnsigned(s variable.Numeric) {
-	if min, ok := s.Min(); ok {
-		if _, ok := r.spec.Default(); ok {
-			r.renderPrimaryConstrant("")
-			r.line("This variable **MAY** be set to `%s` or greater.", min.Quote())
-		} else if r.spec.IsRequired() {
-			r.line("This variable **MUST** be set to `%s` or greater.", min.Quote())
-		} else {
-			r.line("This variable **MAY** be set to `%s` or greater, or left undefined.", min.Quote())
+		switch s.Type().Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			r.renderPrimaryConstrant("**MUST** be a whole number")
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			r.renderPrimaryConstrant("**MUST** be a non-negative whole number")
+		case reflect.Float32, reflect.Float64:
+			r.renderPrimaryConstrant("**MUST** be a number with an **OPTIONAL** fractional part")
+		default:
+			panic("unsupported numeric type")
 		}
-	} else {
-		r.renderPrimaryConstrant("**MUST** be a non-negative whole number")
-	}
-}
-
-func (r schemaRenderer) renderFloat(s variable.Numeric) {
-	if min, ok := s.Min(); ok {
-		if _, ok := r.spec.Default(); ok {
-			r.renderPrimaryConstrant("")
-			r.line("This variable **MAY** be set to `%s` or greater.", min.Quote())
-		} else if r.spec.IsRequired() {
-			r.line("This variable **MUST** be set to `%s` or greater.", min.Quote())
-		} else {
-			r.line("This variable **MAY** be set to `%s` or greater, or left undefined.", min.Quote())
-		}
-	} else {
-		r.renderPrimaryConstrant("**MUST** be a number with an **OPTIONAL** fractional part")
 	}
 }
 
