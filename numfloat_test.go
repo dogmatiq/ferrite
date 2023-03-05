@@ -197,7 +197,7 @@ var _ = Describe("type FloatBuilder", func() {
 					Required().
 					Value()
 			}).To(PanicWith(
-				`value of FERRITE_FLOAT (-1.1) is invalid: too low, expected +5.500000 or greater`,
+				`value of FERRITE_FLOAT (-1.1) is invalid: too low, expected +5.5 or greater`,
 			))
 		})
 	})
@@ -212,7 +212,7 @@ var _ = Describe("type FloatBuilder", func() {
 					Required().
 					Value()
 			}).To(PanicWith(
-				`value of FERRITE_FLOAT (10.1) is invalid: too high, expected +5.500000 or less`,
+				`value of FERRITE_FLOAT (10.1) is invalid: too high, expected +5.5 or less`,
 			))
 		})
 	})

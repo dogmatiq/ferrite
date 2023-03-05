@@ -1,7 +1,6 @@
 package ferrite
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/dogmatiq/ferrite/maybe"
@@ -80,8 +79,18 @@ func (b FloatBuilder[T]) spec(req bool) variable.TypedSpec[T] {
 type floatMarshaler[T constraints.Float] struct{}
 
 func (floatMarshaler[T]) Marshal(v T) (variable.Literal, error) {
+	s := strconv.FormatFloat(
+		float64(v),
+		'g',
+		-1,
+		bitSize[T](),
+	)
+	if s[0] != '-' {
+		s = "+" + s
+	}
+
 	return variable.Literal{
-		String: fmt.Sprintf("%+f", v),
+		String: s,
 	}, nil
 }
 
