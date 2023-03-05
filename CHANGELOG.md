@@ -10,12 +10,12 @@ The format is based on [Keep a Changelog], and this project adheres to
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
-## [Unreleased]
+## [0.3.4] - 2023-03-05
 
 ### Changed
 
 - Generate Markdown documentation for the syntax of integers, floating-point values, URLs and network ports
-- General improvements to generated Markdown documentation
+- Other general improvements to generated Markdown documentation
 
 ### Fixed
 
@@ -74,6 +74,7 @@ The two most important changes in usage are:
 [0.3.1]: https://github.com/dogmatiq/ferrite/releases/tag/v0.3.1
 [0.3.2]: https://github.com/dogmatiq/ferrite/releases/tag/v0.3.2
 [0.3.3]: https://github.com/dogmatiq/ferrite/releases/tag/v0.3.3
+[0.3.4]: https://github.com/dogmatiq/ferrite/releases/tag/v0.3.4
 
 <!-- version template
 ## [0.0.1] - YYYY-MM-DD
