@@ -30,7 +30,7 @@ func NetworkPort(name, desc string) StringBuilder[string] {
 				"https",
 				"the IANA service name that maps to port 443",
 			),
-			variable.WithDocumentation[string](networkPortSyntaxDocumentation),
+			networkPortSyntaxDocumentation,
 		},
 	}
 }
@@ -105,12 +105,14 @@ func validateIANAServiceName(name string) error {
 	return nil
 }
 
-var networkPortSyntaxDocumentation = variable.Documentation{
-	Summary: "Network port syntax",
-	Paragraphs: []string{
-		"Ports may be specified as a numeric value no greater than `65535`. " +
-			"Alternatively, a service name can be used. Service names are resolved against " +
-			"the system's service database, typically located in the `/etc/service` file on " +
-			"UNIX-like systems. Standard service names are published by IANA.",
-	},
-}
+var networkPortSyntaxDocumentation = variable.WithDocumentation[string]().
+	Summary("Network port syntax").
+	Paragraph(
+		"Ports may be specified as a numeric value no greater than `65535`.",
+		"Alternatively, a service name can be used.",
+		"Service names are resolved against the system's service database,",
+		"typically located in the `/etc/service` file on UNIX-like systems.",
+		"Standard service names are published by IANA.",
+	).
+	Format().
+	Done()

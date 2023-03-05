@@ -37,16 +37,15 @@ func URL(name, desc string) URLBuilder {
 				mustParseURL("https://example.org/path"),
 				"a typical URL for a web page",
 			),
-			variable.WithDocumentation[*url.URL](
-				variable.Documentation{
-					Summary: "URL syntax",
-					Paragraphs: []string{
-						"A fully-qualified URL includes both a scheme (protocol) and a hostname. " +
-							"URLs are not necessarily web addresses; `https://example.org` and " +
-							"`mailto:contact@example.org` are both examples of fully-qualified URLs.",
-					},
-				},
-			),
+			variable.WithDocumentation[*url.URL]().
+				Summary("URL syntax").
+				Paragraph(
+					"A fully-qualified URL includes both a scheme (protocol) and a hostname.",
+					"URLs are not necessarily web addresses;",
+					"`https://example.org` and `mailto:contact@example.org` are both examples of fully-qualified URLs.",
+				).
+				Format().
+				Done(),
 		},
 	}
 }

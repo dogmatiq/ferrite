@@ -74,16 +74,14 @@ func (b DurationBuilder) spec(req bool) variable.TypedSpec[time.Duration] {
 			NativeMin: b.min,
 			NativeMax: b.max,
 		},
-		variable.WithDocumentation[time.Duration](
-			variable.Documentation{
-				Summary: "Duration syntax",
-				Paragraphs: []string{
-					"Durations are specified as a sequence of decimal numbers, each with an optional " +
-						"fraction and a unit suffix, such as `300ms`, `-1.5h` or `2h45m`. Supported time " +
-						"units are `ns`, `us` (or `µs`), `ms`, `s`, `m`, `h`.",
-				},
-			},
-		),
+		variable.WithDocumentation[time.Duration]().
+			Summary("Duration syntax").
+			Paragraph(
+				"Durations are specified as a sequence of decimal numbers, each with an optional fraction and a unit suffix, such as `300ms`, `-1.5h` or `2h45m`.",
+				"Supported time units are `ns`, `us` (or `µs`), `ms`, `s`, `m`, `h`.",
+			).
+			Format().
+			Done(),
 	)
 	if err != nil {
 		panic(err.Error())

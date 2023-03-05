@@ -70,22 +70,23 @@ func (b UnsignedBuilder[T]) spec(req bool) variable.TypedSpec[T] {
 			NativeMin: b.min,
 			NativeMax: b.max,
 		},
-		variable.WithDocumentation[T](
-			variable.Documentation{
-				Summary: "Unsigned integer syntax",
-				Paragraphs: []string{
-					"Unsigned integers can only be specified using decimal (base-10) notation. " +
-						"A leading sign (`+` or `-`) is not supported and **MUST NOT** be specified.",
-					fmt.Sprintf(
-						"Internally, the `%s` variable is represented using an unsigned %d-bit integer type (`%s`); "+
-							"any value that overflows this data-type is invalid.",
-						b.name,
-						bitSize[T](),
-						reflect.TypeOf(T(0)).Kind(),
-					),
-				},
-			},
-		),
+		variable.WithDocumentation[T]().
+			Summary("Unsigned integer syntax").
+			Paragraph(
+				"Unsigned integers can only be specified using decimal (base-10) notation.",
+				"A leading sign (`+` or `-`) is not supported and **MUST NOT** be specified.",
+			).
+			Format().
+			Paragraph(
+				"Internally, the `%s` variable is represented using an unsigned %d-bit integer type (`%s`);",
+				"any value that overflows this data-type is invalid.",
+			).
+			Format(
+				b.name,
+				bitSize[T](),
+				reflect.TypeOf(T(0)).Kind(),
+			).
+			Done(),
 	)
 	if err != nil {
 		panic(err.Error())

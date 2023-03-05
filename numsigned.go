@@ -70,23 +70,24 @@ func (b SignedBuilder[T]) spec(req bool) variable.TypedSpec[T] {
 			NativeMin: b.min,
 			NativeMax: b.max,
 		},
-		variable.WithDocumentation[T](
-			variable.Documentation{
-				Summary: "Signed integer syntax",
-				Paragraphs: []string{
-					"Signed integers can only be specified using decimal notation. " +
-						"A leading positive sign (`+`) is **OPTIONAL**. " +
-						"A leading negative sign (`-`) is **REQUIRED** in order to specify a negative value.",
-					fmt.Sprintf(
-						"Internally, the `%s` variable is represented using a signed %d-bit integer type (`%s`); "+
-							"any value that overflows this data-type is invalid.",
-						b.name,
-						bitSize[T](),
-						reflect.TypeOf(T(0)).Kind(),
-					),
-				},
-			},
-		),
+		variable.WithDocumentation[T]().
+			Summary("Signed integer syntax").
+			Paragraph(
+				"Signed integers can only be specified using decimal notation.",
+				"A leading positive sign (`+`) is **OPTIONAL**.",
+				"A leading negative sign (`-`) is **REQUIRED** in order to specify a negative value.",
+			).
+			Format().
+			Paragraph(
+				"Internally, the `%s` variable is represented using a signed %d-bit integer type (`%s`);",
+				"any value that overflows this data-type is invalid.",
+			).
+			Format(
+				b.name,
+				bitSize[T](),
+				reflect.TypeOf(T(0)).Kind(),
+			).
+			Done(),
 	)
 	if err != nil {
 		panic(err.Error())

@@ -188,7 +188,7 @@ func (b KubernetesServiceBuilder) hostSpec(req bool) variable.TypedSpec[string] 
 				return validateHost(h)
 			},
 		),
-		variable.WithDocumentation[string](kubernetesImplicitDefinitionDocumentation),
+		kubernetesImplicitDocumentation,
 	)
 	if err != nil {
 		panic(err.Error())
@@ -215,10 +215,8 @@ func (b KubernetesServiceBuilder) portSpec(req bool) variable.TypedSpec[string] 
 				return validatePort(p)
 			},
 		),
-		variable.WithDocumentation[string](
-			kubernetesImplicitDefinitionDocumentation,
-			networkPortSyntaxDocumentation,
-		),
+		kubernetesImplicitDocumentation,
+		networkPortSyntaxDocumentation,
 	)
 	if err != nil {
 		panic(err.Error())
@@ -287,10 +285,11 @@ func validateHost(host string) error {
 	return nil
 }
 
-var kubernetesImplicitDefinitionDocumentation = variable.Documentation{
-	Paragraphs: []string{
-		"It is expected that this variable will be implicitly defined by Kubernetes; " +
-			"it typically does not need to be specified in the pod manifest.",
-	},
-	IsImportant: true,
-}
+var kubernetesImplicitDocumentation = variable.WithDocumentation[string]().
+	Paragraph(
+		"It is expected that this variable will be implicitly defined by Kubernetes;",
+		"it typically does not need to be specified in the pod manifest.",
+	).
+	Format().
+	Important().
+	Done()
