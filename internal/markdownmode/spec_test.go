@@ -399,6 +399,37 @@ var _ = Describe("func Run()", func() {
 					Required(variable.WithRegistry(reg))
 			},
 		),
+		Entry(
+			"signed + min",
+			"number/signed/with-min.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Signed[int8]("WEIGHT", "weighting for this node").
+					WithMinimum(-10).
+					Required(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"signed + max",
+			"number/signed/with-max.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Signed[int8]("WEIGHT", "weighting for this node").
+					WithMaximum(+20).
+					Required(variable.WithRegistry(reg))
+			},
+		),
+		FEntry(
+			"signed + min/max",
+			"number/signed/with-minmax.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Signed[int8]("WEIGHT", "weighting for this node").
+					WithMinimum(-10).
+					WithMaximum(+20).
+					Required(variable.WithRegistry(reg))
+			},
+		),
 
 		// NUMBER - UNSIGNED
 
