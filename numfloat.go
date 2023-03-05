@@ -85,7 +85,10 @@ func (floatMarshaler[T]) Marshal(v T) (variable.Literal, error) {
 		-1,
 		bitSize[T](),
 	)
-	if s[0] != '-' {
+
+	switch s[0] {
+	case '+', '-':
+	default:
 		s = "+" + s
 	}
 
