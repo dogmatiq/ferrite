@@ -419,7 +419,7 @@ var _ = Describe("func Run()", func() {
 					Required(variable.WithRegistry(reg))
 			},
 		),
-		FEntry(
+		Entry(
 			"signed + min/max",
 			"number/signed/with-minmax.md",
 			func(reg *variable.Registry) {
@@ -468,6 +468,37 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					Unsigned[uint16]("WEIGHT", "weighting for this node").
+					Required(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"unsigned + min",
+			"number/unsigned/with-min.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Unsigned[uint16]("WEIGHT", "weighting for this node").
+					WithMinimum(10).
+					Required(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"unsigned + max",
+			"number/unsigned/with-max.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Unsigned[uint16]("WEIGHT", "weighting for this node").
+					WithMaximum(20).
+					Required(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"unsigned + min/max",
+			"number/unsigned/with-minmax.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Unsigned[uint16]("WEIGHT", "weighting for this node").
+					WithMinimum(10).
+					WithMaximum(20).
 					Required(variable.WithRegistry(reg))
 			},
 		),
