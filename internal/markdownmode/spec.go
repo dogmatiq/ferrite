@@ -83,22 +83,14 @@ func (r schemaRenderer) VisitNumeric(s variable.Numeric) {
 
 func (r schemaRenderer) renderSigned(s variable.Numeric) {
 	min, hasMin := s.Min()
-	_, hasMax := s.Max()
-
-	// if min, ok := s.Min(); ok {
-	// 	if _, ok := r.spec.Default(); ok {
-	// 		r.renderPrimaryConstrant("")
-	// 		r.line("This variable **MAY** be set to `%s` or greater.", min.Quote())
-	// 	} else if r.spec.IsRequired() {
-	// 		r.line("This variable **MUST** be set to `%s` or greater.", min.Quote())
-	// 	} else {
-	// 		r.line("This variable **MAY** be set to `%s` or greater, or left undefined.", min.Quote())
-	// 	}
+	max, hasMax := s.Max()
 
 	if hasMin && hasMax {
+		r.renderPrimaryConstrant("**MUST** be between `%s` and `%s`", min.String, max.String)
 	} else if hasMin {
 		r.renderPrimaryConstrant("**MUST** be `%s` or greater", min.String)
 	} else if hasMax {
+		r.renderPrimaryConstrant("**MUST** be `%s` or less", max.String)
 	} else {
 		r.renderPrimaryConstrant("**MUST** be a whole number")
 	}

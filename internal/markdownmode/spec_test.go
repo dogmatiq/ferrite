@@ -194,6 +194,16 @@ var _ = Describe("func Run()", func() {
 					Required(variable.WithRegistry(reg))
 			},
 		),
+		Entry(
+			"duration + maximum",
+			"duration/with-max.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Duration("GRPC_TIMEOUT", "gRPC request timeout").
+					WithMaximum(24 * time.Hour).
+					Required(variable.WithRegistry(reg))
+			},
+		),
 
 		// KUBERNETES SERVICE
 
