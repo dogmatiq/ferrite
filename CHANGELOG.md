@@ -10,6 +10,12 @@ The format is based on [Keep a Changelog], and this project adheres to
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+## [0.3.5] - 2023-03-06
+
+### Fixed
+
+- Remove use `strings.CutPrefix()` to maintain compatibility with Go v1.19
+
 ## [0.3.4] - 2023-03-05
 
 ### Changed
@@ -75,6 +81,7 @@ The two most important changes in usage are:
 [0.3.2]: https://github.com/dogmatiq/ferrite/releases/tag/v0.3.2
 [0.3.3]: https://github.com/dogmatiq/ferrite/releases/tag/v0.3.3
 [0.3.4]: https://github.com/dogmatiq/ferrite/releases/tag/v0.3.4
+[0.3.5]: https://github.com/dogmatiq/ferrite/releases/tag/v0.3.5
 
 <!-- version template
 ## [0.0.1] - YYYY-MM-DD
