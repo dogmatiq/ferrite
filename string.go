@@ -47,11 +47,11 @@ func (b StringBuilder[T]) WithDefault(v T) StringBuilder[T] {
 // returns an error the value is considered invalid.
 func (b StringBuilder[T]) WithConstraintFunc(
 	desc string,
-	fn func(T) variable.ConstraintError,
+	fn func(T) error,
 ) StringBuilder[T] {
 	b.options = append(
 		slices.Clone(b.options),
-		variable.WithConstraint(desc, fn),
+		variable.WithUserConstraint(desc, fn),
 	)
 	return b
 }

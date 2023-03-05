@@ -6,7 +6,7 @@
 
 > enable or disable debugging features
 
-This variable **MUST** be set to one of the values below.
+The `DEBUG` variable's value **MUST** be either `true` or `false`.
 
 ```bash
 export DEBUG=true

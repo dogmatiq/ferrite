@@ -24,7 +24,8 @@ document are to be interpreted as described in [RFC 2119].
 
 > enable or disable debugging features
 
-This variable **MAY** be set to one of the values below or left undefined.
+The `DEBUG` variable **MAY** be left undefined. Otherwise, the value **MUST** be
+either `true` or `false`.
 
 ```bash
 export DEBUG=true

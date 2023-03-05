@@ -63,11 +63,23 @@ func (r *renderer) hasNonNormativeExamples() bool {
 	return false
 }
 
+func (r *renderer) gap() {
+	r.line("")
+}
+
 func (r *renderer) line(f string, v ...any) {
 	fmt.Fprintf(&r.w, f+"\n", v...)
 }
 
-func (r *renderer) paragraph(text ...string) {
+func (r *renderer) paragraph(text ...string) func(...any) {
+	r.gap()
+
+	return func(v ...any) {
+		r.paragraphDeprecated(fmt.Sprintf(strings.Join(text, " "), v...))
+	}
+}
+
+func (r *renderer) paragraphDeprecated(text ...string) {
 	const width = 80
 
 	t := strings.Join(text, " ")

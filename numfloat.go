@@ -1,6 +1,8 @@
 package ferrite
 
 import (
+	"fmt"
+	"reflect"
 	"strconv"
 
 	"github.com/dogmatiq/ferrite/maybe"
@@ -68,6 +70,24 @@ func (b FloatBuilder[T]) spec(req bool) variable.TypedSpec[T] {
 			NativeMin: b.min,
 			NativeMax: b.max,
 		},
+		variable.WithDocumentation[T](
+			variable.Documentation{
+				Summary: "Floating-point syntax",
+				Paragraphs: []string{
+					"Floating-point values can be specified using decimal (base-10) or hexadecimal (base-16) notation, and may use scientific notation. " +
+						"A leading positive sign (`+`) is **OPTIONAL**. " +
+						"A leading negative sign (`-`) is **REQUIRED** in order to specify a negative value.",
+					fmt.Sprintf(
+						"Internally, the `%s` variable is represented using a %d-bit floating point type (`%s`); "+
+							"any value that overflows this data-type is invalid. "+
+							"Values are rounded to the nearest floating-point number using IEEE 754 unbiased rounding.",
+						b.name,
+						bitSize[T](),
+						reflect.TypeOf(T(0)).Kind(),
+					),
+				},
+			},
+		),
 	)
 	if err != nil {
 		panic(err.Error())

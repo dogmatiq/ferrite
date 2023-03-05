@@ -6,7 +6,7 @@
 
 > database connection string for read-models
 
-This variable **MUST** be set to a non-empty string.
+The `READ_DSN` variable **MUST NOT** be left undefined.
 
 ```bash
 export READ_DSN=foo # (non-normative)

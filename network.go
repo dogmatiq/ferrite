@@ -12,13 +12,27 @@ import (
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
 func NetworkPort(name, desc string) StringBuilder[string] {
-	return String(name, desc).
-		WithConstraintFunc(
-			"must be a valid network port",
-			func(v string) variable.ConstraintError {
-				return validatePort(v)
-			},
-		)
+	return StringBuilder[string]{
+		name: name,
+		desc: desc,
+		options: []variable.SpecOption[string]{
+			variable.WithConstraint(
+				"**MUST** be a valid network port",
+				func(v string) variable.ConstraintError {
+					return validatePort(v)
+				},
+			),
+			variable.WithNonNormativeExample(
+				"8000",
+				"a port commonly used for private web servers",
+			),
+			variable.WithNonNormativeExample(
+				"https",
+				"the IANA service name that maps to port 443",
+			),
+			variable.WithDocumentation[string](networkPortSyntaxDocumentation),
+		},
+	}
 }
 
 // validateHost returns an error of port is not a valid numeric port or IANA
@@ -89,4 +103,14 @@ func validateIANAServiceName(name string) error {
 	}
 
 	return nil
+}
+
+var networkPortSyntaxDocumentation = variable.Documentation{
+	Summary: "Network port syntax",
+	Paragraphs: []string{
+		"Ports may be specified as a numeric value no greater than `65535`. " +
+			"Alternatively, a service name can be used. Service names are resolved against " +
+			"the system's service database, typically located in the `/etc/service` file on " +
+			"UNIX-like systems. Standard service names are published by IANA.",
+	},
 }

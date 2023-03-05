@@ -6,8 +6,9 @@
 
 > the minimum log level to record
 
-This variable **MAY** be set to one of the values below.
-If left undefined the default value of `error` is used.
+The `LOG_LEVEL` variable **MAY** be left undefined, in which case the default
+value of `error` is used. Otherwise, the value **MUST** be one of the values
+shown in the examples below.
 
 ```bash
 export LOG_LEVEL=debug # show information for developers

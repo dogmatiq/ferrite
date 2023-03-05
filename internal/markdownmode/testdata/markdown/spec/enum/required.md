@@ -6,7 +6,8 @@
 
 > the minimum log level to record
 
-This variable **MUST** be set to one of the values below.
+The `LOG_LEVEL` variable's value **MUST** be one of the values shown in the
+examples below.
 
 ```bash
 export LOG_LEVEL=debug # show information for developers

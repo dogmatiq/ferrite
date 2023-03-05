@@ -6,6 +6,7 @@ import (
 )
 
 func (r *renderer) renderExamples(s variable.Spec) {
+	r.line("")
 	r.line("```bash")
 
 	width := 0

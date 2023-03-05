@@ -53,6 +53,16 @@ func appendExample(examples []Example, eg Example) []Example {
 	return append(examples, eg)
 }
 
+// prependExample prepends eg to the examples only if there is no existing
+// example with the same value.
+func prependExample(examples []Example, eg Example) []Example {
+	if containsExample(examples, eg.Canonical) {
+		return examples
+	}
+
+	return append([]Example{eg}, examples...)
+}
+
 // containsExample returns true if lit is one of the example values.
 func containsExample(examples []Example, lit Literal) bool {
 	for _, eg := range examples {

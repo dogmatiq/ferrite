@@ -1,6 +1,9 @@
 package markdownmode
 
 import (
+	"fmt"
+	"reflect"
+
 	"github.com/dogmatiq/ferrite/variable"
 )
 
@@ -19,17 +22,45 @@ func (r *renderer) renderSpec(s variable.Spec) {
 	r.line("")
 	r.line("> %s", s.Description())
 
-	r.line("")
-
 	s.Schema().AcceptVisitor(schemaRenderer{r, s})
 
-	for _, d := range s.Documentation() {
-		r.line("")
-		r.paragraph(d)
-	}
+	r.renderImportantDocumentation(s)
 
-	r.line("")
 	r.renderExamples(s)
+
+	r.renderUnimportantDocumentation(s)
+}
+
+func (r *renderer) renderImportantDocumentation(s variable.Spec) {
+	for _, d := range s.Documentation() {
+		if d.IsImportant {
+			for _, p := range d.Paragraphs {
+				r.paragraph(p)()
+			}
+		}
+	}
+}
+
+func (r *renderer) renderUnimportantDocumentation(s variable.Spec) {
+	for _, d := range s.Documentation() {
+		if d.IsImportant {
+			continue
+		}
+
+		r.line("")
+		r.line("<details>")
+
+		if d.Summary != "" {
+			r.line("<summary>%s</summary>", d.Summary)
+		}
+
+		for _, p := range d.Paragraphs {
+			r.paragraph(p)()
+		}
+
+		r.line("")
+		r.line("</details>")
+	}
 }
 
 type schemaRenderer struct {
@@ -38,62 +69,171 @@ type schemaRenderer struct {
 }
 
 func (r schemaRenderer) VisitNumeric(s variable.Numeric) {
+	switch s.Type().Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		r.renderSigned(s)
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		r.renderUnsigned(s)
+	case reflect.Float32, reflect.Float64:
+		r.renderFloat(s)
+	default:
+		panic("unsupported numeric type")
+	}
+}
+
+func (r schemaRenderer) renderSigned(s variable.Numeric) {
+	min, hasMin := s.Min()
+	_, hasMax := s.Max()
+
+	// if min, ok := s.Min(); ok {
+	// 	if _, ok := r.spec.Default(); ok {
+	// 		r.renderPrimaryConstrant("")
+	// 		r.line("This variable **MAY** be set to `%s` or greater.", min.Quote())
+	// 	} else if r.spec.IsRequired() {
+	// 		r.line("This variable **MUST** be set to `%s` or greater.", min.Quote())
+	// 	} else {
+	// 		r.line("This variable **MAY** be set to `%s` or greater, or left undefined.", min.Quote())
+	// 	}
+
+	if hasMin && hasMax {
+	} else if hasMin {
+		r.renderPrimaryConstrant("**MUST** be `%s` or greater", min.String)
+	} else if hasMax {
+	} else {
+		r.renderPrimaryConstrant("**MUST** be a whole number")
+	}
+}
+
+func (r schemaRenderer) renderUnsigned(s variable.Numeric) {
 	if min, ok := s.Min(); ok {
-		if def, ok := r.spec.Default(); ok {
+		if _, ok := r.spec.Default(); ok {
+			r.renderPrimaryConstrant("")
 			r.line("This variable **MAY** be set to `%s` or greater.", min.Quote())
-			r.line("If left undefined the default value of `%s` is used.", def.Quote())
 		} else if r.spec.IsRequired() {
 			r.line("This variable **MUST** be set to `%s` or greater.", min.Quote())
 		} else {
 			r.line("This variable **MAY** be set to `%s` or greater, or left undefined.", min.Quote())
 		}
 	} else {
-		if def, ok := r.spec.Default(); ok {
-			r.line("This variable **MAY** be set to a `%s` value.", s.Type().Kind())
-			r.line("If left undefined the default value of `%s` is used.", def.Quote())
+		r.renderPrimaryConstrant("**MUST** be a non-negative whole number")
+	}
+}
+
+func (r schemaRenderer) renderFloat(s variable.Numeric) {
+	if min, ok := s.Min(); ok {
+		if _, ok := r.spec.Default(); ok {
+			r.renderPrimaryConstrant("")
+			r.line("This variable **MAY** be set to `%s` or greater.", min.Quote())
 		} else if r.spec.IsRequired() {
-			r.line("This variable **MUST** be set to a `%s` value.", s.Type().Kind())
+			r.line("This variable **MUST** be set to `%s` or greater.", min.Quote())
 		} else {
-			r.line("This variable **MAY** be set to a `%s` value or left undefined.", s.Type().Kind())
+			r.line("This variable **MAY** be set to `%s` or greater, or left undefined.", min.Quote())
 		}
+	} else {
+		r.renderPrimaryConstrant("**MUST** be a number with an **OPTIONAL** fractional part")
 	}
 }
 
 func (r schemaRenderer) VisitSet(s variable.Set) {
-	if def, ok := r.spec.Default(); ok {
-		r.line("This variable **MAY** be set to one of the values below.")
-		r.line("If left undefined the default value of `%s` is used.", def.Quote())
-	} else if r.spec.IsRequired() {
-		r.line("This variable **MUST** be set to one of the values below.")
+	if lits := s.Literals(); len(lits) == 2 {
+		r.renderPrimaryConstrant(
+			"**MUST** be either `%s` or `%s`",
+			lits[0].String,
+			lits[1].String,
+		)
 	} else {
-		r.line("This variable **MAY** be set to one of the values below or left undefined.")
+		r.renderPrimaryConstrant("**MUST** be one of the values shown in the examples below")
 	}
 }
 
 func (r schemaRenderer) VisitString(variable.String) {
-	if _, ok := r.spec.Default(); ok {
-		r.renderDefaultClause()
-	} else if r.spec.IsRequired() {
-		r.line("This variable **MUST** be set to a non-empty string.")
-	} else {
-		r.line("This variable **MAY** be set to a non-empty string or left undefined.")
+	// Find the best constraint to use as the "primary" requirement, favouring
+	// non-user-defined constraints.
+	var con variable.Constraint
+	for _, c := range r.spec.Constraints() {
+		if !c.IsUserDefined() {
+			con = c
+			break
+		} else if con == nil {
+			con = c
+		}
 	}
+
+	if con == nil {
+		r.renderPrimaryConstrant("")
+	} else {
+		r.renderPrimaryConstrant(con.Description())
+	}
+
 }
 
-func (r schemaRenderer) VisitOther(variable.Other) {
-	if _, ok := r.spec.Default(); ok {
-		r.renderDefaultClause()
-		r.renderConstraints(r.spec)
-	} else if r.spec.IsRequired() {
-		r.renderConstraints(r.spec)
-	} else {
-		r.line("This variable **MAY** be left undefined.")
-		r.renderConstraints(r.spec)
+func (r schemaRenderer) VisitOther(s variable.Other) {
+	con := ""
+	for _, c := range r.spec.Constraints() {
+		con = c.Description()
+		break
 	}
+
+	r.renderPrimaryConstrant(con)
 }
 
-func (r schemaRenderer) renderDefaultClause() {
-	v, _ := r.spec.Default()
-	r.line("This variable **MAY** be left undefined, in which case the default value")
-	r.line("of `%s` is used.", v.String)
+// renderPrimaryConstrant renders information about the most important
+// requirement of the variable's schema, this includes information about whether
+// the variable is optional and the basic data type of the variable.
+//
+// The (optional) requirement text must complete the phrase "the value...". It
+// should not include any trailing punctuation.
+func (r schemaRenderer) renderPrimaryConstrant(f string, v ...any) {
+	req := fmt.Sprintf(f, v...)
+
+	if req != "" {
+		if def, ok := r.spec.Default(); ok {
+			r.paragraph(
+				"The `%s` variable **MAY** be left undefined, in which case the default value of `%s` is used.",
+				"Otherwise, the value %s.",
+			)(
+				r.spec.Name(),
+				def.String,
+				req,
+			)
+		} else if r.spec.IsRequired() {
+			r.paragraph(
+				"The `%s` variable's value %s.",
+			)(
+				r.spec.Name(),
+				req,
+			)
+		} else {
+			r.paragraph(
+				"The `%s` variable **MAY** be left undefined.",
+				"Otherwise, the value %s.",
+			)(
+				r.spec.Name(),
+				req,
+			)
+		}
+
+		return
+	}
+
+	if def, ok := r.spec.Default(); ok {
+		r.paragraph(
+			"The `%s` variable **MAY** be left undefined, in which case the default value of `%s` is used.",
+		)(
+			r.spec.Name(),
+			def.String,
+		)
+	} else if r.spec.IsRequired() {
+		r.paragraph(
+			"The `%s` variable **MUST NOT** be left undefined.",
+		)(
+			r.spec.Name(),
+		)
+	} else {
+		r.paragraph(
+			"The `%s` variable **MAY** be left undefined.",
+		)(
+			r.spec.Name(),
+		)
+	}
 }

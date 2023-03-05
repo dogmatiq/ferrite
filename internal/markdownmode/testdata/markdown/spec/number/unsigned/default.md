@@ -2,13 +2,24 @@
 
 ## Specification
 
-### `PPROF_PORT`
+### `WEIGHT`
 
-> HTTP port for serving pprof profiling data
+> weighting for this node
 
-This variable **MAY** be set to a `uint16` value.
-If left undefined the default value of `8080` is used.
+The `WEIGHT` variable **MAY** be left undefined, in which case the default value
+of `900` is used. Otherwise, the value **MUST** be a non-negative whole number.
 
 ```bash
-export PPROF_PORT=8080 # (default)
+export WEIGHT=900 # (default)
 ```
+
+<details>
+<summary>Unsigned integer syntax</summary>
+
+Unsigned integers can only be specified using decimal (base-10) notation. A
+leading sign (`+` or `-`) is not supported and **MUST NOT** be specified.
+
+Internally, the `WEIGHT` variable is represented using an unsigned 16-bit
+integer type (`uint16`); any value that overflows this data-type is invalid.
+
+</details>

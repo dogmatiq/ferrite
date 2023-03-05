@@ -132,26 +132,53 @@ func (s TypedNumeric[T]) Unmarshal(v Literal) (T, error) {
 
 // Examples returns a (possibly empty) set of examples of valid values.
 func (s TypedNumeric[T]) Examples(hasOtherExamples bool) []TypedExample[T] {
-	if hasOtherExamples {
-		return nil
-	}
+	var examples []TypedExample[T]
 
 	min, max := limits.Of[T]()
 	if v, ok := s.NativeMin.Get(); ok {
 		min = v
-	}
-	if v, ok := s.NativeMax.Get(); ok {
-		max = v
+		examples = append(
+			examples,
+			TypedExample[T]{
+				Native:      min,
+				Description: "the minimum accepted value",
+			},
+		)
 	}
 
-	// If there are no other examples we do a linear interpolation at 25% of the
-	// (min, max) range in an attempt to provide _something_ that might be
-	// useful.
-	return []TypedExample[T]{
-		{
-			Native: T(float64(min) + float64(max-min)*0.25),
-		},
+	if v, ok := s.NativeMax.Get(); ok {
+		max = v
+		examples = append(
+			examples,
+			TypedExample[T]{
+				Native:      max,
+				Description: "the maximum accepted value",
+			},
+		)
 	}
+
+	if !hasOtherExamples {
+		// If there are no other examples we do a linear interpolation to find
+		// some values within the (min, max) range in an attempt to provide
+		// _something_ that might be useful.
+		lerp := func(distance float64) T {
+			a := float64(min) * (1 - distance)
+			b := float64(max) * distance
+			return T(a + b)
+		}
+
+		examples = append(
+			examples,
+			TypedExample[T]{
+				Native: lerp(0.45),
+			},
+			TypedExample[T]{
+				Native: lerp(0.60),
+			},
+		)
+	}
+
+	return examples
 }
 
 // validate returns an error if v is invalid.

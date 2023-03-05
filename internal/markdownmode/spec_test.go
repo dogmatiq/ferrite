@@ -277,6 +277,47 @@ var _ = Describe("func Run()", func() {
 			},
 		),
 
+		// NUMBER - FLOAT
+
+		Entry(
+			"float + optional + default",
+			"number/float/default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Float[float32]("WEIGHT", "weighting for this node").
+					WithDefault(123.5).
+					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"float + optional",
+			"number/float/optional.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Float[float32]("WEIGHT", "weighting for this node").
+					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"float + required + default",
+			"number/float/default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Float[float32]("WEIGHT", "weighting for this node").
+					WithDefault(123.5).
+					Required(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"float + required",
+			"number/float/required.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Float[float32]("WEIGHT", "weighting for this node").
+					Required(variable.WithRegistry(reg))
+			},
+		),
+
 		// NUMBER - SIGNED
 
 		Entry(
@@ -284,7 +325,7 @@ var _ = Describe("func Run()", func() {
 			"number/signed/default.md",
 			func(reg *variable.Registry) {
 				ferrite.
-					Signed[int]("WEIGHT", "weighting for this node").
+					Signed[int8]("WEIGHT", "weighting for this node").
 					WithDefault(100).
 					Optional(variable.WithRegistry(reg))
 			},
@@ -294,7 +335,7 @@ var _ = Describe("func Run()", func() {
 			"number/signed/optional.md",
 			func(reg *variable.Registry) {
 				ferrite.
-					Signed[int]("WEIGHT", "weighting for this node").
+					Signed[int8]("WEIGHT", "weighting for this node").
 					Optional(variable.WithRegistry(reg))
 			},
 		),
@@ -303,7 +344,7 @@ var _ = Describe("func Run()", func() {
 			"number/signed/default.md",
 			func(reg *variable.Registry) {
 				ferrite.
-					Signed[int]("WEIGHT", "weighting for this node").
+					Signed[int8]("WEIGHT", "weighting for this node").
 					WithDefault(100).
 					Required(variable.WithRegistry(reg))
 			},
@@ -313,7 +354,7 @@ var _ = Describe("func Run()", func() {
 			"number/signed/required.md",
 			func(reg *variable.Registry) {
 				ferrite.
-					Signed[int]("WEIGHT", "weighting for this node").
+					Signed[int8]("WEIGHT", "weighting for this node").
 					Required(variable.WithRegistry(reg))
 			},
 		),
@@ -325,8 +366,8 @@ var _ = Describe("func Run()", func() {
 			"number/unsigned/default.md",
 			func(reg *variable.Registry) {
 				ferrite.
-					Unsigned[uint16]("PPROF_PORT", "HTTP port for serving pprof profiling data").
-					WithDefault(8080).
+					Unsigned[uint16]("WEIGHT", "weighting for this node").
+					WithDefault(900).
 					Optional(variable.WithRegistry(reg))
 			},
 		),
@@ -335,7 +376,7 @@ var _ = Describe("func Run()", func() {
 			"number/unsigned/optional.md",
 			func(reg *variable.Registry) {
 				ferrite.
-					Unsigned[uint16]("PPROF_PORT", "HTTP port for serving pprof profiling data").
+					Unsigned[uint16]("WEIGHT", "weighting for this node").
 					Optional(variable.WithRegistry(reg))
 			},
 		),
@@ -344,8 +385,8 @@ var _ = Describe("func Run()", func() {
 			"number/unsigned/default.md",
 			func(reg *variable.Registry) {
 				ferrite.
-					Unsigned[uint16]("PPROF_PORT", "HTTP port for serving pprof profiling data").
-					WithDefault(8080).
+					Unsigned[uint16]("WEIGHT", "weighting for this node").
+					WithDefault(900).
 					Required(variable.WithRegistry(reg))
 			},
 		),
@@ -354,7 +395,7 @@ var _ = Describe("func Run()", func() {
 			"number/unsigned/required.md",
 			func(reg *variable.Registry) {
 				ferrite.
-					Unsigned[uint16]("PPROF_PORT", "HTTP port for serving pprof profiling data").
+					Unsigned[uint16]("WEIGHT", "weighting for this node").
 					Required(variable.WithRegistry(reg))
 			},
 		),

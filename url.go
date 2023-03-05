@@ -20,7 +20,7 @@ func URL(name, desc string) URLBuilder {
 		desc: desc,
 		options: []variable.SpecOption[*url.URL]{
 			variable.WithConstraint(
-				"MUST be a fully-qualified URL",
+				"**MUST** be a fully-qualified URL",
 				func(v *url.URL) variable.ConstraintError {
 					if v.Scheme == "" {
 						return errors.New("URL must have a scheme")
@@ -36,6 +36,16 @@ func URL(name, desc string) URLBuilder {
 			variable.WithNonNormativeExample(
 				mustParseURL("https://example.org/path"),
 				"a typical URL for a web page",
+			),
+			variable.WithDocumentation[*url.URL](
+				variable.Documentation{
+					Summary: "URL syntax",
+					Paragraphs: []string{
+						"A fully-qualified URL includes both a scheme (protocol) and a hostname. " +
+							"URLs are not necessarily web addresses; `https://example.org` and " +
+							"`mailto:contact@example.org` are both examples of fully-qualified URLs.",
+					},
+				},
 			),
 		},
 	}

@@ -10,6 +10,17 @@ The format is based on [Keep a Changelog], and this project adheres to
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+## [Unreleased]
+
+### Changed
+
+- Generate Markdown documentation for the syntax of integers, floating-point values, URLs and network ports
+- General improvements to generated Markdown documentation
+
+### Fixed
+
+- Trailing zeroes are no longer rendered on floating point values
+
 ## [0.3.3] - 2023-03-03
 
 ### Added

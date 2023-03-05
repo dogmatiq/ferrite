@@ -35,7 +35,7 @@ type Spec interface {
 	Examples() []Example
 
 	// Documentation returns a list of chunks of documentation text.
-	Documentation() []string
+	Documentation() []Documentation
 }
 
 // IsDefault returns true if v is the default value of the given spec.
@@ -53,7 +53,7 @@ type SpecOption[T any] func(*specOptions[T]) error
 type specOptions[T any] struct {
 	Constraints []TypedConstraint[T]
 	Examples    []TypedExample[T]
-	Docs        []string
+	Docs        []Documentation
 }
 
 // TypedSpec builds a specification for a variable depicted by type T.
@@ -64,7 +64,7 @@ type TypedSpec[T any] struct {
 	required    bool
 	schemax     TypedSchema[T]
 	examples    []Example
-	docs        []string
+	docs        []Documentation
 	constraints []TypedConstraint[T]
 }
 
@@ -157,7 +157,7 @@ func NewSpec[T any, S TypedSchema[T]](
 		})
 
 		// Append an example of the default value if one is not already present.
-		spec.examples = appendExample(spec.examples, Example{
+		spec.examples = prependExample(spec.examples, Example{
 			Canonical:   lit,
 			IsNormative: true,
 		})
@@ -210,7 +210,7 @@ func (s TypedSpec[T]) Examples() []Example {
 }
 
 // Documentation returns a list of chunks of documentation text.
-func (s TypedSpec[T]) Documentation() []string {
+func (s TypedSpec[T]) Documentation() []Documentation {
 	return s.docs
 }
 

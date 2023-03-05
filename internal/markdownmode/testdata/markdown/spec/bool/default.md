@@ -6,8 +6,8 @@
 
 > enable or disable debugging features
 
-This variable **MAY** be set to one of the values below.
-If left undefined the default value of `false` is used.
+The `DEBUG` variable **MAY** be left undefined, in which case the default value
+of `false` is used. Otherwise, the value **MUST** be either `true` or `false`.
 
 ```bash
 export DEBUG=true
