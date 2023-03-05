@@ -30,7 +30,7 @@ func (r *renderer) renderRefs() {
 	for _, k := range keys {
 		u, ok := urls[k]
 		if !ok {
-			n, ok := strings.CutPrefix(k, "rfc ")
+			n, ok := cutPrefix(k, "rfc ")
 			if !ok {
 				panic("unknown reference: " + k)
 			}
@@ -59,4 +59,11 @@ func (r *renderer) link(text string, ref ...string) string {
 	default:
 		panic("too many arguments")
 	}
+}
+
+func cutPrefix(s, prefix string) (after string, found bool) {
+	if !strings.HasPrefix(s, prefix) {
+		return s, false
+	}
+	return s[len(prefix):], true
 }
