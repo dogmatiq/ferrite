@@ -10,6 +10,12 @@ The format is based on [Keep a Changelog], and this project adheres to
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+## [Unreleased]
+
+### Changed
+
+- **[BC]** Change `NetworkPort()` to use the new `NetworkPortBuilder` instead of `StringBuilder`
+
 ## [0.3.6] - 2023-03-06
 
 ### Fixed

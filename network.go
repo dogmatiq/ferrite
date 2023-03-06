@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strconv"
 
+	"github.com/dogmatiq/ferrite/maybe"
 	"github.com/dogmatiq/ferrite/variable"
 )
 
@@ -11,8 +12,8 @@ import (
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func NetworkPort(name, desc string) StringBuilder[string] {
-	return StringBuilder[string]{
+func NetworkPort(name, desc string) NetworkPortBuilder {
+	return NetworkPortBuilder{
 		name: name,
 		desc: desc,
 		options: []variable.SpecOption[string]{
@@ -33,6 +34,49 @@ func NetworkPort(name, desc string) StringBuilder[string] {
 			networkPortSyntaxDocumentation,
 		},
 	}
+}
+
+// NetworkPortBuilder builds a specification for a network port variable.
+type NetworkPortBuilder struct {
+	name, desc string
+	def        maybe.Value[string]
+	options    []variable.SpecOption[string]
+}
+
+// WithDefault sets a default value of the variable.
+//
+// It is used when the environment variable is undefined or empty.
+func (b NetworkPortBuilder) WithDefault(v string) NetworkPortBuilder {
+	b.def = maybe.Some(v)
+	return b
+}
+
+// Required completes the build process and registers a required variable with
+// Ferrite's validation system.
+func (b NetworkPortBuilder) Required(options ...variable.RegisterOption) Required[string] {
+	return registerRequired(b.spec(true), options)
+}
+
+// Optional completes the build process and registers an optional variable with
+// Ferrite's validation system.
+func (b NetworkPortBuilder) Optional(options ...variable.RegisterOption) Optional[string] {
+	return registerOptional(b.spec(false), options)
+}
+
+func (b NetworkPortBuilder) spec(req bool) variable.TypedSpec[string] {
+	s, err := variable.NewSpec(
+		b.name,
+		b.desc,
+		b.def,
+		req,
+		variable.TypedString[string]{},
+		b.options...,
+	)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	return s
 }
 
 // validateHost returns an error of port is not a valid numeric port or IANA
