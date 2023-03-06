@@ -1,8 +1,6 @@
 package markdownmode
 
-import (
-	"github.com/dogmatiq/ferrite/variable"
-)
+import "github.com/dogmatiq/ferrite/variable"
 
 func (r *renderer) renderUsage() {
 	r.line("## Usage Examples")
@@ -34,7 +32,7 @@ func (r *renderer) renderKubernetesUsage() {
 	r.line("          env:")
 
 	for _, s := range r.Specs {
-		eg := chooseExample(s)
+		eg := variable.BestExample(s)
 
 		r.line("            - name: %s # %s", r.yaml(s.Name()), s.Description())
 		r.line("              value: %s", r.yaml(eg.Canonical.String))
@@ -55,7 +53,7 @@ func (r *renderer) renderKubernetesUsage() {
 	r.line("data:")
 
 	for _, s := range r.Specs {
-		eg := chooseExample(s)
+		eg := variable.BestExample(s)
 
 		r.line(
 			"  %s: %s # %s",
@@ -98,7 +96,7 @@ func (r *renderer) renderDockerUsage() {
 	r.line("    environment:")
 
 	for _, s := range r.Specs {
-		eg := chooseExample(s)
+		eg := variable.BestExample(s)
 
 		r.line(
 			"      %s: %s # %s",
@@ -112,16 +110,4 @@ func (r *renderer) renderDockerUsage() {
 
 	r.gap()
 	r.line("</details>")
-}
-
-func chooseExample(spec variable.Spec) variable.Example {
-	examples := spec.Examples()
-
-	for _, eg := range examples {
-		if eg.Description != "" {
-			return eg
-		}
-	}
-
-	return examples[len(examples)-1]
 }

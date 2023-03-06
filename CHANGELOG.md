@@ -10,6 +10,12 @@ The format is based on [Keep a Changelog], and this project adheres to
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+## [Unreleased]
+
+### Changed
+
+- Improved algorithm for choosing which example to show in generated usage documentation
+
 ## [0.3.5] - 2023-03-06
 
 ### Fixed

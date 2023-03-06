@@ -67,7 +67,7 @@ func (r *specRenderer) VisitSet(s variable.Set) {
 // VisitString renders the primary requirement for a spec that uses the "string"
 // schema type.
 func (r *specRenderer) VisitString(variable.String) {
-	// Find the best constraint to use as the "primary" requirement, favouring
+	// Find the best constraint to use as the "primary" requirement, favoring
 	// non-user-defined constraints.
 	var con variable.Constraint
 	for _, c := range r.spec.Constraints() {

@@ -43,12 +43,22 @@ var _ = Describe("func Run()", func() {
 			ExpectWithOffset(1, actual).To(EqualX(string(expect)))
 		},
 		Entry(
-			nil,
+			"usage",
 			"usage.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Bool("DEBUG", "enable or disable debugging features").
 					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"usage shows the default value in examples if available",
+			"usage-shows-default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					NetworkPort("PORT", "an environment variable that has a default value").
+					WithDefault("ftp").
+					Required(variable.WithRegistry(reg))
 			},
 		),
 	)

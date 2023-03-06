@@ -62,7 +62,7 @@ type TypedSpec[T any] struct {
 	desc        string
 	def         maybe.Value[valueOf[T]]
 	required    bool
-	schemax     TypedSchema[T]
+	schema      TypedSchema[T]
 	examples    []Example
 	docs        []Documentation
 	constraints []TypedConstraint[T]
@@ -104,41 +104,9 @@ func NewSpec[T any, S TypedSchema[T]](
 	spec := TypedSpec[T]{
 		name:        name,
 		desc:        desc,
-		schemax:     schema,
+		schema:      schema,
 		required:    req,
 		constraints: opts.Constraints,
-	}
-
-	for _, eg := range opts.Examples {
-		lit, err := spec.Marshal(eg.Native)
-		if err != nil {
-			return TypedSpec[T]{}, SpecError{
-				name:  name,
-				cause: fmt.Errorf("example value: %w", err),
-			}
-		}
-
-		spec.examples = appendExample(spec.examples, Example{
-			Canonical:   lit,
-			Description: eg.Description,
-			IsNormative: eg.IsNormative,
-		})
-	}
-
-	hasOtherExamples := len(spec.examples) > 0 || !def.IsEmpty()
-
-	for _, eg := range schema.Examples(hasOtherExamples) {
-		lit, err := spec.Marshal(eg.Native)
-
-		// Append the example if it meets all of the constraints, otherwise just
-		// ignore it.
-		if err == nil {
-			spec.examples = appendExample(spec.examples, Example{
-				Canonical:   lit,
-				Description: eg.Description,
-				IsNormative: eg.IsNormative,
-			})
-		}
 	}
 
 	if v, ok := def.Get(); ok {
@@ -155,15 +123,18 @@ func NewSpec[T any, S TypedSchema[T]](
 			canonical: lit,
 			isDefault: true,
 		})
+	}
 
-		// Append an example of the default value if one is not already present.
-		spec.examples = prependExample(spec.examples, Example{
-			Canonical:   lit,
-			IsNormative: true,
-		})
+	examples, err := buildExamples(spec, opts.Examples)
+	if err != nil {
+		return TypedSpec[T]{}, SpecError{
+			name:  name,
+			cause: fmt.Errorf("example value: %w", err),
+		}
 	}
 
 	spec.docs = opts.Docs
+	spec.examples = examples
 
 	return spec, nil
 }
@@ -180,7 +151,7 @@ func (s TypedSpec[T]) Description() string {
 
 // Schema returns the schema that applies to the variable's value.
 func (s TypedSpec[T]) Schema() Schema {
-	return s.schemax
+	return s.schema
 }
 
 // Default returns the string representation of the default value.
@@ -235,7 +206,7 @@ func (s TypedSpec[T]) Marshal(v T) (Literal, error) {
 		return Literal{}, err
 	}
 
-	return s.schemax.Marshal(v)
+	return s.schema.Marshal(v)
 }
 
 // Unmarshal converts a literal value to it's native representation.
@@ -243,7 +214,7 @@ func (s TypedSpec[T]) Marshal(v T) (Literal, error) {
 // It returns an error if v does not meet the specification's constraints or
 // unmarshaling fails at the schema level.
 func (s TypedSpec[T]) Unmarshal(v Literal) (T, Literal, error) {
-	n, err := s.schemax.Unmarshal(v)
+	n, err := s.schema.Unmarshal(v)
 	if err != nil {
 		return n, Literal{}, err
 	}
@@ -252,7 +223,7 @@ func (s TypedSpec[T]) Unmarshal(v Literal) (T, Literal, error) {
 		return n, Literal{}, err
 	}
 
-	c, err := s.schemax.Marshal(n)
+	c, err := s.schema.Marshal(n)
 	if err != nil {
 		// Schema can't marshal a value it just successfully unmarshaled!
 		panic(err)
