@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/dogmatiq/ferrite/internal/reflectx"
 	"golang.org/x/exp/slices"
 )
 
@@ -39,7 +40,7 @@ func (s TypedSet[T]) Literals() []Literal {
 
 // Type returns the type of the native value.
 func (s TypedSet[T]) Type() reflect.Type {
-	return typeOf[T]()
+	return reflectx.TypeOf[T]()
 }
 
 // Finalize prepares the schema for use.

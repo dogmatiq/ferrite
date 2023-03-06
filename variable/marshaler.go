@@ -13,6 +13,7 @@ type Marshaler[T any] interface {
 	Unmarshal(Literal) (T, error)
 }
 
+// marshal marshals a native "maybe" value to a literal.
 func marshal[T any, M Marshaler[T]](
 	m M,
 	v maybe.Value[T],
@@ -23,6 +24,8 @@ func marshal[T any, M Marshaler[T]](
 	)
 }
 
+// mustMarshal marshals a native "maybe" value to a literal or panics if unable
+// to do so.
 func mustMarshal[T any, M Marshaler[T]](
 	m M,
 	v maybe.Value[T],

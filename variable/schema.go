@@ -60,8 +60,3 @@ type TypedSchema[T any] interface {
 	// Examples returns a (possibly empty) set of examples of valid values.
 	Examples(hasOtherExamples bool) []TypedExample[T]
 }
-
-// typeOf returns the type of T.
-func typeOf[T any]() reflect.Type {
-	return reflect.TypeOf([...]T{}).Elem()
-}

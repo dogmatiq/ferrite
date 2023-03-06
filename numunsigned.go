@@ -2,9 +2,9 @@ package ferrite
 
 import (
 	"fmt"
-	"reflect"
 	"strconv"
 
+	"github.com/dogmatiq/ferrite/internal/reflectx"
 	"github.com/dogmatiq/ferrite/maybe"
 	"github.com/dogmatiq/ferrite/variable"
 	"golang.org/x/exp/constraints"
@@ -83,8 +83,8 @@ func (b UnsignedBuilder[T]) spec(req bool) variable.TypedSpec[T] {
 			).
 			Format(
 				b.name,
-				bitSize[T](),
-				reflect.TypeOf(T(0)).Kind(),
+				reflectx.BitSize[T](),
+				reflectx.KindOf[T](),
 			).
 			Done(),
 	)
@@ -104,7 +104,7 @@ func (unsignedMarshaler[T]) Marshal(v T) (variable.Literal, error) {
 }
 
 func (unsignedMarshaler[T]) Unmarshal(v variable.Literal) (T, error) {
-	n, err := strconv.ParseUint(v.String, 10, bitSize[T]())
+	n, err := strconv.ParseUint(v.String, 10, reflectx.BitSize[T]())
 	if err != nil {
 		return 0, err
 	}

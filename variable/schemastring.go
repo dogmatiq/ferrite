@@ -5,6 +5,7 @@ import (
 	"math"
 	"reflect"
 
+	"github.com/dogmatiq/ferrite/internal/reflectx"
 	"github.com/dogmatiq/ferrite/maybe"
 )
 
@@ -36,7 +37,7 @@ func (s TypedString[T]) MaxLength() (int, bool) {
 
 // Type returns the type of the native value.
 func (s TypedString[T]) Type() reflect.Type {
-	return typeOf[T]()
+	return reflectx.TypeOf[T]()
 }
 
 // Finalize prepares the schema for use.

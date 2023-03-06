@@ -6,6 +6,7 @@ import (
 	"unsafe"
 
 	"github.com/dogmatiq/ferrite/internal/limits"
+	"github.com/dogmatiq/ferrite/internal/reflectx"
 	"github.com/dogmatiq/ferrite/maybe"
 	"golang.org/x/exp/constraints"
 )
@@ -88,7 +89,7 @@ func (s TypedNumeric[T]) Bits() int {
 
 // Type returns the type of the native value.
 func (s TypedNumeric[T]) Type() reflect.Type {
-	return typeOf[T]()
+	return reflectx.TypeOf[T]()
 }
 
 // Finalize prepares the schema for use.

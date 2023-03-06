@@ -1,9 +1,9 @@
 package ferrite
 
 import (
-	"reflect"
 	"strconv"
 
+	"github.com/dogmatiq/ferrite/internal/reflectx"
 	"github.com/dogmatiq/ferrite/maybe"
 	"github.com/dogmatiq/ferrite/variable"
 	"golang.org/x/exp/constraints"
@@ -84,8 +84,8 @@ func (b FloatBuilder[T]) spec(req bool) variable.TypedSpec[T] {
 			).
 			Format(
 				b.name,
-				bitSize[T](),
-				reflect.TypeOf(T(0)).Kind(),
+				reflectx.BitSize[T](),
+				reflectx.KindOf[T](),
 			).
 			Done(),
 	)
@@ -103,7 +103,7 @@ func (floatMarshaler[T]) Marshal(v T) (variable.Literal, error) {
 		float64(v),
 		'g',
 		-1,
-		bitSize[T](),
+		reflectx.BitSize[T](),
 	)
 
 	switch s[0] {
@@ -118,7 +118,7 @@ func (floatMarshaler[T]) Marshal(v T) (variable.Literal, error) {
 }
 
 func (floatMarshaler[T]) Unmarshal(v variable.Literal) (T, error) {
-	n, err := strconv.ParseFloat(v.String, bitSize[T]())
+	n, err := strconv.ParseFloat(v.String, reflectx.BitSize[T]())
 	if err != nil {
 		return 0, err
 	}

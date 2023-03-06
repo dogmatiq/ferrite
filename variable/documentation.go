@@ -3,6 +3,8 @@ package variable
 import (
 	"fmt"
 	"strings"
+
+	"golang.org/x/exp/slices"
 )
 
 // Documentation is free-form documentation about a variable.
@@ -29,8 +31,8 @@ type DocumentationBuilder[T any] struct {
 	doc Documentation
 }
 
-// WithDocumentation returns an option that adds additional documentation about
-// a variable.
+// WithDocumentation returns documentation builder that adds additional
+// documentation about a variable.
 //
 // The T type parameter is not meaningful, but is required in order to produce a
 // SpecOption of the correct type.
@@ -45,11 +47,14 @@ func (b DocumentationBuilder[T]) Summary(f string, v ...any) DocumentationBuilde
 }
 
 // Paragraph adds a paragraph to the documentation.
+//
+// text is concatenated together with a space to form the paragraph text.
+// The entire paragraph is a Printf() style format specifier.
 func (b DocumentationBuilder[T]) Paragraph(text ...string) ParagraphFormatter[T] {
 	return ParagraphFormatter[T]{
 		func(v ...any) DocumentationBuilder[T] {
 			b.doc.Paragraphs = append(
-				b.doc.Paragraphs,
+				slices.Clone(b.doc.Paragraphs),
 				fmt.Sprintf(
 					strings.Join(text, " "),
 					v...,
@@ -63,6 +68,7 @@ func (b DocumentationBuilder[T]) Paragraph(text ...string) ParagraphFormatter[T]
 // ParagraphFormatter is a fluent interface for applying values to a paragraph
 // template.
 type ParagraphFormatter[T any] struct {
+	// Format applies the given values to the paragraph template.
 	Format func(...any) DocumentationBuilder[T]
 }
 
