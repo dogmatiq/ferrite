@@ -25,6 +25,10 @@ type Spec interface {
 	// variable (even if it is fulfilled by a default value).
 	IsRequired() bool
 
+	// IsSensitive returns true if the variable's value contains sensitive
+	// information.
+	IsSensitive() bool
+
 	// Constraints returns a list of additional constraints on the variable's
 	// value.
 	Constraints() []Constraint
@@ -50,10 +54,23 @@ func IsDefault(s Spec, v Literal) bool {
 // SpecOption is an option that changes the behavior of a spec.
 type SpecOption[T any] func(*specOptions[T]) error
 
+// Sensitive returns an option that marks a variable as containing sensitive
+// information.
+//
+// The T type parameter is not meaningful, but is required in order to produce a
+// SpecOption of the correct type.
+func Sensitive[T any]() SpecOption[T] {
+	return func(o *specOptions[T]) error {
+		o.IsSensitive = true
+		return nil
+	}
+}
+
 type specOptions[T any] struct {
 	Constraints []TypedConstraint[T]
 	Examples    []TypedExample[T]
 	Docs        []Documentation
+	IsSensitive bool
 }
 
 // TypedSpec builds a specification for a variable depicted by type T.
@@ -62,6 +79,7 @@ type TypedSpec[T any] struct {
 	desc        string
 	def         maybe.Value[valueOf[T]]
 	required    bool
+	sensitive   bool
 	schema      TypedSchema[T]
 	examples    []Example
 	docs        []Documentation
@@ -106,6 +124,7 @@ func NewSpec[T any, S TypedSchema[T]](
 		desc:        desc,
 		schema:      schema,
 		required:    req,
+		sensitive:   opts.IsSensitive,
 		constraints: opts.Constraints,
 	}
 
@@ -163,6 +182,12 @@ func (s TypedSpec[T]) Default() (Literal, bool) {
 // variable (even if it is fulfilled by a default value).
 func (s TypedSpec[T]) IsRequired() bool {
 	return s.required
+}
+
+// IsSensitive returns true if the variable's value contains sensitive
+// information.
+func (s TypedSpec[T]) IsSensitive() bool {
+	return s.sensitive
 }
 
 // Constraints returns a list of additional constraints on the variable's

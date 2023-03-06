@@ -45,6 +45,12 @@ func ExampleInit_validation() {
 		String("FERRITE_STRING", "example string").
 		Required()
 
+	os.Setenv("FERRITE_STRING_SENSITIVE", "hunter2")
+	ferrite.
+		String("FERRITE_STRING_SENSITIVE", "example sensitive string").
+		Sensitive().
+		Required()
+
 	os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
 	os.Setenv("FERRITE_SVC_SERVICE_PORT", "443")
 	ferrite.
@@ -71,6 +77,7 @@ func ExampleInit_validation() {
 	//    FERRITE_NUM_SIGNED        example signed integer                   <int16>            ✓ set to -123
 	//    FERRITE_NUM_UNSIGNED      example unsigned integer                 <uint16>           ✓ set to 456
 	//    FERRITE_STRING            example string                           <string>           ✓ set to 'hello, world!'
+	//    FERRITE_STRING_SENSITIVE  example sensitive string                 <string>           ✓ set to *******
 	//    FERRITE_SVC_SERVICE_HOST  kubernetes "ferrite-svc" service host    <string>           ✓ set to host.example.org
 	//    FERRITE_SVC_SERVICE_PORT  kubernetes "ferrite-svc" service port    <string>           ✓ set to 443
 	//    FERRITE_URL               example URL                              <string>           ✓ set to https://example.org
@@ -113,6 +120,12 @@ func ExampleInit_validationWithDefaultValues() {
 		Required()
 
 	ferrite.
+		String("FERRITE_STRING_SENSITIVE", "example sensitive string").
+		WithDefault("hunter2").
+		Sensitive().
+		Required()
+
+	ferrite.
 		KubernetesService("ferrite-svc").
 		WithDefault("host.example.org", "443").
 		Optional()
@@ -137,6 +150,7 @@ func ExampleInit_validationWithDefaultValues() {
 	//    FERRITE_NUM_SIGNED        example signed integer                 [ <int16> ] = -123                  ✓ using default value
 	//    FERRITE_NUM_UNSIGNED      example unsigned integer               [ <uint16> ] = 123                  ✓ using default value
 	//    FERRITE_STRING            example string                         [ <string> ] = 'hello, world!'      ✓ using default value
+	//    FERRITE_STRING_SENSITIVE  example sensitive string               [ <string> ] = *******              ✓ using default value
 	//    FERRITE_SVC_SERVICE_HOST  kubernetes "ferrite-svc" service host  [ <string> ] = host.example.org     ✓ using default value
 	//    FERRITE_SVC_SERVICE_PORT  kubernetes "ferrite-svc" service port  [ <string> ] = 443                  ✓ using default value
 	//    FERRITE_URL               example URL                            [ <string> ] = https://example.org  ✓ using default value
@@ -173,6 +187,11 @@ func ExampleInit_validationWithOptionalValues() {
 		Optional()
 
 	ferrite.
+		String("FERRITE_STRING_SENSITIVE", "example sensitive string").
+		Sensitive().
+		Optional()
+
+	ferrite.
 		KubernetesService("ferrite-svc").
 		Optional()
 
@@ -195,6 +214,7 @@ func ExampleInit_validationWithOptionalValues() {
 	//    FERRITE_NUM_SIGNED        example signed integer                 [ <int16> ]          • undefined
 	//    FERRITE_NUM_UNSIGNED      example unsigned integer               [ <uint16> ]         • undefined
 	//    FERRITE_STRING            example string                         [ <string> ]         • undefined
+	//    FERRITE_STRING_SENSITIVE  example sensitive string               [ <string> ]         • undefined
 	//    FERRITE_SVC_SERVICE_HOST  kubernetes "ferrite-svc" service host  [ <string> ]         • undefined
 	//    FERRITE_SVC_SERVICE_PORT  kubernetes "ferrite-svc" service port  [ <string> ]         • undefined
 	//    FERRITE_URL               example URL                            [ <string> ]         • undefined
@@ -257,7 +277,7 @@ func ExampleInit_validationWithInvalidValues() {
 	ferrite.
 		String("FERRITE_STRING", "example string").
 		WithConstraintFunc(
-			"MUST have an even number of characters",
+			"MUST NOT contain whitespace",
 			func(s string) variable.ConstraintError {
 				if strings.ContainsRune(s, ' ') {
 					return errors.New("must not contain whitespace")
@@ -266,6 +286,21 @@ func ExampleInit_validationWithInvalidValues() {
 			},
 		).
 		Required()
+
+	os.Setenv("FERRITE_STRING_SENSITIVE", "foo bar")
+	ferrite.
+		String("FERRITE_STRING_SENSITIVE", "example sensitive string").
+		WithConstraintFunc(
+			"MUST NOT contain whitespace",
+			func(s string) variable.ConstraintError {
+				if strings.ContainsRune(s, ' ') {
+					return errors.New("must not contain whitespace")
+				}
+				return nil
+			},
+		).
+		Sensitive().
+		Optional()
 
 	os.Setenv("FERRITE_SVC_SERVICE_HOST", ".local")
 	os.Setenv("FERRITE_SVC_SERVICE_PORT", "https-")
@@ -289,6 +324,7 @@ func ExampleInit_validationWithInvalidValues() {
 	//  ❯ FERRITE_NUM_SIGNED        example signed integer                   <int16>            ✗ set to 123.3, expected integer between -32768 and +32767
 	//  ❯ FERRITE_NUM_UNSIGNED      example unsigned integer                 <uint16>           ✗ set to -123, expected integer between 0 and 65535
 	//  ❯ FERRITE_STRING            example string                           <string>           ✗ set to 'foo bar', must not contain whitespace
+	//  ❯ FERRITE_STRING_SENSITIVE  example sensitive string               [ <string> ]         ✗ set to *******, must not contain whitespace
 	//  ❯ FERRITE_SVC_SERVICE_HOST  kubernetes "ferrite-svc" service host    <string>           ✗ set to .local, host must not begin or end with a dot
 	//  ❯ FERRITE_SVC_SERVICE_PORT  kubernetes "ferrite-svc" service port    <string>           ✗ set to https-, IANA service name must not begin or end with a hyphen
 	//  ❯ FERRITE_URL               example URL                              <string>           ✗ set to /relative/path, URL must have a scheme

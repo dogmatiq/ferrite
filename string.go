@@ -56,6 +56,16 @@ func (b StringBuilder[T]) WithConstraintFunc(
 	return b
 }
 
+// Sensitive marks the variable as containing sensitive information, such as
+// passwords or cryptographic keys.
+func (b StringBuilder[T]) Sensitive() StringBuilder[T] {
+	b.options = append(
+		slices.Clone(b.options),
+		variable.Sensitive[T](),
+	)
+	return b
+}
+
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b StringBuilder[T]) Required(options ...variable.RegisterOption) Required[T] {

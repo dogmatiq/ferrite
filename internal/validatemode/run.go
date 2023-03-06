@@ -20,10 +20,10 @@ func Run(reg *variable.Registry) (usage string, ok bool) {
 
 	for _, v := range reg.Variables() {
 		t.AddRow(
-			renderName(v),
+			renderNameColumn(v),
 			v.Spec().Description(),
-			renderSpec(v.Spec()),
-			renderValue(v),
+			renderSpecColumn(v.Spec()),
+			renderValueColumn(v),
 		)
 
 		if !v.IsValid() {
@@ -34,7 +34,7 @@ func Run(reg *variable.Registry) (usage string, ok bool) {
 	return "Environment Variables:\n\n" + t.String(), ok
 }
 
-func renderName(v variable.Any) string {
+func renderNameColumn(v variable.Any) string {
 	if v.IsValid() {
 		return fmt.Sprintf("   %s", v.Spec().Name())
 	}
@@ -42,7 +42,7 @@ func renderName(v variable.Any) string {
 	return fmt.Sprintf(" %s %s", attentionIcon, v.Spec().Name())
 }
 
-func renderSpec(s variable.Spec) string {
+func renderSpecColumn(s variable.Spec) string {
 	out := &strings.Builder{}
 	s.Schema().AcceptVisitor(&schemaRenderer{
 		Output: out,
@@ -52,7 +52,7 @@ func renderSpec(s variable.Spec) string {
 		return fmt.Sprintf(
 			"[ %s ] = %s",
 			out,
-			def.Quote(),
+			renderValue(s, def),
 		)
 	}
 
@@ -63,7 +63,9 @@ func renderSpec(s variable.Spec) string {
 	return fmt.Sprintf("[ %s ]", out)
 }
 
-func renderValue(v variable.Any) string {
+func renderValueColumn(v variable.Any) string {
+	spec := v.Spec()
+
 	value, ok, err := v.Value()
 	if err != nil {
 		out := &strings.Builder{}
@@ -76,7 +78,7 @@ func renderValue(v variable.Any) string {
 		return fmt.Sprintf(
 			"%s set to %s, %s",
 			invalidIcon,
-			err.Literal().Quote(),
+			renderValue(spec, err.Literal()),
 			out.String(),
 		)
 	}
@@ -90,15 +92,15 @@ func renderValue(v variable.Any) string {
 			return fmt.Sprintf(
 				"%s set to %s",
 				validIcon,
-				value.Canonical().Quote(),
+				renderValue(spec, value.Canonical()),
 			)
 		}
 
 		return fmt.Sprintf(
 			"%s set to %s (specified non-canonically as %s)",
 			validIcon,
-			value.Canonical().Quote(),
-			value.Verbatim().Quote(),
+			renderValue(spec, value.Canonical()),
+			renderValue(spec, value.Verbatim()),
 		)
 	}
 
@@ -108,6 +110,14 @@ func renderValue(v variable.Any) string {
 	}
 
 	return fmt.Sprintf("%s undefined", icon)
+}
+
+func renderValue(s variable.Spec, v variable.Literal) string {
+	if s.IsSensitive() {
+		return strings.Repeat("*", len(v.String))
+	}
+
+	return v.Quote()
 }
 
 const (
