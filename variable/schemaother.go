@@ -1,7 +1,6 @@
 package variable
 
 import (
-	"fmt"
 	"io"
 	"reflect"
 )
@@ -12,12 +11,6 @@ import (
 // explanation of the value.
 type Other interface {
 	Schema
-
-	// RenderSchema writes a human-readable representation of the schema to w.
-	RenderSchema(w io.Writer)
-
-	// RenderValueError writes a human-readable representation of err to w.
-	RenderValueError(w io.Writer, err ValueError)
 }
 
 // TypedOther is a schema for representing values of arbitrary types.
@@ -61,22 +54,4 @@ func (s TypedOther[T]) Unmarshal(v Literal) (T, error) {
 // Examples returns a (possibly empty) set of examples of valid values.
 func (s TypedOther[T]) Examples(hasOtherExamples bool) []TypedExample[T] {
 	return nil
-}
-
-// RenderSchema writes a human-readable representation of the schema to w.
-func (s TypedOther[T]) RenderSchema(w io.Writer) {
-	if s.SchemaRenderer != nil {
-		s.SchemaRenderer(w, s)
-	} else {
-		fmt.Fprintf(w, "<%s>", s.Type().Kind())
-	}
-}
-
-// RenderValueError writes a human-readable representation of err to w.
-func (s TypedOther[T]) RenderValueError(w io.Writer, err ValueError) {
-	if s.ValueErrorRenderer != nil {
-		s.ValueErrorRenderer(w, s, err)
-	} else {
-		io.WriteString(w, err.Error())
-	}
 }

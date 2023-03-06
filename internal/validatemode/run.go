@@ -2,6 +2,7 @@ package validatemode
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 
 	"github.com/dogmatiq/ferrite/variable"
@@ -167,7 +168,26 @@ func (r *schemaRenderer) VisitString(s variable.String) {
 }
 
 func (r *schemaRenderer) VisitOther(s variable.Other) {
-	s.RenderSchema(r.Output)
+	t := s.Type()
+
+again:
+	switch t.Kind() {
+	case reflect.Pointer:
+		t = t.Elem()
+		goto again
+
+	case reflect.Bool,
+		reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
+		reflect.Uintptr,
+		reflect.Float32, reflect.Float64,
+		reflect.Complex64, reflect.Complex128,
+		reflect.String:
+		fmt.Fprintf(r.Output, "<%s>", t.Kind())
+
+	default:
+		r.Output.WriteString("<string>")
+	}
 }
 
 type errorRenderer struct {
@@ -232,5 +252,5 @@ func (r *errorRenderer) VisitMaxLengthError(err variable.MaxLengthError) {
 }
 
 func (r *errorRenderer) VisitOther(s variable.Other) {
-	s.RenderValueError(r.Output, r.Error)
+	r.Output.WriteString(r.Error.Unwrap().Error())
 }

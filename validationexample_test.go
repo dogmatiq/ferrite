@@ -48,6 +48,11 @@ func ExampleInit_validation() {
 		KubernetesService("ferrite-svc").
 		Required()
 
+	os.Setenv("FERRITE_URL", "https://example.org")
+	ferrite.
+		URL("FERRITE_URL", "example URL").
+		Required()
+
 	ferrite.
 		String("FERRITE_XTRIGGER", "trigger failure").
 		Required()
@@ -65,6 +70,7 @@ func ExampleInit_validation() {
 	//    FERRITE_STRING            example string                           <string>           ✓ set to 'hello, world!'
 	//    FERRITE_SVC_SERVICE_HOST  kubernetes "ferrite-svc" service host    <string>           ✓ set to host.example.org
 	//    FERRITE_SVC_SERVICE_PORT  kubernetes "ferrite-svc" service port    <string>           ✓ set to 443
+	//    FERRITE_URL               example URL                              <string>           ✓ set to https://example.org
 	//  ❯ FERRITE_XTRIGGER          trigger failure                          <string>           ✗ undefined
 }
 

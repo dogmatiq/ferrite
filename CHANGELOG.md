@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed schema rendering of URL variables in validation mode
+
 ### Changed
 
 - Improved algorithm for choosing which example to show in generated usage documentation
