@@ -169,10 +169,6 @@ func buildExamples[T any](
 		})
 	}
 
-	if len(examples) == 0 {
-		panic("spec must contain at least one example")
-	}
-
 	return examples, nil
 }
 

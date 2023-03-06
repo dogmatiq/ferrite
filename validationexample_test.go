@@ -1,10 +1,13 @@
 package ferrite_test
 
 import (
+	"errors"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/dogmatiq/ferrite"
+	"github.com/dogmatiq/ferrite/variable"
 )
 
 func ExampleInit_validation() {
@@ -250,9 +253,18 @@ func ExampleInit_validationWithInvalidValues() {
 		Unsigned[uint16]("FERRITE_NUM_UNSIGNED", "example unsigned integer").
 		Required()
 
-	// There is currently no way to make a string defined but invalid.
+	os.Setenv("FERRITE_STRING", "foo bar")
 	ferrite.
 		String("FERRITE_STRING", "example string").
+		WithConstraintFunc(
+			"MUST have an even number of characters",
+			func(s string) variable.ConstraintError {
+				if strings.ContainsRune(s, ' ') {
+					return errors.New("must not contain whitespace")
+				}
+				return nil
+			},
+		).
 		Required()
 
 	os.Setenv("FERRITE_SVC_SERVICE_HOST", ".local")
@@ -276,7 +288,7 @@ func ExampleInit_validationWithInvalidValues() {
 	//  ❯ FERRITE_ENUM              example enum                             foo | bar | baz    ✗ set to qux, expected foo, bar or baz
 	//  ❯ FERRITE_NUM_SIGNED        example signed integer                   <int16>            ✗ set to 123.3, expected integer between -32768 and +32767
 	//  ❯ FERRITE_NUM_UNSIGNED      example unsigned integer                 <uint16>           ✗ set to -123, expected integer between 0 and 65535
-	//  ❯ FERRITE_STRING            example string                           <string>           ✗ undefined
+	//  ❯ FERRITE_STRING            example string                           <string>           ✗ set to 'foo bar', must not contain whitespace
 	//  ❯ FERRITE_SVC_SERVICE_HOST  kubernetes "ferrite-svc" service host    <string>           ✗ set to .local, host must not begin or end with a dot
 	//  ❯ FERRITE_SVC_SERVICE_PORT  kubernetes "ferrite-svc" service port    <string>           ✗ set to https-, IANA service name must not begin or end with a hyphen
 	//  ❯ FERRITE_URL               example URL                              <string>           ✗ set to /relative/path, URL must have a scheme
