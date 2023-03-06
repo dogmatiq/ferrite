@@ -20,7 +20,7 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Fixed
 
-- Remove use `strings.CutPrefix()` to maintain compatibility with Go v1.19
+- Remove use of `strings.CutPrefix()` to maintain compatibility with Go v1.19
 
 ## [0.3.4] - 2023-03-05
 
