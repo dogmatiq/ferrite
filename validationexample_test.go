@@ -115,6 +115,11 @@ func ExampleInit_validationWithDefaultValues() {
 		Optional()
 
 	ferrite.
+		URL("FERRITE_URL", "example URL").
+		WithDefault("https://example.org").
+		Required()
+
+	ferrite.
 		String("FERRITE_XTRIGGER", "trigger failure").
 		Required()
 
@@ -123,15 +128,16 @@ func ExampleInit_validationWithDefaultValues() {
 	// Output:
 	// Environment Variables:
 	//
-	//    FERRITE_BOOL              example bool                           [ true | false ] = true          ✓ using default value
-	//    FERRITE_DURATION          example duration                       [ 1ns ... ] = 10s                ✓ using default value
-	//    FERRITE_ENUM              example enum                           [ foo | bar | baz ] = bar        ✓ using default value
-	//    FERRITE_NUM_SIGNED        example signed integer                 [ <int16> ] = -123               ✓ using default value
-	//    FERRITE_NUM_UNSIGNED      example unsigned integer               [ <uint16> ] = 123               ✓ using default value
-	//    FERRITE_STRING            example string                         [ <string> ] = 'hello, world!'   ✓ using default value
-	//    FERRITE_SVC_SERVICE_HOST  kubernetes "ferrite-svc" service host  [ <string> ] = host.example.org  ✓ using default value
-	//    FERRITE_SVC_SERVICE_PORT  kubernetes "ferrite-svc" service port  [ <string> ] = 443               ✓ using default value
-	//  ❯ FERRITE_XTRIGGER          trigger failure                          <string>                       ✗ undefined
+	//    FERRITE_BOOL              example bool                           [ true | false ] = true             ✓ using default value
+	//    FERRITE_DURATION          example duration                       [ 1ns ... ] = 10s                   ✓ using default value
+	//    FERRITE_ENUM              example enum                           [ foo | bar | baz ] = bar           ✓ using default value
+	//    FERRITE_NUM_SIGNED        example signed integer                 [ <int16> ] = -123                  ✓ using default value
+	//    FERRITE_NUM_UNSIGNED      example unsigned integer               [ <uint16> ] = 123                  ✓ using default value
+	//    FERRITE_STRING            example string                         [ <string> ] = 'hello, world!'      ✓ using default value
+	//    FERRITE_SVC_SERVICE_HOST  kubernetes "ferrite-svc" service host  [ <string> ] = host.example.org     ✓ using default value
+	//    FERRITE_SVC_SERVICE_PORT  kubernetes "ferrite-svc" service port  [ <string> ] = 443                  ✓ using default value
+	//    FERRITE_URL               example URL                            [ <string> ] = https://example.org  ✓ using default value
+	//  ❯ FERRITE_XTRIGGER          trigger failure                          <string>                          ✗ undefined
 }
 
 func ExampleInit_validationWithOptionalValues() {
@@ -168,6 +174,10 @@ func ExampleInit_validationWithOptionalValues() {
 		Optional()
 
 	ferrite.
+		URL("FERRITE_URL", "example URL").
+		Optional()
+
+	ferrite.
 		String("FERRITE_XTRIGGER", "trigger failure").
 		Required()
 
@@ -184,6 +194,7 @@ func ExampleInit_validationWithOptionalValues() {
 	//    FERRITE_STRING            example string                         [ <string> ]         • undefined
 	//    FERRITE_SVC_SERVICE_HOST  kubernetes "ferrite-svc" service host  [ <string> ]         • undefined
 	//    FERRITE_SVC_SERVICE_PORT  kubernetes "ferrite-svc" service port  [ <string> ]         • undefined
+	//    FERRITE_URL               example URL                            [ <string> ]         • undefined
 	//  ❯ FERRITE_XTRIGGER          trigger failure                          <string>           ✗ undefined
 }
 
@@ -250,6 +261,11 @@ func ExampleInit_validationWithInvalidValues() {
 		KubernetesService("ferrite-svc").
 		Required()
 
+	os.Setenv("FERRITE_URL", "/relative/path")
+	ferrite.
+		URL("FERRITE_URL", "example URL").
+		Required()
+
 	ferrite.Init()
 
 	// Output:
@@ -263,4 +279,5 @@ func ExampleInit_validationWithInvalidValues() {
 	//  ❯ FERRITE_STRING            example string                           <string>           ✗ undefined
 	//  ❯ FERRITE_SVC_SERVICE_HOST  kubernetes "ferrite-svc" service host    <string>           ✗ set to .local, host must not begin or end with a dot
 	//  ❯ FERRITE_SVC_SERVICE_PORT  kubernetes "ferrite-svc" service port    <string>           ✗ set to https-, IANA service name must not begin or end with a hyphen
+	//  ❯ FERRITE_URL               example URL                              <string>           ✗ set to /relative/path, URL must have a scheme
 }
