@@ -29,71 +29,88 @@ type Optional[T any] interface {
 	Value() (T, bool)
 }
 
-// requiredVar is a simple implementation of Required[T] that obtains the value
-// from a single environment variable of the same type.
-type requiredVar[T any] struct {
-	v *variable.OfType[T]
-}
-
-func (r requiredVar[T]) Value() T {
-	n, ok, err := r.v.NativeValue()
-	if err != nil {
-		panic(err.Error())
-	}
-	if !ok {
-		panic(undefinedError(r.v).Error())
-	}
-
-	return n
-}
-
-// requiredFunc is an implementation of Required[T] that obtains the value
-// from an arbitrary function.
-type requiredFunc[T any] struct {
-	fn func() (T, error)
-}
-
-func (r requiredFunc[T]) Value() T {
-	n, err := r.fn()
-	if err != nil {
-		panic(err.Error())
-	}
-	return n
-}
-
-// optionalVar is a simple implementation of Optional[T] that obtains the value
-// from a single environment variable of the same type.
-type optionalVar[T any] struct {
-	v *variable.OfType[T]
-}
-
-func (o optionalVar[T]) Value() (v T, ok bool) {
-	n, ok, err := o.v.NativeValue()
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return n, ok
-}
-
-// optionalFunc is an implementation of Optional[T] that obtains the value
-// from an arbitrary function.
-type optionalFunc[T any] struct {
-	fn func() (T, bool, error)
-}
-
-func (r optionalFunc[T]) Value() (T, bool) {
-	n, ok, err := r.fn()
-	if err != nil {
-		panic(err.Error())
-	}
-	return n, ok
-}
-
 // undefinedError returns an error that indicates that a variable is undefined.
 func undefinedError(v variable.Any) error {
 	return fmt.Errorf(
 		"%s is undefined and does not have a default value",
 		v.Spec().Name(),
 	)
+}
+
+func requiredOne[T any](
+	v *variable.OfType[T],
+) Required[T] {
+	return required[T]{
+		vars: []variable.Any{v},
+		fn: func() (T, error) {
+			n, ok, err := v.NativeValue()
+			if ok || err != nil {
+				return n, err
+			}
+			return n, undefinedError(v)
+		},
+	}
+}
+
+func optionalOne[T any](
+	v *variable.OfType[T],
+) Optional[T] {
+	return optional[T]{
+		vars: []variable.Any{v},
+		fn: func() (T, bool, error) {
+			return v.NativeValue()
+		},
+	}
+}
+
+func requiredMany[T any](
+	fn func() (T, error),
+	vars ...variable.Any,
+) Required[T] {
+	return required[T]{fn, vars}
+}
+
+func optionalMany[T any](
+	fn func() (T, bool, error),
+	vars ...variable.Any,
+) Optional[T] {
+	return optional[T]{fn, vars}
+}
+
+// required is an implementation of Required[T] that obtains the value
+// from an arbitrary function.
+type required[T any] struct {
+	fn   func() (T, error)
+	vars []variable.Any
+}
+
+func (d required[T]) Value() T {
+	n, err := d.fn()
+	if err != nil {
+		panic(err.Error())
+	}
+	return n
+}
+
+func (d required[T]) variables() []variable.Any {
+	return d.vars
+}
+
+// optional is an implementation of Optional[T] that obtains the value from an
+// arbitrary function.
+type optional[T any] struct {
+	fn   func() (T, bool, error)
+	vars []variable.Any
+}
+
+func (d optional[T]) Value() (T, bool) {
+	n, ok, err := d.fn()
+	if err != nil {
+		panic(err.Error())
+	}
+	return n, ok
+}
+
+func (d optional[T]) variables() []variable.Any {
+	return d.vars
 }

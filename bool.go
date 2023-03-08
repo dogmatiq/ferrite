@@ -56,16 +56,16 @@ func (b *BoolBuilder[T]) WithDefault(v T) *BoolBuilder[T] {
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b *BoolBuilder[T]) Required(options ...variable.RegisterOption) Required[T] {
+func (b *BoolBuilder[T]) Required(options ...Option) Required[T] {
 	v := variable.Register(b.spec(true), options)
-	return requiredVar[T]{v}
+	return requiredOne(v)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b *BoolBuilder[T]) Optional(options ...variable.RegisterOption) Optional[T] {
+func (b *BoolBuilder[T]) Optional(options ...Option) Optional[T] {
 	v := variable.Register(b.spec(false), options)
-	return optionalVar[T]{v}
+	return optionalOne(v)
 }
 
 func (b *BoolBuilder[T]) spec(req bool) variable.TypedSpec[T] {

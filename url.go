@@ -68,16 +68,16 @@ func (b *URLBuilder) WithDefault(v string) *URLBuilder {
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b *URLBuilder) Required(options ...variable.RegisterOption) Required[*url.URL] {
+func (b *URLBuilder) Required(options ...Option) Required[*url.URL] {
 	v := variable.Register(b.spec(true), options)
-	return requiredVar[*url.URL]{v}
+	return requiredOne(v)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b *URLBuilder) Optional(options ...variable.RegisterOption) Optional[*url.URL] {
+func (b *URLBuilder) Optional(options ...Option) Optional[*url.URL] {
 	v := variable.Register(b.spec(false), options)
-	return optionalVar[*url.URL]{v}
+	return optionalOne(v)
 
 }
 

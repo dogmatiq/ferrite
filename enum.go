@@ -83,17 +83,17 @@ func (b *EnumBuilder[T]) WithDefault(v T) *EnumBuilder[T] {
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b *EnumBuilder[T]) Required(options ...variable.RegisterOption) Required[T] {
+func (b *EnumBuilder[T]) Required(options ...Option) Required[T] {
 	v := variable.Register(b.spec(true), options)
-	return requiredVar[T]{v}
+	return requiredOne(v)
 
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b *EnumBuilder[T]) Optional(options ...variable.RegisterOption) Optional[T] {
+func (b *EnumBuilder[T]) Optional(options ...Option) Optional[T] {
 	v := variable.Register(b.spec(false), options)
-	return optionalVar[T]{v}
+	return optionalOne(v)
 
 }
 
