@@ -87,15 +87,21 @@ func (b *EnumBuilder[T]) WithDefault(v T) *EnumBuilder[T] {
 // Ferrite's validation system.
 func (b *EnumBuilder[T]) Required(options ...Option) Required[T] {
 	b.spec.MarkRequired()
-	v := b.spec.Done(b.schema, options)
-	return requiredOne(v)
-
+	return requiredOne(
+		variable.Register(
+			b.spec.Done(b.schema),
+			options,
+		),
+	)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *EnumBuilder[T]) Optional(options ...Option) Optional[T] {
-	v := b.spec.Done(b.schema, options)
-	return optionalOne(v)
-
+	return optionalOne(
+		variable.Register(
+			b.spec.Done(b.schema),
+			options,
+		),
+	)
 }

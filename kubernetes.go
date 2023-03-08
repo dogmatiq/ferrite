@@ -151,10 +151,16 @@ func (b *KubernetesServiceBuilder) WithDefault(host, port string) *KubernetesSer
 // Ferrite's validation system.
 func (b *KubernetesServiceBuilder) Required(options ...Option) Required[KubernetesAddress] {
 	b.hostSpec.MarkRequired()
-	b.portSpec.MarkRequired()
+	host := variable.Register(
+		b.hostSpec.Done(b.hostSchema),
+		options,
+	)
 
-	host := b.hostSpec.Done(b.hostSchema, options)
-	port := b.portSpec.Done(b.portSchema, options)
+	b.portSpec.MarkRequired()
+	port := variable.Register(
+		b.portSpec.Done(b.portSchema),
+		options,
+	)
 
 	return requiredMany(
 		func() (KubernetesAddress, error) {
@@ -186,8 +192,15 @@ func (b *KubernetesServiceBuilder) Required(options ...Option) Required[Kubernet
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *KubernetesServiceBuilder) Optional(options ...Option) Optional[KubernetesAddress] {
-	host := b.hostSpec.Done(b.hostSchema, options)
-	port := b.portSpec.Done(b.portSchema, options)
+	host := variable.Register(
+		b.hostSpec.Done(b.hostSchema),
+		options,
+	)
+
+	port := variable.Register(
+		b.portSpec.Done(b.portSchema),
+		options,
+	)
 
 	return optionalMany(
 		func() (KubernetesAddress, bool, error) {

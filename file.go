@@ -37,16 +37,23 @@ func (b *FileBuilder) WithDefault(v string) *FileBuilder {
 // Ferrite's validation system.
 func (b *FileBuilder) Required(options ...Option) Required[FileName] {
 	b.spec.MarkRequired()
-	v := b.spec.Done(b.schema, options)
-	return requiredOne(v)
+	return requiredOne(
+		variable.Register(
+			b.spec.Done(b.schema),
+			options,
+		),
+	)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *FileBuilder) Optional(options ...Option) Optional[FileName] {
-	v := b.spec.Done(b.schema, options)
-	return optionalOne(v)
-
+	return optionalOne(
+		variable.Register(
+			b.spec.Done(b.schema),
+			options,
+		),
+	)
 }
 
 // FileName is the name of a file.

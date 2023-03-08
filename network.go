@@ -47,16 +47,23 @@ func (b *NetworkPortBuilder) WithDefault(v string) *NetworkPortBuilder {
 // Ferrite's validation system.
 func (b *NetworkPortBuilder) Required(options ...Option) Required[string] {
 	b.spec.MarkRequired()
-	v := b.spec.Done(b.schema, options)
-	return requiredOne(v)
+	return requiredOne(
+		variable.Register(
+			b.spec.Done(b.schema),
+			options,
+		),
+	)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *NetworkPortBuilder) Optional(options ...Option) Optional[string] {
-	v := b.spec.Done(b.schema, options)
-	return optionalOne(v)
-
+	return optionalOne(
+		variable.Register(
+			b.spec.Done(b.schema),
+			options,
+		),
+	)
 }
 
 // validateHost returns an error of port is not a valid numeric port or IANA

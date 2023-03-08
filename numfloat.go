@@ -75,17 +75,23 @@ func (b *FloatBuilder[T]) WithMaximum(v T) *FloatBuilder[T] {
 // Ferrite's validation system.
 func (b *FloatBuilder[T]) Required(options ...Option) Required[T] {
 	b.spec.MarkRequired()
-	v := b.spec.Done(b.schema, options)
-	return requiredOne(v)
-
+	return requiredOne(
+		variable.Register(
+			b.spec.Done(b.schema),
+			options,
+		),
+	)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *FloatBuilder[T]) Optional(options ...Option) Optional[T] {
-	v := b.spec.Done(b.schema, options)
-	return optionalOne(v)
-
+	return optionalOne(
+		variable.Register(
+			b.spec.Done(b.schema),
+			options,
+		),
+	)
 }
 
 type floatMarshaler[T constraints.Float] struct{}

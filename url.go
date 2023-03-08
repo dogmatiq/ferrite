@@ -71,16 +71,23 @@ func (b *URLBuilder) WithDefault(v string) *URLBuilder {
 // Ferrite's validation system.
 func (b *URLBuilder) Required(options ...Option) Required[*url.URL] {
 	b.spec.MarkRequired()
-	v := b.spec.Done(b.schema, options)
-	return requiredOne(v)
+	return requiredOne(
+		variable.Register(
+			b.spec.Done(b.schema),
+			options,
+		),
+	)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *URLBuilder) Optional(options ...Option) Optional[*url.URL] {
-	v := b.spec.Done(b.schema, options)
-	return optionalOne(v)
-
+	return optionalOne(
+		variable.Register(
+			b.spec.Done(b.schema),
+			options,
+		),
+	)
 }
 
 type urlMarshaler struct{}

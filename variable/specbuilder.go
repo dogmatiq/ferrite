@@ -94,20 +94,17 @@ func (b *SpecBuilder[T]) Documentation() DocumentationBuilder {
 }
 
 // Done builds the specification and registers the variable.
-func (b *SpecBuilder[T]) Done(
-	schema TypedSchema[T],
-	options []RegisterOption,
-) *OfType[T] {
+func (b *SpecBuilder[T]) Done(schema TypedSchema[T]) TypedSpec[T] {
 	b.spec.schema = schema
 
-	if err := b.finalizeSpec(); err != nil {
+	if err := b.finalize(); err != nil {
 		panic(err.Error())
 	}
 
-	return Register(b.spec, options)
+	return b.spec
 }
 
-func (b *SpecBuilder[T]) finalizeSpec() error {
+func (b *SpecBuilder[T]) finalize() error {
 	if b.spec.name == "" {
 		return SpecError{
 			cause: errors.New("variable name must not be empty"),
