@@ -39,7 +39,7 @@ func (b *SpecBuilder[T]) BuiltInConstraint(
 ) {
 	b.spec.constraints = append(
 		b.spec.constraints,
-		ConstraintFunc[T]{desc, false, fn},
+		constraint[T]{desc, false, fn},
 	)
 }
 
@@ -50,7 +50,7 @@ func (b *SpecBuilder[T]) UserConstraint(
 ) {
 	b.spec.constraints = append(
 		b.spec.constraints,
-		ConstraintFunc[T]{desc, true, fn},
+		constraint[T]{desc, true, fn},
 	)
 }
 
@@ -144,10 +144,76 @@ func (b *SpecBuilder[T]) finalizeSpec() error {
 		})
 	}
 
-	if err := addExamples(&b.spec, b.examples); err != nil {
+	if err := b.buildExamples(); err != nil {
 		return SpecError{
 			name:  b.spec.name,
 			cause: fmt.Errorf("example value: %w", err),
+		}
+	}
+
+	return nil
+}
+
+// buildExamples builds the examples for the spec from various sources.
+func (b *SpecBuilder[T]) buildExamples() error {
+	uniq := map[Literal]struct{}{}
+
+	// Add the examples provided directly to the builder.
+	for _, eg := range b.examples {
+		lit, err := b.spec.Marshal(eg.Native)
+		if err != nil {
+			return err
+		}
+
+		if _, ok := uniq[lit]; !ok {
+			uniq[lit] = struct{}{}
+			b.spec.examples = append(b.spec.examples, Example{
+				Canonical:   lit,
+				Description: eg.Description,
+				IsNormative: eg.IsNormative,
+				Source:      ExampleSourceSpecBuilder,
+			})
+		}
+	}
+
+	// Be conservative when generating examples if there are any explicitly
+	// provided examples or a default value, which are likely to be better
+	// examples.
+	conservative := len(b.examples) != 0 || !b.spec.def.IsEmpty()
+
+	// Generate examples from the schema and add each one only if it meets all
+	// of the constraints (and there is no existing example of the same value).
+	for _, eg := range b.spec.schema.Examples(conservative) {
+		if lit, err := b.spec.Marshal(eg.Native); err == nil {
+			if _, ok := uniq[lit]; !ok {
+				uniq[lit] = struct{}{}
+				b.spec.examples = append(b.spec.examples, Example{
+					Canonical:   lit,
+					Description: eg.Description,
+					IsNormative: eg.IsNormative,
+					Source:      ExampleSourceSchema,
+				})
+			}
+		}
+	}
+
+	// Prepend an example of the default value if there is no existing example
+	// of the same value.
+	if def, ok := b.spec.def.Get(); ok {
+		lit := def.Canonical()
+
+		if _, ok := uniq[lit]; !ok {
+			uniq[lit] = struct{}{}
+			b.spec.examples = append(
+				[]Example{
+					{
+						Canonical:   lit,
+						IsNormative: true,
+						Source:      ExampleSourceSpecDefault,
+					},
+				},
+				b.spec.examples...,
+			)
 		}
 	}
 

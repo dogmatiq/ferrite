@@ -58,5 +58,11 @@ type TypedSchema[T any] interface {
 	Marshaler[T]
 
 	// Examples returns a (possibly empty) set of examples of valid values.
-	Examples(hasOtherExamples bool) []TypedExample[T]
+	//
+	// If conservative is true, the schema should only return examples that
+	// are fairly likely to be meaningful to the application.
+	//
+	// If conservative is false, the schema should return as many examples
+	// as possible, even if they are not very likely to be meaningful.
+	Examples(conservative bool) []TypedExample[T]
 }

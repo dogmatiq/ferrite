@@ -11,9 +11,9 @@ const (
 	// as a minimum or maximum value.
 	ExampleSourceSchema
 
-	// ExampleSourceSpecOption indicates that the examples was supplied to the
-	// specification via an option.
-	ExampleSourceSpecOption
+	// ExampleSourceSpecBuilder indicates that the examples was supplied to the
+	// specification via a SpecBuilder.
+	ExampleSourceSpecBuilder
 
 	// ExampleSourceSpecDefault indicates that the example was generated from
 	// the default value of the variable.
@@ -33,36 +33,6 @@ type TypedExample[T any] struct {
 	Native      T
 	Description string
 	IsNormative bool
-}
-
-// WithNormativeExample is a TypedSpecOption that adds a "normative" example
-// value.
-//
-// A normative example is one that is meaningful in the context of the
-// variable's use.
-func WithNormativeExample[T any](v T, desc string) TypedSpecOption[T] {
-	return func(opts *specOptions[T]) error {
-		eg := TypedExample[T]{v, desc, true}
-		opts.Examples = append(opts.Examples, eg)
-		return nil
-	}
-}
-
-// WithNonNormativeExample is a TypedSpecOption that adds a "non-normative"
-// example value.
-//
-// A non-normative example is one that may not be meaningful in the context of
-// the variable's use, but is included for illustrative purposes.
-//
-// For example, a variable that represents a URL may have a non-normative
-// example of "https://example.org/path", even if the actual use-case for the
-// variable requires an "ftp" URL.
-func WithNonNormativeExample[T any](v T, desc string) TypedSpecOption[T] {
-	return func(opts *specOptions[T]) error {
-		eg := TypedExample[T]{v, desc, false}
-		opts.Examples = append(opts.Examples, eg)
-		return nil
-	}
 }
 
 // BestExample returns the heuristically "best" example to use for the given
@@ -111,85 +81,4 @@ func BestExample(spec Spec) Example {
 	}
 
 	return incumbent
-}
-
-// addExamples returns the complete set of examples to use for the given spec.
-//
-// It combines the examples provided by the user with the examples provided by
-// the variable's schema.
-func addExamples[T any](
-	spec *TypedSpec[T],
-	fromOptions []TypedExample[T],
-) error {
-	// Add the examples provided as options to the spec.
-	for _, eg := range fromOptions {
-		lit, err := spec.Marshal(eg.Native)
-		if err != nil {
-			return err
-		}
-
-		spec.examples = appendUniqueExample(spec.examples, Example{
-			Canonical:   lit,
-			Description: eg.Description,
-			IsNormative: eg.IsNormative,
-			Source:      ExampleSourceSpecOption,
-		})
-	}
-
-	hasOtherExamples := len(fromOptions) > 0 || !spec.def.IsEmpty()
-
-	// Generate examples from the schema and add each one only if it meets all
-	// of the constraints.
-	for _, eg := range spec.schema.Examples(hasOtherExamples) {
-		if lit, err := spec.Marshal(eg.Native); err == nil {
-			spec.examples = appendUniqueExample(spec.examples, Example{
-				Canonical:   lit,
-				Description: eg.Description,
-				IsNormative: eg.IsNormative,
-				Source:      ExampleSourceSchema,
-			})
-		}
-	}
-
-	// Add an example of the default value (if one is not already present).
-	if def, ok := spec.def.Get(); ok {
-		spec.examples = prependUniqueExample(spec.examples, Example{
-			Canonical:   def.Canonical(),
-			IsNormative: true,
-			Source:      ExampleSourceSpecDefault,
-		})
-	}
-
-	return nil
-}
-
-// appendUniqueExample appends eg to the examples only if there is no existing example
-// with the same value.
-func appendUniqueExample(examples []Example, eg Example) []Example {
-	if containsExample(examples, eg.Canonical) {
-		return examples
-	}
-
-	return append(examples, eg)
-}
-
-// prependUniqueExample prepends eg to the examples only if there is no existing
-// example with the same value.
-func prependUniqueExample(examples []Example, eg Example) []Example {
-	if containsExample(examples, eg.Canonical) {
-		return examples
-	}
-
-	return append([]Example{eg}, examples...)
-}
-
-// containsExample returns true if lit is one of the example values.
-func containsExample(examples []Example, lit Literal) bool {
-	for _, eg := range examples {
-		if eg.Canonical == lit {
-			return true
-		}
-	}
-
-	return false
 }

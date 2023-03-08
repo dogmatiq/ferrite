@@ -1,7 +1,6 @@
 package variable
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/dogmatiq/ferrite/maybe"
@@ -51,28 +50,6 @@ func IsDefault(s Spec, v Literal) bool {
 	return false
 }
 
-// TypedSpecOption is an option that changes the behavior of a spec.
-type TypedSpecOption[T any] func(*specOptions[T]) error
-
-// WithSensitiveContent returns an option that marks a variable as containing
-// sensitive information.
-//
-// The T type parameter is not meaningful, but is required in order to produce a
-// TypedSpecOption of the correct type.
-func WithSensitiveContent[T any]() TypedSpecOption[T] {
-	return func(o *specOptions[T]) error {
-		o.IsSensitive = true
-		return nil
-	}
-}
-
-type specOptions[T any] struct {
-	Constraints []TypedConstraint[T]
-	Examples    []TypedExample[T]
-	Docs        []Documentation
-	IsSensitive bool
-}
-
 // TypedSpec builds a specification for a variable depicted by type T.
 type TypedSpec[T any] struct {
 	name        string
@@ -84,76 +61,6 @@ type TypedSpec[T any] struct {
 	examples    []Example
 	docs        []Documentation
 	constraints []TypedConstraint[T]
-}
-
-// NewSpec returns a new specification.
-func NewSpec[T any, S TypedSchema[T]](
-	name, desc string,
-	def maybe.Value[T],
-	req bool,
-	schema S,
-	options ...TypedSpecOption[T],
-) (TypedSpec[T], error) {
-	if name == "" {
-		return TypedSpec[T]{}, SpecError{
-			cause: errors.New("variable name must not be empty"),
-		}
-	}
-
-	if desc == "" {
-		return TypedSpec[T]{}, SpecError{
-			name:  name,
-			cause: errors.New("variable description must not be empty"),
-		}
-	}
-
-	if err := schema.Finalize(); err != nil {
-		return TypedSpec[T]{}, SpecError{
-			name:  name,
-			cause: err,
-		}
-	}
-
-	var opts specOptions[T]
-	for _, opt := range options {
-		opt(&opts)
-	}
-
-	spec := TypedSpec[T]{
-		name:        name,
-		desc:        desc,
-		schema:      schema,
-		required:    req,
-		sensitive:   opts.IsSensitive,
-		constraints: opts.Constraints,
-	}
-
-	if v, ok := def.Get(); ok {
-		lit, err := spec.Marshal(v)
-		if err != nil {
-			return TypedSpec[T]{}, SpecError{
-				name:  name,
-				cause: fmt.Errorf("default value: %w", err),
-			}
-		}
-
-		spec.def = maybe.Some(valueOf[T]{
-			native:    v,
-			canonical: lit,
-			isDefault: true,
-		})
-	}
-
-	if err := addExamples(&spec, opts.Examples); err != nil {
-		return TypedSpec[T]{}, SpecError{
-			name:  name,
-			cause: fmt.Errorf("example value: %w", err),
-		}
-	}
-
-	spec.docs = opts.Docs
-
-	return spec, nil
 }
 
 // Name returns the name of the variable.

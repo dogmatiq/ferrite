@@ -132,7 +132,7 @@ func (s TypedNumeric[T]) Unmarshal(v Literal) (T, error) {
 }
 
 // Examples returns a (possibly empty) set of examples of valid values.
-func (s TypedNumeric[T]) Examples(hasOtherExamples bool) []TypedExample[T] {
+func (s TypedNumeric[T]) Examples(conservative bool) []TypedExample[T] {
 	var examples []TypedExample[T]
 
 	min, max := limits.Of[T]()
@@ -158,7 +158,7 @@ func (s TypedNumeric[T]) Examples(hasOtherExamples bool) []TypedExample[T] {
 		)
 	}
 
-	if !hasOtherExamples {
+	if !conservative {
 		// If there are no other examples we do a linear interpolation to find
 		// some values within the (min, max) range in an attempt to provide
 		// _something_ that might be useful.
