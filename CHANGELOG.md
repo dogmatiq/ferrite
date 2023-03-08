@@ -14,7 +14,8 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Added
 
-- Added `StringBuilder.WithSensitiveContent()`, which indicates that a string variable's contents may contain sensitive information
+- Added `Option` type
+- Added `Sensitive()` option, which indicates that a variable's contents may contain sensitive information
 
 ### Changed
 
@@ -25,6 +26,7 @@ actually alter the usage of the Ferrite API.
 - **[BC]** Change `NetworkPort()` to use the new `NetworkPortBuilder` instead of `StringBuilder`
 - **[BC]** Changed `Required[T]` and `Optional[T]` from structs to interfaces
 - **[BC]** Changed all "builder" types to use pointer receivers
+- **[BC]** `Require()` and `Optional()` methods on builders no longer accept `variable.RegisterOption` values
 
 ## [0.3.6] - 2023-03-06
 

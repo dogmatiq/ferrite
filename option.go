@@ -25,3 +25,12 @@ func applyOptions(
 
 	return registerOptions
 }
+
+// Sensitive is an Option that marks a variable as containing sensitive
+// information.
+func Sensitive() Option {
+	return func(spec variable.SpecBuilder) []variable.RegisterOption {
+		spec.MarkSensitive()
+		return nil
+	}
+}

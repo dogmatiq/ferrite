@@ -550,8 +550,10 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					String("PASSWORD", "a very secret password").
 					WithDefault("hunter2").
-					WithSensitiveContent().
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(
+						ferrite.Sensitive(),
+						variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)),
+					)
 			},
 		),
 		Entry(
@@ -560,8 +562,10 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					String("PASSWORD", "a very secret password").
-					WithSensitiveContent().
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(
+						ferrite.Sensitive(),
+						variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)),
+					)
 			},
 		),
 		Entry(
@@ -571,8 +575,10 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					String("PASSWORD", "a very secret password").
 					WithDefault("hunter2").
-					WithSensitiveContent().
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(
+						ferrite.Sensitive(),
+						variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)),
+					)
 			},
 		),
 		Entry(
@@ -581,8 +587,10 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					String("PASSWORD", "a very secret password").
-					WithSensitiveContent().
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(
+						ferrite.Sensitive(),
+						variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)),
+					)
 			},
 		),
 
