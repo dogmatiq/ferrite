@@ -18,13 +18,16 @@ import (
 //
 // Durations have a minimum value of 1 nanosecond by default.
 func Duration(name, desc string) *DurationBuilder {
-	b := &DurationBuilder{}
-	b.v.Init(name, desc)
+	b := &DurationBuilder{
+		schema: variable.TypedNumeric[time.Duration]{
+			Marshaler: durationMarshaler{},
+			NativeMin: maybe.Some(1 * time.Nanosecond),
+		},
+	}
 
-	b.v.Schema.Marshaler = durationMarshaler{}
-	b.v.Schema.NativeMin = maybe.Some(1 * time.Nanosecond)
-
-	b.v.Documentation("Duration syntax").
+	b.spec.Init(name, desc)
+	b.spec.
+		Documentation("Duration syntax").
 		Paragraph(
 			"Durations are specified as a sequence of decimal numbers, each with an optional fraction and a unit suffix, such as `300ms`, `-1.5h` or `2h45m`.",
 			"Supported time units are `ns`, `us` (or `µs`), `ms`, `s`, `m`, `h`.",
@@ -37,41 +40,42 @@ func Duration(name, desc string) *DurationBuilder {
 
 // DurationBuilder builds a specification for a duration variable.
 type DurationBuilder struct {
-	v variable.Builder[time.Duration, variable.TypedNumeric[time.Duration]]
+	schema variable.TypedNumeric[time.Duration]
+	spec   variable.Builder[time.Duration]
 }
 
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b *DurationBuilder) WithDefault(v time.Duration) *DurationBuilder {
-	b.v.Default(v)
+	b.spec.Default(v)
 	return b
 }
 
 // WithMinimum sets the minimum acceptable value of the variable.
 func (b *DurationBuilder) WithMinimum(v time.Duration) *DurationBuilder {
-	b.v.Schema.NativeMin = maybe.Some(v)
+	b.schema.NativeMin = maybe.Some(v)
 	return b
 }
 
 // WithMaximum sets the maximum acceptable value of the variable.
 func (b *DurationBuilder) WithMaximum(v time.Duration) *DurationBuilder {
-	b.v.Schema.NativeMax = maybe.Some(v)
+	b.schema.NativeMax = maybe.Some(v)
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *DurationBuilder) Required(options ...Option) Required[time.Duration] {
-	b.v.Required()
-	v := b.v.Done(options)
+	b.spec.MarkRequired()
+	v := b.spec.Done(b.schema, options)
 	return requiredOne(v)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *DurationBuilder) Optional(options ...Option) Optional[time.Duration] {
-	v := b.v.Done(options)
+	v := b.spec.Done(b.schema, options)
 	return optionalOne(v)
 }
 

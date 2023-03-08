@@ -32,7 +32,8 @@ func NetworkPort(name, desc string) *NetworkPortBuilder {
 
 // NetworkPortBuilder builds a specification for a network port variable.
 type NetworkPortBuilder struct {
-	v variable.Builder[string, variable.TypedString[string]]
+	schema variable.TypedString[string]
+	v      variable.Builder[string]
 }
 
 // WithDefault sets a default value of the variable.
@@ -46,15 +47,15 @@ func (b *NetworkPortBuilder) WithDefault(v string) *NetworkPortBuilder {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *NetworkPortBuilder) Required(options ...Option) Required[string] {
-	b.v.Required()
-	v := b.v.Done(options)
+	b.v.MarkRequired()
+	v := b.v.Done(b.schema, options)
 	return requiredOne(v)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *NetworkPortBuilder) Optional(options ...Option) Optional[string] {
-	v := b.v.Done(options)
+	v := b.v.Done(b.schema, options)
 	return optionalOne(v)
 
 }
@@ -142,8 +143,8 @@ var networkPortSyntaxDocumentation = variable.WithDocumentation[string]().
 	Format().
 	Done()
 
-func addNetworkPortSyntaxDocumentation[T any, S variable.TypedSchema[T]](v *variable.Builder[T, S]) {
-	v.
+func addNetworkPortSyntaxDocumentation(d variable.Documentable) {
+	d.
 		Documentation("Network port syntax").
 		Paragraph(
 			"Ports may be specified as a numeric value no greater than `65535`.",

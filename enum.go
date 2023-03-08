@@ -20,21 +20,25 @@ func Enum(name, desc string) *EnumBuilder[string] {
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
 func EnumAs[T any](name, desc string) *EnumBuilder[T] {
-	b := &EnumBuilder[T]{}
-	b.v.Init(name, desc)
-
-	b.v.Schema.ToLiteral = func(v T) variable.Literal {
-		return variable.Literal{
-			String: fmt.Sprint(v),
-		}
+	b := &EnumBuilder[T]{
+		schema: variable.TypedSet[T]{
+			ToLiteral: func(v T) variable.Literal {
+				return variable.Literal{
+					String: fmt.Sprint(v),
+				}
+			},
+		},
 	}
+
+	b.spec.Init(name, desc)
 
 	return b
 }
 
 // EnumBuilder is the specification for an enumeration.
 type EnumBuilder[T any] struct {
-	v variable.Builder[T, variable.TypedSet[T]]
+	schema variable.TypedSet[T]
+	spec   variable.Builder[T]
 }
 
 // WithMembers adds members to the enum.
@@ -53,8 +57,8 @@ func (b *EnumBuilder[T]) WithMembers(values ...T) *EnumBuilder[T] {
 // The environment variable must be set to the string representation of one of
 // the member values. v must not have an empty string representation.
 func (b *EnumBuilder[T]) WithMember(v T, desc string) *EnumBuilder[T] {
-	b.v.Schema.Members = append(
-		b.v.Schema.Members,
+	b.schema.Members = append(
+		b.schema.Members,
 		variable.SetMember[T]{
 			Value:       v,
 			Description: desc,
@@ -66,7 +70,7 @@ func (b *EnumBuilder[T]) WithMember(v T, desc string) *EnumBuilder[T] {
 // WithRenderer sets the function used to generate the literal string
 // representation of the enum's member values.
 func (b *EnumBuilder[T]) WithRenderer(fn func(T) variable.Literal) *EnumBuilder[T] {
-	b.v.Schema.ToLiteral = fn
+	b.schema.ToLiteral = fn
 	return b
 }
 
@@ -74,15 +78,15 @@ func (b *EnumBuilder[T]) WithRenderer(fn func(T) variable.Literal) *EnumBuilder[
 //
 // It is used when the environment variable is undefined or empty.
 func (b *EnumBuilder[T]) WithDefault(v T) *EnumBuilder[T] {
-	b.v.Default(v)
+	b.spec.Default(v)
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *EnumBuilder[T]) Required(options ...Option) Required[T] {
-	b.v.Required()
-	v := b.v.Done(options)
+	b.spec.MarkRequired()
+	v := b.spec.Done(b.schema, options)
 	return requiredOne(v)
 
 }
@@ -90,7 +94,7 @@ func (b *EnumBuilder[T]) Required(options ...Option) Required[T] {
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *EnumBuilder[T]) Optional(options ...Option) Optional[T] {
-	v := b.v.Done(options)
+	v := b.spec.Done(b.schema, options)
 	return optionalOne(v)
 
 }

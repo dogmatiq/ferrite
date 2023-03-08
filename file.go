@@ -21,7 +21,8 @@ func File(name, desc string) *FileBuilder {
 
 // FileBuilder builds a specification for a boolean value.
 type FileBuilder struct {
-	v variable.Builder[FileName, variable.TypedString[FileName]]
+	schema variable.TypedString[FileName]
+	v      variable.Builder[FileName]
 }
 
 // WithDefault sets a default value of the variable.
@@ -35,15 +36,15 @@ func (b *FileBuilder) WithDefault(v string) *FileBuilder {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *FileBuilder) Required(options ...Option) Required[FileName] {
-	b.v.Required()
-	v := b.v.Done(options)
+	b.v.MarkRequired()
+	v := b.v.Done(b.schema, options)
 	return requiredOne(v)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *FileBuilder) Optional(options ...Option) Optional[FileName] {
-	v := b.v.Done(options)
+	v := b.v.Done(b.schema, options)
 	return optionalOne(v)
 
 }

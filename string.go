@@ -25,7 +25,8 @@ func StringAs[T ~string](name, desc string) *StringBuilder[T] {
 
 // StringBuilder builds a specification for a string variable.
 type StringBuilder[T ~string] struct {
-	v variable.Builder[T, variable.TypedString[T]]
+	schema variable.TypedString[T]
+	v      variable.Builder[T]
 }
 
 // WithDefault sets a default value of the variable.
@@ -57,22 +58,22 @@ func (b *StringBuilder[T]) WithConstraintFunc(
 // Sensitive values are redacted in console output and excluded from examples in
 // generated documentation.
 func (b *StringBuilder[T]) WithSensitiveContent() *StringBuilder[T] {
-	b.v.Sensitive()
+	b.v.MarkSensitive()
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *StringBuilder[T]) Required(options ...Option) Required[T] {
-	b.v.Required()
-	v := b.v.Done(options)
+	b.v.MarkRequired()
+	v := b.v.Done(b.schema, options)
 	return requiredOne(v)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *StringBuilder[T]) Optional(options ...Option) Optional[T] {
-	v := b.v.Done(options)
+	v := b.v.Done(b.schema, options)
 	return optionalOne(v)
 
 }
