@@ -4,16 +4,16 @@ import (
 	"strings"
 
 	"github.com/rivo/uniseg"
-	_ "github.com/rivo/uniseg" // keep
 )
 
 type pos struct {
-	index   int
-	columns int
+	index int
+	width int
 }
 
-// Wrap wraps text to lines to fit within a the given column width.
-func Wrap(text string, columns int) []string {
+// Wrap wraps text at unicode grapheme boundaries such that it fits within the
+// specified maximum column width.
+func Wrap(text string, width int) []string {
 	var (
 		// wrapped is a slice containing each line of text, after wrapping.
 		wrapped []string
@@ -41,46 +41,45 @@ func Wrap(text string, columns int) []string {
 		state = -1
 	)
 
-	// flush writes the a line of text to the wrapped slice, if it is not empty.
-	//
-	// next is the position within the text at which the next line should start.
-	flush := func(next pos) {
+	// wrap writes the a line of text to the wrapped slice, if it is not empty.
+	wrap := func() {
 		if lower != upper {
-			wrapped = append(
-				wrapped,
-				strings.TrimSpace(
-					text[lower.index:next.index],
-				),
-			)
-
-			lower = next
-			mid = lower
+			line := text[lower.index:mid.index]
+			lower = mid
+			wrapped = append(wrapped, strings.TrimSpace(line))
 		}
 	}
 
 	for len(remaining) > 0 {
 		cluster, remaining, boundaries, state = uniseg.Step(remaining, state)
 
+		clusterWidth := boundaries >> uniseg.ShiftWidth
+
 		upper.index += len(cluster)
-		upper.columns += boundaries >> uniseg.ShiftWidth
+		upper.width += clusterWidth
 
-		needsBreak := upper.columns-lower.columns >= columns
-		canBreak := lower.index < mid.index
-
-		if needsBreak && canBreak {
-			flush(mid)
-			continue
-		}
+		lineWidth := upper.width - lower.width
+		wrapNeeded := lineWidth > width
+		wrapPossible := lower.index < mid.index
 
 		switch boundaries & uniseg.MaskLine {
 		case uniseg.LineCanBreak:
 			mid = upper
+			wrapPossible = true
 		case uniseg.LineMustBreak:
-			flush(upper)
+			mid = upper
+			wrapNeeded = true
+			wrapPossible = true
 		}
+
+		if wrapNeeded && wrapPossible {
+			wrap()
+		}
+
 	}
 
-	flush(upper)
+	// Add any remaining text as the last line.
+	wrap()
 
 	return wrapped
 }

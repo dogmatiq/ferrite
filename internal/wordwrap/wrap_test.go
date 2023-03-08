@@ -89,6 +89,14 @@ var _ = Describe("func Wrap()", func() {
 			},
 		),
 		Entry(
+			"multi-line, wrapping exactly at max columns",
+			"The `DEBUG` variable **MAY** be left undefined. Otherwise, the value **MUST** be either `true` or `false`.",
+			[]string{
+				"The `DEBUG` variable **MAY** be left undefined. Otherwise, the value **MUST** be",
+				"either `true` or `false`.",
+			},
+		),
+		Entry(
 			"explicit newlines",
 			"foo\nbar",
 			[]string{

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/dogmatiq/ferrite/internal/wordwrap"
 	"github.com/dogmatiq/ferrite/variable"
 	"gopkg.in/yaml.v3"
 )
@@ -64,34 +65,15 @@ func (r *renderer) line(f string, v ...any) {
 }
 
 func (r *renderer) paragraph(text ...string) func(...any) {
-	r.gap()
-
 	return func(v ...any) {
-		r.paragraphDeprecated(fmt.Sprintf(strings.Join(text, " "), v...))
-	}
-}
+		text := fmt.Sprintf(strings.Join(text, " "), v...)
 
-func (r *renderer) paragraphDeprecated(text ...string) {
-	const width = 80
-
-	t := strings.Join(text, " ")
-
-	for len(t) > width {
-		for i := width; i >= 0; i-- {
-			if t[i] == ' ' {
-				r.w.WriteString(t[:i])
-				r.w.WriteByte('\n')
-				t = t[i+1:]
-				break
-			}
+		r.gap()
+		for _, l := range wordwrap.Wrap(text, 80) {
+			r.w.WriteString(l)
+			r.w.WriteByte('\n')
 		}
 	}
-
-	r.w.WriteString(t)
-	r.w.WriteByte('\n')
-
-	return
-
 }
 
 func (r *renderer) yaml(v string) string {
