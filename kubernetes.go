@@ -102,7 +102,7 @@ func (b KubernetesServiceBuilder) Required(options ...variable.RegisterOption) R
 	host := variable.Register(b.hostSpec(true), options)
 	port := variable.Register(b.portSpec(true), options)
 
-	return Required[KubernetesAddress]{
+	return requiredFunc[KubernetesAddress]{
 		func() (KubernetesAddress, error) {
 			h, ok, err := host.NativeValue()
 			if err != nil {
@@ -133,7 +133,7 @@ func (b KubernetesServiceBuilder) Optional(options ...variable.RegisterOption) O
 	host := variable.Register(b.hostSpec(false), options)
 	port := variable.Register(b.portSpec(false), options)
 
-	return Optional[KubernetesAddress]{
+	return optionalFunc[KubernetesAddress]{
 		func() (KubernetesAddress, bool, error) {
 			h, hostOk, err := host.NativeValue()
 			if err != nil {

@@ -54,13 +54,15 @@ func (b DurationBuilder) WithMaximum(v time.Duration) DurationBuilder {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b DurationBuilder) Required(options ...variable.RegisterOption) Required[time.Duration] {
-	return registerRequired(b.spec(true), options)
+	v := variable.Register(b.spec(true), options)
+	return requiredVar[time.Duration]{v}
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b DurationBuilder) Optional(options ...variable.RegisterOption) Optional[time.Duration] {
-	return registerOptional(b.spec(false), options)
+	v := variable.Register(b.spec(false), options)
+	return optionalVar[time.Duration]{v}
 }
 
 func (b DurationBuilder) spec(req bool) variable.TypedSpec[time.Duration] {

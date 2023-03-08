@@ -54,13 +54,16 @@ func (b NetworkPortBuilder) WithDefault(v string) NetworkPortBuilder {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b NetworkPortBuilder) Required(options ...variable.RegisterOption) Required[string] {
-	return registerRequired(b.spec(true), options)
+	v := variable.Register(b.spec(true), options)
+	return requiredVar[string]{v}
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b NetworkPortBuilder) Optional(options ...variable.RegisterOption) Optional[string] {
-	return registerOptional(b.spec(false), options)
+	v := variable.Register(b.spec(false), options)
+	return optionalVar[string]{v}
+
 }
 
 func (b NetworkPortBuilder) spec(req bool) variable.TypedSpec[string] {

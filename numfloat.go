@@ -49,13 +49,17 @@ func (b FloatBuilder[T]) WithMaximum(v T) FloatBuilder[T] {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b FloatBuilder[T]) Required(options ...variable.RegisterOption) Required[T] {
-	return registerRequired(b.spec(true), options)
+	v := variable.Register(b.spec(true), options)
+	return requiredVar[T]{v}
+
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b FloatBuilder[T]) Optional(options ...variable.RegisterOption) Optional[T] {
-	return registerOptional(b.spec(false), options)
+	v := variable.Register(b.spec(false), options)
+	return optionalVar[T]{v}
+
 }
 
 func (b FloatBuilder[T]) spec(req bool) variable.TypedSpec[T] {

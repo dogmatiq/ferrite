@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog], and this project adheres to
 ### Changed
 
 - **[BC]** Change `NetworkPort()` to use the new `NetworkPortBuilder` instead of `StringBuilder`
+- **[BC]** `Required[T]` and `Optional[T]` are now interfaces, this is technically not backwards compatable but should not affect normal usage
 
 ## [0.3.6] - 2023-03-06
 

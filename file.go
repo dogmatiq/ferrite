@@ -37,13 +37,16 @@ func (b FileBuilder) WithDefault(v string) FileBuilder {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b FileBuilder) Required(options ...variable.RegisterOption) Required[FileName] {
-	return registerRequired(b.spec(true), options)
+	v := variable.Register(b.spec(true), options)
+	return requiredVar[FileName]{v}
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b FileBuilder) Optional(options ...variable.RegisterOption) Optional[FileName] {
-	return registerOptional(b.spec(false), options)
+	v := variable.Register(b.spec(false), options)
+	return optionalVar[FileName]{v}
+
 }
 
 func (b FileBuilder) spec(req bool) variable.TypedSpec[FileName] {
