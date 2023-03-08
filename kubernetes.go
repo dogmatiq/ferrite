@@ -162,7 +162,8 @@ func (b *KubernetesServiceBuilder) Required(options ...Option) Required[Kubernet
 		options,
 	)
 
-	return requiredMany(
+	return required[KubernetesAddress]{
+		[]variable.Any{host, port},
 		func() (KubernetesAddress, error) {
 			h, ok, err := host.NativeValue()
 			if err != nil {
@@ -184,9 +185,7 @@ func (b *KubernetesServiceBuilder) Required(options ...Option) Required[Kubernet
 
 			return KubernetesAddress{h, p}, nil
 		},
-		host,
-		port,
-	)
+	}
 }
 
 // Optional completes the build process and registers an optional variable with
@@ -202,7 +201,8 @@ func (b *KubernetesServiceBuilder) Optional(options ...Option) Optional[Kubernet
 		options,
 	)
 
-	return optionalMany(
+	return optional[KubernetesAddress]{
+		[]variable.Any{host, port},
 		func() (KubernetesAddress, bool, error) {
 			h, hostOk, err := host.NativeValue()
 			if err != nil {
@@ -236,9 +236,7 @@ func (b *KubernetesServiceBuilder) Optional(options ...Option) Optional[Kubernet
 
 			return KubernetesAddress{}, false, nil
 		},
-		host,
-		port,
-	)
+	}
 }
 
 // kubernetesNameToEnv converts a kubernetes resource name to an environment variable

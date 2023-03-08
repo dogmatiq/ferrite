@@ -2,24 +2,21 @@ package ferrite
 
 import "github.com/dogmatiq/ferrite/variable"
 
-// An Option changes the behavior of a variable. Options are applicable to all
-// variable types.
-type Option = variable.RegisterOption
+// An Option changes the behavior of an environment variable specification.
+//
+// Options are used to configure aspects of the variable that are non specific
+// to its type.
+type Option = variable.RegisterOption //func(*optionsX)
 
-// (*options)
+type optionsX struct {
+	RegisterOptions []variable.RegisterOption
+}
 
-// type options struct {
-// 	SpecOptions     []variable.TypedSpecOption
-// 	RegisterOptions []variable.RegisterOption
-// }
-
-// // WithRegistry is an option that sets the registry that an environment variable
-// // specification is placed into.
-// func WithRegistry(r *variable.Registry) Option {
-// 	return func(o *options) {
-// 		o.RegisterOptions = append(
-// 			o.RegisterOptions,
-// 			variable.WithRegistry(r),
-// 		)
-// 	}
-// }
+func resolveOptions(options []Option) optionsX {
+	var opts optionsX
+	opts.RegisterOptions = options
+	// for _, opt := range options {
+	// 	opt(&opts)
+	// }
+	return opts
+}

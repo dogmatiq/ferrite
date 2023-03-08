@@ -37,12 +37,25 @@ func undefinedError(v variable.Any) error {
 	)
 }
 
-func requiredOne[T any](
-	v *variable.OfType[T],
+// req is a convenience function that registers and returns a required[T] that
+// maps one-to-one with an environment variable of the same type.
+func req[T any, S variable.TypedSchema[T]](
+	schema S,
+	spec variable.SpecBuilder[T],
+	options []Option,
 ) Required[T] {
+	spec.MarkRequired()
+
+	opts := resolveOptions(options)
+
+	v := variable.Register(
+		spec.Done(schema),
+		opts.RegisterOptions,
+	)
+
 	return required[T]{
-		vars: []variable.Any{v},
-		fn: func() (T, error) {
+		[]variable.Any{v},
+		func() (T, error) {
 			n, ok, err := v.NativeValue()
 			if ok || err != nil {
 				return n, err
@@ -52,36 +65,33 @@ func requiredOne[T any](
 	}
 }
 
-func optionalOne[T any](
-	v *variable.OfType[T],
+// opt is a convenience function that registers and returns a required[T] that
+// maps one-to-one with an environment variable of the same type.
+func opt[T any, S variable.TypedSchema[T]](
+	schema S,
+	spec variable.SpecBuilder[T],
+	options []Option,
 ) Optional[T] {
+	opts := resolveOptions(options)
+
+	v := variable.Register(
+		spec.Done(schema),
+		opts.RegisterOptions,
+	)
+
 	return optional[T]{
-		vars: []variable.Any{v},
-		fn: func() (T, bool, error) {
+		[]variable.Any{v},
+		func() (T, bool, error) {
 			return v.NativeValue()
 		},
 	}
 }
 
-func requiredMany[T any](
-	fn func() (T, error),
-	vars ...variable.Any,
-) Required[T] {
-	return required[T]{fn, vars}
-}
-
-func optionalMany[T any](
-	fn func() (T, bool, error),
-	vars ...variable.Any,
-) Optional[T] {
-	return optional[T]{fn, vars}
-}
-
 // required is an implementation of Required[T] that obtains the value
 // from an arbitrary function.
 type required[T any] struct {
-	fn   func() (T, error)
 	vars []variable.Any
+	fn   func() (T, error)
 }
 
 func (d required[T]) Value() T {
@@ -99,8 +109,8 @@ func (d required[T]) variables() []variable.Any {
 // optional is an implementation of Optional[T] that obtains the value from an
 // arbitrary function.
 type optional[T any] struct {
-	fn   func() (T, bool, error)
 	vars []variable.Any
+	fn   func() (T, bool, error)
 }
 
 func (d optional[T]) Value() (T, bool) {

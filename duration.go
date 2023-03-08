@@ -68,24 +68,13 @@ func (b *DurationBuilder) WithMaximum(v time.Duration) *DurationBuilder {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *DurationBuilder) Required(options ...Option) Required[time.Duration] {
-	b.spec.MarkRequired()
-	return requiredOne(
-		variable.Register(
-			b.spec.Done(b.schema),
-			options,
-		),
-	)
+	return req(b.schema, b.spec, options)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *DurationBuilder) Optional(options ...Option) Optional[time.Duration] {
-	return optionalOne(
-		variable.Register(
-			b.spec.Done(b.schema),
-			options,
-		),
-	)
+	return opt(b.schema, b.spec, options)
 }
 
 type durationMarshaler struct{}
