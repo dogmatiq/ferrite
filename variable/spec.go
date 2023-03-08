@@ -51,15 +51,15 @@ func IsDefault(s Spec, v Literal) bool {
 	return false
 }
 
-// SpecOption is an option that changes the behavior of a spec.
-type SpecOption[T any] func(*specOptions[T]) error
+// TypedSpecOption is an option that changes the behavior of a spec.
+type TypedSpecOption[T any] func(*specOptions[T]) error
 
 // WithSensitiveContent returns an option that marks a variable as containing
 // sensitive information.
 //
 // The T type parameter is not meaningful, but is required in order to produce a
-// SpecOption of the correct type.
-func WithSensitiveContent[T any]() SpecOption[T] {
+// TypedSpecOption of the correct type.
+func WithSensitiveContent[T any]() TypedSpecOption[T] {
 	return func(o *specOptions[T]) error {
 		o.IsSensitive = true
 		return nil
@@ -92,7 +92,7 @@ func NewSpec[T any, S TypedSchema[T]](
 	def maybe.Value[T],
 	req bool,
 	schema S,
-	options ...SpecOption[T],
+	options ...TypedSpecOption[T],
 ) (TypedSpec[T], error) {
 	if name == "" {
 		return TypedSpec[T]{}, SpecError{

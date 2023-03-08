@@ -16,7 +16,7 @@ func NetworkPort(name, desc string) *NetworkPortBuilder {
 	return &NetworkPortBuilder{
 		name: name,
 		desc: desc,
-		options: []variable.SpecOption[string]{
+		options: []variable.TypedSpecOption[string]{
 			variable.WithConstraint(
 				"**MUST** be a valid network port",
 				func(v string) variable.ConstraintError {
@@ -40,7 +40,7 @@ func NetworkPort(name, desc string) *NetworkPortBuilder {
 type NetworkPortBuilder struct {
 	name, desc string
 	def        maybe.Value[string]
-	options    []variable.SpecOption[string]
+	options    []variable.TypedSpecOption[string]
 }
 
 // WithDefault sets a default value of the variable.

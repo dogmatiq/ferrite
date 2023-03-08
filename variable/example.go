@@ -12,7 +12,7 @@ const (
 	ExampleSourceSchema
 
 	// ExampleSourceSpecOption indicates that the examples was supplied to the
-	// specification via a SpecOption.
+	// specification via an option.
 	ExampleSourceSpecOption
 
 	// ExampleSourceSpecDefault indicates that the example was generated from
@@ -35,11 +35,12 @@ type TypedExample[T any] struct {
 	IsNormative bool
 }
 
-// WithNormativeExample is a SpecOption that adds a "normative" example value.
+// WithNormativeExample is a TypedSpecOption that adds a "normative" example
+// value.
 //
 // A normative example is one that is meaningful in the context of the
 // variable's use.
-func WithNormativeExample[T any](v T, desc string) SpecOption[T] {
+func WithNormativeExample[T any](v T, desc string) TypedSpecOption[T] {
 	return func(opts *specOptions[T]) error {
 		eg := TypedExample[T]{v, desc, true}
 		opts.Examples = append(opts.Examples, eg)
@@ -47,8 +48,8 @@ func WithNormativeExample[T any](v T, desc string) SpecOption[T] {
 	}
 }
 
-// WithNonNormativeExample is a SpecOption that adds a "non-normative" example
-// value.
+// WithNonNormativeExample is a TypedSpecOption that adds a "non-normative"
+// example value.
 //
 // A non-normative example is one that may not be meaningful in the context of
 // the variable's use, but is included for illustrative purposes.
@@ -56,7 +57,7 @@ func WithNormativeExample[T any](v T, desc string) SpecOption[T] {
 // For example, a variable that represents a URL may have a non-normative
 // example of "https://example.org/path", even if the actual use-case for the
 // variable requires an "ftp" URL.
-func WithNonNormativeExample[T any](v T, desc string) SpecOption[T] {
+func WithNonNormativeExample[T any](v T, desc string) TypedSpecOption[T] {
 	return func(opts *specOptions[T]) error {
 		eg := TypedExample[T]{v, desc, false}
 		opts.Examples = append(opts.Examples, eg)

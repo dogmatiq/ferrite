@@ -18,7 +18,7 @@ func URL(name, desc string) *URLBuilder {
 	return &URLBuilder{
 		name: name,
 		desc: desc,
-		options: []variable.SpecOption[*url.URL]{
+		options: []variable.TypedSpecOption[*url.URL]{
 			variable.WithConstraint(
 				"**MUST** be a fully-qualified URL",
 				func(v *url.URL) variable.ConstraintError {
@@ -54,7 +54,7 @@ func URL(name, desc string) *URLBuilder {
 type URLBuilder struct {
 	name, desc string
 	def        maybe.Value[*url.URL]
-	options    []variable.SpecOption[*url.URL]
+	options    []variable.TypedSpecOption[*url.URL]
 }
 
 // WithDefault sets a default value of the variable.

@@ -35,7 +35,7 @@ type DocumentationBuilder[T any] struct {
 // documentation about a variable.
 //
 // The T type parameter is not meaningful, but is required in order to produce a
-// SpecOption of the correct type.
+// TypedSpecOption of the correct type.
 func WithDocumentation[T any]() DocumentationBuilder[T] {
 	return DocumentationBuilder[T]{}
 }
@@ -79,7 +79,7 @@ func (b DocumentationBuilder[T]) Important() DocumentationBuilder[T] {
 }
 
 // Done returns an option that adds the documentation to the variable spec.
-func (b DocumentationBuilder[T]) Done() SpecOption[T] {
+func (b DocumentationBuilder[T]) Done() TypedSpecOption[T] {
 	return func(opts *specOptions[T]) error {
 		opts.Docs = append(opts.Docs, b.doc)
 		return nil

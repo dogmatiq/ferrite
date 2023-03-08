@@ -29,7 +29,7 @@ func StringAs[T ~string](name, desc string) *StringBuilder[T] {
 type StringBuilder[T ~string] struct {
 	name, desc string
 	def        maybe.Value[T]
-	options    []variable.SpecOption[T]
+	options    []variable.TypedSpecOption[T]
 }
 
 // WithDefault sets a default value of the variable.

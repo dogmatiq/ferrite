@@ -26,11 +26,11 @@ type ConstraintError interface {
 	error
 }
 
-// WithConstraint is a SpecOption that adds a constraint to a variable.
+// WithConstraint is a TypedSpecOption that adds a constraint to a variable.
 func WithConstraint[T any](
 	desc string,
 	fn func(T) ConstraintError,
-) SpecOption[T] {
+) TypedSpecOption[T] {
 	return withConstraint(
 		constraint[T]{
 			desc,
@@ -40,11 +40,11 @@ func WithConstraint[T any](
 	)
 }
 
-// WithUserConstraint is a SpecOption that adds a user-defined constraint.
+// WithUserConstraint is a TypedSpecOption that adds a user-defined constraint.
 func WithUserConstraint[T any](
 	desc string,
 	fn func(T) error,
-) SpecOption[T] {
+) TypedSpecOption[T] {
 	return withConstraint(
 		constraint[T]{
 			desc,
@@ -56,7 +56,7 @@ func WithUserConstraint[T any](
 	)
 }
 
-func withConstraint[T any](c constraint[T]) SpecOption[T] {
+func withConstraint[T any](c constraint[T]) TypedSpecOption[T] {
 	return func(opts *specOptions[T]) error {
 		if c.desc == "" {
 			return errors.New("constraint description must not be empty")
