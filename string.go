@@ -45,6 +45,9 @@ func (b StringBuilder[T]) WithDefault(v T) StringBuilder[T] {
 //
 // fn is called with the environment variable value after it is parsed. If fn
 // returns an error the value is considered invalid.
+//
+// Care should be taken never to include the value in the error message, as it
+// may contain sensitive information.
 func (b StringBuilder[T]) WithConstraintFunc(
 	desc string,
 	fn func(T) variable.ConstraintError,
