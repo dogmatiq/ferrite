@@ -1,9 +1,5 @@
 package variable
 
-import (
-	"golang.org/x/exp/slices"
-)
-
 // ExampleSource is an enumeration describing the source of an example.
 type ExampleSource int
 
@@ -71,53 +67,50 @@ func WithNonNormativeExample[T any](v T, desc string) SpecOption[T] {
 // BestExample returns the heuristically "best" example to use for the given
 // spec.
 func BestExample(spec Spec) Example {
-	// Always prefer the default value, as it's always supplied by the
-	// application author and "guaranteed" to work.
-	if def, ok := spec.Default(); ok {
-		for _, eg := range spec.Examples() {
-			if eg.Canonical == def {
-				return eg
-			}
+	var incumbent Example
+
+	for _, candidate := range spec.Examples() {
+		// Always prefer the default value, as it's typically supplied by the
+		// application author and "guaranteed" to work.
+		if IsDefault(spec, candidate.Canonical) {
+			return candidate
+		}
+
+		// Otherwise, keep going looking for a better candidate.
+		if isBetterExample(candidate, incumbent) {
+			incumbent = candidate
 		}
 	}
 
-	// Otherwise, we rank the examples by their "quality" and return the
-	// highest-ranked one.
-	ranked := slices.Clone(
-		spec.Examples(),
-	)
+	return incumbent
+}
 
-	slices.SortFunc(
-		ranked,
-		func(a, b Example) bool {
-			// Prefer normative examples over non-normative ones.
-			if a.IsNormative != b.IsNormative {
-				return a.IsNormative
-			}
+// isBetterExample returns true if a is heuristically "better" than b.
+func isBetterExample(a, b Example) bool {
+	// Prefer normative examples over non-normative ones.
+	if a.IsNormative != b.IsNormative {
+		return a.IsNormative
+	}
 
-			// Prefer examples from higher-levels sources.
-			if a.Source != b.Source {
-				return a.Source > b.Source
-			}
+	// Prefer examples from higher-levels sources.
+	if a.Source != b.Source {
+		return a.Source > b.Source
+	}
 
-			// Prefer examples with (longer) descriptions than those without.
-			if a.Description != b.Description {
-				return len(a.Description) > len(b.Description)
-			}
+	// Prefer examples with (longer) descriptions than those without.
+	if a.Description != b.Description {
+		return len(a.Description) > len(b.Description)
+	}
 
-			// If both are schema-generated non-normative examples, assume that
-			// the shorter value is less likely to be "weird".
-			if a.Source == ExampleSourceSchema && !a.IsNormative {
-				return len(a.Canonical.String) < len(b.Canonical.String)
-			}
+	// If both are schema-generated non-normative examples, assume that
+	// the shorter value is less likely to be "weird".
+	if a.Source == ExampleSourceSchema && !a.IsNormative {
+		return len(a.Canonical.String) < len(b.Canonical.String)
+	}
 
-			// Otherwise, assume that the the longer value has better
-			// illustrative properties.
-			return len(a.Canonical.String) > len(b.Canonical.String)
-		},
-	)
-
-	return ranked[0]
+	// Otherwise, assume that the the longer value has better
+	// illustrative properties.
+	return len(a.Canonical.String) > len(b.Canonical.String)
 }
 
 // buildExamples returns the complete set of examples to use for the given spec.
