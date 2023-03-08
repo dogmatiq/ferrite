@@ -47,13 +47,7 @@ func (b *StringBuilder[T]) WithConstraintFunc(
 	desc string,
 	fn func(T) variable.ConstraintError,
 ) *StringBuilder[T] {
-	b.v.Constraint(
-		variable.ConstraintFunc[T]{
-			Desc: desc,
-			User: true,
-			Fn:   fn,
-		},
-	)
+	b.v.UserConstraint(desc, fn)
 	return b
 }
 

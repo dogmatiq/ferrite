@@ -4,7 +4,6 @@ import (
 	"errors"
 	"strconv"
 
-	"github.com/dogmatiq/ferrite/maybe"
 	"github.com/dogmatiq/ferrite/variable"
 )
 
@@ -13,73 +12,51 @@ import (
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
 func NetworkPort(name, desc string) *NetworkPortBuilder {
-	return &NetworkPortBuilder{
-		name: name,
-		desc: desc,
-		options: []variable.TypedSpecOption[string]{
-			variable.WithConstraint(
-				"**MUST** be a valid network port",
-				func(v string) variable.ConstraintError {
-					return validatePort(v)
-				},
-			),
-			variable.WithNonNormativeExample(
-				"8000",
-				"a port commonly used for private web servers",
-			),
-			variable.WithNonNormativeExample(
-				"https",
-				"the IANA service name that maps to port 443",
-			),
-			networkPortSyntaxDocumentation,
+	b := &NetworkPortBuilder{}
+	b.v.Init(name, desc)
+
+	b.v.BuiltInConstraint(
+		"**MUST** be a valid network port",
+		func(v string) variable.ConstraintError {
+			return validatePort(v)
 		},
-	}
+	)
+
+	b.v.NonNormativeExample("8000", "a port commonly used for private web servers")
+	b.v.NonNormativeExample("https", "the IANA service name that maps to port 443")
+
+	addNetworkPortSyntaxDocumentation(&b.v)
+
+	return b
 }
 
 // NetworkPortBuilder builds a specification for a network port variable.
 type NetworkPortBuilder struct {
-	name, desc string
-	def        maybe.Value[string]
-	options    []variable.TypedSpecOption[string]
+	v variable.Builder[string, variable.TypedString[string]]
 }
 
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b *NetworkPortBuilder) WithDefault(v string) *NetworkPortBuilder {
-	b.def = maybe.Some(v)
+	b.v.Default(v)
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *NetworkPortBuilder) Required(options ...Option) Required[string] {
-	v := variable.Register(b.spec(true), options)
+	b.v.Required()
+	v := b.v.Done(options)
 	return requiredOne(v)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *NetworkPortBuilder) Optional(options ...Option) Optional[string] {
-	v := variable.Register(b.spec(false), options)
+	v := b.v.Done(options)
 	return optionalOne(v)
 
-}
-
-func (b *NetworkPortBuilder) spec(req bool) variable.TypedSpec[string] {
-	s, err := variable.NewSpec(
-		b.name,
-		b.desc,
-		b.def,
-		req,
-		variable.TypedString[string]{},
-		b.options...,
-	)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return s
 }
 
 // validateHost returns an error of port is not a valid numeric port or IANA
@@ -152,6 +129,7 @@ func validateIANAServiceName(name string) error {
 	return nil
 }
 
+// Deprecated: use addNetworkPortSyntaxDocumentation() instead.
 var networkPortSyntaxDocumentation = variable.WithDocumentation[string]().
 	Summary("Network port syntax").
 	Paragraph(
@@ -163,3 +141,17 @@ var networkPortSyntaxDocumentation = variable.WithDocumentation[string]().
 	).
 	Format().
 	Done()
+
+func addNetworkPortSyntaxDocumentation[T any, S variable.TypedSchema[T]](v *variable.Builder[T, S]) {
+	v.
+		Documentation("Network port syntax").
+		Paragraph(
+			"Ports may be specified as a numeric value no greater than `65535`.",
+			"Alternatively, a service name can be used.",
+			"Service names are resolved against the system's service database,",
+			"typically located in the `/etc/service` file on UNIX-like systems.",
+			"Standard service names are published by IANA.",
+		).
+		Format().
+		Done()
+}

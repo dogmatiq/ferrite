@@ -28,9 +28,29 @@ func (b *Builder[T, S]) Default(v T) {
 	b.def = maybe.Some(v)
 }
 
-// Constraint adds a constraint to the variable's value.
-func (b *Builder[T, S]) Constraint(c TypedConstraint[T]) {
-	b.spec.constraints = append(b.spec.constraints, c)
+// BuiltInConstraint adds a constraint to the variable's value.
+//
+// If fn was supplied by the application developer (as opposed to from within
+// Ferrite itself), use UserConstraint() instead.
+func (b *Builder[T, S]) BuiltInConstraint(
+	desc string,
+	fn func(T) ConstraintError,
+) {
+	b.spec.constraints = append(
+		b.spec.constraints,
+		ConstraintFunc[T]{desc, false, fn},
+	)
+}
+
+// UserConstraint adds a user-defined constraint to the variable's value.
+func (b *Builder[T, S]) UserConstraint(
+	desc string,
+	fn func(T) ConstraintError,
+) {
+	b.spec.constraints = append(
+		b.spec.constraints,
+		ConstraintFunc[T]{desc, true, fn},
+	)
 }
 
 // Sensitive marks the variable's content as sensitive.
@@ -41,6 +61,26 @@ func (b *Builder[T, S]) Sensitive() {
 // Required marks the variable as required.
 func (b *Builder[T, S]) Required() {
 	b.spec.required = true
+}
+
+// NormativeExample adds a normative example to the variable.
+//
+// A normative example is one that is meaningful in the context of the
+// variable's use.
+func (b *Builder[T, S]) NormativeExample(v T, desc string) {
+	b.examples = append(b.examples, TypedExample[T]{v, desc, true})
+}
+
+// NonNormativeExample adds a non-normative example to the variable.
+//
+// A non-normative example is one that may not be meaningful in the context of
+// the variable's use, but is included for illustrative purposes.
+//
+// For example, a variable that represents a URL may have a non-normative
+// example of "https://example.org/path", even if the actual use-case for the
+// variable requires an "ftp" URL.
+func (b *Builder[T, S]) NonNormativeExample(v T, desc string) {
+	b.examples = append(b.examples, TypedExample[T]{v, desc, false})
 }
 
 // Documentation adds documentation to the variable.
