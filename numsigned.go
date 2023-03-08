@@ -48,7 +48,7 @@ func Signed[T constraints.Signed](name, desc string) *SignedBuilder[T] {
 // SignedBuilder builds a specification for a signed integer value.
 type SignedBuilder[T constraints.Signed] struct {
 	schema variable.TypedNumeric[T]
-	spec   variable.SpecBuilder[T]
+	spec   variable.TypedSpecBuilder[T]
 }
 
 // WithDefault sets a default value of the variable.
@@ -74,13 +74,13 @@ func (b *SignedBuilder[T]) WithMaximum(v T) *SignedBuilder[T] {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *SignedBuilder[T]) Required(options ...Option) Required[T] {
-	return req(b.schema, b.spec, options)
+	return req(b.schema, &b.spec, options)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *SignedBuilder[T]) Optional(options ...Option) Optional[T] {
-	return opt(b.schema, b.spec, options)
+	return opt(b.schema, &b.spec, options)
 }
 
 type signedMarshaler[T constraints.Signed] struct{}

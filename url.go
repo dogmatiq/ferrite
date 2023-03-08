@@ -56,7 +56,7 @@ func URL(name, desc string) *URLBuilder {
 // URLBuilder builds a specification for a URL variable.
 type URLBuilder struct {
 	schema variable.TypedOther[*url.URL]
-	spec   variable.SpecBuilder[*url.URL]
+	spec   variable.TypedSpecBuilder[*url.URL]
 }
 
 // WithDefault sets a default value of the variable.
@@ -70,13 +70,13 @@ func (b *URLBuilder) WithDefault(v string) *URLBuilder {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *URLBuilder) Required(options ...Option) Required[*url.URL] {
-	return req(b.schema, b.spec, options)
+	return req(b.schema, &b.spec, options)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *URLBuilder) Optional(options ...Option) Optional[*url.URL] {
-	return opt(b.schema, b.spec, options)
+	return opt(b.schema, &b.spec, options)
 }
 
 type urlMarshaler struct{}

@@ -42,7 +42,7 @@ func Duration(name, desc string) *DurationBuilder {
 // DurationBuilder builds a specification for a duration variable.
 type DurationBuilder struct {
 	schema variable.TypedNumeric[time.Duration]
-	spec   variable.SpecBuilder[time.Duration]
+	spec   variable.TypedSpecBuilder[time.Duration]
 }
 
 // WithDefault sets a default value of the variable.
@@ -68,13 +68,13 @@ func (b *DurationBuilder) WithMaximum(v time.Duration) *DurationBuilder {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *DurationBuilder) Required(options ...Option) Required[time.Duration] {
-	return req(b.schema, b.spec, options)
+	return req(b.schema, &b.spec, options)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *DurationBuilder) Optional(options ...Option) Optional[time.Duration] {
-	return opt(b.schema, b.spec, options)
+	return opt(b.schema, &b.spec, options)
 }
 
 type durationMarshaler struct{}

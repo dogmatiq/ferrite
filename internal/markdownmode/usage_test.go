@@ -48,7 +48,7 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					Bool("DEBUG", "enable or disable debugging features").
-					Optional(variable.WithRegistry(reg))
+					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
 			},
 		),
 		Entry(
@@ -58,7 +58,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					NetworkPort("PORT", "an environment variable that has a default value").
 					WithDefault("ftp").
-					Required(variable.WithRegistry(reg))
+					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
 			},
 		),
 	)

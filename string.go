@@ -29,7 +29,7 @@ func StringAs[T ~string](name, desc string) *StringBuilder[T] {
 // StringBuilder builds a specification for a string variable.
 type StringBuilder[T ~string] struct {
 	schema variable.TypedString[T]
-	spec   variable.SpecBuilder[T]
+	spec   variable.TypedSpecBuilder[T]
 }
 
 // WithDefault sets a default value of the variable.
@@ -68,11 +68,11 @@ func (b *StringBuilder[T]) WithSensitiveContent() *StringBuilder[T] {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *StringBuilder[T]) Required(options ...Option) Required[T] {
-	return req(b.schema, b.spec, options)
+	return req(b.schema, &b.spec, options)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *StringBuilder[T]) Optional(options ...Option) Optional[T] {
-	return opt(b.schema, b.spec, options)
+	return opt(b.schema, &b.spec, options)
 }

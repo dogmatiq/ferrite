@@ -39,7 +39,7 @@ func EnumAs[T any](name, desc string) *EnumBuilder[T] {
 // EnumBuilder is the specification for an enumeration.
 type EnumBuilder[T any] struct {
 	schema variable.TypedSet[T]
-	spec   variable.SpecBuilder[T]
+	spec   variable.TypedSpecBuilder[T]
 }
 
 // WithMembers adds members to the enum.
@@ -86,11 +86,11 @@ func (b *EnumBuilder[T]) WithDefault(v T) *EnumBuilder[T] {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *EnumBuilder[T]) Required(options ...Option) Required[T] {
-	return req(b.schema, b.spec, options)
+	return req(b.schema, &b.spec, options)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *EnumBuilder[T]) Optional(options ...Option) Optional[T] {
-	return opt(b.schema, b.spec, options)
+	return opt(b.schema, &b.spec, options)
 }

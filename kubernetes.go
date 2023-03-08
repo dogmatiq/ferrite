@@ -100,8 +100,8 @@ type KubernetesServiceBuilder struct {
 	service    string
 	hostSchema variable.TypedString[string]
 	portSchema variable.TypedString[string]
-	hostSpec   variable.SpecBuilder[string]
-	portSpec   variable.SpecBuilder[string]
+	hostSpec   variable.TypedSpecBuilder[string]
+	portSpec   variable.TypedSpecBuilder[string]
 }
 
 // WithNamedPort uses a Kubernetes named port instead of the default service
@@ -151,15 +151,16 @@ func (b *KubernetesServiceBuilder) WithDefault(host, port string) *KubernetesSer
 // Ferrite's validation system.
 func (b *KubernetesServiceBuilder) Required(options ...Option) Required[KubernetesAddress] {
 	b.hostSpec.MarkRequired()
+
 	host := variable.Register(
 		b.hostSpec.Done(b.hostSchema),
-		options,
+		applyOptions(&b.hostSpec, options),
 	)
 
 	b.portSpec.MarkRequired()
 	port := variable.Register(
 		b.portSpec.Done(b.portSchema),
-		options,
+		applyOptions(&b.portSpec, options),
 	)
 
 	return required[KubernetesAddress]{
@@ -193,12 +194,12 @@ func (b *KubernetesServiceBuilder) Required(options ...Option) Required[Kubernet
 func (b *KubernetesServiceBuilder) Optional(options ...Option) Optional[KubernetesAddress] {
 	host := variable.Register(
 		b.hostSpec.Done(b.hostSchema),
-		options,
+		applyOptions(&b.hostSpec, options),
 	)
 
 	port := variable.Register(
 		b.portSpec.Done(b.portSchema),
-		options,
+		applyOptions(&b.portSpec, options),
 	)
 
 	return optional[KubernetesAddress]{

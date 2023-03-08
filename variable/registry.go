@@ -95,3 +95,11 @@ func WithRegistry(r *Registry) RegisterOption {
 		o.Registry = r
 	}
 }
+
+// UseRegisterOptionsWithBuilder adapts a (set of) RegisterOption to a
+// ferrite.Option so that they can be used with the public builder APIs.
+func UseRegisterOptionsWithBuilder(options ...RegisterOption) func(spec SpecBuilder) []RegisterOption {
+	return func(spec SpecBuilder) []RegisterOption {
+		return options
+	}
+}

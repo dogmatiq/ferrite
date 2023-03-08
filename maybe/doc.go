@@ -4,6 +4,6 @@
 // and "required" types used to represent environment variable values.
 //
 // WARNING: This package is exposed to allow for experimentation but it is not
-// yet considered part of Ferrite's pubilc API. It may change at any time and
+// yet considered part of Ferrite's public API. It may change at any time and
 // without warning.
 package maybe

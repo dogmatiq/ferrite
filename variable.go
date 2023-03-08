@@ -41,16 +41,16 @@ func undefinedError(v variable.Any) error {
 // maps one-to-one with an environment variable of the same type.
 func req[T any, S variable.TypedSchema[T]](
 	schema S,
-	spec variable.SpecBuilder[T],
+	spec *variable.TypedSpecBuilder[T],
 	options []Option,
 ) Required[T] {
 	spec.MarkRequired()
 
-	opts := resolveOptions(options)
+	registerOptions := applyOptions(spec, options)
 
 	v := variable.Register(
 		spec.Done(schema),
-		opts.RegisterOptions,
+		registerOptions,
 	)
 
 	return required[T]{
@@ -69,14 +69,14 @@ func req[T any, S variable.TypedSchema[T]](
 // maps one-to-one with an environment variable of the same type.
 func opt[T any, S variable.TypedSchema[T]](
 	schema S,
-	spec variable.SpecBuilder[T],
+	spec *variable.TypedSpecBuilder[T],
 	options []Option,
 ) Optional[T] {
-	opts := resolveOptions(options)
+	registerOptions := applyOptions(spec, options)
 
 	v := variable.Register(
 		spec.Done(schema),
-		opts.RegisterOptions,
+		registerOptions,
 	)
 
 	return optional[T]{

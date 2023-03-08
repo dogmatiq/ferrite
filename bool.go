@@ -41,7 +41,7 @@ func BoolAs[T ~bool](name, desc string) *BoolBuilder[T] {
 // BoolBuilder builds a specification for a boolean value.
 type BoolBuilder[T ~bool] struct {
 	schema variable.TypedSet[T]
-	spec   variable.SpecBuilder[T]
+	spec   variable.TypedSpecBuilder[T]
 }
 
 // WithLiterals overrides the default literals used to represent true and false.
@@ -70,11 +70,11 @@ func (b *BoolBuilder[T]) WithDefault(v T) *BoolBuilder[T] {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *BoolBuilder[T]) Required(options ...Option) Required[T] {
-	return req(b.schema, b.spec, options)
+	return req(b.schema, &b.spec, options)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *BoolBuilder[T]) Optional(options ...Option) Optional[T] {
-	return opt(b.schema, b.spec, options)
+	return opt(b.schema, &b.spec, options)
 }

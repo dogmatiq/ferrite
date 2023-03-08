@@ -1,22 +1,27 @@
 package ferrite
 
-import "github.com/dogmatiq/ferrite/variable"
+import (
+	"github.com/dogmatiq/ferrite/variable"
+)
 
 // An Option changes the behavior of an environment variable specification.
 //
-// Options are used to configure aspects of the variable that are non specific
-// to its type.
-type Option = variable.RegisterOption //func(*optionsX)
+// WARNING: The signature of this function is not considered part of Ferrite's
+// public API. It may change at any time and without warning.
+type Option func(variable.SpecBuilder) []variable.RegisterOption
 
-type optionsX struct {
-	RegisterOptions []variable.RegisterOption
-}
+func applyOptions(
+	spec variable.SpecBuilder,
+	opts []Option,
+) []variable.RegisterOption {
+	var registerOptions []variable.RegisterOption
 
-func resolveOptions(options []Option) optionsX {
-	var opts optionsX
-	opts.RegisterOptions = options
-	// for _, opt := range options {
-	// 	opt(&opts)
-	// }
-	return opts
+	for _, opt := range opts {
+		registerOptions = append(
+			registerOptions,
+			opt(spec)...,
+		)
+	}
+
+	return registerOptions
 }

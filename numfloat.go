@@ -48,7 +48,7 @@ func Float[T constraints.Float](name, desc string) *FloatBuilder[T] {
 // FloatBuilder builds a specification for a floating-point number.
 type FloatBuilder[T constraints.Float] struct {
 	schema variable.TypedNumeric[T]
-	spec   variable.SpecBuilder[T]
+	spec   variable.TypedSpecBuilder[T]
 }
 
 // WithDefault sets a default value of the variable.
@@ -74,13 +74,13 @@ func (b *FloatBuilder[T]) WithMaximum(v T) *FloatBuilder[T] {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *FloatBuilder[T]) Required(options ...Option) Required[T] {
-	return req(b.schema, b.spec, options)
+	return req(b.schema, &b.spec, options)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *FloatBuilder[T]) Optional(options ...Option) Optional[T] {
-	return opt(b.schema, b.spec, options)
+	return opt(b.schema, &b.spec, options)
 }
 
 type floatMarshaler[T constraints.Float] struct{}

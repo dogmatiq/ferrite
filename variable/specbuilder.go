@@ -7,25 +7,34 @@ import (
 	"github.com/dogmatiq/ferrite/maybe"
 )
 
-// SpecBuilder builds a specification for a variable of type T.
-type SpecBuilder[T any] struct {
+// SpecBuilder builds a specification for an environment variable.
+type SpecBuilder interface {
+	Name(string)
+	Description(string)
+	MarkSensitive()
+	MarkRequired()
+	Documentation() DocumentationBuilder
+}
+
+// TypedSpecBuilder builds a specification for a variable of type T.
+type TypedSpecBuilder[T any] struct {
 	spec     TypedSpec[T]
 	def      maybe.Value[T]
 	examples []TypedExample[T]
 }
 
 // Name sets the name of the environment variable.
-func (b *SpecBuilder[T]) Name(name string) {
+func (b *TypedSpecBuilder[T]) Name(name string) {
 	b.spec.name = name
 }
 
 // Description sets a human-readable description of the environment variable.
-func (b *SpecBuilder[T]) Description(desc string) {
+func (b *TypedSpecBuilder[T]) Description(desc string) {
 	b.spec.desc = desc
 }
 
 // Default sets the default value for the variable.
-func (b *SpecBuilder[T]) Default(v T) {
+func (b *TypedSpecBuilder[T]) Default(v T) {
 	b.def = maybe.Some(v)
 }
 
@@ -33,7 +42,7 @@ func (b *SpecBuilder[T]) Default(v T) {
 //
 // If fn was supplied by the application developer (as opposed to from within
 // Ferrite itself), use UserConstraint() instead.
-func (b *SpecBuilder[T]) BuiltInConstraint(
+func (b *TypedSpecBuilder[T]) BuiltInConstraint(
 	desc string,
 	fn func(T) ConstraintError,
 ) {
@@ -44,7 +53,7 @@ func (b *SpecBuilder[T]) BuiltInConstraint(
 }
 
 // UserConstraint adds a user-defined constraint to the variable's value.
-func (b *SpecBuilder[T]) UserConstraint(
+func (b *TypedSpecBuilder[T]) UserConstraint(
 	desc string,
 	fn func(T) ConstraintError,
 ) {
@@ -55,12 +64,12 @@ func (b *SpecBuilder[T]) UserConstraint(
 }
 
 // MarkSensitive marks the variable's content as sensitive.
-func (b *SpecBuilder[T]) MarkSensitive() {
+func (b *TypedSpecBuilder[T]) MarkSensitive() {
 	b.spec.sensitive = true
 }
 
 // MarkRequired marks the variable as required.
-func (b *SpecBuilder[T]) MarkRequired() {
+func (b *TypedSpecBuilder[T]) MarkRequired() {
 	b.spec.required = true
 }
 
@@ -68,7 +77,7 @@ func (b *SpecBuilder[T]) MarkRequired() {
 //
 // A normative example is one that is meaningful in the context of the
 // variable's use.
-func (b *SpecBuilder[T]) NormativeExample(v T, desc string) {
+func (b *TypedSpecBuilder[T]) NormativeExample(v T, desc string) {
 	b.examples = append(b.examples, TypedExample[T]{v, desc, true})
 }
 
@@ -80,21 +89,21 @@ func (b *SpecBuilder[T]) NormativeExample(v T, desc string) {
 // For example, a variable that represents a URL may have a non-normative
 // example of "https://example.org/path", even if the actual use-case for the
 // variable requires an "ftp" URL.
-func (b *SpecBuilder[T]) NonNormativeExample(v T, desc string) {
+func (b *TypedSpecBuilder[T]) NonNormativeExample(v T, desc string) {
 	b.examples = append(b.examples, TypedExample[T]{v, desc, false})
 }
 
 // Documentation adds documentation to the variable.
 //
 // It returns the DocumentBuilder that can be used to add documentation content .
-func (b *SpecBuilder[T]) Documentation() DocumentationBuilder {
+func (b *TypedSpecBuilder[T]) Documentation() DocumentationBuilder {
 	return DocumentationBuilder{
 		docs: &b.spec.docs,
 	}
 }
 
 // Done builds the specification and registers the variable.
-func (b *SpecBuilder[T]) Done(schema TypedSchema[T]) TypedSpec[T] {
+func (b *TypedSpecBuilder[T]) Done(schema TypedSchema[T]) TypedSpec[T] {
 	b.spec.schema = schema
 
 	if err := b.finalize(); err != nil {
@@ -104,7 +113,7 @@ func (b *SpecBuilder[T]) Done(schema TypedSchema[T]) TypedSpec[T] {
 	return b.spec
 }
 
-func (b *SpecBuilder[T]) finalize() error {
+func (b *TypedSpecBuilder[T]) finalize() error {
 	if b.spec.name == "" {
 		return SpecError{
 			cause: errors.New("variable name must not be empty"),
@@ -152,7 +161,7 @@ func (b *SpecBuilder[T]) finalize() error {
 }
 
 // buildExamples builds the examples for the spec from various sources.
-func (b *SpecBuilder[T]) buildExamples() error {
+func (b *TypedSpecBuilder[T]) buildExamples() error {
 	uniq := map[Literal]struct{}{}
 
 	// Add the examples provided directly to the builder.

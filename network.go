@@ -32,7 +32,7 @@ func NetworkPort(name, desc string) *NetworkPortBuilder {
 // NetworkPortBuilder builds a specification for a network port variable.
 type NetworkPortBuilder struct {
 	schema variable.TypedString[string]
-	spec   variable.SpecBuilder[string]
+	spec   variable.TypedSpecBuilder[string]
 }
 
 // WithDefault sets a default value of the variable.
@@ -46,13 +46,13 @@ func (b *NetworkPortBuilder) WithDefault(v string) *NetworkPortBuilder {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *NetworkPortBuilder) Required(options ...Option) Required[string] {
-	return req(b.schema, b.spec, options)
+	return req(b.schema, &b.spec, options)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *NetworkPortBuilder) Optional(options ...Option) Optional[string] {
-	return opt(b.schema, b.spec, options)
+	return opt(b.schema, &b.spec, options)
 }
 
 // validateHost returns an error of port is not a valid numeric port or IANA
