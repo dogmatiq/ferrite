@@ -61,7 +61,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					Bool("DEBUG", "enable or disable debugging features").
 					WithDefault(false).
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -70,7 +70,7 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					Bool("DEBUG", "enable or disable debugging features").
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -80,7 +80,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					Bool("DEBUG", "enable or disable debugging features").
 					WithDefault(false).
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -89,7 +89,7 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					Bool("DEBUG", "enable or disable debugging features").
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 
@@ -107,7 +107,7 @@ var _ = Describe("func Run()", func() {
 					WithMember("error", "a healthy application shouldn't produce any errors").
 					WithMember("fatal", "the application cannot proceed").
 					WithDefault("error").
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -121,7 +121,7 @@ var _ = Describe("func Run()", func() {
 					WithMember("warn", "important, but don't need individual human review").
 					WithMember("error", "a healthy application shouldn't produce any errors").
 					WithMember("fatal", "the application cannot proceed").
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -136,7 +136,7 @@ var _ = Describe("func Run()", func() {
 					WithMember("error", "a healthy application shouldn't produce any errors").
 					WithMember("fatal", "the application cannot proceed").
 					WithDefault("error").
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -150,7 +150,7 @@ var _ = Describe("func Run()", func() {
 					WithMember("warn", "important, but don't need individual human review").
 					WithMember("error", "a healthy application shouldn't produce any errors").
 					WithMember("fatal", "the application cannot proceed").
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 
@@ -163,7 +163,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					Duration("GRPC_TIMEOUT", "gRPC request timeout").
 					WithDefault(10 * time.Millisecond).
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -172,7 +172,7 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					Duration("GRPC_TIMEOUT", "gRPC request timeout").
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -182,7 +182,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					Duration("GRPC_TIMEOUT", "gRPC request timeout").
 					WithDefault(10 * time.Millisecond).
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -191,7 +191,7 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					Duration("GRPC_TIMEOUT", "gRPC request timeout").
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -201,7 +201,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					Duration("GRPC_TIMEOUT", "gRPC request timeout").
 					WithMaximum(24 * time.Hour).
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 
@@ -214,7 +214,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					KubernetesService("redis").
 					WithDefault("redis.example.org", "6379").
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -223,7 +223,7 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					KubernetesService("redis").
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -233,7 +233,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					KubernetesService("redis").
 					WithDefault("redis.example.org", "6379").
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -242,7 +242,7 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					KubernetesService("redis").
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 
@@ -255,7 +255,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					NetworkPort("PORT", "listen port for the HTTP server").
 					WithDefault("8080").
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -264,7 +264,7 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					NetworkPort("PORT", "listen port for the HTTP server").
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -274,7 +274,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					NetworkPort("PORT", "listen port for the HTTP server").
 					WithDefault("8080").
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -283,7 +283,7 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					NetworkPort("PORT", "listen port for the HTTP server").
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 
@@ -296,7 +296,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					Float[float32]("WEIGHT", "weighting for this node").
 					WithDefault(123.5).
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -305,7 +305,7 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					Float[float32]("WEIGHT", "weighting for this node").
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -315,7 +315,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					Float[float32]("WEIGHT", "weighting for this node").
 					WithDefault(123.5).
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -324,7 +324,7 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					Float[float32]("WEIGHT", "weighting for this node").
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -334,7 +334,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					Float[float32]("WEIGHT", "weighting for this node").
 					WithMinimum(-10.5).
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -344,7 +344,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					Float[float32]("WEIGHT", "weighting for this node").
 					WithMaximum(+20.5).
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -355,7 +355,7 @@ var _ = Describe("func Run()", func() {
 					Float[float32]("WEIGHT", "weighting for this node").
 					WithMinimum(-10.5).
 					WithMaximum(+20.5).
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 
@@ -368,7 +368,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					Signed[int8]("WEIGHT", "weighting for this node").
 					WithDefault(100).
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -377,7 +377,7 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					Signed[int8]("WEIGHT", "weighting for this node").
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -387,7 +387,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					Signed[int8]("WEIGHT", "weighting for this node").
 					WithDefault(100).
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -396,7 +396,7 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					Signed[int8]("WEIGHT", "weighting for this node").
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -406,7 +406,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					Signed[int8]("WEIGHT", "weighting for this node").
 					WithMinimum(-10).
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -416,7 +416,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					Signed[int8]("WEIGHT", "weighting for this node").
 					WithMaximum(+20).
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -427,7 +427,7 @@ var _ = Describe("func Run()", func() {
 					Signed[int8]("WEIGHT", "weighting for this node").
 					WithMinimum(-10).
 					WithMaximum(+20).
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 
@@ -440,7 +440,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					Unsigned[uint16]("WEIGHT", "weighting for this node").
 					WithDefault(900).
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -449,7 +449,7 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					Unsigned[uint16]("WEIGHT", "weighting for this node").
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -459,7 +459,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					Unsigned[uint16]("WEIGHT", "weighting for this node").
 					WithDefault(900).
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -468,7 +468,7 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					Unsigned[uint16]("WEIGHT", "weighting for this node").
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -478,7 +478,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					Unsigned[uint16]("WEIGHT", "weighting for this node").
 					WithMinimum(10).
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -488,7 +488,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					Unsigned[uint16]("WEIGHT", "weighting for this node").
 					WithMaximum(20).
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -499,7 +499,7 @@ var _ = Describe("func Run()", func() {
 					Unsigned[uint16]("WEIGHT", "weighting for this node").
 					WithMinimum(10).
 					WithMaximum(20).
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 
@@ -512,7 +512,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					String("READ_DSN", "database connection string for read-models").
 					WithDefault("host=localhost dbname=readmodels user=projector").
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -521,7 +521,7 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					String("READ_DSN", "database connection string for read-models").
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -531,7 +531,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					String("READ_DSN", "database connection string for read-models").
 					WithDefault("host=localhost dbname=readmodels user=projector").
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -540,7 +540,7 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					String("READ_DSN", "database connection string for read-models").
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -552,7 +552,7 @@ var _ = Describe("func Run()", func() {
 					WithDefault("hunter2").
 					Optional(
 						ferrite.Sensitive(),
-						variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)),
+						variable.WithRegistry(reg).AsVariableOption(),
 					)
 			},
 		),
@@ -564,7 +564,7 @@ var _ = Describe("func Run()", func() {
 					String("PASSWORD", "a very secret password").
 					Optional(
 						ferrite.Sensitive(),
-						variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)),
+						variable.WithRegistry(reg).AsVariableOption(),
 					)
 			},
 		),
@@ -577,7 +577,7 @@ var _ = Describe("func Run()", func() {
 					WithDefault("hunter2").
 					Required(
 						ferrite.Sensitive(),
-						variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)),
+						variable.WithRegistry(reg).AsVariableOption(),
 					)
 			},
 		),
@@ -589,7 +589,7 @@ var _ = Describe("func Run()", func() {
 					String("PASSWORD", "a very secret password").
 					Required(
 						ferrite.Sensitive(),
-						variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)),
+						variable.WithRegistry(reg).AsVariableOption(),
 					)
 			},
 		),
@@ -603,7 +603,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					URL("API_URL", "the URL of the REST API").
 					WithDefault("http://localhost:8080").
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -612,7 +612,7 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					URL("API_URL", "the URL of the REST API").
-					Optional(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Optional(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -622,7 +622,7 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					URL("API_URL", "the URL of the REST API").
 					WithDefault("http://localhost:8080").
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 		Entry(
@@ -631,7 +631,7 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					URL("API_URL", "the URL of the REST API").
-					Required(variable.UseRegisterOptionsWithBuilder(variable.WithRegistry(reg)))
+					Required(variable.WithRegistry(reg).AsVariableOption())
 			},
 		),
 	)

@@ -45,13 +45,13 @@ func (b *NetworkPortBuilder) WithDefault(v string) *NetworkPortBuilder {
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b *NetworkPortBuilder) Required(options ...Option) Required[string] {
+func (b *NetworkPortBuilder) Required(options ...VariableOption) Required[string] {
 	return req(b.schema, &b.spec, options)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b *NetworkPortBuilder) Optional(options ...Option) Optional[string] {
+func (b *NetworkPortBuilder) Optional(options ...VariableOption) Optional[string] {
 	return opt(b.schema, &b.spec, options)
 }
 

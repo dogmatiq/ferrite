@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Added
 
-- Added `Option` type
+- Added `VariableOption` type
 - Added `Sensitive()` option, which indicates that a variable's contents may contain sensitive information
 
 ### Changed

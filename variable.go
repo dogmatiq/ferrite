@@ -29,6 +29,40 @@ type Optional[T any] interface {
 	Value() (T, bool)
 }
 
+// A VariableOption changes the behavior of an environment variable.
+//
+// WARNING: The signature of this function is not considered part of Ferrite's
+// public API. It may change at any time and without warning.
+type VariableOption func(variable.SpecBuilder) []variable.RegisterOption
+
+// Sensitive is a VariableOption that marks a variable as containing sensitive
+// information.
+//
+// Values of sensitive variables are not printed to the console or included in
+// generated documentation.
+func Sensitive() VariableOption {
+	return func(spec variable.SpecBuilder) []variable.RegisterOption {
+		spec.MarkSensitive()
+		return nil
+	}
+}
+
+func applyVariableOptions(
+	spec variable.SpecBuilder,
+	opts []VariableOption,
+) []variable.RegisterOption {
+	var registerOptions []variable.RegisterOption
+
+	for _, opt := range opts {
+		registerOptions = append(
+			registerOptions,
+			opt(spec)...,
+		)
+	}
+
+	return registerOptions
+}
+
 // undefinedError returns an error that indicates that a variable is undefined.
 func undefinedError(v variable.Any) error {
 	return fmt.Errorf(
@@ -42,11 +76,11 @@ func undefinedError(v variable.Any) error {
 func req[T any, S variable.TypedSchema[T]](
 	schema S,
 	spec *variable.TypedSpecBuilder[T],
-	options []Option,
+	options []VariableOption,
 ) Required[T] {
 	spec.MarkRequired()
 
-	registerOptions := applyOptions(spec, options)
+	registerOptions := applyVariableOptions(spec, options)
 
 	v := variable.Register(
 		spec.Done(schema),
@@ -70,9 +104,9 @@ func req[T any, S variable.TypedSchema[T]](
 func opt[T any, S variable.TypedSchema[T]](
 	schema S,
 	spec *variable.TypedSpecBuilder[T],
-	options []Option,
+	options []VariableOption,
 ) Optional[T] {
-	registerOptions := applyOptions(spec, options)
+	registerOptions := applyVariableOptions(spec, options)
 
 	v := variable.Register(
 		spec.Done(schema),

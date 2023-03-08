@@ -83,6 +83,13 @@ func Register[T any](
 // with an environment variable registry.
 type RegisterOption func(*registerOptions)
 
+// AsVariableOption adapts a RegisterOption to a ferrite.VariableOption.
+func (o RegisterOption) AsVariableOption() func(spec SpecBuilder) []RegisterOption {
+	return func(spec SpecBuilder) []RegisterOption {
+		return []RegisterOption{o}
+	}
+}
+
 // registerOptions contains options that are available to all specifications.
 type registerOptions struct {
 	Registry *Registry
@@ -93,13 +100,5 @@ type registerOptions struct {
 func WithRegistry(r *Registry) RegisterOption {
 	return func(o *registerOptions) {
 		o.Registry = r
-	}
-}
-
-// UseRegisterOptionsWithBuilder adapts a (set of) RegisterOption to a
-// ferrite.Option so that they can be used with the public builder APIs.
-func UseRegisterOptionsWithBuilder(options ...RegisterOption) func(spec SpecBuilder) []RegisterOption {
-	return func(spec SpecBuilder) []RegisterOption {
-		return options
 	}
 }

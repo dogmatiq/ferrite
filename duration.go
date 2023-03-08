@@ -67,13 +67,13 @@ func (b *DurationBuilder) WithMaximum(v time.Duration) *DurationBuilder {
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b *DurationBuilder) Required(options ...Option) Required[time.Duration] {
+func (b *DurationBuilder) Required(options ...VariableOption) Required[time.Duration] {
 	return req(b.schema, &b.spec, options)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b *DurationBuilder) Optional(options ...Option) Optional[time.Duration] {
+func (b *DurationBuilder) Optional(options ...VariableOption) Optional[time.Duration] {
 	return opt(b.schema, &b.spec, options)
 }
 

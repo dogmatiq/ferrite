@@ -73,13 +73,13 @@ func (b *FloatBuilder[T]) WithMaximum(v T) *FloatBuilder[T] {
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b *FloatBuilder[T]) Required(options ...Option) Required[T] {
+func (b *FloatBuilder[T]) Required(options ...VariableOption) Required[T] {
 	return req(b.schema, &b.spec, options)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b *FloatBuilder[T]) Optional(options ...Option) Optional[T] {
+func (b *FloatBuilder[T]) Optional(options ...VariableOption) Optional[T] {
 	return opt(b.schema, &b.spec, options)
 }
 
