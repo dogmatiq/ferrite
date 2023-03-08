@@ -20,8 +20,8 @@ func URL(name, desc string) *URLBuilder {
 		},
 	}
 
-	b.spec.Init(name, desc)
-
+	b.spec.Name(name)
+	b.spec.Description(desc)
 	b.spec.BuiltInConstraint(
 		"**MUST** be a fully-qualified URL",
 		func(v *url.URL) variable.ConstraintError {
@@ -36,14 +36,12 @@ func URL(name, desc string) *URLBuilder {
 			return nil
 		},
 	)
-
 	b.spec.NonNormativeExample(
 		mustParseURL("https://example.org/path"),
 		"a typical URL for a web page",
 	)
-
-	b.spec.
-		Documentation("URL syntax").
+	b.spec.Documentation().
+		Summary("URL syntax").
 		Paragraph(
 			"A fully-qualified URL includes both a scheme (protocol) and a hostname.",
 			"URLs are not necessarily web addresses;",

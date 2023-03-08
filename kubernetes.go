@@ -7,7 +7,6 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/dogmatiq/ferrite/maybe"
 	"github.com/dogmatiq/ferrite/variable"
 )
 
@@ -36,24 +35,73 @@ func KubernetesService(svc string) *KubernetesServiceBuilder {
 		))
 	}
 
-	return &KubernetesServiceBuilder{
+	b := &KubernetesServiceBuilder{
 		service: svc,
-		hostVar: fmt.Sprintf(
+	}
+
+	const docs = "It is expected that this variable will be implicitly defined by Kubernetes; " +
+		"it typically does not need to be specified in the pod manifest."
+
+	b.hostSpec.Name(
+		fmt.Sprintf(
 			"%s_SERVICE_HOST",
 			kubernetesNameToEnv(svc),
 		),
-		portVar: fmt.Sprintf(
+	)
+	b.hostSpec.Description(
+		fmt.Sprintf(
+			"kubernetes %q service host",
+			b.service,
+		),
+	)
+	b.hostSpec.BuiltInConstraint(
+		"**MUST** be a valid hostname",
+		func(h string) variable.ConstraintError {
+			return validateHost(h)
+		},
+	)
+	b.hostSpec.Documentation().
+		Paragraph(docs).
+		Format().
+		Important().
+		Done()
+
+	b.portSpec.Name(
+		fmt.Sprintf(
 			"%s_SERVICE_PORT",
 			kubernetesNameToEnv(svc),
 		),
-	}
+	)
+	b.portSpec.Description(
+		fmt.Sprintf(
+			"kubernetes %q service port",
+			b.service,
+		),
+	)
+	b.portSpec.BuiltInConstraint(
+		"**MUST** be a valid network port",
+		func(p string) variable.ConstraintError {
+			return validatePort(p)
+		},
+	)
+	b.portSpec.Documentation().
+		Paragraph(docs).
+		Format().
+		Important().
+		Done()
+
+	buildNetworkPortSyntaxDocumentation(b.portSpec.Documentation())
+
+	return b
 }
 
 // KubernetesServiceBuilder is the specification for a Kubernetes service.
 type KubernetesServiceBuilder struct {
-	service          string
-	hostVar, portVar string
-	def              maybe.Value[KubernetesAddress]
+	service    string
+	hostSchema variable.TypedString[string]
+	portSchema variable.TypedString[string]
+	hostSpec   variable.SpecBuilder[string]
+	portSpec   variable.SpecBuilder[string]
 }
 
 // WithNamedPort uses a Kubernetes named port instead of the default service
@@ -76,10 +124,12 @@ func (b *KubernetesServiceBuilder) WithNamedPort(port string) *KubernetesService
 		))
 	}
 
-	b.portVar = fmt.Sprintf(
-		"%s_SERVICE_PORT_%s",
-		kubernetesNameToEnv(b.service),
-		kubernetesNameToEnv(port),
+	b.portSpec.Name(
+		fmt.Sprintf(
+			"%s_SERVICE_PORT_%s",
+			kubernetesNameToEnv(b.service),
+			kubernetesNameToEnv(port),
+		),
 	)
 
 	return b
@@ -92,15 +142,19 @@ func (b *KubernetesServiceBuilder) WithNamedPort(port string) *KubernetesService
 // service name (such as "https"). The IANA name is not to be confused with the
 // Kubernetes servcice name or port name.
 func (b *KubernetesServiceBuilder) WithDefault(host, port string) *KubernetesServiceBuilder {
-	b.def = maybe.Some(KubernetesAddress{host, port})
+	b.hostSpec.Default(host)
+	b.portSpec.Default(port)
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *KubernetesServiceBuilder) Required(options ...Option) Required[KubernetesAddress] {
-	host := variable.Register(b.hostSpec(true), options)
-	port := variable.Register(b.portSpec(true), options)
+	b.hostSpec.MarkRequired()
+	b.portSpec.MarkRequired()
+
+	host := b.hostSpec.Done(b.hostSchema, options)
+	port := b.portSpec.Done(b.portSchema, options)
 
 	return requiredMany(
 		func() (KubernetesAddress, error) {
@@ -132,8 +186,8 @@ func (b *KubernetesServiceBuilder) Required(options ...Option) Required[Kubernet
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *KubernetesServiceBuilder) Optional(options ...Option) Optional[KubernetesAddress] {
-	host := variable.Register(b.hostSpec(false), options)
-	port := variable.Register(b.portSpec(false), options)
+	host := b.hostSpec.Done(b.hostSchema, options)
+	port := b.portSpec.Done(b.portSchema, options)
 
 	return optionalMany(
 		func() (KubernetesAddress, bool, error) {
@@ -172,61 +226,6 @@ func (b *KubernetesServiceBuilder) Optional(options ...Option) Optional[Kubernet
 		host,
 		port,
 	)
-}
-
-func (b *KubernetesServiceBuilder) hostSpec(req bool) variable.TypedSpec[string] {
-	s, err := variable.NewSpec(
-		b.hostVar,
-		fmt.Sprintf(
-			"kubernetes %q service host",
-			b.service,
-		),
-		maybe.Map(b.def, func(addr KubernetesAddress) string {
-			return addr.Host
-		}),
-		req,
-		variable.TypedString[string]{},
-		variable.WithConstraint(
-			"**MUST** be a valid hostname",
-			func(h string) variable.ConstraintError {
-				return validateHost(h)
-			},
-		),
-		kubernetesImplicitDocumentation,
-	)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return s
-}
-
-func (b *KubernetesServiceBuilder) portSpec(req bool) variable.TypedSpec[string] {
-	s, err := variable.NewSpec(
-		b.portVar,
-		fmt.Sprintf(
-			"kubernetes %q service port",
-			b.service,
-		),
-		maybe.Map(b.def, func(addr KubernetesAddress) string {
-			return addr.Port
-		}),
-		req,
-		variable.TypedString[string]{},
-		variable.WithConstraint(
-			"**MUST** be a valid network port",
-			func(p string) variable.ConstraintError {
-				return validatePort(p)
-			},
-		),
-		kubernetesImplicitDocumentation,
-		networkPortSyntaxDocumentation,
-	)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return s
 }
 
 // kubernetesNameToEnv converts a kubernetes resource name to an environment variable
@@ -288,12 +287,3 @@ func validateHost(host string) error {
 
 	return nil
 }
-
-var kubernetesImplicitDocumentation = variable.WithDocumentation[string]().
-	Paragraph(
-		"It is expected that this variable will be implicitly defined by Kubernetes;",
-		"it typically does not need to be specified in the pod manifest.",
-	).
-	Format().
-	Important().
-	Done()

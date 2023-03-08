@@ -21,9 +21,10 @@ func Unsigned[T constraints.Unsigned](name, desc string) *UnsignedBuilder[T] {
 		},
 	}
 
-	b.spec.Init(name, desc)
-	b.spec.
-		Documentation("Unsigned integer syntax").
+	b.spec.Name(name)
+	b.spec.Description(desc)
+	b.spec.Documentation().
+		Summary("Unsigned integer syntax").
 		Paragraph(
 			"Unsigned integers can only be specified using decimal (base-10) notation.",
 			"A leading sign (`+` or `-`) is not supported and **MUST NOT** be specified.",

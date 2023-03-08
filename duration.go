@@ -25,9 +25,10 @@ func Duration(name, desc string) *DurationBuilder {
 		},
 	}
 
-	b.spec.Init(name, desc)
-	b.spec.
-		Documentation("Duration syntax").
+	b.spec.Name(name)
+	b.spec.Description(desc)
+	b.spec.Documentation().
+		Summary("Duration syntax").
 		Paragraph(
 			"Durations are specified as a sequence of decimal numbers, each with an optional fraction and a unit suffix, such as `300ms`, `-1.5h` or `2h45m`.",
 			"Supported time units are `ns`, `us` (or `µs`), `ms`, `s`, `m`, `h`.",

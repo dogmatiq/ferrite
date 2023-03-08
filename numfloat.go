@@ -20,9 +20,10 @@ func Float[T constraints.Float](name, desc string) *FloatBuilder[T] {
 		},
 	}
 
-	b.spec.Init(name, desc)
-	b.spec.
-		Documentation("Floating-point syntax").
+	b.spec.Name(name)
+	b.spec.Description(desc)
+	b.spec.Documentation().
+		Summary("Floating-point syntax").
 		Paragraph(
 			"Floating-point values can be specified using decimal (base-10) or hexadecimal (base-16) notation, and may use scientific notation.",
 			"A leading positive sign (`+`) is **OPTIONAL**.",

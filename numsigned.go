@@ -21,9 +21,10 @@ func Signed[T constraints.Signed](name, desc string) *SignedBuilder[T] {
 		},
 	}
 
-	b.spec.Init(name, desc)
-	b.spec.
-		Documentation("Signed integer syntax").
+	b.spec.Name(name)
+	b.spec.Description(desc)
+	b.spec.Documentation().
+		Summary("Signed integer syntax").
 		Paragraph(
 			"Signed integers can only be specified using decimal notation.",
 			"A leading positive sign (`+`) is **OPTIONAL**.",

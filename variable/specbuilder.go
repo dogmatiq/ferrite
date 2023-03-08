@@ -14,9 +14,13 @@ type SpecBuilder[T any] struct {
 	examples []TypedExample[T]
 }
 
-// Init initializes the builder.
-func (b *SpecBuilder[T]) Init(name, desc string) {
+// Name sets the name of the environment variable.
+func (b *SpecBuilder[T]) Name(name string) {
 	b.spec.name = name
+}
+
+// Description sets a human-readable description of the environment variable.
+func (b *SpecBuilder[T]) Description(desc string) {
 	b.spec.desc = desc
 }
 
@@ -83,12 +87,9 @@ func (b *SpecBuilder[T]) NonNormativeExample(v T, desc string) {
 // Documentation adds documentation to the variable.
 //
 // It returns the DocumentBuilder that can be used to add documentation content .
-func (b *SpecBuilder[T]) Documentation(summary string) DocumentationBuilder {
+func (b *SpecBuilder[T]) Documentation() DocumentationBuilder {
 	return DocumentationBuilder{
-		&b.spec.docs,
-		Documentation{
-			Summary: summary,
-		},
+		docs: &b.spec.docs,
 	}
 }
 

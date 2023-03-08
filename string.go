@@ -19,7 +19,10 @@ func String(name, desc string) *StringBuilder[string] {
 // human-readable description of the environment variable.
 func StringAs[T ~string](name, desc string) *StringBuilder[T] {
 	b := &StringBuilder[T]{}
-	b.spec.Init(name, desc)
+
+	b.spec.Name(name)
+	b.spec.Description(desc)
+
 	return b
 }
 

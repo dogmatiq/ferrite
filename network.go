@@ -13,19 +13,18 @@ import (
 // human-readable description of the environment variable.
 func NetworkPort(name, desc string) *NetworkPortBuilder {
 	b := &NetworkPortBuilder{}
-	b.v.Init(name, desc)
 
-	b.v.BuiltInConstraint(
+	b.spec.Name(name)
+	b.spec.Description(desc)
+	b.spec.BuiltInConstraint(
 		"**MUST** be a valid network port",
 		func(v string) variable.ConstraintError {
 			return validatePort(v)
 		},
 	)
-
-	b.v.NonNormativeExample("8000", "a port commonly used for private web servers")
-	b.v.NonNormativeExample("https", "the IANA service name that maps to port 443")
-
-	addNetworkPortSyntaxDocumentation(&b.v)
+	b.spec.NonNormativeExample("8000", "a port commonly used for private web servers")
+	b.spec.NonNormativeExample("https", "the IANA service name that maps to port 443")
+	buildNetworkPortSyntaxDocumentation(b.spec.Documentation())
 
 	return b
 }
@@ -33,29 +32,29 @@ func NetworkPort(name, desc string) *NetworkPortBuilder {
 // NetworkPortBuilder builds a specification for a network port variable.
 type NetworkPortBuilder struct {
 	schema variable.TypedString[string]
-	v      variable.SpecBuilder[string]
+	spec   variable.SpecBuilder[string]
 }
 
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b *NetworkPortBuilder) WithDefault(v string) *NetworkPortBuilder {
-	b.v.Default(v)
+	b.spec.Default(v)
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *NetworkPortBuilder) Required(options ...Option) Required[string] {
-	b.v.MarkRequired()
-	v := b.v.Done(b.schema, options)
+	b.spec.MarkRequired()
+	v := b.spec.Done(b.schema, options)
 	return requiredOne(v)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *NetworkPortBuilder) Optional(options ...Option) Optional[string] {
-	v := b.v.Done(b.schema, options)
+	v := b.spec.Done(b.schema, options)
 	return optionalOne(v)
 
 }
@@ -130,22 +129,9 @@ func validateIANAServiceName(name string) error {
 	return nil
 }
 
-// Deprecated: use addNetworkPortSyntaxDocumentation() instead.
-var networkPortSyntaxDocumentation = variable.WithDocumentation[string]().
-	Summary("Network port syntax").
-	Paragraph(
-		"Ports may be specified as a numeric value no greater than `65535`.",
-		"Alternatively, a service name can be used.",
-		"Service names are resolved against the system's service database,",
-		"typically located in the `/etc/service` file on UNIX-like systems.",
-		"Standard service names are published by IANA.",
-	).
-	Format().
-	Done()
-
-func addNetworkPortSyntaxDocumentation(d variable.Documentable) {
+func buildNetworkPortSyntaxDocumentation(d variable.DocumentationBuilder) {
 	d.
-		Documentation("Network port syntax").
+		Summary("Network port syntax").
 		Paragraph(
 			"Ports may be specified as a numeric value no greater than `65535`.",
 			"Alternatively, a service name can be used.",

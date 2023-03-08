@@ -25,16 +25,16 @@ type Documentation struct {
 	IsImportant bool
 }
 
-// Documentable is an interface for things that can be documented using a
-// DocumentationBuilder.
-type Documentable interface {
-	Documentation(summary string) DocumentationBuilder
-}
-
 // DocumentationBuilder is a fluent interface for building a documentation.
 type DocumentationBuilder struct {
 	docs *[]Documentation
 	doc  Documentation
+}
+
+// Summary sets the summary of the documentation.
+func (b DocumentationBuilder) Summary(summary string) DocumentationBuilder {
+	b.doc.Summary = summary
+	return b
 }
 
 // Paragraph adds a paragraph to the documentation.
@@ -72,67 +72,4 @@ func (b DocumentationBuilder) Important() DocumentationBuilder {
 // Done returns an option that adds the documentation to the variable spec.
 func (b DocumentationBuilder) Done() {
 	*b.docs = append(*b.docs, b.doc)
-}
-
-// DocumentationBuilderX is a fluent interface for building a Documentation
-// value.
-// Deprecated:
-type DocumentationBuilderX[T any] struct {
-	doc Documentation
-}
-
-// WithDocumentation returns documentation builder that adds additional
-// documentation about a variable.
-//
-// The T type parameter is not meaningful, but is required in order to produce a
-// TypedSpecOption of the correct type.
-func WithDocumentation[T any]() DocumentationBuilderX[T] {
-	return DocumentationBuilderX[T]{}
-}
-
-// Summary adds a summary to the documentation.
-func (b DocumentationBuilderX[T]) Summary(f string, v ...any) DocumentationBuilderX[T] {
-	b.doc.Summary = fmt.Sprintf(f, v...)
-	return b
-}
-
-// Paragraph adds a paragraph to the documentation.
-//
-// text is concatenated together with a space to form the paragraph text.
-// The entire paragraph is a Printf() style format specifier.
-func (b DocumentationBuilderX[T]) Paragraph(text ...string) ParagraphFormatterX[T] {
-	return ParagraphFormatterX[T]{
-		func(v ...any) DocumentationBuilderX[T] {
-			b.doc.Paragraphs = append(
-				slices.Clone(b.doc.Paragraphs),
-				fmt.Sprintf(
-					strings.Join(text, " "),
-					v...,
-				),
-			)
-			return b
-		},
-	}
-}
-
-// ParagraphFormatterX is a fluent interface for applying values to a paragraph
-// template.
-// Deprecated:
-type ParagraphFormatterX[T any] struct {
-	// Format applies the given values to the paragraph template.
-	Format func(...any) DocumentationBuilderX[T]
-}
-
-// Important marks the documentation as important.
-func (b DocumentationBuilderX[T]) Important() DocumentationBuilderX[T] {
-	b.doc.IsImportant = true
-	return b
-}
-
-// Done returns an option that adds the documentation to the variable spec.
-func (b DocumentationBuilderX[T]) Done() TypedSpecOption[T] {
-	return func(opts *specOptions[T]) error {
-		opts.Docs = append(opts.Docs, b.doc)
-		return nil
-	}
 }

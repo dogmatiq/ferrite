@@ -14,37 +14,37 @@ import (
 // human-readable description of the environment variable.
 func File(name, desc string) *FileBuilder {
 	b := &FileBuilder{}
-	b.v.Init(name, desc)
-
+	b.spec.Name(name)
+	b.spec.Description(desc)
 	return b
 }
 
 // FileBuilder builds a specification for a boolean value.
 type FileBuilder struct {
 	schema variable.TypedString[FileName]
-	v      variable.SpecBuilder[FileName]
+	spec   variable.SpecBuilder[FileName]
 }
 
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b *FileBuilder) WithDefault(v string) *FileBuilder {
-	b.v.Default(FileName(v))
+	b.spec.Default(FileName(v))
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *FileBuilder) Required(options ...Option) Required[FileName] {
-	b.v.MarkRequired()
-	v := b.v.Done(b.schema, options)
+	b.spec.MarkRequired()
+	v := b.spec.Done(b.schema, options)
 	return requiredOne(v)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *FileBuilder) Optional(options ...Option) Optional[FileName] {
-	v := b.v.Done(b.schema, options)
+	v := b.spec.Done(b.schema, options)
 	return optionalOne(v)
 
 }

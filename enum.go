@@ -30,7 +30,8 @@ func EnumAs[T any](name, desc string) *EnumBuilder[T] {
 		},
 	}
 
-	b.spec.Init(name, desc)
+	b.spec.Name(name)
+	b.spec.Description(desc)
 
 	return b
 }

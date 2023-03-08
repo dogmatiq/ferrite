@@ -32,7 +32,8 @@ func BoolAs[T ~bool](name, desc string) *BoolBuilder[T] {
 		},
 	}
 
-	b.spec.Init(name, desc)
+	b.spec.Name(name)
+	b.spec.Description(desc)
 
 	return b
 }
