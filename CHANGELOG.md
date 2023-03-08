@@ -18,8 +18,13 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Changed
 
+The following changes are technically not backwards compatible from a Go
+perspective, but under normal usage (as per the examples) they do not
+actually alter the usage of the Ferrite API.
+
 - **[BC]** Change `NetworkPort()` to use the new `NetworkPortBuilder` instead of `StringBuilder`
-- **[BC]** `Required[T]` and `Optional[T]` are now interfaces, this is technically not backwards compatable but should not affect normal usage
+- **[BC]** Changed `Required[T]` and `Optional[T]` from structs to interfaces
+- **[BC]** Changed all "builder" types to use pointer receivers
 
 ## [0.3.6] - 2023-03-06
 

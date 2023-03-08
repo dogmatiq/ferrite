@@ -9,7 +9,7 @@ import (
 )
 
 var _ = Describe("type KubernetesServiceBuilder", func() {
-	var builder KubernetesServiceBuilder
+	var builder *KubernetesServiceBuilder
 
 	BeforeEach(func() {
 		builder = KubernetesService("ferrite-svc")

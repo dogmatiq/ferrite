@@ -17,8 +17,8 @@ import (
 // human-readable description of the environment variable.
 //
 // Durations have a minimum value of 1 nanosecond by default.
-func Duration(name, desc string) DurationBuilder {
-	return DurationBuilder{
+func Duration(name, desc string) *DurationBuilder {
+	return &DurationBuilder{
 		name: name,
 		desc: desc,
 		min:  maybe.Some(1 * time.Nanosecond),
@@ -34,38 +34,38 @@ type DurationBuilder struct {
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
-func (b DurationBuilder) WithDefault(v time.Duration) DurationBuilder {
+func (b *DurationBuilder) WithDefault(v time.Duration) *DurationBuilder {
 	b.def = maybe.Some(v)
 	return b
 }
 
 // WithMinimum sets the minimum acceptable value of the variable.
-func (b DurationBuilder) WithMinimum(v time.Duration) DurationBuilder {
+func (b *DurationBuilder) WithMinimum(v time.Duration) *DurationBuilder {
 	b.min = maybe.Some(v)
 	return b
 }
 
 // WithMaximum sets the maximum acceptable value of the variable.
-func (b DurationBuilder) WithMaximum(v time.Duration) DurationBuilder {
+func (b *DurationBuilder) WithMaximum(v time.Duration) *DurationBuilder {
 	b.max = maybe.Some(v)
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b DurationBuilder) Required(options ...variable.RegisterOption) Required[time.Duration] {
+func (b *DurationBuilder) Required(options ...variable.RegisterOption) Required[time.Duration] {
 	v := variable.Register(b.spec(true), options)
 	return requiredVar[time.Duration]{v}
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b DurationBuilder) Optional(options ...variable.RegisterOption) Optional[time.Duration] {
+func (b *DurationBuilder) Optional(options ...variable.RegisterOption) Optional[time.Duration] {
 	v := variable.Register(b.spec(false), options)
 	return optionalVar[time.Duration]{v}
 }
 
-func (b DurationBuilder) spec(req bool) variable.TypedSpec[time.Duration] {
+func (b *DurationBuilder) spec(req bool) variable.TypedSpec[time.Duration] {
 	s, err := variable.NewSpec(
 		b.name,
 		b.desc,

@@ -10,7 +10,7 @@ import (
 )
 
 var _ = Describe("type DurationBuilder", func() {
-	var builder DurationBuilder
+	var builder *DurationBuilder
 
 	BeforeEach(func() {
 		builder = Duration("FERRITE_DURATION", "<desc>")

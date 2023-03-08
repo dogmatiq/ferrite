@@ -9,7 +9,7 @@ import (
 )
 
 var _ = Describe("type URLBuilder", func() {
-	var builder URLBuilder
+	var builder *URLBuilder
 
 	BeforeEach(func() {
 		builder = URL("FERRITE_URL", "<desc>")

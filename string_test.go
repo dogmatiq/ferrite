@@ -11,7 +11,7 @@ import (
 type userDefinedString string
 
 var _ = Describe("type StringBuilder", func() {
-	var builder StringBuilder[userDefinedString]
+	var builder *StringBuilder[userDefinedString]
 
 	BeforeEach(func() {
 		builder = StringAs[userDefinedString]("FERRITE_STRING", "<desc>")

@@ -9,7 +9,7 @@ import (
 )
 
 var _ = Describe("func NetworkPort", func() {
-	var builder NetworkPortBuilder
+	var builder *NetworkPortBuilder
 
 	BeforeEach(func() {
 		builder = NetworkPort("FERRITE_NETWORK_PORT", "<desc>")

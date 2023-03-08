@@ -11,7 +11,7 @@ import (
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func Bool(name, desc string) BoolBuilder[bool] {
+func Bool(name, desc string) *BoolBuilder[bool] {
 	return BoolAs[bool](name, desc)
 }
 
@@ -20,8 +20,8 @@ func Bool(name, desc string) BoolBuilder[bool] {
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func BoolAs[T ~bool](name, desc string) BoolBuilder[T] {
-	return BoolBuilder[T]{
+func BoolAs[T ~bool](name, desc string) *BoolBuilder[T] {
+	return &BoolBuilder[T]{
 		name: name,
 		desc: desc,
 		t:    fmt.Sprint(T(true)),
@@ -40,7 +40,7 @@ type BoolBuilder[T ~bool] struct {
 //
 // The default literals "true" and "false" are no longer valid values when using
 // custom literals.
-func (b BoolBuilder[T]) WithLiterals(t, f string) BoolBuilder[T] {
+func (b *BoolBuilder[T]) WithLiterals(t, f string) *BoolBuilder[T] {
 	b.t = t
 	b.f = f
 	return b
@@ -49,26 +49,26 @@ func (b BoolBuilder[T]) WithLiterals(t, f string) BoolBuilder[T] {
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
-func (b BoolBuilder[T]) WithDefault(v T) BoolBuilder[T] {
+func (b *BoolBuilder[T]) WithDefault(v T) *BoolBuilder[T] {
 	b.def = maybe.Some(v)
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b BoolBuilder[T]) Required(options ...variable.RegisterOption) Required[T] {
+func (b *BoolBuilder[T]) Required(options ...variable.RegisterOption) Required[T] {
 	v := variable.Register(b.spec(true), options)
 	return requiredVar[T]{v}
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b BoolBuilder[T]) Optional(options ...variable.RegisterOption) Optional[T] {
+func (b *BoolBuilder[T]) Optional(options ...variable.RegisterOption) Optional[T] {
 	v := variable.Register(b.spec(false), options)
 	return optionalVar[T]{v}
 }
 
-func (b BoolBuilder[T]) spec(req bool) variable.TypedSpec[T] {
+func (b *BoolBuilder[T]) spec(req bool) variable.TypedSpec[T] {
 	s, err := variable.NewSpec(
 		b.name,
 		b.desc,

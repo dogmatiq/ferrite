@@ -11,7 +11,7 @@ import (
 type userDefinedSigned int16
 
 var _ = Describe("type SignedBuilder", func() {
-	var builder SignedBuilder[userDefinedSigned]
+	var builder *SignedBuilder[userDefinedSigned]
 
 	BeforeEach(func() {
 		builder = Signed[userDefinedSigned]("FERRITE_SIGNED", "<desc>")

@@ -28,7 +28,7 @@ func (a KubernetesAddress) String() string {
 //
 // The environment variables "<svc>_SERVICE_HOST" and "<svc>_SERVICE_PORT" are
 // used to construct an address for the service.
-func KubernetesService(svc string) KubernetesServiceBuilder {
+func KubernetesService(svc string) *KubernetesServiceBuilder {
 	if err := validateKubernetesName(svc); err != nil {
 		panic(fmt.Sprintf(
 			"kubernetes service name is invalid: %s",
@@ -36,7 +36,7 @@ func KubernetesService(svc string) KubernetesServiceBuilder {
 		))
 	}
 
-	return KubernetesServiceBuilder{
+	return &KubernetesServiceBuilder{
 		service: svc,
 		hostVar: fmt.Sprintf(
 			"%s_SERVICE_HOST",
@@ -67,7 +67,7 @@ type KubernetesServiceBuilder struct {
 // although the two may use the same names.
 //
 // See https://kubernetes.io/docs/concepts/services-networking/service/#multi-port-services
-func (b KubernetesServiceBuilder) WithNamedPort(port string) KubernetesServiceBuilder {
+func (b *KubernetesServiceBuilder) WithNamedPort(port string) *KubernetesServiceBuilder {
 	if err := validateKubernetesName(port); err != nil {
 		panic(fmt.Sprintf(
 			"specification of kubernetes %q service is invalid: invalid named port: %s",
@@ -91,14 +91,14 @@ func (b KubernetesServiceBuilder) WithNamedPort(port string) KubernetesServiceBu
 // The port may be a numeric value between 1 and 65535, or an IANA registered
 // service name (such as "https"). The IANA name is not to be confused with the
 // Kubernetes servcice name or port name.
-func (b KubernetesServiceBuilder) WithDefault(host, port string) KubernetesServiceBuilder {
+func (b *KubernetesServiceBuilder) WithDefault(host, port string) *KubernetesServiceBuilder {
 	b.def = maybe.Some(KubernetesAddress{host, port})
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b KubernetesServiceBuilder) Required(options ...variable.RegisterOption) Required[KubernetesAddress] {
+func (b *KubernetesServiceBuilder) Required(options ...variable.RegisterOption) Required[KubernetesAddress] {
 	host := variable.Register(b.hostSpec(true), options)
 	port := variable.Register(b.portSpec(true), options)
 
@@ -129,7 +129,7 @@ func (b KubernetesServiceBuilder) Required(options ...variable.RegisterOption) R
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b KubernetesServiceBuilder) Optional(options ...variable.RegisterOption) Optional[KubernetesAddress] {
+func (b *KubernetesServiceBuilder) Optional(options ...variable.RegisterOption) Optional[KubernetesAddress] {
 	host := variable.Register(b.hostSpec(false), options)
 	port := variable.Register(b.portSpec(false), options)
 
@@ -170,7 +170,7 @@ func (b KubernetesServiceBuilder) Optional(options ...variable.RegisterOption) O
 	}
 }
 
-func (b KubernetesServiceBuilder) hostSpec(req bool) variable.TypedSpec[string] {
+func (b *KubernetesServiceBuilder) hostSpec(req bool) variable.TypedSpec[string] {
 	s, err := variable.NewSpec(
 		b.hostVar,
 		fmt.Sprintf(
@@ -197,7 +197,7 @@ func (b KubernetesServiceBuilder) hostSpec(req bool) variable.TypedSpec[string] 
 	return s
 }
 
-func (b KubernetesServiceBuilder) portSpec(req bool) variable.TypedSpec[string] {
+func (b *KubernetesServiceBuilder) portSpec(req bool) variable.TypedSpec[string] {
 	s, err := variable.NewSpec(
 		b.portVar,
 		fmt.Sprintf(

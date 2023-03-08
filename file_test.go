@@ -10,7 +10,7 @@ import (
 )
 
 var _ = Describe("type FileBuilder", func() {
-	var builder FileBuilder
+	var builder *FileBuilder
 
 	BeforeEach(func() {
 		builder = File("FERRITE_FILE", "<desc>")

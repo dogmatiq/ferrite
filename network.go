@@ -12,8 +12,8 @@ import (
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func NetworkPort(name, desc string) NetworkPortBuilder {
-	return NetworkPortBuilder{
+func NetworkPort(name, desc string) *NetworkPortBuilder {
+	return &NetworkPortBuilder{
 		name: name,
 		desc: desc,
 		options: []variable.SpecOption[string]{
@@ -46,27 +46,27 @@ type NetworkPortBuilder struct {
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
-func (b NetworkPortBuilder) WithDefault(v string) NetworkPortBuilder {
+func (b *NetworkPortBuilder) WithDefault(v string) *NetworkPortBuilder {
 	b.def = maybe.Some(v)
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b NetworkPortBuilder) Required(options ...variable.RegisterOption) Required[string] {
+func (b *NetworkPortBuilder) Required(options ...variable.RegisterOption) Required[string] {
 	v := variable.Register(b.spec(true), options)
 	return requiredVar[string]{v}
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b NetworkPortBuilder) Optional(options ...variable.RegisterOption) Optional[string] {
+func (b *NetworkPortBuilder) Optional(options ...variable.RegisterOption) Optional[string] {
 	v := variable.Register(b.spec(false), options)
 	return optionalVar[string]{v}
 
 }
 
-func (b NetworkPortBuilder) spec(req bool) variable.TypedSpec[string] {
+func (b *NetworkPortBuilder) spec(req bool) variable.TypedSpec[string] {
 	s, err := variable.NewSpec(
 		b.name,
 		b.desc,

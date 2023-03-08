@@ -18,7 +18,7 @@ func (v userDefinedBool) String() string {
 }
 
 var _ = Describe("type BoolBuilder", func() {
-	var builder BoolBuilder[userDefinedBool]
+	var builder *BoolBuilder[userDefinedBool]
 
 	BeforeEach(func() {
 		builder = BoolAs[userDefinedBool]("FERRITE_BOOL", "<desc>")

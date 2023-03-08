@@ -11,7 +11,7 @@ import (
 type userDefinedFloat float32
 
 var _ = Describe("type FloatBuilder", func() {
-	var builder FloatBuilder[userDefinedFloat]
+	var builder *FloatBuilder[userDefinedFloat]
 
 	BeforeEach(func() {
 		builder = Float[userDefinedFloat]("FERRITE_FLOAT", "<desc>")

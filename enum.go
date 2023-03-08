@@ -5,14 +5,13 @@ import (
 
 	"github.com/dogmatiq/ferrite/maybe"
 	"github.com/dogmatiq/ferrite/variable"
-	"golang.org/x/exp/slices"
 )
 
 // Enum configures an environment variable as an enumeration.
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func Enum(name, desc string) EnumBuilder[string] {
+func Enum(name, desc string) *EnumBuilder[string] {
 	return EnumAs[string](name, desc)
 }
 
@@ -21,8 +20,8 @@ func Enum(name, desc string) EnumBuilder[string] {
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func EnumAs[T any](name, desc string) EnumBuilder[T] {
-	return EnumBuilder[T]{
+func EnumAs[T any](name, desc string) *EnumBuilder[T] {
+	return &EnumBuilder[T]{
 		name: name,
 		desc: desc,
 		toLiteral: func(v T) variable.Literal {
@@ -45,9 +44,9 @@ type EnumBuilder[T any] struct {
 //
 // The environment variable must be set to the string representation of one of
 // the member values. The values must not have an empty string representation.
-func (b EnumBuilder[T]) WithMembers(values ...T) EnumBuilder[T] {
+func (b *EnumBuilder[T]) WithMembers(values ...T) *EnumBuilder[T] {
 	for _, v := range values {
-		b = b.WithMember(v, "")
+		b.WithMember(v, "")
 	}
 	return b
 }
@@ -56,9 +55,9 @@ func (b EnumBuilder[T]) WithMembers(values ...T) EnumBuilder[T] {
 //
 // The environment variable must be set to the string representation of one of
 // the member values. v must not have an empty string representation.
-func (b EnumBuilder[T]) WithMember(v T, desc string) EnumBuilder[T] {
+func (b *EnumBuilder[T]) WithMember(v T, desc string) *EnumBuilder[T] {
 	b.members = append(
-		slices.Clone(b.members),
+		b.members,
 		variable.SetMember[T]{
 			Value:       v,
 			Description: desc,
@@ -69,7 +68,7 @@ func (b EnumBuilder[T]) WithMember(v T, desc string) EnumBuilder[T] {
 
 // WithRenderer sets the function used to generate the literal string
 // representation of the enum's member values.
-func (b EnumBuilder[T]) WithRenderer(fn func(T) variable.Literal) EnumBuilder[T] {
+func (b *EnumBuilder[T]) WithRenderer(fn func(T) variable.Literal) *EnumBuilder[T] {
 	b.toLiteral = fn
 	return b
 }
@@ -77,14 +76,14 @@ func (b EnumBuilder[T]) WithRenderer(fn func(T) variable.Literal) EnumBuilder[T]
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
-func (b EnumBuilder[T]) WithDefault(v T) EnumBuilder[T] {
+func (b *EnumBuilder[T]) WithDefault(v T) *EnumBuilder[T] {
 	b.def = maybe.Some(v)
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b EnumBuilder[T]) Required(options ...variable.RegisterOption) Required[T] {
+func (b *EnumBuilder[T]) Required(options ...variable.RegisterOption) Required[T] {
 	v := variable.Register(b.spec(true), options)
 	return requiredVar[T]{v}
 
@@ -92,7 +91,7 @@ func (b EnumBuilder[T]) Required(options ...variable.RegisterOption) Required[T]
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b EnumBuilder[T]) Optional(options ...variable.RegisterOption) Optional[T] {
+func (b *EnumBuilder[T]) Optional(options ...variable.RegisterOption) Optional[T] {
 	v := variable.Register(b.spec(false), options)
 	return optionalVar[T]{v}
 

@@ -24,7 +24,7 @@ func (m enumMember) String() string {
 }
 
 var _ = Describe("type EnumBuilder", func() {
-	var builder EnumBuilder[enumMember]
+	var builder *EnumBuilder[enumMember]
 
 	BeforeEach(func() {
 		builder = EnumAs[enumMember]("FERRITE_ENUM", "<desc>").

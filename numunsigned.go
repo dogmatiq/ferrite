@@ -14,8 +14,8 @@ import (
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func Unsigned[T constraints.Unsigned](name, desc string) UnsignedBuilder[T] {
-	return UnsignedBuilder[T]{
+func Unsigned[T constraints.Unsigned](name, desc string) *UnsignedBuilder[T] {
+	return &UnsignedBuilder[T]{
 		name: name,
 		desc: desc,
 	}
@@ -30,39 +30,39 @@ type UnsignedBuilder[T constraints.Unsigned] struct {
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
-func (b UnsignedBuilder[T]) WithDefault(v T) UnsignedBuilder[T] {
+func (b *UnsignedBuilder[T]) WithDefault(v T) *UnsignedBuilder[T] {
 	b.def = maybe.Some(v)
 	return b
 }
 
 // WithMinimum sets the minimum acceptable value of the variable.
-func (b UnsignedBuilder[T]) WithMinimum(v T) UnsignedBuilder[T] {
+func (b *UnsignedBuilder[T]) WithMinimum(v T) *UnsignedBuilder[T] {
 	b.min = maybe.Some(v)
 	return b
 }
 
 // WithMaximum sets the maximum acceptable value of the variable.
-func (b UnsignedBuilder[T]) WithMaximum(v T) UnsignedBuilder[T] {
+func (b *UnsignedBuilder[T]) WithMaximum(v T) *UnsignedBuilder[T] {
 	b.max = maybe.Some(v)
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b UnsignedBuilder[T]) Required(options ...variable.RegisterOption) Required[T] {
+func (b *UnsignedBuilder[T]) Required(options ...variable.RegisterOption) Required[T] {
 	v := variable.Register(b.spec(true), options)
 	return requiredVar[T]{v}
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b UnsignedBuilder[T]) Optional(options ...variable.RegisterOption) Optional[T] {
+func (b *UnsignedBuilder[T]) Optional(options ...variable.RegisterOption) Optional[T] {
 	v := variable.Register(b.spec(false), options)
 	return optionalVar[T]{v}
 
 }
 
-func (b UnsignedBuilder[T]) spec(req bool) variable.TypedSpec[T] {
+func (b *UnsignedBuilder[T]) spec(req bool) variable.TypedSpec[T] {
 	s, err := variable.NewSpec(
 		b.name,
 		b.desc,

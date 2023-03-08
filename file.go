@@ -13,8 +13,8 @@ import (
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func File(name, desc string) FileBuilder {
-	return FileBuilder{
+func File(name, desc string) *FileBuilder {
+	return &FileBuilder{
 		name: name,
 		desc: desc,
 	}
@@ -29,27 +29,27 @@ type FileBuilder struct {
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
-func (b FileBuilder) WithDefault(v string) FileBuilder {
+func (b *FileBuilder) WithDefault(v string) *FileBuilder {
 	b.def = maybe.Some(FileName(v))
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b FileBuilder) Required(options ...variable.RegisterOption) Required[FileName] {
+func (b *FileBuilder) Required(options ...variable.RegisterOption) Required[FileName] {
 	v := variable.Register(b.spec(true), options)
 	return requiredVar[FileName]{v}
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b FileBuilder) Optional(options ...variable.RegisterOption) Optional[FileName] {
+func (b *FileBuilder) Optional(options ...variable.RegisterOption) Optional[FileName] {
 	v := variable.Register(b.spec(false), options)
 	return optionalVar[FileName]{v}
 
 }
 
-func (b FileBuilder) spec(req bool) variable.TypedSpec[FileName] {
+func (b *FileBuilder) spec(req bool) variable.TypedSpec[FileName] {
 	s, err := variable.NewSpec(
 		b.name,
 		b.desc,

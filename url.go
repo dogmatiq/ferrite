@@ -14,8 +14,8 @@ import (
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func URL(name, desc string) URLBuilder {
-	return URLBuilder{
+func URL(name, desc string) *URLBuilder {
+	return &URLBuilder{
 		name: name,
 		desc: desc,
 		options: []variable.SpecOption[*url.URL]{
@@ -60,7 +60,7 @@ type URLBuilder struct {
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
-func (b URLBuilder) WithDefault(v string) URLBuilder {
+func (b *URLBuilder) WithDefault(v string) *URLBuilder {
 	u := mustParseURL(v)
 	b.def = maybe.Some(u)
 	return b
@@ -68,20 +68,20 @@ func (b URLBuilder) WithDefault(v string) URLBuilder {
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b URLBuilder) Required(options ...variable.RegisterOption) Required[*url.URL] {
+func (b *URLBuilder) Required(options ...variable.RegisterOption) Required[*url.URL] {
 	v := variable.Register(b.spec(true), options)
 	return requiredVar[*url.URL]{v}
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b URLBuilder) Optional(options ...variable.RegisterOption) Optional[*url.URL] {
+func (b *URLBuilder) Optional(options ...variable.RegisterOption) Optional[*url.URL] {
 	v := variable.Register(b.spec(false), options)
 	return optionalVar[*url.URL]{v}
 
 }
 
-func (b URLBuilder) spec(req bool) variable.TypedSpec[*url.URL] {
+func (b *URLBuilder) spec(req bool) variable.TypedSpec[*url.URL] {
 	s, err := variable.NewSpec(
 		b.name,
 		b.desc,

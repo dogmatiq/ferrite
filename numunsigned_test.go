@@ -11,8 +11,7 @@ import (
 type userDefinedUnsigned uint16
 
 var _ = Describe("type UnsignedBuilder", func() {
-
-	var builder UnsignedBuilder[userDefinedUnsigned]
+	var builder *UnsignedBuilder[userDefinedUnsigned]
 
 	BeforeEach(func() {
 		builder = Unsigned[userDefinedUnsigned]("FERRITE_UNSIGNED", "<desc>")
