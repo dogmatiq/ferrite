@@ -543,6 +543,48 @@ var _ = Describe("func Run()", func() {
 					Required(variable.WithRegistry(reg))
 			},
 		),
+		Entry(
+			"string + sensitive + optional + default",
+			"string/sensitive-default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					String("PASSWORD", "a very secret password").
+					WithDefault("hunter2").
+					WithSensitiveContent().
+					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"string + sensitive + optional",
+			"string/sensitive-optional.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					String("PASSWORD", "a very secret password").
+					WithSensitiveContent().
+					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"string + sensitive + required + default",
+			"string/sensitive-default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					String("PASSWORD", "a very secret password").
+					WithDefault("hunter2").
+					WithSensitiveContent().
+					Required(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"string + sensitive + required",
+			"string/sensitive-required.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					String("PASSWORD", "a very secret password").
+					WithSensitiveContent().
+					Required(variable.WithRegistry(reg))
+			},
+		),
 
 		// URL
 

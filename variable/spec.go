@@ -54,12 +54,12 @@ func IsDefault(s Spec, v Literal) bool {
 // SpecOption is an option that changes the behavior of a spec.
 type SpecOption[T any] func(*specOptions[T]) error
 
-// Sensitive returns an option that marks a variable as containing sensitive
-// information.
+// WithSensitiveContent returns an option that marks a variable as containing
+// sensitive information.
 //
 // The T type parameter is not meaningful, but is required in order to produce a
 // SpecOption of the correct type.
-func Sensitive[T any]() SpecOption[T] {
+func WithSensitiveContent[T any]() SpecOption[T] {
 	return func(o *specOptions[T]) error {
 		o.IsSensitive = true
 		return nil

@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Added `StringBuilder.WithSensitiveContent()`, which indicates that a string variable's contents may contain sensitive information
+
 ### Changed
 
 - **[BC]** Change `NetworkPort()` to use the new `NetworkPortBuilder` instead of `StringBuilder`

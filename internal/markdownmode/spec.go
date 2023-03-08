@@ -22,7 +22,16 @@ func (r *specRenderer) Render() {
 	r.spec.Schema().AcceptVisitor(r)
 
 	r.renderImportantDocumentation()
-	r.renderExamples()
+
+	if r.spec.IsSensitive() {
+		r.ren.paragraph(
+			"⚠️ This variable is **sensitive**,",
+			"its value may contain private information.",
+		)()
+	} else {
+		r.renderExamples()
+	}
+
 	r.renderUnimportantDocumentation()
 }
 
@@ -107,54 +116,47 @@ func (r *specRenderer) VisitOther(s variable.Other) {
 func (r *specRenderer) renderPrimaryRequirement(f string, v ...any) {
 	req := fmt.Sprintf(f, v...)
 
-	if req != "" {
-		if def, ok := r.spec.Default(); ok {
-			r.ren.paragraph(
-				"The `%s` variable **MAY** be left undefined, in which case the default value of `%s` is used.",
-				"Otherwise, the value %s.",
-			)(
-				r.spec.Name(),
-				def.String,
-				req,
-			)
-		} else if r.spec.IsRequired() {
-			r.ren.paragraph(
-				"The `%s` variable's value %s.",
-			)(
-				r.spec.Name(),
-				req,
-			)
-		} else {
-			r.ren.paragraph(
-				"The `%s` variable **MAY** be left undefined.",
-				"Otherwise, the value %s.",
-			)(
-				r.spec.Name(),
-				req,
-			)
+	var text string
+	var args []any
+
+	if def, ok := r.renderDefaultValueFragment(); ok {
+		text = "The `%s` variable **MAY** be left undefined, in which case %s is used."
+		args = []any{r.spec.Name(), def}
+
+		if req != "" {
+			text += " Otherwise, the value %s."
+			args = append(args, req)
 		}
-
-		return
-	}
-
-	if def, ok := r.spec.Default(); ok {
-		r.ren.paragraph(
-			"The `%s` variable **MAY** be left undefined, in which case the default value of `%s` is used.",
-		)(
-			r.spec.Name(),
-			def.String,
-		)
 	} else if r.spec.IsRequired() {
-		r.ren.paragraph(
-			"The `%s` variable **MUST NOT** be left undefined.",
-		)(
-			r.spec.Name(),
-		)
+		if req != "" {
+			text = "The `%s` variable's value %s."
+			args = []any{r.spec.Name(), req}
+		} else {
+			text = "The `%s` variable **MUST NOT** be left undefined."
+			args = []any{r.spec.Name()}
+		}
 	} else {
-		r.ren.paragraph(
-			"The `%s` variable **MAY** be left undefined.",
-		)(
-			r.spec.Name(),
-		)
+		text = "The `%s` variable **MAY** be left undefined."
+		args = []any{r.spec.Name()}
+
+		if req != "" {
+			text += " Otherwise, the value %s."
+			args = append(args, req)
+		}
 	}
+
+	r.ren.paragraph(text)(args...)
+}
+
+func (r *specRenderer) renderDefaultValueFragment() (string, bool) {
+	def, ok := r.spec.Default()
+	if !ok {
+		return "", false
+	}
+
+	if r.spec.IsSensitive() {
+		return "a default value", true
+	}
+
+	return fmt.Sprintf("the default value of `%s`", def.String), true
 }

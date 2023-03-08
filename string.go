@@ -56,12 +56,15 @@ func (b StringBuilder[T]) WithConstraintFunc(
 	return b
 }
 
-// Sensitive marks the variable as containing sensitive information, such as
-// passwords or cryptographic keys.
-func (b StringBuilder[T]) Sensitive() StringBuilder[T] {
+// WithSensitiveContent marks the variable as containing sensitive information,
+// such as passwords or cryptographic keys.
+//
+// Sensitive values are redacted in console output and excluded from examples in
+// generated documentation.
+func (b StringBuilder[T]) WithSensitiveContent() StringBuilder[T] {
 	b.options = append(
 		slices.Clone(b.options),
-		variable.Sensitive[T](),
+		variable.WithSensitiveContent[T](),
 	)
 	return b
 }
