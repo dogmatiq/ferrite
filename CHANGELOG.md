@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Added
 
+- Added `InitOption` type
 - Added `VariableOption` type
 - Added `Sensitive()` option, which indicates that a variable's contents may contain sensitive information
 
@@ -23,6 +24,7 @@ The following changes are technically not backwards compatible from a Go
 perspective, but under normal usage (as per the examples) they do not
 actually alter the usage of the Ferrite API.
 
+- **[BC]** Change `Init()` to accept options
 - **[BC]** Change `NetworkPort()` to use the new `NetworkPortBuilder` instead of `StringBuilder`
 - **[BC]** Changed `Required[T]` and `Optional[T]` from structs to interfaces
 - **[BC]** Changed all "builder" types to use pointer receivers

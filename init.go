@@ -20,7 +20,7 @@ import (
 // If the FERRITE_MODE environment variable is set to "usage/markdown" it prints
 // information about the environment variables in Markdown format, then exits
 // the process successfully.
-func Init() {
+func Init(options ...InitOption) {
 	switch m := os.Getenv("FERRITE_MODE"); m {
 	case "usage/markdown":
 		result := markdownmode.Run(
@@ -49,3 +49,9 @@ var (
 	// exit is called to exit the process when validation fails.
 	exit = os.Exit
 )
+
+// An InitOption changes the behavior of Init().
+//
+// WARNING: The signature of this function is not considered part of Ferrite's
+// public API. It may change at any time and without warning.
+type InitOption struct{}
