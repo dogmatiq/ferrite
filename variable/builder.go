@@ -55,8 +55,8 @@ func (b *Builder[T, S]) Documentation(summary string) DocumentationBuilder {
 	}
 }
 
-// Register builds the specification and registers the variable.
-func (b *Builder[T, S]) Register(options []RegisterOption) *OfType[T] {
+// Done builds the specification and registers the variable.
+func (b *Builder[T, S]) Done(options []RegisterOption) *OfType[T] {
 	spec, err := b.buildSpec()
 	if err != nil {
 		panic(err.Error())

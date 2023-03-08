@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/dogmatiq/ferrite/maybe"
 	"github.com/dogmatiq/ferrite/variable"
 )
 
@@ -14,54 +13,39 @@ import (
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
 func File(name, desc string) *FileBuilder {
-	return &FileBuilder{
-		name: name,
-		desc: desc,
-	}
+	b := &FileBuilder{}
+	b.v.Init(name, desc)
+
+	return b
 }
 
 // FileBuilder builds a specification for a boolean value.
 type FileBuilder struct {
-	name, desc string
-	def        maybe.Value[FileName]
+	v variable.Builder[FileName, variable.TypedString[FileName]]
 }
 
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b *FileBuilder) WithDefault(v string) *FileBuilder {
-	b.def = maybe.Some(FileName(v))
+	b.v.Default(FileName(v))
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *FileBuilder) Required(options ...Option) Required[FileName] {
-	v := variable.Register(b.spec(true), options)
+	b.v.Required()
+	v := b.v.Done(options)
 	return requiredOne(v)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *FileBuilder) Optional(options ...Option) Optional[FileName] {
-	v := variable.Register(b.spec(false), options)
+	v := b.v.Done(options)
 	return optionalOne(v)
 
-}
-
-func (b *FileBuilder) spec(req bool) variable.TypedSpec[FileName] {
-	s, err := variable.NewSpec(
-		b.name,
-		b.desc,
-		b.def,
-		req,
-		variable.TypedString[FileName]{},
-	)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return s
 }
 
 // FileName is the name of a file.

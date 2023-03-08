@@ -64,14 +64,14 @@ func (b *DurationBuilder) WithMaximum(v time.Duration) *DurationBuilder {
 // Ferrite's validation system.
 func (b *DurationBuilder) Required(options ...Option) Required[time.Duration] {
 	b.v.Required()
-	v := b.v.Register(options)
+	v := b.v.Done(options)
 	return requiredOne(v)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *DurationBuilder) Optional(options ...Option) Optional[time.Duration] {
-	v := b.v.Register(options)
+	v := b.v.Done(options)
 	return optionalOne(v)
 }
 

@@ -67,13 +67,13 @@ func (b *BoolBuilder[T]) WithDefault(v T) *BoolBuilder[T] {
 // Ferrite's validation system.
 func (b *BoolBuilder[T]) Required(options ...Option) Required[T] {
 	b.v.Required()
-	v := b.v.Register(options)
+	v := b.v.Done(options)
 	return requiredOne(v)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *BoolBuilder[T]) Optional(options ...Option) Optional[T] {
-	v := b.v.Register(options)
+	v := b.v.Done(options)
 	return optionalOne(v)
 }

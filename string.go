@@ -71,14 +71,14 @@ func (b *StringBuilder[T]) WithSensitiveContent() *StringBuilder[T] {
 // Ferrite's validation system.
 func (b *StringBuilder[T]) Required(options ...Option) Required[T] {
 	b.v.Required()
-	v := b.v.Register(options)
+	v := b.v.Done(options)
 	return requiredOne(v)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *StringBuilder[T]) Optional(options ...Option) Optional[T] {
-	v := b.v.Register(options)
+	v := b.v.Done(options)
 	return optionalOne(v)
 
 }
