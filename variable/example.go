@@ -69,6 +69,33 @@ func WithNonNormativeExample[T any](v T, desc string) SpecOption[T] {
 func BestExample(spec Spec) Example {
 	var incumbent Example
 
+	isBetter := func(a, b Example) bool {
+		// Prefer normative examples over non-normative ones.
+		if a.IsNormative != b.IsNormative {
+			return a.IsNormative
+		}
+
+		// Prefer examples from higher-levels sources.
+		if a.Source != b.Source {
+			return a.Source > b.Source
+		}
+
+		// Prefer examples with (longer) descriptions than those without.
+		if a.Description != b.Description {
+			return len(a.Description) > len(b.Description)
+		}
+
+		// If both are schema-generated non-normative examples, assume that
+		// the shorter value is less likely to be "weird".
+		if a.Source == ExampleSourceSchema && !a.IsNormative {
+			return len(a.Canonical.String) < len(b.Canonical.String)
+		}
+
+		// Otherwise, assume that the the longer value has better
+		// illustrative properties.
+		return len(a.Canonical.String) > len(b.Canonical.String)
+	}
+
 	for _, candidate := range spec.Examples() {
 		// Always prefer the default value, as it's typically supplied by the
 		// application author and "guaranteed" to work.
@@ -77,40 +104,12 @@ func BestExample(spec Spec) Example {
 		}
 
 		// Otherwise, keep going looking for a better candidate.
-		if isBetterExample(candidate, incumbent) {
+		if isBetter(candidate, incumbent) {
 			incumbent = candidate
 		}
 	}
 
 	return incumbent
-}
-
-// isBetterExample returns true if a is heuristically "better" than b.
-func isBetterExample(a, b Example) bool {
-	// Prefer normative examples over non-normative ones.
-	if a.IsNormative != b.IsNormative {
-		return a.IsNormative
-	}
-
-	// Prefer examples from higher-levels sources.
-	if a.Source != b.Source {
-		return a.Source > b.Source
-	}
-
-	// Prefer examples with (longer) descriptions than those without.
-	if a.Description != b.Description {
-		return len(a.Description) > len(b.Description)
-	}
-
-	// If both are schema-generated non-normative examples, assume that
-	// the shorter value is less likely to be "weird".
-	if a.Source == ExampleSourceSchema && !a.IsNormative {
-		return len(a.Canonical.String) < len(b.Canonical.String)
-	}
-
-	// Otherwise, assume that the the longer value has better
-	// illustrative properties.
-	return len(a.Canonical.String) > len(b.Canonical.String)
 }
 
 // buildExamples returns the complete set of examples to use for the given spec.
