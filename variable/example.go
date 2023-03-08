@@ -113,24 +113,22 @@ func BestExample(spec Spec) Example {
 	return incumbent
 }
 
-// buildExamples returns the complete set of examples to use for the given spec.
+// addExamples returns the complete set of examples to use for the given spec.
 //
 // It combines the examples provided by the user with the examples provided by
 // the variable's schema.
-func buildExamples[T any](
-	spec TypedSpec[T],
+func addExamples[T any](
+	spec *TypedSpec[T],
 	fromOptions []TypedExample[T],
-) ([]Example, error) {
-	var examples []Example
-
+) error {
 	// Add the examples provided as options to the spec.
 	for _, eg := range fromOptions {
 		lit, err := spec.Marshal(eg.Native)
 		if err != nil {
-			return nil, err
+			return err
 		}
 
-		examples = appendUniqueExample(examples, Example{
+		spec.examples = appendUniqueExample(spec.examples, Example{
 			Canonical:   lit,
 			Description: eg.Description,
 			IsNormative: eg.IsNormative,
@@ -144,7 +142,7 @@ func buildExamples[T any](
 	// of the constraints.
 	for _, eg := range spec.schema.Examples(hasOtherExamples) {
 		if lit, err := spec.Marshal(eg.Native); err == nil {
-			examples = appendUniqueExample(examples, Example{
+			spec.examples = appendUniqueExample(spec.examples, Example{
 				Canonical:   lit,
 				Description: eg.Description,
 				IsNormative: eg.IsNormative,
@@ -155,14 +153,14 @@ func buildExamples[T any](
 
 	// Add an example of the default value (if one is not already present).
 	if def, ok := spec.def.Get(); ok {
-		examples = prependUniqueExample(examples, Example{
+		spec.examples = prependUniqueExample(spec.examples, Example{
 			Canonical:   def.Canonical(),
 			IsNormative: true,
 			Source:      ExampleSourceSpecDefault,
 		})
 	}
 
-	return examples, nil
+	return nil
 }
 
 // appendUniqueExample appends eg to the examples only if there is no existing example

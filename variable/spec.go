@@ -144,8 +144,7 @@ func NewSpec[T any, S TypedSchema[T]](
 		})
 	}
 
-	examples, err := buildExamples(spec, opts.Examples)
-	if err != nil {
+	if err := addExamples(&spec, opts.Examples); err != nil {
 		return TypedSpec[T]{}, SpecError{
 			name:  name,
 			cause: fmt.Errorf("example value: %w", err),
@@ -153,7 +152,6 @@ func NewSpec[T any, S TypedSchema[T]](
 	}
 
 	spec.docs = opts.Docs
-	spec.examples = examples
 
 	return spec, nil
 }
