@@ -15,87 +15,74 @@ import (
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
 func Unsigned[T constraints.Unsigned](name, desc string) *UnsignedBuilder[T] {
-	return &UnsignedBuilder[T]{
-		name: name,
-		desc: desc,
+	b := &UnsignedBuilder[T]{
+		schema: variable.TypedNumeric[T]{
+			Marshaler: unsignedMarshaler[T]{},
+		},
 	}
+
+	b.spec.Init(name, desc)
+	b.spec.
+		Documentation("Unsigned integer syntax").
+		Paragraph(
+			"Unsigned integers can only be specified using decimal (base-10) notation.",
+			"A leading sign (`+` or `-`) is not supported and **MUST NOT** be specified.",
+		).
+		Format().
+		Paragraph(
+			"Internally, the `%s` variable is represented using an unsigned %d-bit integer type (`%s`);",
+			"any value that overflows this data-type is invalid.",
+		).
+		Format(
+			name,
+			reflectx.BitSize[T](),
+			reflectx.KindOf[T](),
+		).
+		Done()
+
+	return b
 }
 
 // UnsignedBuilder builds a specification for an unsigned integer value.
 type UnsignedBuilder[T constraints.Unsigned] struct {
-	name, desc    string
-	def, min, max maybe.Value[T]
+	schema variable.TypedNumeric[T]
+	spec   variable.SpecBuilder[T]
 }
 
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b *UnsignedBuilder[T]) WithDefault(v T) *UnsignedBuilder[T] {
-	b.def = maybe.Some(v)
+	b.spec.Default(v)
 	return b
 }
 
 // WithMinimum sets the minimum acceptable value of the variable.
 func (b *UnsignedBuilder[T]) WithMinimum(v T) *UnsignedBuilder[T] {
-	b.min = maybe.Some(v)
+	b.schema.NativeMin = maybe.Some(v)
 	return b
 }
 
 // WithMaximum sets the maximum acceptable value of the variable.
 func (b *UnsignedBuilder[T]) WithMaximum(v T) *UnsignedBuilder[T] {
-	b.max = maybe.Some(v)
+	b.schema.NativeMax = maybe.Some(v)
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *UnsignedBuilder[T]) Required(options ...Option) Required[T] {
-	v := variable.Register(b.spec(true), options)
+	b.spec.MarkRequired()
+	v := b.spec.Done(b.schema, options)
 	return requiredOne(v)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *UnsignedBuilder[T]) Optional(options ...Option) Optional[T] {
-	v := variable.Register(b.spec(false), options)
+	v := b.spec.Done(b.schema, options)
 	return optionalOne(v)
 
-}
-
-func (b *UnsignedBuilder[T]) spec(req bool) variable.TypedSpec[T] {
-	s, err := variable.NewSpec(
-		b.name,
-		b.desc,
-		b.def,
-		req,
-		variable.TypedNumeric[T]{
-			Marshaler: unsignedMarshaler[T]{},
-			NativeMin: b.min,
-			NativeMax: b.max,
-		},
-		variable.WithDocumentation[T]().
-			Summary("Unsigned integer syntax").
-			Paragraph(
-				"Unsigned integers can only be specified using decimal (base-10) notation.",
-				"A leading sign (`+` or `-`) is not supported and **MUST NOT** be specified.",
-			).
-			Format().
-			Paragraph(
-				"Internally, the `%s` variable is represented using an unsigned %d-bit integer type (`%s`);",
-				"any value that overflows this data-type is invalid.",
-			).
-			Format(
-				b.name,
-				reflectx.BitSize[T](),
-				reflectx.KindOf[T](),
-			).
-			Done(),
-	)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return s
 }
 
 type unsignedMarshaler[T constraints.Unsigned] struct{}
