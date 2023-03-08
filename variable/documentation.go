@@ -25,9 +25,10 @@ type Documentation struct {
 	IsImportant bool
 }
 
-// DocumentationBuilder is a fluent interface for building a Documentation
+// DocumentationBuilderX is a fluent interface for building a Documentation
 // value.
-type DocumentationBuilder[T any] struct {
+// Deprecated:
+type DocumentationBuilderX[T any] struct {
 	doc Documentation
 }
 
@@ -36,12 +37,12 @@ type DocumentationBuilder[T any] struct {
 //
 // The T type parameter is not meaningful, but is required in order to produce a
 // TypedSpecOption of the correct type.
-func WithDocumentation[T any]() DocumentationBuilder[T] {
-	return DocumentationBuilder[T]{}
+func WithDocumentation[T any]() DocumentationBuilderX[T] {
+	return DocumentationBuilderX[T]{}
 }
 
 // Summary adds a summary to the documentation.
-func (b DocumentationBuilder[T]) Summary(f string, v ...any) DocumentationBuilder[T] {
+func (b DocumentationBuilderX[T]) Summary(f string, v ...any) DocumentationBuilderX[T] {
 	b.doc.Summary = fmt.Sprintf(f, v...)
 	return b
 }
@@ -50,9 +51,56 @@ func (b DocumentationBuilder[T]) Summary(f string, v ...any) DocumentationBuilde
 //
 // text is concatenated together with a space to form the paragraph text.
 // The entire paragraph is a Printf() style format specifier.
-func (b DocumentationBuilder[T]) Paragraph(text ...string) ParagraphFormatter[T] {
-	return ParagraphFormatter[T]{
-		func(v ...any) DocumentationBuilder[T] {
+func (b DocumentationBuilderX[T]) Paragraph(text ...string) ParagraphFormatterX[T] {
+	return ParagraphFormatterX[T]{
+		func(v ...any) DocumentationBuilderX[T] {
+			b.doc.Paragraphs = append(
+				slices.Clone(b.doc.Paragraphs),
+				fmt.Sprintf(
+					strings.Join(text, " "),
+					v...,
+				),
+			)
+			return b
+		},
+	}
+}
+
+// ParagraphFormatterX is a fluent interface for applying values to a paragraph
+// template.
+// Deprecated:
+type ParagraphFormatterX[T any] struct {
+	// Format applies the given values to the paragraph template.
+	Format func(...any) DocumentationBuilderX[T]
+}
+
+// Important marks the documentation as important.
+func (b DocumentationBuilderX[T]) Important() DocumentationBuilderX[T] {
+	b.doc.IsImportant = true
+	return b
+}
+
+// Done returns an option that adds the documentation to the variable spec.
+func (b DocumentationBuilderX[T]) Done() TypedSpecOption[T] {
+	return func(opts *specOptions[T]) error {
+		opts.Docs = append(opts.Docs, b.doc)
+		return nil
+	}
+}
+
+// DocumentationBuilder is a fluent interface for building a documentation.
+type DocumentationBuilder struct {
+	docs *[]Documentation
+	doc  Documentation
+}
+
+// Paragraph adds a paragraph to the documentation.
+//
+// text is concatenated together with a space to form the paragraph text.
+// The entire paragraph is a Printf() style format specifier.
+func (b DocumentationBuilder) Paragraph(text ...string) ParagraphFormatter {
+	return ParagraphFormatter{
+		func(v ...any) DocumentationBuilder {
 			b.doc.Paragraphs = append(
 				slices.Clone(b.doc.Paragraphs),
 				fmt.Sprintf(
@@ -67,21 +115,18 @@ func (b DocumentationBuilder[T]) Paragraph(text ...string) ParagraphFormatter[T]
 
 // ParagraphFormatter is a fluent interface for applying values to a paragraph
 // template.
-type ParagraphFormatter[T any] struct {
+type ParagraphFormatter struct {
 	// Format applies the given values to the paragraph template.
-	Format func(...any) DocumentationBuilder[T]
+	Format func(...any) DocumentationBuilder
 }
 
 // Important marks the documentation as important.
-func (b DocumentationBuilder[T]) Important() DocumentationBuilder[T] {
+func (b DocumentationBuilder) Important() DocumentationBuilder {
 	b.doc.IsImportant = true
 	return b
 }
 
 // Done returns an option that adds the documentation to the variable spec.
-func (b DocumentationBuilder[T]) Done() TypedSpecOption[T] {
-	return func(opts *specOptions[T]) error {
-		opts.Docs = append(opts.Docs, b.doc)
-		return nil
-	}
+func (b DocumentationBuilder) Done() {
+	*b.docs = append(*b.docs, b.doc)
 }

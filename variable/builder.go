@@ -17,19 +17,8 @@ type Builder[T any, S TypedSchema[T]] struct {
 	examples []TypedExample[T]
 }
 
-// // NewBuilder returns a specification builder that builds a TypedSpec[T].
-// func NewBuilder[T any, S TypedSchema[T]](
-// 	name, desc string,
-// ) *Builder[T, S] {
-// 	return &Builder[T, S]{
-// 		spec: TypedSpec[T]{
-// 			name: name,
-// 			desc: desc,
-// 		},
-// 	}
-// }
-
-func (b *Builder[T, S]) Begin(name, desc string) {
+// Init initializes the builder.
+func (b *Builder[T, S]) Init(name, desc string) {
 	b.spec.name = name
 	b.spec.desc = desc
 }
@@ -54,11 +43,23 @@ func (b *Builder[T, S]) Required() {
 	b.spec.required = true
 }
 
+// Documentation adds documentation to the variable.
+//
+// It returns the DocumentBuilder that can be used to add documentation content .
+func (b *Builder[T, S]) Documentation(summary string) DocumentationBuilder {
+	return DocumentationBuilder{
+		&b.spec.docs,
+		Documentation{
+			Summary: summary,
+		},
+	}
+}
+
 // Register builds the specification and registers the variable.
-func (b *Builder[T, S]) End(options []RegisterOption) *OfType[T] {
+func (b *Builder[T, S]) Register(options []RegisterOption) *OfType[T] {
 	spec, err := b.buildSpec()
 	if err != nil {
-		panic(err)
+		panic(err.Error())
 	}
 
 	return Register(spec, options)

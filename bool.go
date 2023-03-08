@@ -3,7 +3,6 @@ package ferrite
 import (
 	"fmt"
 
-	"github.com/dogmatiq/ferrite/maybe"
 	"github.com/dogmatiq/ferrite/variable"
 )
 
@@ -21,19 +20,24 @@ func Bool(name, desc string) *BoolBuilder[bool] {
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
 func BoolAs[T ~bool](name, desc string) *BoolBuilder[T] {
-	return &BoolBuilder[T]{
-		name: name,
-		desc: desc,
-		t:    fmt.Sprint(T(true)),
-		f:    fmt.Sprint(T(false)),
+	b := &BoolBuilder[T]{}
+	b.v.Init(name, desc)
+
+	b.v.Schema.Members = []variable.SetMember[T]{
+		{Value: true},
+		{Value: false},
 	}
+
+	b.v.Schema.ToLiteral = func(v T) variable.Literal {
+		return variable.Literal{String: fmt.Sprint(v)}
+	}
+
+	return b
 }
 
 // BoolBuilder builds a specification for a boolean value.
 type BoolBuilder[T ~bool] struct {
-	name, desc string
-	t, f       string
-	def        maybe.Value[T]
+	v variable.Builder[T, variable.TypedSet[T]]
 }
 
 // WithLiterals overrides the default literals used to represent true and false.
@@ -41,8 +45,13 @@ type BoolBuilder[T ~bool] struct {
 // The default literals "true" and "false" are no longer valid values when using
 // custom literals.
 func (b *BoolBuilder[T]) WithLiterals(t, f string) *BoolBuilder[T] {
-	b.t = t
-	b.f = f
+	b.v.Schema.ToLiteral = func(v T) variable.Literal {
+		if v {
+			return variable.Literal{String: t}
+		}
+		return variable.Literal{String: f}
+	}
+
 	return b
 }
 
@@ -50,50 +59,21 @@ func (b *BoolBuilder[T]) WithLiterals(t, f string) *BoolBuilder[T] {
 //
 // It is used when the environment variable is undefined or empty.
 func (b *BoolBuilder[T]) WithDefault(v T) *BoolBuilder[T] {
-	b.def = maybe.Some(v)
+	b.v.Default(v)
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *BoolBuilder[T]) Required(options ...Option) Required[T] {
-	v := variable.Register(b.spec(true), options)
+	b.v.Required()
+	v := b.v.Register(options)
 	return requiredOne(v)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *BoolBuilder[T]) Optional(options ...Option) Optional[T] {
-	v := variable.Register(b.spec(false), options)
+	v := b.v.Register(options)
 	return optionalOne(v)
-}
-
-func (b *BoolBuilder[T]) spec(req bool) variable.TypedSpec[T] {
-	s, err := variable.NewSpec(
-		b.name,
-		b.desc,
-		b.def,
-		req,
-		variable.TypedSet[T]{
-			Members: []variable.SetMember[T]{
-				{Value: true},
-				{Value: false},
-			},
-			ToLiteral: func(v T) variable.Literal {
-				s := b.f
-				if v {
-					s = b.t
-				}
-
-				return variable.Literal{
-					String: s,
-				}
-			},
-		},
-	)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return s
 }

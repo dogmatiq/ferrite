@@ -19,7 +19,7 @@ func String(name, desc string) *StringBuilder[string] {
 // human-readable description of the environment variable.
 func StringAs[T ~string](name, desc string) *StringBuilder[T] {
 	b := &StringBuilder[T]{}
-	b.v.Begin(name, desc)
+	b.v.Init(name, desc)
 	return b
 }
 
@@ -71,14 +71,14 @@ func (b *StringBuilder[T]) WithSensitiveContent() *StringBuilder[T] {
 // Ferrite's validation system.
 func (b *StringBuilder[T]) Required(options ...Option) Required[T] {
 	b.v.Required()
-	v := b.v.End(options)
+	v := b.v.Register(options)
 	return requiredOne(v)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *StringBuilder[T]) Optional(options ...Option) Optional[T] {
-	v := b.v.End(options)
+	v := b.v.Register(options)
 	return optionalOne(v)
 
 }
