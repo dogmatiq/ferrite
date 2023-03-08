@@ -17,7 +17,7 @@ var _ = Describe("func Run()", func() {
 
 	BeforeEach(func() {
 		reg = &variable.Registry{
-			Environment: variable.MemoryEnvironment{},
+			Environment: &variable.MemoryEnvironment{},
 		}
 	})
 

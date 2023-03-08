@@ -76,7 +76,7 @@ type MemoryEnvironment struct {
 }
 
 // Get returns the value of an environment variable.
-func (e MemoryEnvironment) Get(n string) Literal {
+func (e *MemoryEnvironment) Get(n string) Literal {
 	if v, ok := e.m.Load(n); ok {
 		return v.(Literal)
 	}
@@ -85,12 +85,12 @@ func (e MemoryEnvironment) Get(n string) Literal {
 }
 
 // Set sets the value of an environment variable.
-func (e MemoryEnvironment) Set(n string, v Literal) {
+func (e *MemoryEnvironment) Set(n string, v Literal) {
 	e.m.Store(n, v)
 }
 
 // Unset removes an environment variable.
-func (e MemoryEnvironment) Unset(n string) {
+func (e *MemoryEnvironment) Unset(n string) {
 	e.m.Delete(n)
 }
 
@@ -98,7 +98,7 @@ func (e MemoryEnvironment) Unset(n string) {
 //
 // It stops iterating if fn returns false. It returns true if iteration
 // reached the env.
-func (e MemoryEnvironment) Range(fn func(string, Literal) bool) {
+func (e *MemoryEnvironment) Range(fn func(string, Literal) bool) {
 	e.m.Range(
 		func(k, v any) bool {
 			return fn(
