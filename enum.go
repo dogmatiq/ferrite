@@ -38,7 +38,7 @@ func EnumAs[T any](name, desc string) *EnumBuilder[T] {
 // EnumBuilder is the specification for an enumeration.
 type EnumBuilder[T any] struct {
 	schema variable.TypedSet[T]
-	spec   variable.Builder[T]
+	spec   variable.SpecBuilder[T]
 }
 
 // WithMembers adds members to the enum.

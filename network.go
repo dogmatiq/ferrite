@@ -33,7 +33,7 @@ func NetworkPort(name, desc string) *NetworkPortBuilder {
 // NetworkPortBuilder builds a specification for a network port variable.
 type NetworkPortBuilder struct {
 	schema variable.TypedString[string]
-	v      variable.Builder[string]
+	v      variable.SpecBuilder[string]
 }
 
 // WithDefault sets a default value of the variable.

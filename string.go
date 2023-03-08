@@ -26,7 +26,7 @@ func StringAs[T ~string](name, desc string) *StringBuilder[T] {
 // StringBuilder builds a specification for a string variable.
 type StringBuilder[T ~string] struct {
 	schema variable.TypedString[T]
-	v      variable.Builder[T]
+	v      variable.SpecBuilder[T]
 }
 
 // WithDefault sets a default value of the variable.

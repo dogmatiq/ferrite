@@ -22,7 +22,7 @@ func File(name, desc string) *FileBuilder {
 // FileBuilder builds a specification for a boolean value.
 type FileBuilder struct {
 	schema variable.TypedString[FileName]
-	v      variable.Builder[FileName]
+	v      variable.SpecBuilder[FileName]
 }
 
 // WithDefault sets a default value of the variable.

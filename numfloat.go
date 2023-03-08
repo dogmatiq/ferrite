@@ -47,7 +47,7 @@ func Float[T constraints.Float](name, desc string) *FloatBuilder[T] {
 // FloatBuilder builds a specification for a floating-point number.
 type FloatBuilder[T constraints.Float] struct {
 	schema variable.TypedNumeric[T]
-	spec   variable.Builder[T]
+	spec   variable.SpecBuilder[T]
 }
 
 // WithDefault sets a default value of the variable.

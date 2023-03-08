@@ -41,7 +41,7 @@ func Duration(name, desc string) *DurationBuilder {
 // DurationBuilder builds a specification for a duration variable.
 type DurationBuilder struct {
 	schema variable.TypedNumeric[time.Duration]
-	spec   variable.Builder[time.Duration]
+	spec   variable.SpecBuilder[time.Duration]
 }
 
 // WithDefault sets a default value of the variable.

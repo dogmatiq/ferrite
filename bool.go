@@ -40,7 +40,7 @@ func BoolAs[T ~bool](name, desc string) *BoolBuilder[T] {
 // BoolBuilder builds a specification for a boolean value.
 type BoolBuilder[T ~bool] struct {
 	schema variable.TypedSet[T]
-	spec   variable.Builder[T]
+	spec   variable.SpecBuilder[T]
 }
 
 // WithLiterals overrides the default literals used to represent true and false.
