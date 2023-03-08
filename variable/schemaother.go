@@ -1,7 +1,6 @@
 package variable
 
 import (
-	"io"
 	"reflect"
 
 	"github.com/dogmatiq/ferrite/internal/reflectx"
@@ -21,9 +20,6 @@ type Other interface {
 // explanation of the value.
 type TypedOther[T any] struct {
 	Marshaler Marshaler[T]
-
-	SchemaRenderer     func(io.Writer, TypedOther[T])
-	ValueErrorRenderer func(io.Writer, TypedOther[T], ValueError)
 }
 
 // Type returns the type of the native value.
