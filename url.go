@@ -4,7 +4,6 @@ import (
 	"errors"
 	"net/url"
 
-	"github.com/dogmatiq/ferrite/maybe"
 	"github.com/dogmatiq/ferrite/variable"
 )
 
@@ -15,88 +14,75 @@ import (
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
 func URL(name, desc string) *URLBuilder {
-	return &URLBuilder{
-		name: name,
-		desc: desc,
-		options: []variable.TypedSpecOption[*url.URL]{
-			variable.WithConstraint(
-				"**MUST** be a fully-qualified URL",
-				func(v *url.URL) variable.ConstraintError {
-					if v.Scheme == "" {
-						return errors.New("URL must have a scheme")
-					}
-
-					if v.Host == "" {
-						return errors.New("URL must have a hostname")
-					}
-
-					return nil
-				},
-			),
-			variable.WithNonNormativeExample(
-				mustParseURL("https://example.org/path"),
-				"a typical URL for a web page",
-			),
-			variable.WithDocumentation[*url.URL]().
-				Summary("URL syntax").
-				Paragraph(
-					"A fully-qualified URL includes both a scheme (protocol) and a hostname.",
-					"URLs are not necessarily web addresses;",
-					"`https://example.org` and `mailto:contact@example.org` are both examples of fully-qualified URLs.",
-				).
-				Format().
-				Done(),
+	b := &URLBuilder{
+		schema: variable.TypedOther[*url.URL]{
+			Marshaler: urlMarshaler{},
 		},
 	}
+
+	b.spec.Init(name, desc)
+
+	b.spec.BuiltInConstraint(
+		"**MUST** be a fully-qualified URL",
+		func(v *url.URL) variable.ConstraintError {
+			if v.Scheme == "" {
+				return errors.New("URL must have a scheme")
+			}
+
+			if v.Host == "" {
+				return errors.New("URL must have a hostname")
+			}
+
+			return nil
+		},
+	)
+
+	b.spec.NonNormativeExample(
+		mustParseURL("https://example.org/path"),
+		"a typical URL for a web page",
+	)
+
+	b.spec.
+		Documentation("URL syntax").
+		Paragraph(
+			"A fully-qualified URL includes both a scheme (protocol) and a hostname.",
+			"URLs are not necessarily web addresses;",
+			"`https://example.org` and `mailto:contact@example.org` are both examples of fully-qualified URLs.",
+		).
+		Format().
+		Done()
+
+	return b
 }
 
 // URLBuilder builds a specification for a URL variable.
 type URLBuilder struct {
-	name, desc string
-	def        maybe.Value[*url.URL]
-	options    []variable.TypedSpecOption[*url.URL]
+	schema variable.TypedOther[*url.URL]
+	spec   variable.SpecBuilder[*url.URL]
 }
 
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b *URLBuilder) WithDefault(v string) *URLBuilder {
-	u := mustParseURL(v)
-	b.def = maybe.Some(u)
+	b.spec.Default(mustParseURL(v))
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *URLBuilder) Required(options ...Option) Required[*url.URL] {
-	v := variable.Register(b.spec(true), options)
+	b.spec.MarkRequired()
+	v := b.spec.Done(b.schema, options)
 	return requiredOne(v)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *URLBuilder) Optional(options ...Option) Optional[*url.URL] {
-	v := variable.Register(b.spec(false), options)
+	v := b.spec.Done(b.schema, options)
 	return optionalOne(v)
 
-}
-
-func (b *URLBuilder) spec(req bool) variable.TypedSpec[*url.URL] {
-	s, err := variable.NewSpec(
-		b.name,
-		b.desc,
-		b.def,
-		req,
-		variable.TypedOther[*url.URL]{
-			Marshaler: urlMarshaler{},
-		},
-		b.options...,
-	)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return s
 }
 
 type urlMarshaler struct{}

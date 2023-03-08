@@ -19,21 +19,21 @@ func String(name, desc string) *StringBuilder[string] {
 // human-readable description of the environment variable.
 func StringAs[T ~string](name, desc string) *StringBuilder[T] {
 	b := &StringBuilder[T]{}
-	b.v.Init(name, desc)
+	b.spec.Init(name, desc)
 	return b
 }
 
 // StringBuilder builds a specification for a string variable.
 type StringBuilder[T ~string] struct {
 	schema variable.TypedString[T]
-	v      variable.SpecBuilder[T]
+	spec   variable.SpecBuilder[T]
 }
 
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b *StringBuilder[T]) WithDefault(v T) *StringBuilder[T] {
-	b.v.Default(v)
+	b.spec.Default(v)
 	return b
 }
 
@@ -48,7 +48,7 @@ func (b *StringBuilder[T]) WithConstraintFunc(
 	desc string,
 	fn func(T) variable.ConstraintError,
 ) *StringBuilder[T] {
-	b.v.UserConstraint(desc, fn)
+	b.spec.UserConstraint(desc, fn)
 	return b
 }
 
@@ -58,22 +58,22 @@ func (b *StringBuilder[T]) WithConstraintFunc(
 // Sensitive values are redacted in console output and excluded from examples in
 // generated documentation.
 func (b *StringBuilder[T]) WithSensitiveContent() *StringBuilder[T] {
-	b.v.MarkSensitive()
+	b.spec.MarkSensitive()
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *StringBuilder[T]) Required(options ...Option) Required[T] {
-	b.v.MarkRequired()
-	v := b.v.Done(b.schema, options)
+	b.spec.MarkRequired()
+	v := b.spec.Done(b.schema, options)
 	return requiredOne(v)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *StringBuilder[T]) Optional(options ...Option) Optional[T] {
-	v := b.v.Done(b.schema, options)
+	v := b.spec.Done(b.schema, options)
 	return optionalOne(v)
 
 }
