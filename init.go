@@ -36,9 +36,25 @@ func Init(options ...InitOption) {
 		opts.Exit(0)
 
 	case "validate", "":
-		if result, ok := validatemode.Run(&variable.DefaultRegistry); !ok {
+		reg := &variable.DefaultRegistry
+
+		if result, ok := validatemode.Run(reg); !ok {
 			io.WriteString(opts.Err, result)
 			opts.Exit(1)
+		}
+
+		for _, v := range reg.Variables() {
+			s := v.Spec()
+
+			if s.IsDeprecated() {
+				if _, defined, _ := v.Value(); defined {
+					fmt.Fprintf(
+						opts.Err,
+						"WARNING: the %s environment variable is deprecated\n",
+						v.Spec().Name(),
+					)
+				}
+			}
 		}
 
 	default:

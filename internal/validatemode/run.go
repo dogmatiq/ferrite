@@ -19,10 +19,12 @@ func Run(reg *variable.Registry) (usage string, ok bool) {
 	t := table{}
 
 	for _, v := range reg.Variables() {
+		s := v.Spec()
+
 		t.AddRow(
 			renderNameColumn(v),
-			v.Spec().Description(),
-			renderSpecColumn(v.Spec()),
+			s.Description(),
+			renderSpecColumn(s),
 			renderValueColumn(v),
 		)
 

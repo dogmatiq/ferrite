@@ -11,8 +11,9 @@ import (
 type SpecBuilder interface {
 	Name(string)
 	Description(string)
-	MarkSensitive()
 	MarkRequired()
+	MarkDeprecated()
+	MarkSensitive()
 	Documentation() DocumentationBuilder
 }
 
@@ -63,14 +64,19 @@ func (b *TypedSpecBuilder[T]) UserConstraint(
 	)
 }
 
+// MarkRequired marks the variable as required.
+func (b *TypedSpecBuilder[T]) MarkRequired() {
+	b.spec.required = true
+}
+
 // MarkSensitive marks the variable's content as sensitive.
 func (b *TypedSpecBuilder[T]) MarkSensitive() {
 	b.spec.sensitive = true
 }
 
-// MarkRequired marks the variable as required.
-func (b *TypedSpecBuilder[T]) MarkRequired() {
-	b.spec.required = true
+// MarkDeprecated marks the variable as deprecated.
+func (b *TypedSpecBuilder[T]) MarkDeprecated() {
+	b.spec.deprecated = true
 }
 
 // NormativeExample adds a normative example to the variable.
