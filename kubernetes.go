@@ -165,7 +165,6 @@ func (b *KubernetesServiceBuilder) Required(options ...VariableOption) Required[
 	)
 
 	return requiredFunc[KubernetesAddress]{
-		[]variable.Any{host, port},
 		func() (KubernetesAddress, error) {
 			h, ok, err := host.NativeValue()
 			if err != nil {
@@ -204,7 +203,6 @@ func (b *KubernetesServiceBuilder) Optional(options ...VariableOption) Optional[
 	)
 
 	return optionalFunc[KubernetesAddress]{
-		[]variable.Any{host, port},
 		func() (KubernetesAddress, bool, error) {
 			h, hostOk, err := host.NativeValue()
 			if err != nil {
