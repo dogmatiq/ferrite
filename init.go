@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/dogmatiq/ferrite/internal/markdownmode"
-	"github.com/dogmatiq/ferrite/internal/validatemode"
+	"github.com/dogmatiq/ferrite/internal/mode/markdownmode"
+	"github.com/dogmatiq/ferrite/internal/mode/validatemode"
 	"github.com/dogmatiq/ferrite/variable"
 )
 
