@@ -83,7 +83,7 @@ func ExampleEnum_deprecated() {
 	defer example()()
 
 	os.Setenv("FERRITE_ENUM", "red")
-	ferrite.
+	v := ferrite.
 		Enum("FERRITE_ENUM", "example enum variable").
 		WithMember("red", "the color red").
 		WithMember("green", "the color green").
@@ -92,12 +92,16 @@ func ExampleEnum_deprecated() {
 
 	ferrite.Init()
 
-	fmt.Println("<execution continues>")
+	if x, ok := v.DeprecatedValue(); ok {
+		fmt.Println("value is", x)
+	} else {
+		fmt.Println("value is undefined")
+	}
 
 	// Output:
 	// Environment Variables:
 	//
 	//  ❯ FERRITE_ENUM  example enum variable  [ red | green | blue ]  ⚠ deprecated variable set to red
 	//
-	// <execution continues>
+	// value is red
 }

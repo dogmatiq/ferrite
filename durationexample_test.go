@@ -81,18 +81,22 @@ func ExampleDuration_deprecated() {
 	defer example()()
 
 	os.Setenv("FERRITE_DURATION", "630s")
-	ferrite.
+	v := ferrite.
 		Duration("FERRITE_DURATION", "example duration variable").
 		Deprecated()
 
 	ferrite.Init()
 
-	fmt.Println("<execution continues>")
+	if x, ok := v.DeprecatedValue(); ok {
+		fmt.Println("value is", x)
+	} else {
+		fmt.Println("value is undefined")
+	}
 
 	// Output:
 	// Environment Variables:
 	//
 	//  ❯ FERRITE_DURATION  example duration variable  [ 1ns ... ]  ⚠ deprecated variable set to 630s, equivalent to 10m30s
 	//
-	// <execution continues>
+	// value is 10m30s
 }

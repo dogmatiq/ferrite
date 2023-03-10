@@ -80,18 +80,22 @@ func ExampleUnsigned_deprecated() {
 	defer example()()
 
 	os.Setenv("FERRITE_UNSIGNED", "123")
-	ferrite.
+	v := ferrite.
 		Unsigned[uint]("FERRITE_UNSIGNED", "example unsigned integer variable").
 		Deprecated()
 
 	ferrite.Init()
 
-	fmt.Println("<execution continues>")
+	if x, ok := v.DeprecatedValue(); ok {
+		fmt.Println("value is", x)
+	} else {
+		fmt.Println("value is undefined")
+	}
 
 	// Output:
 	// Environment Variables:
 	//
 	//  ❯ FERRITE_UNSIGNED  example unsigned integer variable  [ <uint> ]  ⚠ deprecated variable set to 123
 	//
-	// <execution continues>
+	// value is 123
 }

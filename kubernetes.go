@@ -204,39 +204,7 @@ func (b *KubernetesServiceBuilder) Optional(options ...OptionalOption) Optional[
 	)
 
 	return optionalFunc[KubernetesAddress]{
-		func() (KubernetesAddress, bool, error) {
-			h, hostOk, err := host.NativeValue()
-			if err != nil {
-				return KubernetesAddress{}, false, err
-			}
-
-			p, portOk, err := port.NativeValue()
-			if err != nil {
-				return KubernetesAddress{}, false, err
-			}
-
-			if hostOk && portOk {
-				return KubernetesAddress{h, p}, true, nil
-			}
-
-			if hostOk {
-				return KubernetesAddress{}, false, fmt.Errorf(
-					"%s is defined but %s is not, define both or neither",
-					host.Spec().Name(),
-					port.Spec().Name(),
-				)
-			}
-
-			if portOk {
-				return KubernetesAddress{}, false, fmt.Errorf(
-					"%s is defined but %s is not, define both or neither",
-					port.Spec().Name(),
-					host.Spec().Name(),
-				)
-			}
-
-			return KubernetesAddress{}, false, nil
-		},
+		b.optionalResolver(host, port),
 	}
 }
 
@@ -246,18 +214,57 @@ func (b *KubernetesServiceBuilder) Deprecated(options ...DeprecatedOption) Depre
 	b.hostSpec.MarkDeprecated()
 	b.portSpec.MarkDeprecated()
 
-	variable.Register(
+	host := variable.Register(
 		b.hostSpec.Done(b.hostSchema),
 		options...,
 	)
 
-	variable.Register(
+	port := variable.Register(
 		b.portSpec.Done(b.portSchema),
 		options...,
 	)
 
-	// interface is currently empty so we don't need an implementation
-	return nil
+	return deprecatedFunc[KubernetesAddress]{
+		b.optionalResolver(host, port),
+	}
+}
+
+func (b *KubernetesServiceBuilder) optionalResolver(
+	host, port *variable.OfType[string],
+) func() (KubernetesAddress, bool, error) {
+	return func() (KubernetesAddress, bool, error) {
+		h, hostOk, err := host.NativeValue()
+		if err != nil {
+			return KubernetesAddress{}, false, err
+		}
+
+		p, portOk, err := port.NativeValue()
+		if err != nil {
+			return KubernetesAddress{}, false, err
+		}
+
+		if hostOk && portOk {
+			return KubernetesAddress{h, p}, true, nil
+		}
+
+		if hostOk {
+			return KubernetesAddress{}, false, fmt.Errorf(
+				"%s is defined but %s is not, define both or neither",
+				host.Spec().Name(),
+				port.Spec().Name(),
+			)
+		}
+
+		if portOk {
+			return KubernetesAddress{}, false, fmt.Errorf(
+				"%s is defined but %s is not, define both or neither",
+				port.Spec().Name(),
+				host.Spec().Name(),
+			)
+		}
+
+		return KubernetesAddress{}, false, nil
+	}
 }
 
 // kubernetesNameToEnv converts a kubernetes resource name to an environment variable

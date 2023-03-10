@@ -61,18 +61,22 @@ func ExampleURL_deprecated() {
 	defer example()()
 
 	os.Setenv("FERRITE_URL", "https://example.org/path")
-	ferrite.
+	v := ferrite.
 		URL("FERRITE_URL", "example URL variable").
 		Deprecated()
 
 	ferrite.Init()
 
-	fmt.Println("<execution continues>")
+	if x, ok := v.DeprecatedValue(); ok {
+		fmt.Println("value is", x)
+	} else {
+		fmt.Println("value is undefined")
+	}
 
 	// Output:
 	// Environment Variables:
 	//
 	//  ❯ FERRITE_URL  example URL variable  [ <string> ]  ⚠ deprecated variable set to https://example.org/path
 	//
-	// <execution continues>
+	// value is https://example.org/path
 }

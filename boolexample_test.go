@@ -78,19 +78,23 @@ func ExampleBool_customLiterals() {
 func ExampleBool_deprecated() {
 	defer example()()
 
-	os.Setenv("FERRITE_BOOL", "<value>")
-	ferrite.
-		String("FERRITE_BOOL", "example boolean variable").
+	os.Setenv("FERRITE_BOOL", "true")
+	v := ferrite.
+		Bool("FERRITE_BOOL", "example boolean variable").
 		Deprecated()
 
 	ferrite.Init()
 
-	fmt.Println("<execution continues>")
+	if x, ok := v.DeprecatedValue(); ok {
+		fmt.Println("value is", x)
+	} else {
+		fmt.Println("value is undefined")
+	}
 
 	// Output:
 	// Environment Variables:
 	//
-	//  ❯ FERRITE_BOOL  example boolean variable  [ <string> ]  ⚠ deprecated variable set to '<value>'
+	//  ❯ FERRITE_BOOL  example boolean variable  [ true | false ]  ⚠ deprecated variable set to true
 	//
-	// <execution continues>
+	// value is true
 }

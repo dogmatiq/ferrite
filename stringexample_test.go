@@ -89,18 +89,22 @@ func ExampleString_deprecated() {
 	defer example()()
 
 	os.Setenv("FERRITE_STRING", "<value>")
-	ferrite.
+	v := ferrite.
 		String("FERRITE_STRING", "example string variable").
 		Deprecated()
 
 	ferrite.Init()
 
-	fmt.Println("<execution continues>")
+	if x, ok := v.DeprecatedValue(); ok {
+		fmt.Println("value is", x)
+	} else {
+		fmt.Println("value is undefined")
+	}
 
 	// Output:
 	// Environment Variables:
 	//
 	//  ❯ FERRITE_STRING  example string variable  [ <string> ]  ⚠ deprecated variable set to '<value>'
 	//
-	// <execution continues>
+	// value is <value>
 }

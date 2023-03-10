@@ -9,6 +9,14 @@ import (
 //
 // It is obtained by calling Deprecated() on a variable builder.
 type Deprecated[T any] interface {
+	// DeprecatedValue returns the parsed and validated value of the environment
+	// variable, if it is defined.
+	//
+	// If the environment variable is not defined (and there is no default
+	// value), ok is false; otherwise, ok is true and v is the value.
+	//
+	// It panics if the environment variable is defined but invalid.
+	DeprecatedValue() (T, bool)
 }
 
 // DeprecatedOption is an option that can be applied to a deprecated variable.
@@ -26,11 +34,29 @@ func deprecated[T any, S variable.TypedSchema[T]](
 ) Deprecated[T] {
 	spec.MarkDeprecated()
 
-	variable.Register(
+	v := variable.Register(
 		spec.Done(schema),
 		options...,
 	)
 
 	// interface is currently empty so we don't need an implementation
-	return nil
+	return deprecatedFunc[T]{
+		func() (T, bool, error) {
+			return v.NativeValue()
+		},
+	}
+}
+
+// deprecatedFunc is an implementation of Deprecated[T] that obtains the value
+// from an arbitrary function.
+type deprecatedFunc[T any] struct {
+	fn func() (T, bool, error)
+}
+
+func (d deprecatedFunc[T]) DeprecatedValue() (T, bool) {
+	n, ok, err := d.fn()
+	if err != nil {
+		panic(err.Error())
+	}
+	return n, ok
 }

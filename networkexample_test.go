@@ -62,18 +62,22 @@ func ExampleNetworkPort_deprecated() {
 	defer example()()
 
 	os.Setenv("FERRITE_NETWORK_PORT", "https")
-	ferrite.
+	v := ferrite.
 		NetworkPort("FERRITE_NETWORK_PORT", "example network port variable").
 		Deprecated()
 
 	ferrite.Init()
 
-	fmt.Println("<execution continues>")
+	if x, ok := v.DeprecatedValue(); ok {
+		fmt.Println("value is", x)
+	} else {
+		fmt.Println("value is undefined")
+	}
 
 	// Output:
 	// Environment Variables:
 	//
 	//  ❯ FERRITE_NETWORK_PORT  example network port variable  [ <string> ]  ⚠ deprecated variable set to https
 	//
-	// <execution continues>
+	// value is https
 }

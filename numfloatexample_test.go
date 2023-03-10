@@ -80,18 +80,22 @@ func ExampleFloat_deprecated() {
 	defer example()()
 
 	os.Setenv("FERRITE_FLOAT", "-123.45")
-	ferrite.
+	v := ferrite.
 		Float[float64]("FERRITE_FLOAT", "example floating-point variable").
 		Deprecated()
 
 	ferrite.Init()
 
-	fmt.Println("<execution continues>")
+	if x, ok := v.DeprecatedValue(); ok {
+		fmt.Println("value is", x)
+	} else {
+		fmt.Println("value is undefined")
+	}
 
 	// Output:
 	// Environment Variables:
 	//
 	//  ❯ FERRITE_FLOAT  example floating-point variable  [ <float64> ]  ⚠ deprecated variable set to -123.45
 	//
-	// <execution continues>
+	// value is -123.45
 }

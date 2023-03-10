@@ -132,18 +132,22 @@ func ExampleFile_deprecated() {
 	defer example()()
 
 	os.Setenv("FERRITE_FILE", "testdata/hello.txt")
-	ferrite.
+	v := ferrite.
 		File("FERRITE_FILE", "example file variable").
 		Deprecated()
 
 	ferrite.Init()
 
-	fmt.Println("<execution continues>")
+	if x, ok := v.DeprecatedValue(); ok {
+		fmt.Println("value is", x)
+	} else {
+		fmt.Println("value is undefined")
+	}
 
 	// Output:
 	// Environment Variables:
 	//
 	//  ❯ FERRITE_FILE  example file variable  [ <string> ]  ⚠ deprecated variable set to testdata/hello.txt
 	//
-	// <execution continues>
+	// value is testdata/hello.txt
 }
