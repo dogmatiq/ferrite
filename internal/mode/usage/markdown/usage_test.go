@@ -1,4 +1,4 @@
-package markdownmode_test
+package markdown_test
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 
 	"github.com/dogmatiq/ferrite"
 	"github.com/dogmatiq/ferrite/internal/mode"
-	. "github.com/dogmatiq/ferrite/internal/mode/markdownmode"
+	. "github.com/dogmatiq/ferrite/internal/mode/usage/markdown"
 	"github.com/dogmatiq/ferrite/variable"
 	. "github.com/jmalloc/gomegax"
 	. "github.com/onsi/ginkgo/v2"
@@ -24,7 +24,7 @@ var _ = Describe("func Run()", func() {
 	})
 
 	DescribeTable(
-		"it generates the correct preamble",
+		"it describes the environment variable",
 		func(
 			file string,
 			setup func(*variable.Registry),
@@ -35,7 +35,7 @@ var _ = Describe("func Run()", func() {
 				filepath.Join(
 					"testdata",
 					"markdown",
-					"preamble",
+					"usage",
 					file,
 				),
 			)
@@ -54,22 +54,26 @@ var _ = Describe("func Run()", func() {
 						Expect(code).To(Equal(0))
 					},
 				},
-				WithoutUsageExamples(),
 			)
 			ExpectWithOffset(1, actual.String()).To(EqualX(string(expect)))
 			Expect(exited).To(BeTrue())
 		},
 		Entry(
-			"no variables",
-			"empty.md",
-			func(reg *variable.Registry) {},
-		),
-		Entry(
-			"non-normative examples",
-			"non-normative.md",
+			"usage",
+			"usage.md",
 			func(reg *variable.Registry) {
 				ferrite.
-					String("READ_DSN", "database connection string for read-models").
+					Bool("DEBUG", "enable or disable debugging features").
+					Optional(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"usage shows the default value in examples if available",
+			"usage-shows-default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					NetworkPort("PORT", "an environment variable that has a default value").
+					WithDefault("ftp").
 					Required(variable.WithRegistry(reg))
 			},
 		),

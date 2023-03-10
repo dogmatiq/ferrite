@@ -1,4 +1,4 @@
-package markdownmode_test
+package markdown_test
 
 import (
 	"bytes"
@@ -9,7 +9,7 @@ import (
 
 	"github.com/dogmatiq/ferrite"
 	"github.com/dogmatiq/ferrite/internal/mode"
-	. "github.com/dogmatiq/ferrite/internal/mode/markdownmode"
+	. "github.com/dogmatiq/ferrite/internal/mode/usage/markdown"
 	"github.com/dogmatiq/ferrite/variable"
 	. "github.com/jmalloc/gomegax"
 	. "github.com/onsi/ginkgo/v2"

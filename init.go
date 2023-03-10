@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/dogmatiq/ferrite/internal/mode"
-	"github.com/dogmatiq/ferrite/internal/mode/markdownmode"
+	"github.com/dogmatiq/ferrite/internal/mode/usage/markdown"
 	"github.com/dogmatiq/ferrite/internal/mode/validatemode"
 )
 
@@ -26,7 +26,7 @@ func Init(options ...InitOption) {
 
 	switch m := os.Getenv("FERRITE_MODE"); m {
 	case "usage/markdown":
-		markdownmode.Run(opts)
+		markdown.Run(opts)
 	case "validate", "":
 		validatemode.Run(opts)
 	default:

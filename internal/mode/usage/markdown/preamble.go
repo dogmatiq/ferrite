@@ -1,4 +1,4 @@
-package markdownmode
+package markdown
 
 func (r *renderer) renderPreamble() {
 	r.line("This document describes the environment variables used by `%s`.", r.App)

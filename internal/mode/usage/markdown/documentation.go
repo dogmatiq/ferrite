@@ -1,4 +1,4 @@
-package markdownmode
+package markdown
 
 func (r *specRenderer) renderImportantDocumentation() {
 	for _, d := range r.spec.Documentation() {

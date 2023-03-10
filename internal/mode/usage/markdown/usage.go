@@ -1,4 +1,4 @@
-package markdownmode
+package markdown
 
 import "github.com/dogmatiq/ferrite/variable"
 

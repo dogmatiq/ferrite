@@ -1,4 +1,4 @@
-package markdownmode_test
+package markdown_test
 
 import (
 	"reflect"
