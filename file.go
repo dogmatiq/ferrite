@@ -37,19 +37,19 @@ func (b *FileBuilder) WithDefault(v string) *FileBuilder {
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b *FileBuilder) Required(options ...VariableOption) Required[FileName] {
+func (b *FileBuilder) Required(options ...RequiredOption) Required[FileName] {
 	return required(b.schema, &b.spec, options)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b *FileBuilder) Optional(options ...VariableOption) Optional[FileName] {
+func (b *FileBuilder) Optional(options ...OptionalOption) Optional[FileName] {
 	return optional(b.schema, &b.spec, options)
 }
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
-func (b *FileBuilder) Deprecated(reason string, options ...VariableOption) Deprecated[FileName] {
+func (b *FileBuilder) Deprecated(reason string, options ...DeprecatedOption) Deprecated[FileName] {
 	return deprecated(b.schema, &b.spec, reason, options)
 }
 

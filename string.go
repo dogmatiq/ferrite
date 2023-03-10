@@ -68,18 +68,18 @@ func (b *StringBuilder[T]) WithSensitiveContent() *StringBuilder[T] {
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b *StringBuilder[T]) Required(options ...VariableOption) Required[T] {
+func (b *StringBuilder[T]) Required(options ...RequiredOption) Required[T] {
 	return required(b.schema, &b.spec, options)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b *StringBuilder[T]) Optional(options ...VariableOption) Optional[T] {
+func (b *StringBuilder[T]) Optional(options ...OptionalOption) Optional[T] {
 	return optional(b.schema, &b.spec, options)
 }
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
-func (b *StringBuilder[T]) Deprecated(reason string, options ...VariableOption) Deprecated[T] {
+func (b *StringBuilder[T]) Deprecated(reason string, options ...DeprecatedOption) Deprecated[T] {
 	return deprecated(b.schema, &b.spec, reason, options)
 }

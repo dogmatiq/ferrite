@@ -151,7 +151,7 @@ func (b *KubernetesServiceBuilder) WithDefault(host, port string) *KubernetesSer
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b *KubernetesServiceBuilder) Required(options ...VariableOption) Required[KubernetesAddress] {
+func (b *KubernetesServiceBuilder) Required(options ...RequiredOption) Required[KubernetesAddress] {
 	b.hostSpec.MarkRequired()
 	host := variable.Register(
 		b.hostSpec.Done(b.hostSchema),
@@ -191,7 +191,7 @@ func (b *KubernetesServiceBuilder) Required(options ...VariableOption) Required[
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b *KubernetesServiceBuilder) Optional(options ...VariableOption) Optional[KubernetesAddress] {
+func (b *KubernetesServiceBuilder) Optional(options ...OptionalOption) Optional[KubernetesAddress] {
 	host := variable.Register(
 		b.hostSpec.Done(b.hostSchema),
 		options...,
@@ -241,7 +241,7 @@ func (b *KubernetesServiceBuilder) Optional(options ...VariableOption) Optional[
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
-func (b *KubernetesServiceBuilder) Deprecated(reason string, options ...VariableOption) Deprecated[KubernetesAddress] {
+func (b *KubernetesServiceBuilder) Deprecated(reason string, options ...DeprecatedOption) Deprecated[KubernetesAddress] {
 	b.hostSpec.MarkDeprecated(reason)
 	b.portSpec.MarkDeprecated(reason)
 

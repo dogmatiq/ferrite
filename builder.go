@@ -6,11 +6,6 @@ import (
 	"github.com/dogmatiq/ferrite/variable"
 )
 
-// A VariableOption changes the behavior of an environment variable.
-type VariableOption interface {
-	variable.RegisterOption
-}
-
 // undefinedError returns an error that indicates that a variable is undefined.
 func undefinedError(v variable.Any) error {
 	return fmt.Errorf(
@@ -25,10 +20,7 @@ type isBuilderOf[T any, B builderOf[T]] struct{}
 // builderOf is an interface and type constriant common to all builders that
 // produce a value of type T.
 type builderOf[T any] interface {
-	Required(options ...VariableOption) Required[T]
-	Optional(options ...VariableOption) Optional[T]
-	Deprecated(
-		reason string,
-		options ...VariableOption,
-	) Deprecated[T]
+	Required(options ...RequiredOption) Required[T]
+	Optional(options ...OptionalOption) Optional[T]
+	Deprecated(reason string, options ...DeprecatedOption) Deprecated[T]
 }

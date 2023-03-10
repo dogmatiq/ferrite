@@ -11,6 +11,11 @@ import (
 type Deprecated[T any] interface {
 }
 
+// DeprecatedOption is an option that can be applied to a deprecated variable.
+type DeprecatedOption interface {
+	variable.RegisterOption
+}
+
 // deprecated is a convenience function that registers and returns a
 // deprecated[T] that maps one-to-one with an environment variable of the same
 // type.
@@ -18,7 +23,7 @@ func deprecated[T any, S variable.TypedSchema[T]](
 	schema S,
 	spec *variable.TypedSpecBuilder[T],
 	reason string,
-	options []VariableOption,
+	options []DeprecatedOption,
 ) Deprecated[T] {
 	spec.MarkDeprecated(reason)
 

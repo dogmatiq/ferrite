@@ -19,12 +19,17 @@ type Optional[T any] interface {
 	Value() (T, bool)
 }
 
+// OptionalOption is an option that can be applied to an optional variable.
+type OptionalOption interface {
+	variable.RegisterOption
+}
+
 // optional is a convenience function that registers and returns a required[T]
 // that maps one-to-one with an environment variable of the same type.
 func optional[T any, S variable.TypedSchema[T]](
 	schema S,
 	spec *variable.TypedSpecBuilder[T],
-	options []VariableOption,
+	options []OptionalOption,
 ) Optional[T] {
 	v := variable.Register(
 		spec.Done(schema),

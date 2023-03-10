@@ -15,12 +15,17 @@ type Required[T any] interface {
 	Value() T
 }
 
+// RequiredOption is an option that can be applied to a required variable.
+type RequiredOption interface {
+	variable.RegisterOption
+}
+
 // required is a convenience function that registers and returns a required[T]
 // that maps one-to-one with an environment variable of the same type.
 func required[T any, S variable.TypedSchema[T]](
 	schema S,
 	spec *variable.TypedSpecBuilder[T],
-	options []VariableOption,
+	options []RequiredOption,
 ) Required[T] {
 	spec.MarkRequired()
 
