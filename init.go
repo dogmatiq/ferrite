@@ -6,7 +6,7 @@ import (
 
 	"github.com/dogmatiq/ferrite/internal/mode"
 	"github.com/dogmatiq/ferrite/internal/mode/usage/markdown"
-	"github.com/dogmatiq/ferrite/internal/mode/validatemode"
+	"github.com/dogmatiq/ferrite/internal/mode/validate"
 )
 
 // Init initializes ferrite.
@@ -28,7 +28,7 @@ func Init(options ...InitOption) {
 	case "usage/markdown":
 		markdown.Run(opts)
 	case "validate", "":
-		validatemode.Run(opts)
+		validate.Run(opts)
 	default:
 		fmt.Fprintf(opts.Err, "unrecognized FERRITE_MODE (%s)\n", m)
 		opts.Exit(1)

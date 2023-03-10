@@ -1,4 +1,4 @@
-package validatemode
+package validate
 
 import (
 	"io"

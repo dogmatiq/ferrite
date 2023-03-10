@@ -1,2 +1,3 @@
-// Package markdown implements Ferrite's "usage/markdown" mode.
+// Package markdown is a Ferrite mode that generates usage documentation in
+// markdown format.
 package markdown

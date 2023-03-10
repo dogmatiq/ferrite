@@ -1,4 +1,4 @@
-package validatemode
+package validate
 
 import "github.com/dogmatiq/ferrite/variable"
 
