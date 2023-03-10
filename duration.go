@@ -70,19 +70,19 @@ func (b *DurationBuilder) WithMaximum(v time.Duration) *DurationBuilder {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *DurationBuilder) Required(options ...VariableOption) Required[time.Duration] {
-	return req(b.schema, &b.spec, options)
+	return required(b.schema, &b.spec, options)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *DurationBuilder) Optional(options ...VariableOption) Optional[time.Duration] {
-	return opt(b.schema, &b.spec, options)
+	return optional(b.schema, &b.spec, options)
 }
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
 func (b *DurationBuilder) Deprecated(reason string, options ...VariableOption) Deprecated[time.Duration] {
-	return dep(b.schema, &b.spec, reason, options)
+	return deprecated(b.schema, &b.spec, reason, options)
 }
 
 type durationMarshaler struct{}

@@ -72,19 +72,19 @@ func (b *URLBuilder) WithDefault(v string) *URLBuilder {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *URLBuilder) Required(options ...VariableOption) Required[*url.URL] {
-	return req(b.schema, &b.spec, options)
+	return required(b.schema, &b.spec, options)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *URLBuilder) Optional(options ...VariableOption) Optional[*url.URL] {
-	return opt(b.schema, &b.spec, options)
+	return optional(b.schema, &b.spec, options)
 }
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
 func (b *URLBuilder) Deprecated(reason string, options ...VariableOption) Deprecated[*url.URL] {
-	return dep(b.schema, &b.spec, reason, options)
+	return deprecated(b.schema, &b.spec, reason, options)
 }
 
 type urlMarshaler struct{}

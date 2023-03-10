@@ -164,7 +164,7 @@ func (b *KubernetesServiceBuilder) Required(options ...VariableOption) Required[
 		options...,
 	)
 
-	return required[KubernetesAddress]{
+	return requiredFunc[KubernetesAddress]{
 		[]variable.Any{host, port},
 		func() (KubernetesAddress, error) {
 			h, ok, err := host.NativeValue()
@@ -203,7 +203,7 @@ func (b *KubernetesServiceBuilder) Optional(options ...VariableOption) Optional[
 		options...,
 	)
 
-	return optional[KubernetesAddress]{
+	return optionalFunc[KubernetesAddress]{
 		[]variable.Any{host, port},
 		func() (KubernetesAddress, bool, error) {
 			h, hostOk, err := host.NativeValue()
@@ -257,7 +257,8 @@ func (b *KubernetesServiceBuilder) Deprecated(reason string, options ...Variable
 		options...,
 	)
 
-	return deprecated[KubernetesAddress]{}
+	// interface is currently empty so we don't need an implementation
+	return nil
 }
 
 // kubernetesNameToEnv converts a kubernetes resource name to an environment variable

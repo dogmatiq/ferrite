@@ -50,9 +50,9 @@ func undefinedError(v variable.Any) error {
 	)
 }
 
-// req is a convenience function that registers and returns a required[T] that
-// maps one-to-one with an environment variable of the same type.
-func req[T any, S variable.TypedSchema[T]](
+// required is a convenience function that registers and returns a required[T]
+// that maps one-to-one with an environment variable of the same type.
+func required[T any, S variable.TypedSchema[T]](
 	schema S,
 	spec *variable.TypedSpecBuilder[T],
 	options []VariableOption,
@@ -64,7 +64,7 @@ func req[T any, S variable.TypedSchema[T]](
 		options...,
 	)
 
-	return required[T]{
+	return requiredFunc[T]{
 		[]variable.Any{v},
 		func() (T, error) {
 			n, ok, err := v.NativeValue()
@@ -76,9 +76,9 @@ func req[T any, S variable.TypedSchema[T]](
 	}
 }
 
-// opt is a convenience function that registers and returns a required[T] that
-// maps one-to-one with an environment variable of the same type.
-func opt[T any, S variable.TypedSchema[T]](
+// optional is a convenience function that registers and returns a required[T]
+// that maps one-to-one with an environment variable of the same type.
+func optional[T any, S variable.TypedSchema[T]](
 	schema S,
 	spec *variable.TypedSpecBuilder[T],
 	options []VariableOption,
@@ -88,7 +88,7 @@ func opt[T any, S variable.TypedSchema[T]](
 		options...,
 	)
 
-	return optional[T]{
+	return optionalFunc[T]{
 		[]variable.Any{v},
 		func() (T, bool, error) {
 			return v.NativeValue()
@@ -96,9 +96,10 @@ func opt[T any, S variable.TypedSchema[T]](
 	}
 }
 
-// opt is a convenience function that registers and returns a deprecated[T] that
-// maps one-to-one with an environment variable of the same type.
-func dep[T any, S variable.TypedSchema[T]](
+// deprecated is a convenience function that registers and returns a
+// deprecated[T] that maps one-to-one with an environment variable of the same
+// type.
+func deprecated[T any, S variable.TypedSchema[T]](
 	schema S,
 	spec *variable.TypedSpecBuilder[T],
 	reason string,
@@ -111,17 +112,18 @@ func dep[T any, S variable.TypedSchema[T]](
 		options...,
 	)
 
-	return deprecated[T]{}
+	// interface is currently empty so we don't need an implementation
+	return nil
 }
 
-// required is an implementation of Required[T] that obtains the value
+// requiredFunc is an implementation of Required[T] that obtains the value
 // from an arbitrary function.
-type required[T any] struct {
+type requiredFunc[T any] struct {
 	vars []variable.Any
 	fn   func() (T, error)
 }
 
-func (d required[T]) Value() T {
+func (d requiredFunc[T]) Value() T {
 	n, err := d.fn()
 	if err != nil {
 		panic(err.Error())
@@ -129,20 +131,17 @@ func (d required[T]) Value() T {
 	return n
 }
 
-// optional is an implementation of Optional[T] that obtains the value from an
+// optionalFunc is an implementation of Optional[T] that obtains the value from an
 // arbitrary function.
-type optional[T any] struct {
+type optionalFunc[T any] struct {
 	vars []variable.Any
 	fn   func() (T, bool, error)
 }
 
-func (d optional[T]) Value() (T, bool) {
+func (d optionalFunc[T]) Value() (T, bool) {
 	n, ok, err := d.fn()
 	if err != nil {
 		panic(err.Error())
 	}
 	return n, ok
 }
-
-// optional is an implementation of Deprecated[T].
-type deprecated[T any] struct{}

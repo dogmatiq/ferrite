@@ -88,17 +88,17 @@ func (b *EnumBuilder[T]) WithDefault(v T) *EnumBuilder[T] {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *EnumBuilder[T]) Required(options ...VariableOption) Required[T] {
-	return req(b.schema, &b.spec, options)
+	return required(b.schema, &b.spec, options)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *EnumBuilder[T]) Optional(options ...VariableOption) Optional[T] {
-	return opt(b.schema, &b.spec, options)
+	return optional(b.schema, &b.spec, options)
 }
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
 func (b *EnumBuilder[T]) Deprecated(reason string, options ...VariableOption) Deprecated[T] {
-	return dep(b.schema, &b.spec, reason, options)
+	return deprecated(b.schema, &b.spec, reason, options)
 }
