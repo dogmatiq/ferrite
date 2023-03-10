@@ -14,9 +14,9 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Added
 
+- Added `String().WithSensitiveContent()`, which hides the variable value from console output and generated documentation
 - Added `InitOption` type
 - Added `VariableOption` type
-- Added `Sensitive()` option, which indicates that a variable's contents may contain sensitive information
 
 ### Changed
 

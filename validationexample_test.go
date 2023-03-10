@@ -48,7 +48,8 @@ func ExampleInit_validation() {
 	os.Setenv("FERRITE_STRING_SENSITIVE", "hunter2")
 	ferrite.
 		String("FERRITE_STRING_SENSITIVE", "example sensitive string").
-		Required(ferrite.Sensitive())
+		WithSensitiveContent().
+		Required()
 
 	os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
 	os.Setenv("FERRITE_SVC_SERVICE_PORT", "443")
@@ -121,7 +122,8 @@ func ExampleInit_validationWithDefaultValues() {
 	ferrite.
 		String("FERRITE_STRING_SENSITIVE", "example sensitive string").
 		WithDefault("hunter2").
-		Required(ferrite.Sensitive())
+		WithSensitiveContent().
+		Required()
 
 	ferrite.
 		KubernetesService("ferrite-svc").
@@ -186,7 +188,8 @@ func ExampleInit_validationWithOptionalValues() {
 
 	ferrite.
 		String("FERRITE_STRING_SENSITIVE", "example sensitive string").
-		Optional(ferrite.Sensitive())
+		WithSensitiveContent().
+		Optional()
 
 	ferrite.
 		KubernetesService("ferrite-svc").
@@ -296,7 +299,8 @@ func ExampleInit_validationWithInvalidValues() {
 				return nil
 			},
 		).
-		Optional(ferrite.Sensitive())
+		WithSensitiveContent().
+		Optional()
 
 	os.Setenv("FERRITE_SVC_SERVICE_HOST", ".local")
 	os.Setenv("FERRITE_SVC_SERVICE_PORT", "https-")

@@ -55,6 +55,15 @@ func (b *StringBuilder[T]) WithConstraintFunc(
 	return b
 }
 
+// WithSensitiveContent marks the variable as containing sensitive content.
+//
+// Values of sensitive variables are not printed to the console or included in
+// generated documentation.
+func (b *StringBuilder[T]) WithSensitiveContent() *StringBuilder[T] {
+	b.spec.MarkSensitive()
+	return b
+}
+
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *StringBuilder[T]) Required(options ...VariableOption) Required[T] {

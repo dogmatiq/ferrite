@@ -1,10 +1,12 @@
 package ferrite_test
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
 	"github.com/dogmatiq/ferrite"
+	"github.com/dogmatiq/ferrite/variable"
 )
 
 func ExampleString_required() {
@@ -59,4 +61,30 @@ func ExampleString_optional() {
 
 	// Output:
 	// value is undefined
+}
+
+func ExampleString_sensitive() {
+	setUp()
+	defer tearDown()
+
+	os.Setenv("FERRITE_STRING", "hunter2")
+	ferrite.
+		String("FERRITE_STRING", "example sensitive string variable").
+		WithConstraintFunc(
+			"always fail",
+			func(s string) variable.ConstraintError {
+				return errors.New("always fail")
+			},
+		).
+		WithSensitiveContent().
+		Required()
+
+	ferrite.Init()
+
+	// Note that the variable's value is obscured in the console output.
+
+	// Output:
+	// Environment Variables:
+	//
+	//  ❯ FERRITE_STRING  example sensitive string variable    <string>    ✗ set to *******, always fail
 }

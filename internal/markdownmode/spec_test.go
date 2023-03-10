@@ -550,8 +550,8 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					String("PASSWORD", "a very secret password").
 					WithDefault("hunter2").
+					WithSensitiveContent().
 					Optional(
-						ferrite.Sensitive(),
 						variable.WithRegistry(reg).AsVariableOption(),
 					)
 			},
@@ -562,8 +562,8 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					String("PASSWORD", "a very secret password").
+					WithSensitiveContent().
 					Optional(
-						ferrite.Sensitive(),
 						variable.WithRegistry(reg).AsVariableOption(),
 					)
 			},
@@ -575,8 +575,8 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					String("PASSWORD", "a very secret password").
 					WithDefault("hunter2").
+					WithSensitiveContent().
 					Required(
-						ferrite.Sensitive(),
 						variable.WithRegistry(reg).AsVariableOption(),
 					)
 			},
@@ -587,8 +587,8 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					String("PASSWORD", "a very secret password").
+					WithSensitiveContent().
 					Required(
-						ferrite.Sensitive(),
 						variable.WithRegistry(reg).AsVariableOption(),
 					)
 			},

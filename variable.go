@@ -35,18 +35,6 @@ type Optional[T any] interface {
 // public API. It may change at any time and without warning.
 type VariableOption func(variable.SpecBuilder) []variable.RegisterOption
 
-// Sensitive is a VariableOption that marks a variable as containing sensitive
-// information.
-//
-// Values of sensitive variables are not printed to the console or included in
-// generated documentation.
-func Sensitive() VariableOption {
-	return func(spec variable.SpecBuilder) []variable.RegisterOption {
-		spec.MarkSensitive()
-		return nil
-	}
-}
-
 func applyVariableOptions(
 	spec variable.SpecBuilder,
 	opts []VariableOption,
