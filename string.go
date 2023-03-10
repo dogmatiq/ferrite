@@ -32,6 +32,8 @@ type StringBuilder[T ~string] struct {
 	spec   variable.TypedSpecBuilder[T]
 }
 
+var _ isBuilderOf[string, *StringBuilder[string]]
+
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.

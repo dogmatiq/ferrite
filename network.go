@@ -35,6 +35,8 @@ type NetworkPortBuilder struct {
 	spec   variable.TypedSpecBuilder[string]
 }
 
+var _ isBuilderOf[string, *NetworkPortBuilder]
+
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.

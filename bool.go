@@ -44,6 +44,8 @@ type BoolBuilder[T ~bool] struct {
 	spec   variable.TypedSpecBuilder[T]
 }
 
+var _ isBuilderOf[bool, *BoolBuilder[bool]]
+
 // WithLiterals overrides the default literals used to represent true and false.
 //
 // The default literals "true" and "false" are no longer valid values when using

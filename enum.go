@@ -42,6 +42,8 @@ type EnumBuilder[T any] struct {
 	spec   variable.TypedSpecBuilder[T]
 }
 
+var _ isBuilderOf[any, *EnumBuilder[any]]
+
 // WithMembers adds members to the enum.
 //
 // The environment variable must be set to the string representation of one of

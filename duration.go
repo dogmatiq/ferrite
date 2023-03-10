@@ -45,6 +45,8 @@ type DurationBuilder struct {
 	spec   variable.TypedSpecBuilder[time.Duration]
 }
 
+var _ isBuilderOf[time.Duration, *DurationBuilder]
+
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.

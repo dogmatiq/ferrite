@@ -50,6 +50,8 @@ type UnsignedBuilder[T constraints.Unsigned] struct {
 	spec   variable.TypedSpecBuilder[T]
 }
 
+var _ isBuilderOf[uint, *UnsignedBuilder[uint]]
+
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.

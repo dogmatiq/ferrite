@@ -51,6 +51,8 @@ type SignedBuilder[T constraints.Signed] struct {
 	spec   variable.TypedSpecBuilder[T]
 }
 
+var _ isBuilderOf[int, *SignedBuilder[int]]
+
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.

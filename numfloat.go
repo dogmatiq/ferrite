@@ -51,6 +51,8 @@ type FloatBuilder[T constraints.Float] struct {
 	spec   variable.TypedSpecBuilder[T]
 }
 
+var _ isBuilderOf[float32, *FloatBuilder[float32]]
+
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.

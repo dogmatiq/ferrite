@@ -25,6 +25,8 @@ type FileBuilder struct {
 	spec   variable.TypedSpecBuilder[FileName]
 }
 
+var _ isBuilderOf[FileName, *FileBuilder]
+
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.

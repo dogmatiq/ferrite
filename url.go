@@ -59,6 +59,8 @@ type URLBuilder struct {
 	spec   variable.TypedSpecBuilder[*url.URL]
 }
 
+var _ isBuilderOf[*url.URL, *URLBuilder]
+
 // WithDefault sets a default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
