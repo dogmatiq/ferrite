@@ -5,25 +5,25 @@ import (
 	"strings"
 
 	"github.com/dogmatiq/ferrite"
+	. "github.com/dogmatiq/ferrite"
+	"github.com/dogmatiq/ferrite/internal/mode"
 	"github.com/dogmatiq/ferrite/variable"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 )
 
 // example is a helper function that sets up the global state for a testable
 // example. It returns a function that resets the global state after the test.
 func example() func() {
-	ferrite.XDefaultInitOptions.Out = os.Stdout
-	ferrite.XDefaultInitOptions.Err = os.Stdout
-	ferrite.XDefaultInitOptions.Exit = func(code int) {}
-
+	mode.DefaultOptions.Out = os.Stdout
+	mode.DefaultOptions.Err = os.Stdout
+	mode.DefaultOptions.Exit = func(code int) {}
 	return tearDown
 }
 
 // tearDown resets the environemnt and Ferrite global state after a test.
 func tearDown() {
-	ferrite.XDefaultInitOptions.Out = os.Stdout
-	ferrite.XDefaultInitOptions.Err = os.Stderr
-	ferrite.XDefaultInitOptions.Exit = os.Exit
-
+	mode.ResetDefaultOptions()
 	variable.DefaultRegistry.Reset()
 
 	for _, env := range os.Environ() {
@@ -33,3 +33,26 @@ func tearDown() {
 		}
 	}
 }
+
+var _ = Describe("func Init()", func() {
+	BeforeEach(func() {
+	})
+
+	AfterEach(func() {
+		tearDown()
+	})
+
+	It("exits with a non-zero status code if there is an invalid environment variable", func() {
+		String("FERRITE_STRING", "required").
+			Required()
+
+		exited := false
+		mode.DefaultOptions.Exit = func(code int) {
+			Expect(code).NotTo(Equal(0))
+			exited = true
+		}
+
+		ferrite.Init()
+		Expect(exited).To(BeTrue())
+	})
+})

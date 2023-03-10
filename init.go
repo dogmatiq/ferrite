@@ -2,13 +2,11 @@ package ferrite
 
 import (
 	"fmt"
-	"io"
 	"os"
-	"path/filepath"
 
+	"github.com/dogmatiq/ferrite/internal/mode"
 	"github.com/dogmatiq/ferrite/internal/mode/markdownmode"
 	"github.com/dogmatiq/ferrite/internal/mode/validatemode"
-	"github.com/dogmatiq/ferrite/variable"
 )
 
 // Init initializes ferrite.
@@ -21,24 +19,16 @@ import (
 // information about the environment variables in Markdown format, then exits
 // the process successfully.
 func Init(options ...InitOption) {
-	opts := defaultInitOptions // copy
+	opts := mode.DefaultOptions
 	for _, opt := range options {
 		opt.applyInitOption(&opts)
 	}
 
-	reg := opts.Registry
-
 	switch m := os.Getenv("FERRITE_MODE"); m {
 	case "usage/markdown":
-		app := filepath.Base(os.Args[0])
-		markdownmode.Run(reg, app, opts.Out)
-		opts.Exit(0)
-
+		markdownmode.Run(opts)
 	case "validate", "":
-		if ok := validatemode.Run(reg, opts.Err); !ok {
-			opts.Exit(1)
-		}
-
+		validatemode.Run(opts)
 	default:
 		fmt.Fprintf(opts.Err, "unrecognized FERRITE_MODE (%s)\n", m)
 		opts.Exit(1)
@@ -47,19 +37,5 @@ func Init(options ...InitOption) {
 
 // An InitOption changes the behavior of Init().
 type InitOption interface {
-	applyInitOption(*initOptions)
-}
-
-type initOptions struct {
-	Registry *variable.Registry
-	Out      io.Writer
-	Err      io.Writer
-	Exit     func(int)
-}
-
-var defaultInitOptions = initOptions{
-	Registry: &variable.DefaultRegistry,
-	Out:      os.Stdout,
-	Err:      os.Stderr,
-	Exit:     os.Exit,
+	applyInitOption(*mode.Options)
 }

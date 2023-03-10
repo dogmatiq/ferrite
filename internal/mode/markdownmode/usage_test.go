@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/dogmatiq/ferrite"
+	"github.com/dogmatiq/ferrite/internal/mode"
 	. "github.com/dogmatiq/ferrite/internal/mode/markdownmode"
 	"github.com/dogmatiq/ferrite/variable"
 	. "github.com/jmalloc/gomegax"
@@ -41,12 +42,21 @@ var _ = Describe("func Run()", func() {
 			Expect(err).ShouldNot(HaveOccurred())
 
 			actual := &bytes.Buffer{}
+			exited := false
+
 			Run(
-				reg,
-				"<app>",
-				actual,
+				mode.Options{
+					Registry: reg,
+					Args:     []string{"<app>"},
+					Out:      actual,
+					Exit: func(code int) {
+						exited = true
+						Expect(code).To(Equal(0))
+					},
+				},
 			)
 			ExpectWithOffset(1, actual.String()).To(EqualX(string(expect)))
+			Expect(exited).To(BeTrue())
 		},
 		Entry(
 			"usage",

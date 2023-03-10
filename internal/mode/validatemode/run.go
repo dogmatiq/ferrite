@@ -3,6 +3,7 @@ package validatemode
 import (
 	"io"
 
+	"github.com/dogmatiq/ferrite/internal/mode"
 	"github.com/dogmatiq/ferrite/variable"
 )
 
@@ -12,12 +13,12 @@ import (
 // for display in the console.
 //
 // It returns true if all variables are valid.
-func Run(reg *variable.Registry, w io.Writer) bool {
+func Run(opts mode.Options) {
 	show := false
 	valid := true
 
 	t := table{}
-	for _, v := range reg.Variables() {
+	for _, v := range opts.Registry.Variables() {
 		t.AddRow(
 			name(v),
 			description(v),
@@ -35,20 +36,22 @@ func Run(reg *variable.Registry, w io.Writer) bool {
 	}
 
 	if show {
-		if _, err := io.WriteString(w, "Environment Variables:\n\n"); err != nil {
+		if _, err := io.WriteString(opts.Err, "Environment Variables:\n\n"); err != nil {
 			panic(err)
 		}
 
-		if _, err := t.WriteTo(w); err != nil {
+		if _, err := t.WriteTo(opts.Err); err != nil {
 			panic(err)
 		}
 
-		if _, err := io.WriteString(w, "\n"); err != nil {
+		if _, err := io.WriteString(opts.Err, "\n"); err != nil {
 			panic(err)
 		}
 	}
 
-	return valid
+	if !valid {
+		opts.Exit(1)
+	}
 }
 
 const (
