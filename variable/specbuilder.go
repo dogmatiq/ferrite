@@ -75,8 +75,8 @@ func (b *TypedSpecBuilder[T]) MarkSensitive() {
 }
 
 // MarkDeprecated marks the variable as deprecated.
-func (b *TypedSpecBuilder[T]) MarkDeprecated(reason string) {
-	b.spec.deprecated = reason
+func (b *TypedSpecBuilder[T]) MarkDeprecated() {
+	b.spec.deprecated = true
 }
 
 // NormativeExample adds a normative example to the variable.

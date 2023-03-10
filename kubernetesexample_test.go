@@ -76,3 +76,25 @@ func ExampleKubernetesService_namedPort() {
 	// Output:
 	// value is host.example.org:12345
 }
+
+func ExampleKubernetesService_deprecated() {
+	defer example()()
+
+	os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
+	os.Setenv("FERRITE_SVC_SERVICE_PORT", "12345")
+	ferrite.
+		KubernetesService("ferrite-svc").
+		Deprecated()
+
+	ferrite.Init()
+
+	fmt.Println("<execution continues>")
+
+	// Output:
+	// Environment Variables:
+	//
+	//  ❯ FERRITE_SVC_SERVICE_HOST  kubernetes "ferrite-svc" service host  [ <string> ]  ⚠ deprecated variable set to host.example.org
+	//  ❯ FERRITE_SVC_SERVICE_PORT  kubernetes "ferrite-svc" service port  [ <string> ]  ⚠ deprecated variable set to 12345
+	//
+	// <execution continues>
+}

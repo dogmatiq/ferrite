@@ -11,7 +11,7 @@ func ExampleNetworkPort_required() {
 	defer example()()
 
 	v := ferrite.
-		NetworkPort("FERRITE_NETWORK_PORT", "example network port").
+		NetworkPort("FERRITE_NETWORK_PORT", "example network port variable").
 		Required()
 
 	os.Setenv("FERRITE_NETWORK_PORT", "https")
@@ -27,7 +27,7 @@ func ExampleNetworkPort_default() {
 	defer example()()
 
 	v := ferrite.
-		NetworkPort("FERRITE_NETWORK_PORT", "example network port").
+		NetworkPort("FERRITE_NETWORK_PORT", "example network port variable").
 		WithDefault("12345").
 		Required()
 
@@ -43,7 +43,7 @@ func ExampleNetworkPort_optional() {
 	defer example()()
 
 	v := ferrite.
-		NetworkPort("FERRITE_NETWORK_PORT", "example network port").
+		NetworkPort("FERRITE_NETWORK_PORT", "example network port variable").
 		Optional()
 
 	ferrite.Init()
@@ -56,4 +56,24 @@ func ExampleNetworkPort_optional() {
 
 	// Output:
 	// value is undefined
+}
+
+func ExampleNetworkPort_deprecated() {
+	defer example()()
+
+	os.Setenv("FERRITE_NETWORK_PORT", "https")
+	ferrite.
+		NetworkPort("FERRITE_NETWORK_PORT", "example network port variable").
+		Deprecated()
+
+	ferrite.Init()
+
+	fmt.Println("<execution continues>")
+
+	// Output:
+	// Environment Variables:
+	//
+	//  ❯ FERRITE_NETWORK_PORT  example network port variable  [ <string> ]  ⚠ deprecated variable set to https
+	//
+	// <execution continues>
 }

@@ -11,7 +11,7 @@ func ExampleFloat_required() {
 	defer example()()
 
 	v := ferrite.
-		Float[float64]("FERRITE_FLOAT", "example signed floating-point variable").
+		Float[float64]("FERRITE_FLOAT", "example floating-point variable").
 		Required()
 
 	os.Setenv("FERRITE_FLOAT", "-123.45")
@@ -27,7 +27,7 @@ func ExampleFloat_default() {
 	defer example()()
 
 	v := ferrite.
-		Float[float64]("FERRITE_FLOAT", "example signed floating-point variable").
+		Float[float64]("FERRITE_FLOAT", "example floating-point variable").
 		WithDefault(-123.45).
 		Required()
 
@@ -43,7 +43,7 @@ func ExampleFloat_optional() {
 	defer example()()
 
 	v := ferrite.
-		Float[float64]("FERRITE_FLOAT", "example signed floating-point variable").
+		Float[float64]("FERRITE_FLOAT", "example floating-point variable").
 		Optional()
 
 	ferrite.Init()
@@ -62,7 +62,7 @@ func ExampleFloat_limits() {
 	defer example()()
 
 	v := ferrite.
-		Float[float64]("FERRITE_FLOAT", "example signed floating-point variable").
+		Float[float64]("FERRITE_FLOAT", "example floating-point variable").
 		WithMinimum(-5).
 		WithMaximum(10).
 		Required()
@@ -74,4 +74,24 @@ func ExampleFloat_limits() {
 
 	// Output:
 	// value is -2
+}
+
+func ExampleFloat_deprecated() {
+	defer example()()
+
+	os.Setenv("FERRITE_FLOAT", "-123.45")
+	ferrite.
+		Float[float64]("FERRITE_FLOAT", "example floating-point variable").
+		Deprecated()
+
+	ferrite.Init()
+
+	fmt.Println("<execution continues>")
+
+	// Output:
+	// Environment Variables:
+	//
+	//  ❯ FERRITE_FLOAT  example floating-point variable  [ <float64> ]  ⚠ deprecated variable set to -123.45
+	//
+	// <execution continues>
 }

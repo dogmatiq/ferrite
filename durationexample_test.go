@@ -76,3 +76,23 @@ func ExampleDuration_limits() {
 	// Output:
 	// value is 5m0s
 }
+
+func ExampleDuration_deprecated() {
+	defer example()()
+
+	os.Setenv("FERRITE_DURATION", "630s")
+	ferrite.
+		Duration("FERRITE_DURATION", "example duration variable").
+		Deprecated()
+
+	ferrite.Init()
+
+	fmt.Println("<execution continues>")
+
+	// Output:
+	// Environment Variables:
+	//
+	//  ❯ FERRITE_DURATION  example duration variable  [ 1ns ... ]  ⚠ deprecated variable set to 630s, equivalent to 10m30s
+	//
+	// <execution continues>
+}

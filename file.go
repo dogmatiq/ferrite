@@ -49,8 +49,8 @@ func (b *FileBuilder) Optional(options ...OptionalOption) Optional[FileName] {
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
-func (b *FileBuilder) Deprecated(reason string, options ...DeprecatedOption) Deprecated[FileName] {
-	return deprecated(b.schema, &b.spec, reason, options)
+func (b *FileBuilder) Deprecated(options ...DeprecatedOption) Deprecated[FileName] {
+	return deprecated(b.schema, &b.spec, options)
 }
 
 // FileName is the name of a file.

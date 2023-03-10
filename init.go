@@ -26,35 +26,18 @@ func Init(options ...InitOption) {
 		opt.applyInitOption(&opts)
 	}
 
+	reg := opts.Registry
+
 	switch m := os.Getenv("FERRITE_MODE"); m {
 	case "usage/markdown":
-		result := markdownmode.Run(
-			filepath.Base(os.Args[0]),
-			&variable.DefaultRegistry,
-		)
+		app := filepath.Base(os.Args[0])
+		result := markdownmode.Run(app, reg)
 		io.WriteString(opts.Err, result)
 		opts.Exit(0)
 
 	case "validate", "":
-		reg := &variable.DefaultRegistry
-
-		if result, ok := validatemode.Run(reg); !ok {
-			io.WriteString(opts.Err, result)
+		if ok := validatemode.Run(reg, opts.Err); !ok {
 			opts.Exit(1)
-		}
-
-		for _, v := range reg.Variables() {
-			s := v.Spec()
-
-			if s.IsDeprecated() {
-				if _, defined, _ := v.Value(); defined {
-					fmt.Fprintf(
-						opts.Err,
-						"WARNING: the %s environment variable is deprecated\n",
-						v.Spec().Name(),
-					)
-				}
-			}
 		}
 
 	default:
@@ -69,13 +52,15 @@ type InitOption interface {
 }
 
 type initOptions struct {
-	Out  io.Writer
-	Err  io.Writer
-	Exit func(int)
+	Registry *variable.Registry
+	Out      io.Writer
+	Err      io.Writer
+	Exit     func(int)
 }
 
 var defaultInitOptions = initOptions{
-	Out:  os.Stdout,
-	Err:  os.Stderr,
-	Exit: os.Exit,
+	Registry: &variable.DefaultRegistry,
+	Out:      os.Stdout,
+	Err:      os.Stderr,
+	Exit:     os.Exit,
 }

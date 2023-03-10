@@ -84,3 +84,23 @@ func ExampleString_sensitive() {
 	//
 	//  ❯ FERRITE_STRING  example sensitive string variable    <string>    ✗ set to *******, always fail
 }
+
+func ExampleString_deprecated() {
+	defer example()()
+
+	os.Setenv("FERRITE_STRING", "<value>")
+	ferrite.
+		String("FERRITE_STRING", "example string variable").
+		Deprecated()
+
+	ferrite.Init()
+
+	fmt.Println("<execution continues>")
+
+	// Output:
+	// Environment Variables:
+	//
+	//  ❯ FERRITE_STRING  example string variable  [ <string> ]  ⚠ deprecated variable set to '<value>'
+	//
+	// <execution continues>
+}

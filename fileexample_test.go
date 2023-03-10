@@ -12,7 +12,7 @@ func ExampleFile_required() {
 	defer example()()
 
 	v := ferrite.
-		File("FERRITE_FILE", "example file").
+		File("FERRITE_FILE", "example file variable").
 		Required()
 
 	os.Setenv("FERRITE_FILE", "testdata/hello.txt")
@@ -28,7 +28,7 @@ func ExampleFile_default() {
 	defer example()()
 
 	v := ferrite.
-		File("FERRITE_FILE", "example file").
+		File("FERRITE_FILE", "example file variable").
 		WithDefault("testdata/hello.txt").
 		Required()
 
@@ -44,7 +44,7 @@ func ExampleFile_optional() {
 	defer example()()
 
 	v := ferrite.
-		File("FERRITE_FILE", "example file").
+		File("FERRITE_FILE", "example file variable").
 		Optional()
 
 	ferrite.Init()
@@ -63,7 +63,7 @@ func ExampleFile_contentAsReader() {
 	defer example()()
 
 	v := ferrite.
-		File("FERRITE_FILE", "example file").
+		File("FERRITE_FILE", "example file variable").
 		Required()
 
 	os.Setenv("FERRITE_FILE", "testdata/hello.txt")
@@ -90,7 +90,7 @@ func ExampleFile_contentAsBytes() {
 	defer example()()
 
 	v := ferrite.
-		File("FERRITE_FILE", "example file").
+		File("FERRITE_FILE", "example file variable").
 		Required()
 
 	os.Setenv("FERRITE_FILE", "testdata/hello.txt")
@@ -111,7 +111,7 @@ func ExampleFile_contentAsString() {
 	defer example()()
 
 	v := ferrite.
-		File("FERRITE_FILE", "example file").
+		File("FERRITE_FILE", "example file variable").
 		Required()
 
 	os.Setenv("FERRITE_FILE", "testdata/hello.txt")
@@ -126,4 +126,24 @@ func ExampleFile_contentAsString() {
 
 	// Output:
 	// file content is "Hello, world!\n"
+}
+
+func ExampleFile_deprecated() {
+	defer example()()
+
+	os.Setenv("FERRITE_FILE", "testdata/hello.txt")
+	ferrite.
+		File("FERRITE_FILE", "example file variable").
+		Deprecated()
+
+	ferrite.Init()
+
+	fmt.Println("<execution continues>")
+
+	// Output:
+	// Environment Variables:
+	//
+	//  ❯ FERRITE_FILE  example file variable  [ <string> ]  ⚠ deprecated variable set to testdata/hello.txt
+	//
+	// <execution continues>
 }

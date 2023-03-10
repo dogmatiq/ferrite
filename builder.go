@@ -22,5 +22,5 @@ type isBuilderOf[T any, B builderOf[T]] struct{}
 type builderOf[T any] interface {
 	Required(options ...RequiredOption) Required[T]
 	Optional(options ...OptionalOption) Optional[T]
-	Deprecated(reason string, options ...DeprecatedOption) Deprecated[T]
+	Deprecated(options ...DeprecatedOption) Deprecated[T]
 }

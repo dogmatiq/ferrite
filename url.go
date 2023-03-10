@@ -83,8 +83,8 @@ func (b *URLBuilder) Optional(options ...OptionalOption) Optional[*url.URL] {
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
-func (b *URLBuilder) Deprecated(reason string, options ...DeprecatedOption) Deprecated[*url.URL] {
-	return deprecated(b.schema, &b.spec, reason, options)
+func (b *URLBuilder) Deprecated(options ...DeprecatedOption) Deprecated[*url.URL] {
+	return deprecated(b.schema, &b.spec, options)
 }
 
 type urlMarshaler struct{}

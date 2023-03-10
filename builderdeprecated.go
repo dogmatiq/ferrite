@@ -22,10 +22,9 @@ type DeprecatedOption interface {
 func deprecated[T any, S variable.TypedSchema[T]](
 	schema S,
 	spec *variable.TypedSpecBuilder[T],
-	reason string,
 	options []DeprecatedOption,
 ) Deprecated[T] {
-	spec.MarkDeprecated(reason)
+	spec.MarkDeprecated()
 
 	variable.Register(
 		spec.Done(schema),

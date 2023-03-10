@@ -75,3 +75,23 @@ func ExampleSigned_limits() {
 	// Output:
 	// value is -2
 }
+
+func ExampleSigned_deprecated() {
+	defer example()()
+
+	os.Setenv("FERRITE_SIGNED", "-123")
+	ferrite.
+		Signed[int]("FERRITE_SIGNED", "example signed integer variable").
+		Deprecated()
+
+	ferrite.Init()
+
+	fmt.Println("<execution continues>")
+
+	// Output:
+	// Environment Variables:
+	//
+	//  ❯ FERRITE_SIGNED  example signed integer variable  [ <int> ]  ⚠ deprecated variable set to -123
+	//
+	// <execution continues>
+}

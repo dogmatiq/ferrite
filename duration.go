@@ -81,8 +81,8 @@ func (b *DurationBuilder) Optional(options ...OptionalOption) Optional[time.Dura
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
-func (b *DurationBuilder) Deprecated(reason string, options ...DeprecatedOption) Deprecated[time.Duration] {
-	return deprecated(b.schema, &b.spec, reason, options)
+func (b *DurationBuilder) Deprecated(options ...DeprecatedOption) Deprecated[time.Duration] {
+	return deprecated(b.schema, &b.spec, options)
 }
 
 type durationMarshaler struct{}

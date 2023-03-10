@@ -235,7 +235,7 @@ func ExampleInit_validationWithNonCanonicalValues() {
 	// Output:
 	// Environment Variables:
 	//
-	//    FERRITE_DURATION  example duration    1ns ...     ✓ set to 3h10m (specified non-canonically as '3h 10m 0s')
+	//    FERRITE_DURATION  example duration    1ns ...     ✓ set to '3h 10m 0s', equivalent to 3h10m
 	//  ❯ FERRITE_XTRIGGER  trigger failure     <string>    ✗ undefined
 }
 

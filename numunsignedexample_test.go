@@ -75,3 +75,23 @@ func ExampleUnsigned_limits() {
 	// Output:
 	// value is 7
 }
+
+func ExampleUnsigned_deprecated() {
+	defer example()()
+
+	os.Setenv("FERRITE_UNSIGNED", "123")
+	ferrite.
+		Unsigned[uint]("FERRITE_UNSIGNED", "example unsigned integer variable").
+		Deprecated()
+
+	ferrite.Init()
+
+	fmt.Println("<execution continues>")
+
+	// Output:
+	// Environment Variables:
+	//
+	//  ❯ FERRITE_UNSIGNED  example unsigned integer variable  [ <uint> ]  ⚠ deprecated variable set to 123
+	//
+	// <execution continues>
+}

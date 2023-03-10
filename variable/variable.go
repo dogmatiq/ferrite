@@ -14,6 +14,11 @@ type Any interface {
 	// IsValid returns true if the variable is valid.
 	IsValid() bool
 
+	// IsExplicit returns true if the variable has been explicitly defined in
+	// the environment, irrespective of its validity or the presence of a
+	// default value.
+	IsExplicit() bool
+
 	// Value returns the variable's value.
 	Value() (Value, bool, ValueError)
 }
@@ -23,9 +28,10 @@ type OfType[T any] struct {
 	spec TypedSpec[T]
 	env  Environment
 
-	once  sync.Once
-	value maybe.Value[valueOf[T]]
-	err   ValueError
+	once     sync.Once
+	value    maybe.Value[valueOf[T]]
+	explicit bool
+	err      ValueError
 }
 
 // Spec returns the variable's specification.
@@ -46,6 +52,14 @@ func (v *OfType[T]) IsValid() bool {
 	}
 
 	return true
+}
+
+// IsExplicit returns true if the variable has been explicitly defined in
+// the environment, irrespective of its validity or the presence of a
+// default value.
+func (v *OfType[T]) IsExplicit() bool {
+	v.resolve()
+	return v.explicit
 }
 
 // Value returns the variable's value.
@@ -70,6 +84,8 @@ func (v *OfType[T]) resolve() {
 			v.value = v.spec.def
 			return
 		}
+
+		v.explicit = true
 
 		n, c, err := v.spec.Unmarshal(lit)
 		if err != nil {
