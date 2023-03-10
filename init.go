@@ -21,37 +21,45 @@ import (
 // information about the environment variables in Markdown format, then exits
 // the process successfully.
 func Init(options ...InitOption) {
+	opts := defaultInitOptions // copy
+	for _, opt := range options {
+		opt.applyInitOption(&opts)
+	}
+
 	switch m := os.Getenv("FERRITE_MODE"); m {
 	case "usage/markdown":
 		result := markdownmode.Run(
 			filepath.Base(os.Args[0]),
 			&variable.DefaultRegistry,
 		)
-		io.WriteString(output, result)
-		exit(0)
+		io.WriteString(opts.Err, result)
+		opts.Exit(0)
 
 	case "validate", "":
 		if result, ok := validatemode.Run(&variable.DefaultRegistry); !ok {
-			io.WriteString(output, result)
-			exit(1)
+			io.WriteString(opts.Err, result)
+			opts.Exit(1)
 		}
 
 	default:
-		fmt.Fprintf(output, "unrecognized FERRITE_MODE (%s)\n", m)
-		exit(1)
+		fmt.Fprintf(opts.Err, "unrecognized FERRITE_MODE (%s)\n", m)
+		opts.Exit(1)
 	}
 }
 
-var (
-	// output is the writer to which the validation result is written.
-	output io.Writer = os.Stderr
-
-	// exit is called to exit the process when validation fails.
-	exit = os.Exit
-)
-
 // An InitOption changes the behavior of Init().
-//
-// WARNING: The signature of this function is not considered part of Ferrite's
-// public API. It may change at any time and without warning.
-type InitOption struct{}
+type InitOption interface {
+	applyInitOption(*initOptions)
+}
+
+type initOptions struct {
+	Out  io.Writer
+	Err  io.Writer
+	Exit func(int)
+}
+
+var defaultInitOptions = initOptions{
+	Out:  os.Stdout,
+	Err:  os.Stderr,
+	Exit: os.Exit,
+}

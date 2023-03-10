@@ -58,15 +58,15 @@ var DefaultRegistry = Registry{
 }
 
 // Register registers a new variable.
-func Register[T any](
+func Register[T any, Option RegisterOption](
 	spec TypedSpec[T],
-	options []RegisterOption,
+	options ...Option,
 ) *OfType[T] {
 	opts := registerOptions{
 		Registry: &DefaultRegistry,
 	}
 	for _, opt := range options {
-		opt(&opts)
+		opt.applyRegisterOption(&opts)
 	}
 
 	v := &OfType[T]{
@@ -81,13 +81,8 @@ func Register[T any](
 
 // RegisterOption is an option that controls how a specification is registered
 // with an environment variable registry.
-type RegisterOption func(*registerOptions)
-
-// AsVariableOption adapts a RegisterOption to a ferrite.VariableOption.
-func (o RegisterOption) AsVariableOption() func(spec SpecBuilder) []RegisterOption {
-	return func(spec SpecBuilder) []RegisterOption {
-		return []RegisterOption{o}
-	}
+type RegisterOption interface {
+	applyRegisterOption(*registerOptions)
 }
 
 // registerOptions contains options that are available to all specifications.
@@ -98,7 +93,13 @@ type registerOptions struct {
 // WithRegistry is an option that sets the registry that an environment variable
 // specification is placed into.
 func WithRegistry(r *Registry) RegisterOption {
-	return func(o *registerOptions) {
+	return registerOptionFunc(func(o *registerOptions) {
 		o.Registry = r
-	}
+	})
+}
+
+type registerOptionFunc func(*registerOptions)
+
+func (f registerOptionFunc) applyRegisterOption(o *registerOptions) {
+	f(o)
 }

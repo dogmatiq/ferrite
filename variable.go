@@ -30,25 +30,8 @@ type Optional[T any] interface {
 }
 
 // A VariableOption changes the behavior of an environment variable.
-//
-// WARNING: The signature of this function is not considered part of Ferrite's
-// public API. It may change at any time and without warning.
-type VariableOption func(variable.SpecBuilder) []variable.RegisterOption
-
-func applyVariableOptions(
-	spec variable.SpecBuilder,
-	opts []VariableOption,
-) []variable.RegisterOption {
-	var registerOptions []variable.RegisterOption
-
-	for _, opt := range opts {
-		registerOptions = append(
-			registerOptions,
-			opt(spec)...,
-		)
-	}
-
-	return registerOptions
+type VariableOption interface {
+	variable.RegisterOption
 }
 
 // undefinedError returns an error that indicates that a variable is undefined.
@@ -68,11 +51,9 @@ func req[T any, S variable.TypedSchema[T]](
 ) Required[T] {
 	spec.MarkRequired()
 
-	registerOptions := applyVariableOptions(spec, options)
-
 	v := variable.Register(
 		spec.Done(schema),
-		registerOptions,
+		options...,
 	)
 
 	return required[T]{
@@ -94,11 +75,9 @@ func opt[T any, S variable.TypedSchema[T]](
 	spec *variable.TypedSpecBuilder[T],
 	options []VariableOption,
 ) Optional[T] {
-	registerOptions := applyVariableOptions(spec, options)
-
 	v := variable.Register(
 		spec.Done(schema),
-		registerOptions,
+		options...,
 	)
 
 	return optional[T]{

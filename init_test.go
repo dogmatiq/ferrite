@@ -8,19 +8,20 @@ import (
 	"github.com/dogmatiq/ferrite/variable"
 )
 
-// setUp configures the validation exit behavior such that it prints to stdout
-// and does NOT exit the process on failure. This is useful inside testable
-// examples.
-func setUp() {
-	ferrite.SetExitBehavior(
-		os.Stdout,
-		func(code int) {},
-	)
+// example is a helper function that sets up the global state for a testable
+// example. It returns a function that resets the global state after the test.
+func example() func() {
+	ferrite.XDefaultInitOptions.Err = os.Stdout
+	ferrite.XDefaultInitOptions.Exit = func(code int) {}
+
+	return tearDown
 }
 
-// tearDown resets the global state after a test.
+// tearDown resets the environemnt and Ferrite global state after a test.
 func tearDown() {
-	ferrite.SetExitBehavior(os.Stderr, os.Exit)
+	ferrite.XDefaultInitOptions.Err = os.Stderr
+	ferrite.XDefaultInitOptions.Exit = os.Exit
+
 	variable.DefaultRegistry.Reset()
 
 	for _, env := range os.Environ() {

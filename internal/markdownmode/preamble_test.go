@@ -57,7 +57,7 @@ var _ = Describe("func Run()", func() {
 			func(reg *variable.Registry) {
 				ferrite.
 					String("READ_DSN", "database connection string for read-models").
-					Required(variable.WithRegistry(reg).AsVariableOption())
+					Required(variable.WithRegistry(reg))
 			},
 		),
 	)
