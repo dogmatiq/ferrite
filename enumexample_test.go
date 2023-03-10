@@ -8,8 +8,7 @@ import (
 )
 
 func ExampleEnum_required() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Enum("FERRITE_ENUM", "example enum variable").
@@ -26,8 +25,7 @@ func ExampleEnum_required() {
 }
 
 func ExampleEnum_default() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Enum("FERRITE_ENUM", "example enum variable").
@@ -44,8 +42,7 @@ func ExampleEnum_default() {
 }
 
 func ExampleEnum_optional() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Enum("FERRITE_ENUM", "example enum variable").
@@ -64,8 +61,7 @@ func ExampleEnum_optional() {
 }
 
 func ExampleEnum_descriptions() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Enum("FERRITE_ENUM", "example enum variable").

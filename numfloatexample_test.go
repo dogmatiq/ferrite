@@ -8,8 +8,7 @@ import (
 )
 
 func ExampleFloat_required() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Float[float64]("FERRITE_FLOAT", "example signed floating-point variable").
@@ -25,8 +24,7 @@ func ExampleFloat_required() {
 }
 
 func ExampleFloat_default() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Float[float64]("FERRITE_FLOAT", "example signed floating-point variable").
@@ -42,8 +40,7 @@ func ExampleFloat_default() {
 }
 
 func ExampleFloat_optional() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Float[float64]("FERRITE_FLOAT", "example signed floating-point variable").
@@ -62,8 +59,7 @@ func ExampleFloat_optional() {
 }
 
 func ExampleFloat_limits() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Float[float64]("FERRITE_FLOAT", "example signed floating-point variable").

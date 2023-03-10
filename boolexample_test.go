@@ -8,8 +8,7 @@ import (
 )
 
 func ExampleBool_required() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Bool("FERRITE_BOOL", "example boolean variable").
@@ -25,8 +24,7 @@ func ExampleBool_required() {
 }
 
 func ExampleBool_default() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Bool("FERRITE_BOOL", "example boolean variable").
@@ -42,8 +40,7 @@ func ExampleBool_default() {
 }
 
 func ExampleBool_optional() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Bool("FERRITE_BOOL", "example boolean variable").
@@ -62,8 +59,7 @@ func ExampleBool_optional() {
 }
 
 func ExampleBool_customLiterals() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Bool("FERRITE_BOOL", "example boolean variable").

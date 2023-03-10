@@ -9,8 +9,7 @@ import (
 )
 
 func ExampleDuration_required() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Duration("FERRITE_DURATION", "example duration variable").
@@ -26,8 +25,7 @@ func ExampleDuration_required() {
 }
 
 func ExampleDuration_default() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Duration("FERRITE_DURATION", "example duration variable").
@@ -43,8 +41,7 @@ func ExampleDuration_default() {
 }
 
 func ExampleDuration_optional() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Duration("FERRITE_DURATION", "example duration variable").
@@ -63,8 +60,7 @@ func ExampleDuration_optional() {
 }
 
 func ExampleDuration_limits() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Duration("FERRITE_DURATION", "example duration variable").

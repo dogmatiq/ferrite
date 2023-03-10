@@ -8,8 +8,7 @@ import (
 )
 
 func ExampleSigned_required() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Signed[int]("FERRITE_SIGNED", "example signed integer variable").
@@ -25,8 +24,7 @@ func ExampleSigned_required() {
 }
 
 func ExampleSigned_default() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Signed[int]("FERRITE_SIGNED", "example signed integer variable").
@@ -42,8 +40,7 @@ func ExampleSigned_default() {
 }
 
 func ExampleSigned_optional() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Signed[int]("FERRITE_SIGNED", "example signed integer variable").
@@ -62,8 +59,7 @@ func ExampleSigned_optional() {
 }
 
 func ExampleSigned_limits() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Signed[int]("FERRITE_SIGNED", "example signed integer variable").

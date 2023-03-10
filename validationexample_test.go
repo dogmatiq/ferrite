@@ -11,8 +11,7 @@ import (
 )
 
 func ExampleInit_validation() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	os.Setenv("FERRITE_BOOL", "true")
 	ferrite.
@@ -85,8 +84,7 @@ func ExampleInit_validation() {
 }
 
 func ExampleInit_validationWithDefaultValues() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	ferrite.
 		Bool("FERRITE_BOOL", "example bool").
@@ -158,8 +156,7 @@ func ExampleInit_validationWithDefaultValues() {
 }
 
 func ExampleInit_validationWithOptionalValues() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	ferrite.
 		Bool("FERRITE_BOOL", "example bool").
@@ -222,8 +219,7 @@ func ExampleInit_validationWithOptionalValues() {
 }
 
 func ExampleInit_validationWithNonCanonicalValues() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	os.Setenv("FERRITE_DURATION", "3h 10m 0s")
 	ferrite.
@@ -244,8 +240,7 @@ func ExampleInit_validationWithNonCanonicalValues() {
 }
 
 func ExampleInit_validationWithInvalidValues() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	os.Setenv("FERRITE_BOOL", "yes")
 	ferrite.

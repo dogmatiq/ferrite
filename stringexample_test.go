@@ -10,8 +10,7 @@ import (
 )
 
 func ExampleString_required() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		String("FERRITE_STRING", "example string variable").
@@ -27,8 +26,7 @@ func ExampleString_required() {
 }
 
 func ExampleString_default() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		String("FERRITE_STRING", "example string variable").
@@ -44,8 +42,7 @@ func ExampleString_default() {
 }
 
 func ExampleString_optional() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		String("FERRITE_STRING", "example string variable").
@@ -64,8 +61,7 @@ func ExampleString_optional() {
 }
 
 func ExampleString_sensitive() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	os.Setenv("FERRITE_STRING", "hunter2")
 	ferrite.

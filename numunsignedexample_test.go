@@ -8,8 +8,7 @@ import (
 )
 
 func ExampleUnsigned_required() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Unsigned[uint]("FERRITE_UNSIGNED", "example unsigned integer variable").
@@ -25,8 +24,7 @@ func ExampleUnsigned_required() {
 }
 
 func ExampleUnsigned_default() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Unsigned[uint]("FERRITE_UNSIGNED", "example unsigned integer variable").
@@ -42,8 +40,7 @@ func ExampleUnsigned_default() {
 }
 
 func ExampleUnsigned_optional() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Unsigned[uint]("FERRITE_UNSIGNED", "example unsigned integer variable").
@@ -62,8 +59,7 @@ func ExampleUnsigned_optional() {
 }
 
 func ExampleUnsigned_limits() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		Unsigned[uint]("FERRITE_UNSIGNED", "example unsigned integer variable").

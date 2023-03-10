@@ -7,8 +7,7 @@ import (
 )
 
 func ExampleInit_markdownUsage() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	// Tell ferrite to generate markdown documentation for the environment
 	// variables.

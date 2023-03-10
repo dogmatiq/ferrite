@@ -8,8 +8,7 @@ import (
 )
 
 func ExampleNetworkPort_required() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		NetworkPort("FERRITE_NETWORK_PORT", "example network port").
@@ -25,8 +24,7 @@ func ExampleNetworkPort_required() {
 }
 
 func ExampleNetworkPort_default() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		NetworkPort("FERRITE_NETWORK_PORT", "example network port").
@@ -42,8 +40,7 @@ func ExampleNetworkPort_default() {
 }
 
 func ExampleNetworkPort_optional() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		NetworkPort("FERRITE_NETWORK_PORT", "example network port").

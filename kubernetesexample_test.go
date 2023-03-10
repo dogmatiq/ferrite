@@ -8,8 +8,7 @@ import (
 )
 
 func ExampleKubernetesService_required() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		KubernetesService("ferrite-svc").
@@ -26,8 +25,7 @@ func ExampleKubernetesService_required() {
 }
 
 func ExampleKubernetesService_default() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		KubernetesService("ferrite-svc").
@@ -43,8 +41,7 @@ func ExampleKubernetesService_default() {
 }
 
 func ExampleKubernetesService_optional() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		KubernetesService("ferrite-svc").
@@ -63,8 +60,7 @@ func ExampleKubernetesService_optional() {
 }
 
 func ExampleKubernetesService_namedPort() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		KubernetesService("ferrite-svc").

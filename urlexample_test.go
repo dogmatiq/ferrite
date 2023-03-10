@@ -8,8 +8,7 @@ import (
 )
 
 func ExampleURL_required() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		URL("FERRITE_URL", "example URL variable").
@@ -25,8 +24,7 @@ func ExampleURL_required() {
 }
 
 func ExampleURL_default() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		URL("FERRITE_URL", "example URL variable").
@@ -42,8 +40,7 @@ func ExampleURL_default() {
 }
 
 func ExampleURL_optional() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		URL("FERRITE_URL", "example URL variable").

@@ -9,8 +9,7 @@ import (
 )
 
 func ExampleFile_required() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		File("FERRITE_FILE", "example file").
@@ -26,8 +25,7 @@ func ExampleFile_required() {
 }
 
 func ExampleFile_default() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		File("FERRITE_FILE", "example file").
@@ -43,8 +41,7 @@ func ExampleFile_default() {
 }
 
 func ExampleFile_optional() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		File("FERRITE_FILE", "example file").
@@ -63,8 +60,7 @@ func ExampleFile_optional() {
 }
 
 func ExampleFile_contentAsReader() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		File("FERRITE_FILE", "example file").
@@ -91,8 +87,7 @@ func ExampleFile_contentAsReader() {
 }
 
 func ExampleFile_contentAsBytes() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		File("FERRITE_FILE", "example file").
@@ -113,8 +108,7 @@ func ExampleFile_contentAsBytes() {
 }
 
 func ExampleFile_contentAsString() {
-	setUp()
-	defer tearDown()
+	defer example()()
 
 	v := ferrite.
 		File("FERRITE_FILE", "example file").
