@@ -56,7 +56,7 @@ Ferrite can automatically generate Markdown documentation for the declared
 environment variables by executing the application with the `FERRITE_MODE`
 environment variable set to `usage/markdown`.
 
-This causes the `ferrite.Init()` function to print the Markdown to `STDERR`, and
+This causes the `ferrite.Init()` function to print the Markdown to `STDOUT`, and
 then exit the process before the application code is executed.
 
 ### Other Implementations

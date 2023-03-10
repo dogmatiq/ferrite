@@ -31,8 +31,7 @@ func Init(options ...InitOption) {
 	switch m := os.Getenv("FERRITE_MODE"); m {
 	case "usage/markdown":
 		app := filepath.Base(os.Args[0])
-		result := markdownmode.Run(app, reg)
-		io.WriteString(opts.Err, result)
+		markdownmode.Run(reg, app, opts.Out)
 		opts.Exit(0)
 
 	case "validate", "":

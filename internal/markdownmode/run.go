@@ -1,25 +1,29 @@
 package markdownmode
 
 import (
+	"io"
+
 	"github.com/dogmatiq/ferrite/variable"
 )
 
 // Run generates environment variable usage instructions in markdown format.
 func Run(
-	app string,
 	reg *variable.Registry,
+	app string,
+	w io.Writer,
 	options ...Option,
-) string {
+) {
 	r := renderer{
-		App:   app,
-		Specs: reg.Specs(),
+		App:    app,
+		Specs:  reg.Specs(),
+		Output: w,
 	}
 
 	for _, opt := range options {
 		opt(&r)
 	}
 
-	return r.Render()
+	r.Render()
 }
 
 // Option is a function that changes the behavior of a renderer.

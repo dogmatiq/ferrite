@@ -11,6 +11,7 @@ import (
 // example is a helper function that sets up the global state for a testable
 // example. It returns a function that resets the global state after the test.
 func example() func() {
+	ferrite.XDefaultInitOptions.Out = os.Stdout
 	ferrite.XDefaultInitOptions.Err = os.Stdout
 	ferrite.XDefaultInitOptions.Exit = func(code int) {}
 
@@ -19,6 +20,7 @@ func example() func() {
 
 // tearDown resets the environemnt and Ferrite global state after a test.
 func tearDown() {
+	ferrite.XDefaultInitOptions.Out = os.Stdout
 	ferrite.XDefaultInitOptions.Err = os.Stderr
 	ferrite.XDefaultInitOptions.Exit = os.Exit
 

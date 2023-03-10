@@ -35,9 +35,17 @@ func Run(reg *variable.Registry, w io.Writer) bool {
 	}
 
 	if show {
-		io.WriteString(w, "Environment Variables:\n\n")
-		t.WriteTo(w)
-		io.WriteString(w, "\n")
+		if _, err := io.WriteString(w, "Environment Variables:\n\n"); err != nil {
+			panic(err)
+		}
+
+		if _, err := t.WriteTo(w); err != nil {
+			panic(err)
+		}
+
+		if _, err := io.WriteString(w, "\n"); err != nil {
+			panic(err)
+		}
 	}
 
 	return valid

@@ -1,6 +1,7 @@
 package markdownmode_test
 
 import (
+	"bytes"
 	"os"
 	"path/filepath"
 
@@ -39,12 +40,14 @@ var _ = Describe("func Run()", func() {
 			)
 			Expect(err).ShouldNot(HaveOccurred())
 
-			actual := Run(
-				"<app>",
+			actual := &bytes.Buffer{}
+			Run(
 				reg,
+				"<app>",
+				actual,
 				WithoutUsageExamples(),
 			)
-			ExpectWithOffset(1, actual).To(EqualX(string(expect)))
+			ExpectWithOffset(1, actual.String()).To(EqualX(string(expect)))
 		},
 		Entry(
 			"no variables",

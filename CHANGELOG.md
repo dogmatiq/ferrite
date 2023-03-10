@@ -10,6 +10,12 @@ The format is based on [Keep a Changelog], and this project adheres to
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+## [0.4.1] - 2023-03-10
+
+### Fixed
+
+- Markdown documentation is now rendered to `stdout` (instead of `stderr`) as intended
+
 ## [0.4.0] - 2023-03-10
 
 ### Added
@@ -113,6 +119,7 @@ The two most important changes in usage are:
 [0.3.5]: https://github.com/dogmatiq/ferrite/releases/tag/v0.3.5
 [0.3.6]: https://github.com/dogmatiq/ferrite/releases/tag/v0.3.6
 [0.4.0]: https://github.com/dogmatiq/ferrite/releases/tag/v0.4.0
+[0.4.1]: https://github.com/dogmatiq/ferrite/releases/tag/v0.4.1
 
 <!-- version template
 ## [0.0.1] - YYYY-MM-DD

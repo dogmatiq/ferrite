@@ -2,6 +2,7 @@ package markdownmode
 
 import (
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/dogmatiq/ferrite/internal/wordwrap"
@@ -10,17 +11,17 @@ import (
 )
 
 type renderer struct {
-	App   string
-	Specs []variable.Spec
+	App    string
+	Specs  []variable.Spec
+	Output io.Writer
 
-	w                    strings.Builder
 	withoutPreamble      bool
 	withoutIndex         bool
 	withoutUsageExamples bool
 	refs                 map[string]struct{}
 }
 
-func (r *renderer) Render() string {
+func (r *renderer) Render() {
 	r.line("# Environment Variables")
 
 	if !r.withoutPreamble {
@@ -52,16 +53,16 @@ func (r *renderer) Render() string {
 		r.gap()
 		r.renderRefs()
 	}
-
-	return r.w.String()
 }
 
 func (r *renderer) gap() {
-	r.w.WriteByte('\n')
+	r.line("")
 }
 
 func (r *renderer) line(f string, v ...any) {
-	fmt.Fprintf(&r.w, f+"\n", v...)
+	if _, err := fmt.Fprintf(r.Output, f+"\n", v...); err != nil {
+		panic(err)
+	}
 }
 
 func (r *renderer) paragraph(text ...string) func(...any) {
@@ -69,9 +70,8 @@ func (r *renderer) paragraph(text ...string) func(...any) {
 		text := fmt.Sprintf(strings.Join(text, " "), v...)
 
 		r.gap()
-		for _, l := range wordwrap.Wrap(text, 80) {
-			r.w.WriteString(l)
-			r.w.WriteByte('\n')
+		for _, line := range wordwrap.Wrap(text, 80) {
+			r.line("%s", line)
 		}
 	}
 }
