@@ -56,7 +56,7 @@ var _ = Describe("func Run()", func() {
 
 		Entry(
 			"bool + optional + default",
-			"bool/default.md",
+			"bool/with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Bool("DEBUG", "enable or disable debugging features").
@@ -75,7 +75,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"bool + required + default",
-			"bool/default.md",
+			"bool/with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Bool("DEBUG", "enable or disable debugging features").
@@ -92,12 +92,31 @@ var _ = Describe("func Run()", func() {
 					Required(variable.WithRegistry(reg))
 			},
 		),
+		Entry(
+			"bool + deprecated + default",
+			"bool/deprecated-with-default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Bool("DEBUG", "enable or disable debugging features").
+					WithDefault(false).
+					Deprecated(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"bool + deprecated",
+			"bool/deprecated.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Bool("DEBUG", "enable or disable debugging features").
+					Deprecated(variable.WithRegistry(reg))
+			},
+		),
 
 		// ENUM
 
 		Entry(
 			"enum + optional + default",
-			"enum/default.md",
+			"enum/with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Enum("LOG_LEVEL", "the minimum log level to record").
@@ -126,7 +145,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"enum + required + default",
-			"enum/default.md",
+			"enum/with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Enum("LOG_LEVEL", "the minimum log level to record").
@@ -153,12 +172,41 @@ var _ = Describe("func Run()", func() {
 					Required(variable.WithRegistry(reg))
 			},
 		),
+		Entry(
+			"enum + deprecated + default",
+			"enum/deprecated-with-default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Enum("LOG_LEVEL", "the minimum log level to record").
+					WithMember("debug", "show information for developers").
+					WithMember("info", "standard log messages").
+					WithMember("warn", "important, but don't need individual human review").
+					WithMember("error", "a healthy application shouldn't produce any errors").
+					WithMember("fatal", "the application cannot proceed").
+					WithDefault("error").
+					Deprecated(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"enum + deprecated",
+			"enum/deprecated.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Enum("LOG_LEVEL", "the minimum log level to record").
+					WithMember("debug", "show information for developers").
+					WithMember("info", "standard log messages").
+					WithMember("warn", "important, but don't need individual human review").
+					WithMember("error", "a healthy application shouldn't produce any errors").
+					WithMember("fatal", "the application cannot proceed").
+					Deprecated(variable.WithRegistry(reg))
+			},
+		),
 
 		// DURATION
 
 		Entry(
 			"duration + optional + default",
-			"duration/default.md",
+			"duration/with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Duration("GRPC_TIMEOUT", "gRPC request timeout").
@@ -177,7 +225,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"duration + required + default",
-			"duration/default.md",
+			"duration/with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Duration("GRPC_TIMEOUT", "gRPC request timeout").
@@ -204,12 +252,31 @@ var _ = Describe("func Run()", func() {
 					Required(variable.WithRegistry(reg))
 			},
 		),
+		Entry(
+			"duration + deprecated + default",
+			"duration/deprecated-with-default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Duration("GRPC_TIMEOUT", "gRPC request timeout").
+					WithDefault(10 * time.Millisecond).
+					Deprecated(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"duration + deprecated",
+			"duration/deprecated.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Duration("GRPC_TIMEOUT", "gRPC request timeout").
+					Deprecated(variable.WithRegistry(reg))
+			},
+		),
 
 		// KUBERNETES SERVICE
 
 		Entry(
 			"k8s service + optional + default",
-			"k8s-service/default.md",
+			"k8s-service/with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					KubernetesService("redis").
@@ -228,7 +295,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"k8s service + required + default",
-			"k8s-service/default.md",
+			"k8s-service/with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					KubernetesService("redis").
@@ -245,12 +312,30 @@ var _ = Describe("func Run()", func() {
 					Required(variable.WithRegistry(reg))
 			},
 		),
-
+		Entry(
+			"k8s service + deprecated + default",
+			"k8s-service/deprecated-with-default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					KubernetesService("redis").
+					WithDefault("redis.example.org", "6379").
+					Deprecated(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"k8s service + deprecated",
+			"k8s-service/deprecated.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					KubernetesService("redis").
+					Deprecated(variable.WithRegistry(reg))
+			},
+		),
 		// NETWORK PORT
 
 		Entry(
 			"network port + optional + default",
-			"network-port/default.md",
+			"network-port/with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					NetworkPort("PORT", "listen port for the HTTP server").
@@ -269,7 +354,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"network port + required + default",
-			"network-port/default.md",
+			"network-port/with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					NetworkPort("PORT", "listen port for the HTTP server").
@@ -286,12 +371,31 @@ var _ = Describe("func Run()", func() {
 					Required(variable.WithRegistry(reg))
 			},
 		),
+		Entry(
+			"network port + deprecated + default",
+			"network-port/deprecated-with-default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					NetworkPort("PORT", "listen port for the HTTP server").
+					WithDefault("8080").
+					Deprecated(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"network port + deprecated",
+			"network-port/deprecated.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					NetworkPort("PORT", "listen port for the HTTP server").
+					Deprecated(variable.WithRegistry(reg))
+			},
+		),
 
 		// NUMBER - FLOAT
 
 		Entry(
 			"float + optional + default",
-			"number/float/default.md",
+			"float/with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Float[float32]("WEIGHT", "weighting for this node").
@@ -301,7 +405,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"float + optional",
-			"number/float/optional.md",
+			"float/optional.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Float[float32]("WEIGHT", "weighting for this node").
@@ -310,7 +414,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"float + required + default",
-			"number/float/default.md",
+			"float/with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Float[float32]("WEIGHT", "weighting for this node").
@@ -320,7 +424,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"float + required",
-			"number/float/required.md",
+			"float/required.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Float[float32]("WEIGHT", "weighting for this node").
@@ -329,7 +433,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"float + min",
-			"number/float/with-min.md",
+			"float/with-min.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Float[float32]("WEIGHT", "weighting for this node").
@@ -339,7 +443,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"float + max",
-			"number/float/with-max.md",
+			"float/with-max.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Float[float32]("WEIGHT", "weighting for this node").
@@ -349,7 +453,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"float + min/max",
-			"number/float/with-minmax.md",
+			"float/with-minmax.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Float[float32]("WEIGHT", "weighting for this node").
@@ -358,12 +462,31 @@ var _ = Describe("func Run()", func() {
 					Required(variable.WithRegistry(reg))
 			},
 		),
+		Entry(
+			"float + deprecated + default",
+			"float/deprecated-with-default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Float[float32]("WEIGHT", "weighting for this node").
+					WithDefault(123.5).
+					Deprecated(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"float + deprecated",
+			"float/deprecated.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Float[float32]("WEIGHT", "weighting for this node").
+					Deprecated(variable.WithRegistry(reg))
+			},
+		),
 
 		// NUMBER - SIGNED
 
 		Entry(
 			"signed + optional + default",
-			"number/signed/default.md",
+			"signed/with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Signed[int8]("WEIGHT", "weighting for this node").
@@ -373,7 +496,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"signed + optional",
-			"number/signed/optional.md",
+			"signed/optional.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Signed[int8]("WEIGHT", "weighting for this node").
@@ -382,7 +505,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"signed + required + default",
-			"number/signed/default.md",
+			"signed/with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Signed[int8]("WEIGHT", "weighting for this node").
@@ -392,7 +515,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"signed + required",
-			"number/signed/required.md",
+			"signed/required.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Signed[int8]("WEIGHT", "weighting for this node").
@@ -401,7 +524,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"signed + min",
-			"number/signed/with-min.md",
+			"signed/with-min.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Signed[int8]("WEIGHT", "weighting for this node").
@@ -411,7 +534,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"signed + max",
-			"number/signed/with-max.md",
+			"signed/with-max.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Signed[int8]("WEIGHT", "weighting for this node").
@@ -421,7 +544,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"signed + min/max",
-			"number/signed/with-minmax.md",
+			"signed/with-minmax.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Signed[int8]("WEIGHT", "weighting for this node").
@@ -430,12 +553,31 @@ var _ = Describe("func Run()", func() {
 					Required(variable.WithRegistry(reg))
 			},
 		),
+		Entry(
+			"signed + deprecated + default",
+			"signed/deprecated-with-default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Signed[int8]("WEIGHT", "weighting for this node").
+					WithDefault(100).
+					Deprecated(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"signed + deprecated",
+			"signed/deprecated.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Signed[int8]("WEIGHT", "weighting for this node").
+					Deprecated(variable.WithRegistry(reg))
+			},
+		),
 
 		// NUMBER - UNSIGNED
 
 		Entry(
 			"unsigned + optional + default",
-			"number/unsigned/default.md",
+			"unsigned/with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Unsigned[uint16]("WEIGHT", "weighting for this node").
@@ -445,7 +587,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"unsigned + optional",
-			"number/unsigned/optional.md",
+			"unsigned/optional.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Unsigned[uint16]("WEIGHT", "weighting for this node").
@@ -454,7 +596,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"unsigned + required + default",
-			"number/unsigned/default.md",
+			"unsigned/with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Unsigned[uint16]("WEIGHT", "weighting for this node").
@@ -464,7 +606,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"unsigned + required",
-			"number/unsigned/required.md",
+			"unsigned/required.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Unsigned[uint16]("WEIGHT", "weighting for this node").
@@ -473,7 +615,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"unsigned + min",
-			"number/unsigned/with-min.md",
+			"unsigned/with-min.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Unsigned[uint16]("WEIGHT", "weighting for this node").
@@ -483,7 +625,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"unsigned + max",
-			"number/unsigned/with-max.md",
+			"unsigned/with-max.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Unsigned[uint16]("WEIGHT", "weighting for this node").
@@ -493,7 +635,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"unsigned + min/max",
-			"number/unsigned/with-minmax.md",
+			"unsigned/with-minmax.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					Unsigned[uint16]("WEIGHT", "weighting for this node").
@@ -502,12 +644,31 @@ var _ = Describe("func Run()", func() {
 					Required(variable.WithRegistry(reg))
 			},
 		),
+		Entry(
+			"unsigned + deprecated + default",
+			"unsigned/deprecated-with-default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Unsigned[uint16]("WEIGHT", "weighting for this node").
+					WithDefault(900).
+					Deprecated(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"unsigned + deprecated",
+			"unsigned/deprecated.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					Unsigned[uint16]("WEIGHT", "weighting for this node").
+					Deprecated(variable.WithRegistry(reg))
+			},
+		),
 
 		// STRING
 
 		Entry(
 			"string + optional + default",
-			"string/default.md",
+			"string/with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					String("READ_DSN", "database connection string for read-models").
@@ -526,7 +687,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"string + required + default",
-			"string/default.md",
+			"string/with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					String("READ_DSN", "database connection string for read-models").
@@ -544,8 +705,27 @@ var _ = Describe("func Run()", func() {
 			},
 		),
 		Entry(
+			"string + deprecated + default",
+			"string/deprecated-with-default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					String("READ_DSN", "database connection string for read-models").
+					WithDefault("host=localhost dbname=readmodels user=projector").
+					Deprecated(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"string + deprecated",
+			"string/deprecated.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					String("READ_DSN", "database connection string for read-models").
+					Deprecated(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
 			"string + sensitive + optional + default",
-			"string/sensitive-default.md",
+			"string/sensitive-with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					String("PASSWORD", "a very secret password").
@@ -570,7 +750,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"string + sensitive + required + default",
-			"string/sensitive-default.md",
+			"string/sensitive-with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					String("PASSWORD", "a very secret password").
@@ -598,7 +778,7 @@ var _ = Describe("func Run()", func() {
 
 		Entry(
 			"url + optional + default",
-			"url/default.md",
+			"url/with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					URL("API_URL", "the URL of the REST API").
@@ -617,7 +797,7 @@ var _ = Describe("func Run()", func() {
 		),
 		Entry(
 			"url + required + default",
-			"url/default.md",
+			"url/with-default.md",
 			func(reg *variable.Registry) {
 				ferrite.
 					URL("API_URL", "the URL of the REST API").
@@ -632,6 +812,25 @@ var _ = Describe("func Run()", func() {
 				ferrite.
 					URL("API_URL", "the URL of the REST API").
 					Required(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"url + deprecated + default",
+			"url/deprecated-with-default.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					URL("API_URL", "the URL of the REST API").
+					WithDefault("http://localhost:8080").
+					Deprecated(variable.WithRegistry(reg))
+			},
+		),
+		Entry(
+			"url + deprecated",
+			"url/deprecated.md",
+			func(reg *variable.Registry) {
+				ferrite.
+					URL("API_URL", "the URL of the REST API").
+					Deprecated(variable.WithRegistry(reg))
 			},
 		),
 	)

@@ -37,9 +37,9 @@ var _ = Describe("func Wrap()", func() {
 		),
 		Entry(
 			"multi-byte character, single line, byte-size greater than max columns",
-			"⚠️ This variable is **sensitive**, its value may contain private information.",
+			"⚠️ This variable is **sensitive**; its value may contain private information.",
 			[]string{
-				"⚠️ This variable is **sensitive**, its value may contain private information.",
+				"⚠️ This variable is **sensitive**; its value may contain private information.",
 			},
 		),
 		Entry(

@@ -14,21 +14,20 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Added
 
-- Added `String().WithSensitiveContent()`, which hides the variable value from console output and generated documentation
-- Added `InitOption` type
-- Added `VariableOption` type
+- Added `Deprecated()` method to all builders, which marks the variable as deprecated and warns the user if it is defined
+- Added `StringBuilder.WithSensitiveContent()`, which hides the variable value from console output and generated documentation
+- Added functional options to `Init()`
 
 ### Changed
 
 The following changes are technically not backwards compatible from a Go
-perspective, but under normal usage (as per the examples) they do not
-actually alter the usage of the Ferrite API.
+perspective, but under normal usage (as per the examples) they do not actually
+alter the usage of the Ferrite API.
 
-- **[BC]** Change `Init()` to accept options
-- **[BC]** Change `NetworkPort()` to use the new `NetworkPortBuilder` instead of `StringBuilder`
-- **[BC]** Changed `Required[T]` and `Optional[T]` from structs to interfaces
-- **[BC]** Changed all "builder" types to use pointer receivers
-- **[BC]** `Require()` and `Optional()` methods on builders no longer accept `variable.RegisterOption` values
+- **[BC]** `NetworkPort()` now returns a `NetworkPortBuilder` instead of `StringBuilder`
+- **[BC]** `Required[T]` and `Optional[T]` are now structs instead of interfaces
+- **[BC]** All builder types now use pointer receivers
+- **[BC]** `Require()` and `Optional()` methods on all builders now use distinct option types
 
 ## [0.3.6] - 2023-03-06
 
