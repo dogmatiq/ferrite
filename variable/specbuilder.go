@@ -12,7 +12,7 @@ type SpecBuilder interface {
 	Name(string)
 	Description(string)
 	MarkRequired()
-	MarkDeprecated()
+	MarkDeprecated(reason string)
 	MarkSensitive()
 	Documentation() DocumentationBuilder
 }
@@ -75,8 +75,8 @@ func (b *TypedSpecBuilder[T]) MarkSensitive() {
 }
 
 // MarkDeprecated marks the variable as deprecated.
-func (b *TypedSpecBuilder[T]) MarkDeprecated() {
-	b.spec.deprecated = true
+func (b *TypedSpecBuilder[T]) MarkDeprecated(reason string) {
+	b.spec.deprecated = reason
 }
 
 // NormativeExample adds a normative example to the variable.

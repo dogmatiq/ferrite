@@ -96,3 +96,9 @@ func (b *EnumBuilder[T]) Required(options ...VariableOption) Required[T] {
 func (b *EnumBuilder[T]) Optional(options ...VariableOption) Optional[T] {
 	return opt(b.schema, &b.spec, options)
 }
+
+// Deprecated completes the build process and registers a deprecated variable
+// with Ferrite's validation system.
+func (b *EnumBuilder[T]) Deprecated(reason string, options ...VariableOption) Deprecated[T] {
+	return dep(b.schema, &b.spec, reason, options)
+}

@@ -60,7 +60,7 @@ type TypedSpec[T any] struct {
 	def         maybe.Value[valueOf[T]]
 	required    bool
 	sensitive   bool
-	deprecated  bool
+	deprecated  string
 	schema      TypedSchema[T]
 	examples    []Example
 	docs        []Documentation
@@ -101,7 +101,7 @@ func (s TypedSpec[T]) IsSensitive() bool {
 
 // IsDeprecated returns true if the variable is deprecated.
 func (s TypedSpec[T]) IsDeprecated() bool {
-	return s.deprecated
+	return s.deprecated != ""
 }
 
 // Constraints returns a list of additional constraints on the variable's

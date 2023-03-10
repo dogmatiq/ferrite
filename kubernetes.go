@@ -241,6 +241,25 @@ func (b *KubernetesServiceBuilder) Optional(options ...VariableOption) Optional[
 	}
 }
 
+// Deprecated completes the build process and registers a deprecated variable
+// with Ferrite's validation system.
+func (b *KubernetesServiceBuilder) Deprecated(reason string, options ...VariableOption) Deprecated[KubernetesAddress] {
+	b.hostSpec.MarkDeprecated(reason)
+	b.portSpec.MarkDeprecated(reason)
+
+	variable.Register(
+		b.hostSpec.Done(b.hostSchema),
+		options...,
+	)
+
+	variable.Register(
+		b.portSpec.Done(b.portSchema),
+		options...,
+	)
+
+	return deprecated[KubernetesAddress]{}
+}
+
 // kubernetesNameToEnv converts a kubernetes resource name to an environment variable
 // name, as per Kubernetes own behavior.
 func kubernetesNameToEnv(s string) string {

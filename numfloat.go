@@ -85,6 +85,12 @@ func (b *FloatBuilder[T]) Optional(options ...VariableOption) Optional[T] {
 	return opt(b.schema, &b.spec, options)
 }
 
+// Deprecated completes the build process and registers a deprecated variable
+// with Ferrite's validation system.
+func (b *FloatBuilder[T]) Deprecated(reason string, options ...VariableOption) Deprecated[T] {
+	return dep(b.schema, &b.spec, reason, options)
+}
+
 type floatMarshaler[T constraints.Float] struct{}
 
 func (floatMarshaler[T]) Marshal(v T) (variable.Literal, error) {

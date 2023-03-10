@@ -7,5 +7,9 @@ type isBuilderOf[
 	B interface {
 		Required(options ...VariableOption) Required[T]
 		Optional(options ...VariableOption) Optional[T]
+		Deprecated(
+			reason string,
+			options ...VariableOption,
+		) Deprecated[T]
 	},
 ] struct{}

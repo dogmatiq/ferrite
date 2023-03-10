@@ -80,3 +80,9 @@ func (b *BoolBuilder[T]) Required(options ...VariableOption) Required[T] {
 func (b *BoolBuilder[T]) Optional(options ...VariableOption) Optional[T] {
 	return opt(b.schema, &b.spec, options)
 }
+
+// Deprecated completes the build process and registers a deprecated variable
+// with Ferrite's validation system.
+func (b *BoolBuilder[T]) Deprecated(reason string, options ...VariableOption) Deprecated[T] {
+	return dep(b.schema, &b.spec, reason, options)
+}

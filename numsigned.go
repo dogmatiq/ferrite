@@ -85,6 +85,12 @@ func (b *SignedBuilder[T]) Optional(options ...VariableOption) Optional[T] {
 	return opt(b.schema, &b.spec, options)
 }
 
+// Deprecated completes the build process and registers a deprecated variable
+// with Ferrite's validation system.
+func (b *SignedBuilder[T]) Deprecated(reason string, options ...VariableOption) Deprecated[T] {
+	return dep(b.schema, &b.spec, reason, options)
+}
+
 type signedMarshaler[T constraints.Signed] struct{}
 
 func (signedMarshaler[T]) Marshal(v T) (variable.Literal, error) {

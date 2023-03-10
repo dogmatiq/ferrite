@@ -57,6 +57,12 @@ func (b *NetworkPortBuilder) Optional(options ...VariableOption) Optional[string
 	return opt(b.schema, &b.spec, options)
 }
 
+// Deprecated completes the build process and registers a deprecated variable
+// with Ferrite's validation system.
+func (b *NetworkPortBuilder) Deprecated(reason string, options ...VariableOption) Deprecated[string] {
+	return dep(b.schema, &b.spec, reason, options)
+}
+
 // validateHost returns an error of port is not a valid numeric port or IANA
 // service name.
 func validatePort(port string) error {

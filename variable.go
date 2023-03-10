@@ -29,6 +29,14 @@ type Optional[T any] interface {
 	Value() (T, bool)
 }
 
+// Deprecated is the application-facing interface for obtaining a value from an
+// environment variable (or variables) when those variables are deprecated.
+//
+// It is currently empty by design, so as to disallow the use of deprecated
+// variables.
+type Deprecated[T any] interface {
+}
+
 // A VariableOption changes the behavior of an environment variable.
 type VariableOption interface {
 	variable.RegisterOption
@@ -88,6 +96,24 @@ func opt[T any, S variable.TypedSchema[T]](
 	}
 }
 
+// opt is a convenience function that registers and returns a deprecated[T] that
+// maps one-to-one with an environment variable of the same type.
+func dep[T any, S variable.TypedSchema[T]](
+	schema S,
+	spec *variable.TypedSpecBuilder[T],
+	reason string,
+	options []VariableOption,
+) Deprecated[T] {
+	spec.MarkDeprecated(reason)
+
+	variable.Register(
+		spec.Done(schema),
+		options...,
+	)
+
+	return deprecated[T]{}
+}
+
 // required is an implementation of Required[T] that obtains the value
 // from an arbitrary function.
 type required[T any] struct {
@@ -101,10 +127,6 @@ func (d required[T]) Value() T {
 		panic(err.Error())
 	}
 	return n
-}
-
-func (d required[T]) variables() []variable.Any {
-	return d.vars
 }
 
 // optional is an implementation of Optional[T] that obtains the value from an
@@ -122,6 +144,5 @@ func (d optional[T]) Value() (T, bool) {
 	return n, ok
 }
 
-func (d optional[T]) variables() []variable.Any {
-	return d.vars
-}
+// optional is an implementation of Deprecated[T].
+type deprecated[T any] struct{}
