@@ -4,18 +4,17 @@ import (
 	"github.com/dogmatiq/ferrite/variable"
 )
 
-// Deprecated is the application-facing interface for a value that is sourced
+// Deprecated is a specialization of the Input interface for values obtained
 // from deprecated environment variables.
-//
-// It is obtained by calling Deprecated() on a variable builder.
 type Deprecated[T any] interface {
-	// DeprecatedValue returns the parsed and validated value of the environment
-	// variable, if it is defined.
+	// DeprecatedValue returns the parsed and validated value built from the
+	// environment variable(s).
 	//
-	// If the environment variable is not defined (and there is no default
-	// value), ok is false; otherwise, ok is true and v is the value.
+	// If the constituent environment variable(s) are not defined and there is
+	// no default value, ok is false; otherwise, ok is true and v is the value.
 	//
-	// It panics if the environment variable is defined but invalid.
+	// It panics if any of one of the constituent environment variable(s) has an
+	// invalid value.
 	DeprecatedValue() (T, bool)
 }
 

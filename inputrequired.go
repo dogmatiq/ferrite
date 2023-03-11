@@ -4,14 +4,13 @@ import (
 	"github.com/dogmatiq/ferrite/variable"
 )
 
-// Required is the application-facing interface for a value that is sourced
-// from required environment variables.
-//
-// It is obtained by calling Deprecated() on a variable builder.
+// Required is a specialization of the Input interface for values obtained
+// from required (mandatory) environment variables.
 type Required[T any] interface {
 	// Value returns the parsed and validated value of the environment variable.
 	//
-	// It panics if the environment variable is undefined or invalid.
+	// It panics if any of one of the constituent environment variable(s) is
+	// undefined or has an invalid value.
 	Value() T
 }
 
