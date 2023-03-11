@@ -6,8 +6,7 @@
 
 > kubernetes "redis" service host
 
-The `REDIS_SERVICE_HOST` variable **MAY** be left undefined. Otherwise, the
-value **MUST** be a valid hostname.
+The `REDIS_SERVICE_HOST` variable's value **MUST** be a valid hostname.
 
 It is expected that this variable will be implicitly defined by Kubernetes; it
 typically does not need to be specified in the pod manifest.
@@ -16,12 +15,15 @@ typically does not need to be specified in the pod manifest.
 export REDIS_SERVICE_HOST=foo # (non-normative)
 ```
 
+#### See Also
+
+- [`REDIS_SERVICE_PORT`](#REDIS_SERVICE_PORT) — kubernetes "redis" service port
+
 ### `REDIS_SERVICE_PORT`
 
 > kubernetes "redis" service port
 
-The `REDIS_SERVICE_PORT` variable **MAY** be left undefined. Otherwise, the
-value **MUST** be a valid network port.
+The `REDIS_SERVICE_PORT` variable's value **MUST** be a valid network port.
 
 It is expected that this variable will be implicitly defined by Kubernetes; it
 typically does not need to be specified in the pod manifest.
@@ -39,3 +41,7 @@ the system's service database, typically located in the `/etc/service` file on
 UNIX-like systems. Standard service names are published by IANA.
 
 </details>
+
+#### See Also
+
+- [`REDIS_SERVICE_HOST`](#REDIS_SERVICE_HOST) — kubernetes "redis" service host

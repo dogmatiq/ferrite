@@ -42,6 +42,12 @@ type Spec interface {
 
 	// Documentation returns a list of chunks of documentation text.
 	Documentation() []Documentation
+
+	// Relationships returns a list of relationships that involve this variable.
+	Relationships() []Relationship
+
+	// AddRelationship adds a relationship that involves this variable.
+	AddRelationship(r Relationship)
 }
 
 // IsDefault returns true if v is the default value of the given spec.
@@ -55,16 +61,17 @@ func IsDefault(s Spec, v Literal) bool {
 
 // TypedSpec builds a specification for a variable depicted by type T.
 type TypedSpec[T any] struct {
-	name        string
-	desc        string
-	def         maybe.Value[valueOf[T]]
-	required    bool
-	sensitive   bool
-	deprecated  bool
-	schema      TypedSchema[T]
-	examples    []Example
-	docs        []Documentation
-	constraints []TypedConstraint[T]
+	name          string
+	desc          string
+	def           maybe.Value[valueOf[T]]
+	required      bool
+	sensitive     bool
+	deprecated    bool
+	schema        TypedSchema[T]
+	examples      []Example
+	docs          []Documentation
+	constraints   []TypedConstraint[T]
+	relationships []Relationship
 }
 
 // Name returns the name of the variable.
@@ -122,6 +129,16 @@ func (s *TypedSpec[T]) Examples() []Example {
 // Documentation returns a list of chunks of documentation text.
 func (s *TypedSpec[T]) Documentation() []Documentation {
 	return s.docs
+}
+
+// Relationships returns a list of relationships that involve this variable.
+func (s TypedSpec[T]) Relationships() []Relationship {
+	return s.relationships
+}
+
+// AddRelationship adds a relationship that involves this variable.
+func (s *TypedSpec[T]) AddRelationship(r Relationship) {
+	s.relationships = append(s.relationships, r)
 }
 
 // CheckConstraints returns an error if v does not satisfy any one of the

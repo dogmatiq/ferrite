@@ -45,7 +45,7 @@ func (r *renderer) Render() {
 
 		if !r.withoutUsageExamples {
 			r.gap()
-			r.renderUsage()
+			r.renderPlatformExamples()
 		}
 	}
 

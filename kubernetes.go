@@ -92,6 +92,9 @@ func KubernetesService(svc string) *KubernetesServiceBuilder {
 
 	buildNetworkPortSyntaxDocumentation(b.portSpec.Documentation())
 
+	seeAlso(b.hostSpec.Peek(), b.portSpec.Peek())
+	seeAlso(b.portSpec.Peek(), b.hostSpec.Peek())
+
 	return b
 }
 
@@ -149,6 +152,13 @@ func (b *KubernetesServiceBuilder) WithDefault(host, port string) *KubernetesSer
 	return b
 }
 
+// SeeAlso creates a relationship between this variable and those used by i.
+func (b *KubernetesServiceBuilder) SeeAlso(i Input, options ...SeeAlsoOption) *KubernetesServiceBuilder {
+	seeAlsoInput(&b.hostSpec, i, options...)
+	seeAlsoInput(&b.portSpec, i, options...)
+	return b
+}
+
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *KubernetesServiceBuilder) Required(options ...RequiredOption) Required[KubernetesAddress] {
@@ -166,6 +176,7 @@ func (b *KubernetesServiceBuilder) Required(options ...RequiredOption) Required[
 	)
 
 	return requiredFunc[KubernetesAddress]{
+		[]variable.Any{host, port},
 		func() (KubernetesAddress, error) {
 			h, ok, err := host.NativeValue()
 			if err != nil {
@@ -204,6 +215,7 @@ func (b *KubernetesServiceBuilder) Optional(options ...OptionalOption) Optional[
 	)
 
 	return optionalFunc[KubernetesAddress]{
+		[]variable.Any{host, port},
 		b.optionalResolver(host, port),
 	}
 }
@@ -225,6 +237,7 @@ func (b *KubernetesServiceBuilder) Deprecated(options ...DeprecatedOption) Depre
 	)
 
 	return deprecatedFunc[KubernetesAddress]{
+		[]variable.Any{host, port},
 		b.optionalResolver(host, port),
 	}
 }

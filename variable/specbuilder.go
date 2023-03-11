@@ -12,9 +12,11 @@ type SpecBuilder interface {
 	Name(string)
 	Description(string)
 	MarkRequired()
-	MarkDeprecated(reason string)
+	MarkDeprecated()
 	MarkSensitive()
 	Documentation() DocumentationBuilder
+	Relationship(Relationship)
+	Peek() Spec
 }
 
 // TypedSpecBuilder builds a specification for a variable of type T.
@@ -106,6 +108,16 @@ func (b *TypedSpecBuilder[T]) Documentation() DocumentationBuilder {
 	return DocumentationBuilder{
 		docs: &b.spec.docs,
 	}
+}
+
+// Relationship adds a relationship that involves this variable.
+func (b *TypedSpecBuilder[T]) Relationship(rel Relationship) {
+	b.spec.AddRelationship(rel)
+}
+
+// Peek returns the (potentially invalid) spec that is being built.
+func (b *TypedSpecBuilder[T]) Peek() Spec {
+	return &b.spec
 }
 
 // Done builds the specification and registers the variable.

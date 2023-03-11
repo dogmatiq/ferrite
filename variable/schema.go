@@ -15,7 +15,7 @@ type Schema interface {
 	Finalize() error
 
 	// AcceptVisitor passes the schema to the appropriate method of v.
-	AcceptVisitor(SchemaVisitor)
+	AcceptVisitor(v SchemaVisitor)
 }
 
 // SchemaError indicates that a value is invalid because it violates its schema.
@@ -26,7 +26,7 @@ type SchemaError interface {
 	Schema() Schema
 
 	// AcceptVisitor passes the error to the appropriate method of v.
-	AcceptVisitor(SchemaErrorVisitor)
+	AcceptVisitor(v SchemaErrorVisitor)
 }
 
 // SchemaVisitor dispatches based on a variable's schema.

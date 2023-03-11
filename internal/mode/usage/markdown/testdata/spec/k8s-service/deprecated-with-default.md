@@ -20,6 +20,10 @@ in a future version.
 export REDIS_SERVICE_HOST=redis.example.org # (default)
 ```
 
+#### See Also
+
+- [`REDIS_SERVICE_PORT`](#REDIS_SERVICE_PORT) — kubernetes "redis" service port
+
 ### `REDIS_SERVICE_PORT`
 
 > kubernetes "redis" service port
@@ -47,3 +51,7 @@ the system's service database, typically located in the `/etc/service` file on
 UNIX-like systems. Standard service names are published by IANA.
 
 </details>
+
+#### See Also
+
+- [`REDIS_SERVICE_HOST`](#REDIS_SERVICE_HOST) — kubernetes "redis" service host
