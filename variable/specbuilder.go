@@ -152,7 +152,6 @@ func (b *TypedSpecBuilder[T]) finalize() error {
 		b.spec.def = maybe.Some(valueOf[T]{
 			native:    v,
 			canonical: lit,
-			isDefault: true,
 		})
 	}
 
