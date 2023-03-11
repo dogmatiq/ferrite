@@ -29,7 +29,7 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Fixed
 
-- Markdown documentation is now rendered to `stdout` (instead of `stderr`) as intended
+- Markdown documentation is now rendered to `STDOUT` (instead of `STDERR`) as intended
 
 ## [0.4.0] - 2023-03-10
 
