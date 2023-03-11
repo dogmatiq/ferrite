@@ -20,6 +20,18 @@ var _ = Describe("type DurationBuilder", func() {
 		tearDown()
 	})
 
+	It("panics if the name is empty", func() {
+		Expect(func() {
+			Duration("", "<desc>").Optional()
+		}).To(PanicWith("invalid specification: variable name must not be empty"))
+	})
+
+	It("panics if the description is empty", func() {
+		Expect(func() {
+			Duration("FERRITE_DURATION", "").Optional()
+		}).To(PanicWith("specification for FERRITE_DURATION is invalid: variable description must not be empty"))
+	})
+
 	When("the variable is required", func() {
 		When("the value is a valid duration", func() {
 			Describe("func Value()", func() {

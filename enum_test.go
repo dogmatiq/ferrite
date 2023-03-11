@@ -37,6 +37,18 @@ var _ = Describe("type EnumBuilder", func() {
 		tearDown()
 	})
 
+	It("panics if the name is empty", func() {
+		Expect(func() {
+			EnumAs[enumMember]("", "<desc>").Optional()
+		}).To(PanicWith("invalid specification: variable name must not be empty"))
+	})
+
+	It("panics if the description is empty", func() {
+		Expect(func() {
+			EnumAs[enumMember]("FERRITE_ENUM", "").Optional()
+		}).To(PanicWith("specification for FERRITE_ENUM is invalid: variable description must not be empty"))
+	})
+
 	When("the variable is required", func() {
 		When("the value is one of the accepted literals", func() {
 			Describe("func Value()", func() {

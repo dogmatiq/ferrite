@@ -19,6 +19,12 @@ var _ = Describe("type KubernetesServiceBuilder", func() {
 		tearDown()
 	})
 
+	It("panics if the service name is empty", func() {
+		Expect(func() {
+			KubernetesService("").Optional()
+		}).To(PanicWith("kubernetes service name is invalid: name must not be empty"))
+	})
+
 	When("the variables are required", func() {
 		When("the the host and port are valid", func() {
 			BeforeEach(func() {

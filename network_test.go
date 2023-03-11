@@ -19,6 +19,18 @@ var _ = Describe("func NetworkPort", func() {
 		tearDown()
 	})
 
+	It("panics if the name is empty", func() {
+		Expect(func() {
+			NetworkPort("", "<desc>").Optional()
+		}).To(PanicWith("invalid specification: variable name must not be empty"))
+	})
+
+	It("panics if the description is empty", func() {
+		Expect(func() {
+			NetworkPort("FERRITE_NETWORK_PORT", "").Optional()
+		}).To(PanicWith("specification for FERRITE_NETWORK_PORT is invalid: variable description must not be empty"))
+	})
+
 	When("the variable is required", func() {
 		When("the value is not empty", func() {
 			Describe("func Value()", func() {

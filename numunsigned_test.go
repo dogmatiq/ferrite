@@ -21,6 +21,18 @@ var _ = Describe("type UnsignedBuilder", func() {
 		tearDown()
 	})
 
+	It("panics if the name is empty", func() {
+		Expect(func() {
+			Unsigned[userDefinedUnsigned]("", "<desc>").Optional()
+		}).To(PanicWith("invalid specification: variable name must not be empty"))
+	})
+
+	It("panics if the description is empty", func() {
+		Expect(func() {
+			Unsigned[userDefinedUnsigned]("FERRITE_UNSIGNED", "").Optional()
+		}).To(PanicWith("specification for FERRITE_UNSIGNED is invalid: variable description must not be empty"))
+	})
+
 	When("the variable is required", func() {
 		When("the value is valid", func() {
 			Describe("func Value()", func() {

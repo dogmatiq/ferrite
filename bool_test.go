@@ -28,6 +28,18 @@ var _ = Describe("type BoolBuilder", func() {
 		tearDown()
 	})
 
+	It("panics if the name is empty", func() {
+		Expect(func() {
+			BoolAs[userDefinedBool]("", "<desc>").Optional()
+		}).To(PanicWith("invalid specification: variable name must not be empty"))
+	})
+
+	It("panics if the description is empty", func() {
+		Expect(func() {
+			BoolAs[userDefinedBool]("FERRITE_BOOL", "").Optional()
+		}).To(PanicWith("specification for FERRITE_BOOL is invalid: variable description must not be empty"))
+	})
+
 	When("the variable is required", func() {
 		When("the value is one of the accepted literals", func() {
 			Describe("func Value()", func() {
