@@ -16,6 +16,10 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 - Added `SeeAlso()` method to all builders, which links to another variable for documentation purposes
 
+### Changed
+
+- **[BC]** Floating point variables no longer accepted `NaN`, `+Inf` or `-Inf` as valid values
+
 ## [0.4.2] - 2023-03-11
 
 ### Added
