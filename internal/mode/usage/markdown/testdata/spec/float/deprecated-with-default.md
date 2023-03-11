@@ -29,4 +29,6 @@ Internally, the `WEIGHT` variable is represented using a 32-bit floating point
 type (`float32`); any value that overflows this data-type is invalid. Values are
 rounded to the nearest floating-point number using IEEE 754 unbiased rounding.
 
+The non-finite values `NaN`, `+Inf` and `-Inf` are not accepted.
+
 </details>

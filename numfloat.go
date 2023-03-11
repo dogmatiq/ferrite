@@ -1,6 +1,8 @@
 package ferrite
 
 import (
+	"errors"
+	"math"
 	"strconv"
 
 	"github.com/dogmatiq/ferrite/internal/reflectx"
@@ -22,6 +24,16 @@ func Float[T constraints.Float](name, desc string) *FloatBuilder[T] {
 
 	b.spec.Name(name)
 	b.spec.Description(desc)
+	b.spec.BuiltInConstraint(
+		"MUST be a fine number",
+		func(v T) variable.ConstraintError {
+			v64 := float64(v)
+			if math.IsNaN(v64) || math.IsInf(v64, 0) {
+				return errors.New("value must be a finite number")
+			}
+			return nil
+		},
+	)
 	b.spec.Documentation().
 		Summary("Floating-point syntax").
 		Paragraph(
@@ -40,6 +52,10 @@ func Float[T constraints.Float](name, desc string) *FloatBuilder[T] {
 			reflectx.BitSize[T](),
 			reflectx.KindOf[T](),
 		).
+		Paragraph(
+			"The non-finite values `NaN`, `+Inf` and `-Inf` are not accepted.",
+		).
+		Format().
 		Done()
 
 	return b

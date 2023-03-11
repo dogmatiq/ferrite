@@ -70,6 +70,21 @@ var _ = Describe("type FloatBuilder", func() {
 						"123!",
 						`value of FERRITE_FLOAT ('123!') is invalid: strconv.ParseFloat: parsing "123!": invalid syntax`,
 					),
+					Entry(
+						"not-a-number",
+						"NaN",
+						`value of FERRITE_FLOAT (NaN) is invalid: value must be a finite number`,
+					),
+					Entry(
+						"positive infinity",
+						"+Inf",
+						`value of FERRITE_FLOAT (+Inf) is invalid: value must be a finite number`,
+					),
+					Entry(
+						"negative infinity",
+						"-Inf",
+						`value of FERRITE_FLOAT (-Inf) is invalid: value must be a finite number`,
+					),
 				)
 			})
 		})
