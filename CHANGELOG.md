@@ -15,10 +15,16 @@ The format is based on [Keep a Changelog], and this project adheres to
 ### Added
 
 - Added `SeeAlso()` method to all builders, which links to another variable for documentation purposes
+- Added `WithRegistry()`
 
 ### Changed
 
 - **[BC]** Floating point variables no longer accepted `NaN`, `+Inf` or `-Inf` as valid values
+- **[BC]** `variable.Register()` now directly accepts a `Registry` instead of using functional options
+
+### Removed
+
+- **[BC]** Removed `variable.Option` type and `variable.WithRegistry()` option
 
 ### Fixed
 

@@ -16,9 +16,9 @@ import (
 // example is a helper function that sets up the global state for a testable
 // example. It returns a function that resets the global state after the test.
 func example() func() {
-	mode.DefaultOptions.Out = os.Stdout
-	mode.DefaultOptions.Err = os.Stdout
-	mode.DefaultOptions.Exit = func(code int) {
+	mode.DefaultConfig.Out = os.Stdout
+	mode.DefaultConfig.Err = os.Stdout
+	mode.DefaultConfig.Exit = func(code int) {
 		if code == 0 {
 			fmt.Fprintln(os.Stdout, "<process exited successfully>")
 		} else {
@@ -31,7 +31,7 @@ func example() func() {
 
 // tearDown resets the environemnt and Ferrite global state after a test.
 func tearDown() {
-	mode.ResetDefaultOptions()
+	mode.ResetDefaultConfig()
 	variable.DefaultRegistry.Reset()
 
 	for _, env := range os.Environ() {
@@ -55,7 +55,7 @@ var _ = Describe("func Init()", func() {
 			Required()
 
 		exited := false
-		mode.DefaultOptions.Exit = func(code int) {
+		mode.DefaultConfig.Exit = func(code int) {
 			Expect(code).NotTo(Equal(0))
 			exited = true
 		}

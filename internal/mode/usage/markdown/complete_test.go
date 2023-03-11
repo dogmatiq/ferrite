@@ -20,7 +20,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				String("READ_DSN", "database connection string for read-models").
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -29,7 +29,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				Bool("DEBUG", "enable or disable debugging features").
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -39,7 +39,7 @@ var _ = DescribeTable(
 			ferrite.
 				NetworkPort("PORT", "an environment variable that has a default value").
 				WithDefault("ftp").
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -48,12 +48,12 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			verbose := ferrite.
 				Bool("VERBOSE", "enable verbose logging").
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 
 			ferrite.
 				Bool("DEBUG", "enable or disable debugging features").
 				SeeAlso(verbose).
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 )

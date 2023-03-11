@@ -7,7 +7,7 @@ import (
 )
 
 // Run generates environment variable usage instructions in markdown format.
-func Run(opts mode.Options, options ...Option) {
+func Run(opts mode.Config, options ...Option) {
 	r := renderer{
 		App:    filepath.Base(opts.Args[0]),
 		Specs:  opts.Registry.Specs(),

@@ -42,7 +42,7 @@ func tableTest(
 		exited := false
 
 		Run(
-			mode.Options{
+			mode.Config{
 				Registry: reg,
 				Args:     []string{"<app>"},
 				Out:      actual,

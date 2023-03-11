@@ -58,48 +58,17 @@ var DefaultRegistry = Registry{
 }
 
 // Register registers a new variable.
-func Register[T any, Option RegisterOption](
-	spec *TypedSpec[T],
-	options ...Option,
-) *OfType[T] {
-	opts := registerOptions{
-		Registry: &DefaultRegistry,
-	}
-	for _, opt := range options {
-		opt.applyRegisterOption(&opts)
+func Register[T any](reg *Registry, spec *TypedSpec[T]) *OfType[T] {
+	if reg == nil {
+		reg = &DefaultRegistry
 	}
 
 	v := &OfType[T]{
 		spec: spec,
-		env:  opts.Registry.Environment,
+		env:  reg.Environment,
 	}
 
-	opts.Registry.vars.Store(spec.name, v)
+	reg.vars.Store(spec.name, v)
 
 	return v
-}
-
-// RegisterOption is an option that controls how a specification is registered
-// with an environment variable registry.
-type RegisterOption interface {
-	applyRegisterOption(*registerOptions)
-}
-
-// registerOptions contains options that are available to all specifications.
-type registerOptions struct {
-	Registry *Registry
-}
-
-// WithRegistry is an option that sets the registry that an environment variable
-// specification is placed into.
-func WithRegistry(r *Registry) RegisterOption {
-	return registerOptionFunc(func(o *registerOptions) {
-		o.Registry = r
-	})
-}
-
-type registerOptionFunc func(*registerOptions)
-
-func (f registerOptionFunc) applyRegisterOption(o *registerOptions) {
-	f(o)
 }

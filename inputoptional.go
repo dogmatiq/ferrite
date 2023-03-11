@@ -22,7 +22,23 @@ type Optional[T any] interface {
 
 // OptionalOption is an option that can be applied to an optional variable.
 type OptionalOption interface {
-	variable.RegisterOption
+	applyOptionalOption(*optionalConfig)
+}
+
+// optionalConfig is the configuration for the deprecated inputs, built from
+// OptionalOption values.
+type optionalConfig struct {
+	inputConfig
+}
+
+// buildOptionalConfig returns a new optionalConfig, built from the given
+// options.
+func buildOptionalConfig(options ...OptionalOption) optionalConfig {
+	var cfg optionalConfig
+	for _, opt := range options {
+		opt.applyOptionalOption(&cfg)
+	}
+	return cfg
 }
 
 // optional is a convenience function that registers and returns a required[T]
@@ -30,11 +46,13 @@ type OptionalOption interface {
 func optional[T any, S variable.TypedSchema[T]](
 	schema S,
 	spec *variable.TypedSpecBuilder[T],
-	options []OptionalOption,
+	options ...OptionalOption,
 ) Optional[T] {
+	cfg := buildOptionalConfig(options...)
+
 	v := variable.Register(
+		cfg.Registry,
 		spec.Done(schema),
-		options...,
 	)
 
 	return optionalFunc[T]{

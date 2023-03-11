@@ -75,19 +75,19 @@ func (b *DurationBuilder) SeeAlso(i Input, options ...SeeAlsoOption) *DurationBu
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *DurationBuilder) Required(options ...RequiredOption) Required[time.Duration] {
-	return required(b.schema, &b.spec, options)
+	return required(b.schema, &b.spec, options...)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *DurationBuilder) Optional(options ...OptionalOption) Optional[time.Duration] {
-	return optional(b.schema, &b.spec, options)
+	return optional(b.schema, &b.spec, options...)
 }
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
 func (b *DurationBuilder) Deprecated(options ...DeprecatedOption) Deprecated[time.Duration] {
-	return deprecated(b.schema, &b.spec, options)
+	return deprecated(b.schema, &b.spec, options...)
 }
 
 type durationMarshaler struct{}

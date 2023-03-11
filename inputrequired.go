@@ -18,7 +18,23 @@ type Required[T any] interface {
 
 // RequiredOption is an option that can be applied to a required variable.
 type RequiredOption interface {
-	variable.RegisterOption
+	applyRequiredOption(*requiredConfig)
+}
+
+// requiredConfig is the configuration for the deprecated inputs, built from
+// RequiredOption values.
+type requiredConfig struct {
+	inputConfig
+}
+
+// buildRequiredConfig returns a new requiredConfig, built from the given
+// options.
+func buildRequiredConfig(options ...RequiredOption) requiredConfig {
+	var cfg requiredConfig
+	for _, opt := range options {
+		opt.applyRequiredOption(&cfg)
+	}
+	return cfg
 }
 
 // required is a convenience function that registers and returns a required[T]
@@ -26,13 +42,15 @@ type RequiredOption interface {
 func required[T any, S variable.TypedSchema[T]](
 	schema S,
 	spec *variable.TypedSpecBuilder[T],
-	options []RequiredOption,
+	options ...RequiredOption,
 ) Required[T] {
 	spec.MarkRequired()
 
+	cfg := buildRequiredConfig(options...)
+
 	v := variable.Register(
+		cfg.Registry,
 		spec.Done(schema),
-		options...,
 	)
 
 	return requiredFunc[T]{

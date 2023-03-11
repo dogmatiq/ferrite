@@ -54,19 +54,19 @@ func (b *NetworkPortBuilder) SeeAlso(i Input, options ...SeeAlsoOption) *Network
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *NetworkPortBuilder) Required(options ...RequiredOption) Required[string] {
-	return required(b.schema, &b.spec, options)
+	return required(b.schema, &b.spec, options...)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *NetworkPortBuilder) Optional(options ...OptionalOption) Optional[string] {
-	return optional(b.schema, &b.spec, options)
+	return optional(b.schema, &b.spec, options...)
 }
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
 func (b *NetworkPortBuilder) Deprecated(options ...DeprecatedOption) Deprecated[string] {
-	return deprecated(b.schema, &b.spec, options)
+	return deprecated(b.schema, &b.spec, options...)
 }
 
 // validateHost returns an error of port is not a valid numeric port or IANA

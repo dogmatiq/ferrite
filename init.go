@@ -20,25 +20,33 @@ import (
 // information about the environment variables in Markdown format, then exits
 // the process successfully.
 func Init(options ...InitOption) {
-	opts := mode.DefaultOptions
+	cfg := initConfig{
+		mode.DefaultConfig,
+	}
 	for _, opt := range options {
-		opt.applyInitOption(&opts)
+		opt.applyInitOption(&cfg)
 	}
 
 	switch m := os.Getenv("FERRITE_MODE"); m {
 	case "validate", "":
-		validate.Run(opts)
+		validate.Run(cfg.ModeConfig)
 	case "usage/markdown":
-		markdown.Run(opts)
+		markdown.Run(cfg.ModeConfig)
 	case "export/dotenv":
-		dotenv.Run(opts)
+		dotenv.Run(cfg.ModeConfig)
 	default:
-		fmt.Fprintf(opts.Err, "unrecognized FERRITE_MODE (%s)\n", m)
-		opts.Exit(1)
+		fmt.Fprintf(cfg.ModeConfig.Err, "unrecognized FERRITE_MODE (%s)\n", m)
+		cfg.ModeConfig.Exit(1)
 	}
 }
 
-// An InitOption changes the behavior of Init().
+// An InitOption changes the behavior of the Init() function.
 type InitOption interface {
-	applyInitOption(*mode.Options)
+	applyInitOption(*initConfig)
+}
+
+// initConfig is the configuration for the Init() function, built from
+// InitOption values.
+type initConfig struct {
+	ModeConfig mode.Config
 }

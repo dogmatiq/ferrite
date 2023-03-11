@@ -9,7 +9,7 @@ import (
 
 // Run generates and env file describing the environment variables and their
 // current values.
-func Run(opts mode.Options) {
+func Run(opts mode.Config) {
 	for i, v := range opts.Registry.Variables() {
 		s := v.Spec()
 

@@ -22,7 +22,23 @@ type Deprecated[T any] interface {
 
 // DeprecatedOption is an option that can be applied to a deprecated variable.
 type DeprecatedOption interface {
-	variable.RegisterOption
+	applyDeprecatedOption(*deprecatedConfig)
+}
+
+// deprecatedConfig is the configuration for the deprecated inputs, built from
+// DeprecatedOption values.
+type deprecatedConfig struct {
+	inputConfig
+}
+
+// buildDeprecatedConfig returns a new deprecatedConfig, built from the given
+// options.
+func buildDeprecatedConfig(options ...DeprecatedOption) deprecatedConfig {
+	var cfg deprecatedConfig
+	for _, opt := range options {
+		opt.applyDeprecatedOption(&cfg)
+	}
+	return cfg
 }
 
 // deprecated is a convenience function that registers and returns a
@@ -31,13 +47,15 @@ type DeprecatedOption interface {
 func deprecated[T any, S variable.TypedSchema[T]](
 	schema S,
 	spec *variable.TypedSpecBuilder[T],
-	options []DeprecatedOption,
+	options ...DeprecatedOption,
 ) Deprecated[T] {
 	spec.MarkDeprecated()
 
+	cfg := buildDeprecatedConfig(options...)
+
 	v := variable.Register(
+		cfg.Registry,
 		spec.Done(schema),
-		options...,
 	)
 
 	// interface is currently empty so we don't need an implementation

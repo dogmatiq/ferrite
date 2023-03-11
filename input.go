@@ -1,6 +1,8 @@
 package ferrite
 
-import "github.com/dogmatiq/ferrite/variable"
+import (
+	"github.com/dogmatiq/ferrite/variable"
+)
 
 // An Input is the application-facing interface for obtaining a value from
 // environment variables.
@@ -12,4 +14,8 @@ import "github.com/dogmatiq/ferrite/variable"
 // String().
 type Input interface {
 	variables() []variable.Any
+}
+
+type inputConfig struct {
+	Registry *variable.Registry
 }

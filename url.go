@@ -78,19 +78,19 @@ func (b *URLBuilder) SeeAlso(i Input, options ...SeeAlsoOption) *URLBuilder {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *URLBuilder) Required(options ...RequiredOption) Required[*url.URL] {
-	return required(b.schema, &b.spec, options)
+	return required(b.schema, &b.spec, options...)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *URLBuilder) Optional(options ...OptionalOption) Optional[*url.URL] {
-	return optional(b.schema, &b.spec, options)
+	return optional(b.schema, &b.spec, options...)
 }
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
 func (b *URLBuilder) Deprecated(options ...DeprecatedOption) Deprecated[*url.URL] {
-	return deprecated(b.schema, &b.spec, options)
+	return deprecated(b.schema, &b.spec, options...)
 }
 
 type urlMarshaler struct{}

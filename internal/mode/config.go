@@ -7,8 +7,8 @@ import (
 	"github.com/dogmatiq/ferrite/variable"
 )
 
-// Options is a set of options for running a mode.
-type Options struct {
+// Config is the configuration used when running a mode.
+type Config struct {
 	Registry *variable.Registry
 	Args     []string
 	Out      io.Writer
@@ -16,13 +16,13 @@ type Options struct {
 	Exit     func(int)
 }
 
-// DefaultOptions is the default set of options for running a mode.
-var DefaultOptions Options
+// DefaultConfig is the default configuration for running a mode.
+var DefaultConfig Config
 
-// ResetDefaultOptions resets DefaultOptions to its default value. This is
+// ResetDefaultConfig resets DefaultConfig to its initial value. This is
 // largely intended for tearing down tests.
-func ResetDefaultOptions() {
-	DefaultOptions = Options{
+func ResetDefaultConfig() {
+	DefaultConfig = Config{
 		&variable.DefaultRegistry,
 		os.Args,
 		os.Stdout,
@@ -32,5 +32,5 @@ func ResetDefaultOptions() {
 }
 
 func init() {
-	ResetDefaultOptions()
+	ResetDefaultConfig()
 }

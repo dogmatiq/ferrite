@@ -31,7 +31,7 @@ var _ = DescribeTable(
 			ferrite.
 				Bool("DEBUG", "enable or disable debugging features").
 				WithDefault(false).
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -40,7 +40,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				Bool("DEBUG", "enable or disable debugging features").
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -50,7 +50,7 @@ var _ = DescribeTable(
 			ferrite.
 				Bool("DEBUG", "enable or disable debugging features").
 				WithDefault(false).
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -59,7 +59,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				Bool("DEBUG", "enable or disable debugging features").
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -69,7 +69,7 @@ var _ = DescribeTable(
 			ferrite.
 				Bool("DEBUG", "enable or disable debugging features").
 				WithDefault(false).
-				Deprecated(variable.WithRegistry(reg))
+				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -78,7 +78,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				Bool("DEBUG", "enable or disable debugging features").
-				Deprecated(variable.WithRegistry(reg))
+				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 
@@ -96,7 +96,7 @@ var _ = DescribeTable(
 				WithMember("error", "a healthy application shouldn't produce any errors").
 				WithMember("fatal", "the application cannot proceed").
 				WithDefault("error").
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -110,7 +110,7 @@ var _ = DescribeTable(
 				WithMember("warn", "important, but don't need individual human review").
 				WithMember("error", "a healthy application shouldn't produce any errors").
 				WithMember("fatal", "the application cannot proceed").
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -125,7 +125,7 @@ var _ = DescribeTable(
 				WithMember("error", "a healthy application shouldn't produce any errors").
 				WithMember("fatal", "the application cannot proceed").
 				WithDefault("error").
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -139,7 +139,7 @@ var _ = DescribeTable(
 				WithMember("warn", "important, but don't need individual human review").
 				WithMember("error", "a healthy application shouldn't produce any errors").
 				WithMember("fatal", "the application cannot proceed").
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -154,7 +154,7 @@ var _ = DescribeTable(
 				WithMember("error", "a healthy application shouldn't produce any errors").
 				WithMember("fatal", "the application cannot proceed").
 				WithDefault("error").
-				Deprecated(variable.WithRegistry(reg))
+				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -168,7 +168,7 @@ var _ = DescribeTable(
 				WithMember("warn", "important, but don't need individual human review").
 				WithMember("error", "a healthy application shouldn't produce any errors").
 				WithMember("fatal", "the application cannot proceed").
-				Deprecated(variable.WithRegistry(reg))
+				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 
@@ -181,7 +181,7 @@ var _ = DescribeTable(
 			ferrite.
 				Duration("GRPC_TIMEOUT", "gRPC request timeout").
 				WithDefault(10 * time.Millisecond).
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -190,7 +190,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				Duration("GRPC_TIMEOUT", "gRPC request timeout").
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -200,7 +200,7 @@ var _ = DescribeTable(
 			ferrite.
 				Duration("GRPC_TIMEOUT", "gRPC request timeout").
 				WithDefault(10 * time.Millisecond).
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -209,7 +209,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				Duration("GRPC_TIMEOUT", "gRPC request timeout").
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -219,7 +219,7 @@ var _ = DescribeTable(
 			ferrite.
 				Duration("GRPC_TIMEOUT", "gRPC request timeout").
 				WithMaximum(24 * time.Hour).
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -229,7 +229,7 @@ var _ = DescribeTable(
 			ferrite.
 				Duration("GRPC_TIMEOUT", "gRPC request timeout").
 				WithDefault(10 * time.Millisecond).
-				Deprecated(variable.WithRegistry(reg))
+				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -238,7 +238,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				Duration("GRPC_TIMEOUT", "gRPC request timeout").
-				Deprecated(variable.WithRegistry(reg))
+				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 
@@ -251,7 +251,7 @@ var _ = DescribeTable(
 			ferrite.
 				KubernetesService("redis").
 				WithDefault("redis.example.org", "6379").
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -260,7 +260,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				KubernetesService("redis").
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -270,7 +270,7 @@ var _ = DescribeTable(
 			ferrite.
 				KubernetesService("redis").
 				WithDefault("redis.example.org", "6379").
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -279,7 +279,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				KubernetesService("redis").
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -289,7 +289,7 @@ var _ = DescribeTable(
 			ferrite.
 				KubernetesService("redis").
 				WithDefault("redis.example.org", "6379").
-				Deprecated(variable.WithRegistry(reg))
+				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -298,7 +298,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				KubernetesService("redis").
-				Deprecated(variable.WithRegistry(reg))
+				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 	// NETWORK PORT
@@ -310,7 +310,7 @@ var _ = DescribeTable(
 			ferrite.
 				NetworkPort("PORT", "listen port for the HTTP server").
 				WithDefault("8080").
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -319,7 +319,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				NetworkPort("PORT", "listen port for the HTTP server").
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -329,7 +329,7 @@ var _ = DescribeTable(
 			ferrite.
 				NetworkPort("PORT", "listen port for the HTTP server").
 				WithDefault("8080").
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -338,7 +338,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				NetworkPort("PORT", "listen port for the HTTP server").
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -348,7 +348,7 @@ var _ = DescribeTable(
 			ferrite.
 				NetworkPort("PORT", "listen port for the HTTP server").
 				WithDefault("8080").
-				Deprecated(variable.WithRegistry(reg))
+				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -357,7 +357,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				NetworkPort("PORT", "listen port for the HTTP server").
-				Deprecated(variable.WithRegistry(reg))
+				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 
@@ -370,7 +370,7 @@ var _ = DescribeTable(
 			ferrite.
 				Float[float32]("WEIGHT", "weighting for this node").
 				WithDefault(123.5).
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -379,7 +379,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				Float[float32]("WEIGHT", "weighting for this node").
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -389,7 +389,7 @@ var _ = DescribeTable(
 			ferrite.
 				Float[float32]("WEIGHT", "weighting for this node").
 				WithDefault(123.5).
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -398,7 +398,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				Float[float32]("WEIGHT", "weighting for this node").
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -408,7 +408,7 @@ var _ = DescribeTable(
 			ferrite.
 				Float[float32]("WEIGHT", "weighting for this node").
 				WithMinimum(-10.5).
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -418,7 +418,7 @@ var _ = DescribeTable(
 			ferrite.
 				Float[float32]("WEIGHT", "weighting for this node").
 				WithMaximum(+20.5).
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -429,7 +429,7 @@ var _ = DescribeTable(
 				Float[float32]("WEIGHT", "weighting for this node").
 				WithMinimum(-10.5).
 				WithMaximum(+20.5).
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -439,7 +439,7 @@ var _ = DescribeTable(
 			ferrite.
 				Float[float32]("WEIGHT", "weighting for this node").
 				WithDefault(123.5).
-				Deprecated(variable.WithRegistry(reg))
+				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -448,7 +448,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				Float[float32]("WEIGHT", "weighting for this node").
-				Deprecated(variable.WithRegistry(reg))
+				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 
@@ -461,7 +461,7 @@ var _ = DescribeTable(
 			ferrite.
 				Signed[int8]("WEIGHT", "weighting for this node").
 				WithDefault(100).
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -470,7 +470,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				Signed[int8]("WEIGHT", "weighting for this node").
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -480,7 +480,7 @@ var _ = DescribeTable(
 			ferrite.
 				Signed[int8]("WEIGHT", "weighting for this node").
 				WithDefault(100).
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -489,7 +489,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				Signed[int8]("WEIGHT", "weighting for this node").
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -499,7 +499,7 @@ var _ = DescribeTable(
 			ferrite.
 				Signed[int8]("WEIGHT", "weighting for this node").
 				WithMinimum(-10).
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -509,7 +509,7 @@ var _ = DescribeTable(
 			ferrite.
 				Signed[int8]("WEIGHT", "weighting for this node").
 				WithMaximum(+20).
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -520,7 +520,7 @@ var _ = DescribeTable(
 				Signed[int8]("WEIGHT", "weighting for this node").
 				WithMinimum(-10).
 				WithMaximum(+20).
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -530,7 +530,7 @@ var _ = DescribeTable(
 			ferrite.
 				Signed[int8]("WEIGHT", "weighting for this node").
 				WithDefault(100).
-				Deprecated(variable.WithRegistry(reg))
+				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -539,7 +539,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				Signed[int8]("WEIGHT", "weighting for this node").
-				Deprecated(variable.WithRegistry(reg))
+				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 
@@ -552,7 +552,7 @@ var _ = DescribeTable(
 			ferrite.
 				Unsigned[uint16]("WEIGHT", "weighting for this node").
 				WithDefault(900).
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -561,7 +561,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				Unsigned[uint16]("WEIGHT", "weighting for this node").
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -571,7 +571,7 @@ var _ = DescribeTable(
 			ferrite.
 				Unsigned[uint16]("WEIGHT", "weighting for this node").
 				WithDefault(900).
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -580,7 +580,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				Unsigned[uint16]("WEIGHT", "weighting for this node").
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -590,7 +590,7 @@ var _ = DescribeTable(
 			ferrite.
 				Unsigned[uint16]("WEIGHT", "weighting for this node").
 				WithMinimum(10).
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -600,7 +600,7 @@ var _ = DescribeTable(
 			ferrite.
 				Unsigned[uint16]("WEIGHT", "weighting for this node").
 				WithMaximum(20).
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -611,7 +611,7 @@ var _ = DescribeTable(
 				Unsigned[uint16]("WEIGHT", "weighting for this node").
 				WithMinimum(10).
 				WithMaximum(20).
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -621,7 +621,7 @@ var _ = DescribeTable(
 			ferrite.
 				Unsigned[uint16]("WEIGHT", "weighting for this node").
 				WithDefault(900).
-				Deprecated(variable.WithRegistry(reg))
+				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -630,7 +630,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				Unsigned[uint16]("WEIGHT", "weighting for this node").
-				Deprecated(variable.WithRegistry(reg))
+				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 
@@ -643,7 +643,7 @@ var _ = DescribeTable(
 			ferrite.
 				String("READ_DSN", "database connection string for read-models").
 				WithDefault("host=localhost dbname=readmodels user=projector").
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -652,7 +652,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				String("READ_DSN", "database connection string for read-models").
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -662,7 +662,7 @@ var _ = DescribeTable(
 			ferrite.
 				String("READ_DSN", "database connection string for read-models").
 				WithDefault("host=localhost dbname=readmodels user=projector").
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -671,7 +671,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				String("READ_DSN", "database connection string for read-models").
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -681,7 +681,7 @@ var _ = DescribeTable(
 			ferrite.
 				String("READ_DSN", "database connection string for read-models").
 				WithDefault("host=localhost dbname=readmodels user=projector").
-				Deprecated(variable.WithRegistry(reg))
+				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -690,7 +690,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				String("READ_DSN", "database connection string for read-models").
-				Deprecated(variable.WithRegistry(reg))
+				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -702,7 +702,7 @@ var _ = DescribeTable(
 				WithDefault("hunter2").
 				WithSensitiveContent().
 				Optional(
-					variable.WithRegistry(reg),
+					ferrite.WithRegistry(reg),
 				)
 		},
 	),
@@ -714,7 +714,7 @@ var _ = DescribeTable(
 				String("PASSWORD", "a very secret password").
 				WithSensitiveContent().
 				Optional(
-					variable.WithRegistry(reg),
+					ferrite.WithRegistry(reg),
 				)
 		},
 	),
@@ -727,7 +727,7 @@ var _ = DescribeTable(
 				WithDefault("hunter2").
 				WithSensitiveContent().
 				Required(
-					variable.WithRegistry(reg),
+					ferrite.WithRegistry(reg),
 				)
 		},
 	),
@@ -739,7 +739,7 @@ var _ = DescribeTable(
 				String("PASSWORD", "a very secret password").
 				WithSensitiveContent().
 				Required(
-					variable.WithRegistry(reg),
+					ferrite.WithRegistry(reg),
 				)
 		},
 	),
@@ -753,7 +753,7 @@ var _ = DescribeTable(
 			ferrite.
 				URL("API_URL", "the URL of the REST API").
 				WithDefault("http://localhost:8080").
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -762,7 +762,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				URL("API_URL", "the URL of the REST API").
-				Optional(variable.WithRegistry(reg))
+				Optional(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -772,7 +772,7 @@ var _ = DescribeTable(
 			ferrite.
 				URL("API_URL", "the URL of the REST API").
 				WithDefault("http://localhost:8080").
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -781,7 +781,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				URL("API_URL", "the URL of the REST API").
-				Required(variable.WithRegistry(reg))
+				Required(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -791,7 +791,7 @@ var _ = DescribeTable(
 			ferrite.
 				URL("API_URL", "the URL of the REST API").
 				WithDefault("http://localhost:8080").
-				Deprecated(variable.WithRegistry(reg))
+				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -800,7 +800,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				URL("API_URL", "the URL of the REST API").
-				Deprecated(variable.WithRegistry(reg))
+				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 )

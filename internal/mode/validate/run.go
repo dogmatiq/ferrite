@@ -13,7 +13,7 @@ import (
 // for display in the console.
 //
 // It returns true if all variables are valid.
-func Run(opts mode.Options) {
+func Run(opts mode.Config) {
 	show := false
 	valid := true
 

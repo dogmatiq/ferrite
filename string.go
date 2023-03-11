@@ -75,17 +75,17 @@ func (b *StringBuilder[T]) SeeAlso(i Input, options ...SeeAlsoOption) *StringBui
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *StringBuilder[T]) Required(options ...RequiredOption) Required[T] {
-	return required(b.schema, &b.spec, options)
+	return required(b.schema, &b.spec, options...)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *StringBuilder[T]) Optional(options ...OptionalOption) Optional[T] {
-	return optional(b.schema, &b.spec, options)
+	return optional(b.schema, &b.spec, options...)
 }
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
 func (b *StringBuilder[T]) Deprecated(options ...DeprecatedOption) Deprecated[T] {
-	return deprecated(b.schema, &b.spec, options)
+	return deprecated(b.schema, &b.spec, options...)
 }
