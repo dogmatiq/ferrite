@@ -31,4 +31,5 @@ func ExampleInit_markdownUsage() {
 	// <!-- references -->
 	//
 	// [ferrite]: https://github.com/dogmatiq/ferrite
+	// <process exited successfully>
 }

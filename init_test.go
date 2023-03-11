@@ -1,6 +1,7 @@
 package ferrite_test
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -17,7 +18,14 @@ import (
 func example() func() {
 	mode.DefaultOptions.Out = os.Stdout
 	mode.DefaultOptions.Err = os.Stdout
-	mode.DefaultOptions.Exit = func(code int) {}
+	mode.DefaultOptions.Exit = func(code int) {
+		if code == 0 {
+			fmt.Fprintln(os.Stdout, "<process exited successfully>")
+		} else {
+			fmt.Fprintf(os.Stdout, "<process exited with error code %d>\n", code)
+		}
+	}
+
 	return tearDown
 }
 

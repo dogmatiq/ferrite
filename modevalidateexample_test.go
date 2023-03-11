@@ -62,7 +62,7 @@ func ExampleInit_validation() {
 		Required()
 
 	ferrite.
-		String("FERRITE_XTRIGGER", "trigger failure").
+		String("FERRITE_XTRIGGER", "trigger failure for example").
 		Required()
 
 	ferrite.Init()
@@ -80,7 +80,9 @@ func ExampleInit_validation() {
 	//    FERRITE_SVC_SERVICE_HOST  kubernetes "ferrite-svc" service host    <string>           ✓ set to host.example.org
 	//    FERRITE_SVC_SERVICE_PORT  kubernetes "ferrite-svc" service port    <string>           ✓ set to 443
 	//    FERRITE_URL               example URL                              <string>           ✓ set to https://example.org
-	//  ❯ FERRITE_XTRIGGER          trigger failure                          <string>           ✗ undefined
+	//  ❯ FERRITE_XTRIGGER          trigger failure for example              <string>           ✗ undefined
+	//
+	// <process exited with error code 1>
 }
 
 func ExampleInit_validationWithDefaultValues() {
@@ -134,7 +136,7 @@ func ExampleInit_validationWithDefaultValues() {
 		Required()
 
 	ferrite.
-		String("FERRITE_XTRIGGER", "trigger failure").
+		String("FERRITE_XTRIGGER", "trigger failure for example").
 		Required()
 
 	ferrite.Init()
@@ -152,7 +154,9 @@ func ExampleInit_validationWithDefaultValues() {
 	//    FERRITE_SVC_SERVICE_HOST  kubernetes "ferrite-svc" service host  [ <string> ] = host.example.org     ✓ using default value
 	//    FERRITE_SVC_SERVICE_PORT  kubernetes "ferrite-svc" service port  [ <string> ] = 443                  ✓ using default value
 	//    FERRITE_URL               example URL                            [ <string> ] = https://example.org  ✓ using default value
-	//  ❯ FERRITE_XTRIGGER          trigger failure                          <string>                          ✗ undefined
+	//  ❯ FERRITE_XTRIGGER          trigger failure for example              <string>                          ✗ undefined
+	//
+	// <process exited with error code 1>
 }
 
 func ExampleInit_validationWithOptionalValues() {
@@ -197,7 +201,7 @@ func ExampleInit_validationWithOptionalValues() {
 		Optional()
 
 	ferrite.
-		String("FERRITE_XTRIGGER", "trigger failure").
+		String("FERRITE_XTRIGGER", "trigger failure for example").
 		Required()
 
 	ferrite.Init()
@@ -215,7 +219,9 @@ func ExampleInit_validationWithOptionalValues() {
 	//    FERRITE_SVC_SERVICE_HOST  kubernetes "ferrite-svc" service host  [ <string> ]         • undefined
 	//    FERRITE_SVC_SERVICE_PORT  kubernetes "ferrite-svc" service port  [ <string> ]         • undefined
 	//    FERRITE_URL               example URL                            [ <string> ]         • undefined
-	//  ❯ FERRITE_XTRIGGER          trigger failure                          <string>           ✗ undefined
+	//  ❯ FERRITE_XTRIGGER          trigger failure for example              <string>           ✗ undefined
+	//
+	// <process exited with error code 1>
 }
 
 func ExampleInit_validationWithNonCanonicalValues() {
@@ -227,7 +233,7 @@ func ExampleInit_validationWithNonCanonicalValues() {
 		Required()
 
 	ferrite.
-		String("FERRITE_XTRIGGER", "trigger failure").
+		String("FERRITE_XTRIGGER", "trigger failure for example").
 		Required()
 
 	ferrite.Init()
@@ -235,8 +241,10 @@ func ExampleInit_validationWithNonCanonicalValues() {
 	// Output:
 	// Environment Variables:
 	//
-	//    FERRITE_DURATION  example duration    1ns ...     ✓ set to '3h 10m 0s', equivalent to 3h10m
-	//  ❯ FERRITE_XTRIGGER  trigger failure     <string>    ✗ undefined
+	//    FERRITE_DURATION  example duration               1ns ...     ✓ set to '3h 10m 0s', equivalent to 3h10m
+	//  ❯ FERRITE_XTRIGGER  trigger failure for example    <string>    ✗ undefined
+	//
+	// <process exited with error code 1>
 }
 
 func ExampleInit_validationWithInvalidValues() {
@@ -323,4 +331,6 @@ func ExampleInit_validationWithInvalidValues() {
 	//  ❯ FERRITE_SVC_SERVICE_HOST  kubernetes "ferrite-svc" service host    <string>           ✗ set to .local, host must not begin or end with a dot
 	//  ❯ FERRITE_SVC_SERVICE_PORT  kubernetes "ferrite-svc" service port    <string>           ✗ set to https-, IANA service name must not begin or end with a hyphen
 	//  ❯ FERRITE_URL               example URL                              <string>           ✗ set to /relative/path, URL must have a scheme
+	//
+	// <process exited with error code 1>
 }

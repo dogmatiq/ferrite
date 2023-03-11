@@ -83,6 +83,8 @@ func ExampleString_sensitive() {
 	// Environment Variables:
 	//
 	//  ❯ FERRITE_STRING  example sensitive string variable    <string>    ✗ set to *******, always fail
+	//
+	// <process exited with error code 1>
 }
 
 func ExampleString_deprecated() {
