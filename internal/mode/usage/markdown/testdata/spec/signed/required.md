@@ -10,7 +10,7 @@ The `WEIGHT` variable's value **MUST** be a whole number.
 
 ```bash
 export WEIGHT=-13 # (non-normative)
-export WEIGHT=+24 # (non-normative)
+export WEIGHT=+25 # (non-normative)
 ```
 
 <details>

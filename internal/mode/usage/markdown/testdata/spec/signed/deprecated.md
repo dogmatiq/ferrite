@@ -14,7 +14,7 @@ in a future version.
 
 ```bash
 export WEIGHT=-13 # (non-normative)
-export WEIGHT=+24 # (non-normative)
+export WEIGHT=+25 # (non-normative)
 ```
 
 <details>
