@@ -12,6 +12,15 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## Unreleased
 
+### Added
+
+- Added `export/dotenv` mode, which renders environment variables and their
+  current values in [dotenv] format
+
+<!-- references -->
+
+[dotenv]: https://github.com/motdotla/dotenv
+
 ### Fixed
 
 - Fixed issue where durations were rendered with tailing zero-valued minute components

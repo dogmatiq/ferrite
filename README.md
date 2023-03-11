@@ -50,16 +50,37 @@ defer cancel()
 // do HTTP request ...
 ```
 
-### Automatic Usage Documentation
+## Modes of Operation
 
-Ferrite can automatically generate Markdown documentation for the declared
-environment variables by executing the application with the `FERRITE_MODE`
-environment variable set to `usage/markdown`.
+By default, calling `Init()` operates in "validation" mode. There are several
+other modes that can be used to gain insight into the application's use of
+environment variables.
 
-This causes the `ferrite.Init()` function to print the Markdown to `STDOUT`, and
-then exit the process before the application code is executed.
+Modes are selected by setting the `FERRITE_MODE` environment variable.
 
-### Other Implementations
+### `validate` mode
+
+This is the default mode. If one or more environment variables are invalid, this
+mode renders a description of all declared environment variables and their
+associated values and validation failures to `STDERR`, then exits the process
+with a non-zero exit code.
+
+It also shows warnings if deprecated environment variables are used.
+
+### `usage/markdown` mode
+
+This mode renders Markdown documentation about the environment variables to
+`STDOUT`. The output is designed to be included in the application's `README.md`
+file or a similar file.
+
+### `export/dotenv` mode
+
+This mode renders environment variables to `STDOUT` in a format suitable for use
+with tools like [`dotenv`](https://github.com/motdotla/dotenv) and the
+[`env_file`](https://docs.docker.com/compose/compose-file/#env_file) directive
+in Docker compose files.
+
+## Other Implementations
 
 [Austenite](https://github.com/eloquent/austenite) is a TypeScript
 library with similar features to Ferrite.

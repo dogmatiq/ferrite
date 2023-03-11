@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/dogmatiq/ferrite/internal/mode"
+	"github.com/dogmatiq/ferrite/internal/mode/export/dotenv"
 	"github.com/dogmatiq/ferrite/internal/mode/usage/markdown"
 	"github.com/dogmatiq/ferrite/internal/mode/validate"
 )
@@ -25,10 +26,12 @@ func Init(options ...InitOption) {
 	}
 
 	switch m := os.Getenv("FERRITE_MODE"); m {
-	case "usage/markdown":
-		markdown.Run(opts)
 	case "validate", "":
 		validate.Run(opts)
+	case "usage/markdown":
+		markdown.Run(opts)
+	case "export/dotenv":
+		dotenv.Run(opts)
 	default:
 		fmt.Fprintf(opts.Err, "unrecognized FERRITE_MODE (%s)\n", m)
 		opts.Exit(1)
