@@ -12,7 +12,7 @@ type SpecBuilder interface {
 	Name(string)
 	Description(string)
 	MarkRequired()
-	MarkDeprecated(reason string)
+	MarkDeprecated()
 	MarkSensitive()
 	Documentation() DocumentationBuilder
 }
