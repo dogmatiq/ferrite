@@ -64,17 +64,17 @@ func ExampleDuration_limits() {
 
 	v := ferrite.
 		Duration("FERRITE_DURATION", "example duration variable").
-		WithMinimum(5 * time.Minute).
-		WithMaximum(10 * time.Minute).
+		WithMinimum(-1 * time.Hour).
+		WithMaximum(+1 * time.Hour).
 		Required()
 
-	os.Setenv("FERRITE_DURATION", "5m")
+	os.Setenv("FERRITE_DURATION", "0h")
 	ferrite.Init()
 
 	fmt.Println("value is", v.Value())
 
 	// Output:
-	// value is 5m0s
+	// value is 0s
 }
 
 func ExampleDuration_deprecated() {

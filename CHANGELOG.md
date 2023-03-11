@@ -10,6 +10,12 @@ The format is based on [Keep a Changelog], and this project adheres to
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+## Unreleased
+
+### Fixed
+
+- Fixed issue where durations were rendered with tailing zero-valued minute components
+
 ## [0.4.1] - 2023-03-10
 
 ### Fixed

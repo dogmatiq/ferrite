@@ -6,11 +6,11 @@
 
 > gRPC request timeout
 
-The `GRPC_TIMEOUT` variable's value **MUST** be between `1ns` and `24h0m`.
+The `GRPC_TIMEOUT` variable's value **MUST** be between `1ns` and `24h`.
 
 ```bash
 export GRPC_TIMEOUT=1ns    # (non-normative) the minimum accepted value
-export GRPC_TIMEOUT=24h0m  # (non-normative) the maximum accepted value
+export GRPC_TIMEOUT=24h    # (non-normative) the maximum accepted value
 export GRPC_TIMEOUT=10h48m # (non-normative)
 export GRPC_TIMEOUT=14h24m # (non-normative)
 ```

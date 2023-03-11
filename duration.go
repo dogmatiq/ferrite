@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 	"time"
-	"unicode"
 
 	"github.com/dogmatiq/ferrite/maybe"
 	"github.com/dogmatiq/ferrite/variable"
@@ -89,28 +88,31 @@ type durationMarshaler struct{}
 
 func (durationMarshaler) Marshal(v time.Duration) (variable.Literal, error) {
 	runes := []rune(v.String())
-	i := len(runes) - 1
+	zeroes := false
 
-	// Skip over the last units.
-	for !unicode.IsDigit(runes[i]) {
-		i--
-	}
-
-	// Look for the second-to-last units, if any non-zero digit is encountered
-	// then we need to keep the last units.
-	for unicode.IsDigit(runes[i]) {
-		if runes[i] != '0' {
-			return variable.Literal{
-				String: string(runes),
-			}, nil
+loop:
+	for end := len(runes); end > 0; end-- {
+		switch runes[end-1] {
+		case '0':
+			// Keep track of when we're in a run of zeroes.
+			zeroes = true
+		case '1', '2', '3', '4', '5', '6', '7', '8', '9':
+			// If we find any non-zero digits then we need to keep the current
+			// units.
+			break loop
+		default:
+			// If we were traversing a run of zeroes and have found another unit
+			// string (s, ms, us, etc) then we can discard everything after this
+			// point.
+			if zeroes {
+				zeroes = false
+				runes = runes[:end]
+			}
 		}
-
-		i--
 	}
 
-	// Otherwise the last units have a zero value and we omit them.
 	return variable.Literal{
-		String: string(runes[:i+1]),
+		String: string(runes),
 	}, nil
 }
 
