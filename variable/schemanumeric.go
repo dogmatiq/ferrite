@@ -1,8 +1,11 @@
 package variable
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
+	"strings"
 	"unsafe"
 
 	"github.com/dogmatiq/ferrite/internal/limits"
@@ -269,4 +272,38 @@ func explainRangeError(s Numeric) string {
 		min.Quote(),
 		max.Quote(),
 	)
+}
+
+// UnwrapNumericParseError returns a more user-friendly error message for
+// errors returned by strconv.ParseInt(), ParseUint(), and ParseFloat().
+func UnwrapNumericParseError[T constraints.Integer | constraints.Float](
+	err error,
+	format func(T) string,
+) error {
+	var numErr *strconv.NumError
+	if errors.As(err, &numErr) {
+		min, max := limits.Of[T]()
+		kind := reflectx.KindOf[T]()
+
+		switch numErr.Err {
+		case strconv.ErrSyntax:
+			return fmt.Errorf("unrecognized %s syntax", kind)
+		case strconv.ErrRange:
+			if strings.TrimSpace(numErr.Num)[0] == '-' {
+				return fmt.Errorf(
+					"too low, expected the smallest %s value of %s or greater",
+					kind,
+					format(min),
+				)
+			}
+
+			return fmt.Errorf(
+				"too high, expected the largest %s value of %s or less",
+				kind,
+				format(max),
+			)
+		}
+	}
+
+	return err
 }

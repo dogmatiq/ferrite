@@ -29,7 +29,7 @@ func Float[T constraints.Float](name, desc string) *FloatBuilder[T] {
 		func(v T) variable.ConstraintError {
 			v64 := float64(v)
 			if math.IsNaN(v64) || math.IsInf(v64, 0) {
-				return errors.New("value must be a finite number")
+				return errors.New("expected a finite number")
 			}
 			return nil
 		},
@@ -116,6 +116,17 @@ func (b *FloatBuilder[T]) Deprecated(options ...DeprecatedOption) Deprecated[T] 
 type floatMarshaler[T constraints.Float] struct{}
 
 func (floatMarshaler[T]) Marshal(v T) (variable.Literal, error) {
+	return variable.Literal{
+		String: formatFloat(v),
+	}, nil
+}
+
+func (floatMarshaler[T]) Unmarshal(v variable.Literal) (T, error) {
+	n, err := strconv.ParseFloat(v.String, reflectx.BitSize[T]())
+	return T(n), variable.UnwrapNumericParseError(err, formatFloat[T])
+}
+
+func formatFloat[T constraints.Float](v T) string {
 	s := strconv.FormatFloat(
 		float64(v),
 		'g',
@@ -129,16 +140,5 @@ func (floatMarshaler[T]) Marshal(v T) (variable.Literal, error) {
 		s = "+" + s
 	}
 
-	return variable.Literal{
-		String: s,
-	}, nil
-}
-
-func (floatMarshaler[T]) Unmarshal(v variable.Literal) (T, error) {
-	n, err := strconv.ParseFloat(v.String, reflectx.BitSize[T]())
-	if err != nil {
-		return 0, err
-	}
-
-	return T(n), nil
+	return s
 }

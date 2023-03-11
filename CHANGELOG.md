@@ -20,6 +20,10 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 - **[BC]** Floating point variables no longer accepted `NaN`, `+Inf` or `-Inf` as valid values
 
+### Fixed
+
+- Internal errors from `strconv.ParseXXX()` functions are no longer presented to the user verbatim
+
 ## [0.4.2] - 2023-03-11
 
 ### Added

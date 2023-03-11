@@ -58,22 +58,22 @@ var _ = Describe("type SignedBuilder", func() {
 					Entry(
 						"underflow",
 						"-32769",
-						`value of FERRITE_SIGNED (-32769) is invalid: strconv.ParseInt: parsing "-32769": value out of range`,
+						`value of FERRITE_SIGNED (-32769) is invalid: too low, expected the smallest int16 value of -32768 or greater`,
 					),
 					Entry(
 						"overflow",
 						"32768",
-						`value of FERRITE_SIGNED (32768) is invalid: strconv.ParseInt: parsing "32768": value out of range`,
+						`value of FERRITE_SIGNED (32768) is invalid: too high, expected the largest int16 value of +32767 or less`,
 					),
 					Entry(
 						"decimal",
 						"123.45",
-						`value of FERRITE_SIGNED (123.45) is invalid: strconv.ParseInt: parsing "123.45": invalid syntax`,
+						`value of FERRITE_SIGNED (123.45) is invalid: unrecognized int16 syntax`,
 					),
 					Entry(
 						"invalid characters",
 						"123!",
-						`value of FERRITE_SIGNED ('123!') is invalid: strconv.ParseInt: parsing "123!": invalid syntax`,
+						`value of FERRITE_SIGNED ('123!') is invalid: unrecognized int16 syntax`,
 					),
 				)
 			})
@@ -147,22 +147,22 @@ var _ = Describe("type SignedBuilder", func() {
 					Entry(
 						"underflow",
 						"-32769",
-						`value of FERRITE_SIGNED (-32769) is invalid: strconv.ParseInt: parsing "-32769": value out of range`,
+						`value of FERRITE_SIGNED (-32769) is invalid: too low, expected the smallest int16 value of -32768 or greater`,
 					),
 					Entry(
 						"overflow",
 						"32768",
-						`value of FERRITE_SIGNED (32768) is invalid: strconv.ParseInt: parsing "32768": value out of range`,
+						`value of FERRITE_SIGNED (32768) is invalid: too high, expected the largest int16 value of +32767 or less`,
 					),
 					Entry(
 						"decimal",
 						"123.45",
-						`value of FERRITE_SIGNED (123.45) is invalid: strconv.ParseInt: parsing "123.45": invalid syntax`,
+						`value of FERRITE_SIGNED (123.45) is invalid: unrecognized int16 syntax`,
 					),
 					Entry(
 						"invalid characters",
 						"123!",
-						`value of FERRITE_SIGNED ('123!') is invalid: strconv.ParseInt: parsing "123!": invalid syntax`,
+						`value of FERRITE_SIGNED ('123!') is invalid: unrecognized int16 syntax`,
 					),
 				)
 			})

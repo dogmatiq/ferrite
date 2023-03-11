@@ -101,15 +101,15 @@ type signedMarshaler[T constraints.Signed] struct{}
 
 func (signedMarshaler[T]) Marshal(v T) (variable.Literal, error) {
 	return variable.Literal{
-		String: fmt.Sprintf("%+d", v),
+		String: formatSigned(v),
 	}, nil
 }
 
 func (signedMarshaler[T]) Unmarshal(v variable.Literal) (T, error) {
 	n, err := strconv.ParseInt(v.String, 10, reflectx.BitSize[T]())
-	if err != nil {
-		return 0, err
-	}
+	return T(n), variable.UnwrapNumericParseError(err, formatSigned[T])
+}
 
-	return T(n), nil
+func formatSigned[T constraints.Signed](v T) string {
+	return fmt.Sprintf("%+d", v)
 }

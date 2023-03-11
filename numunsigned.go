@@ -100,15 +100,15 @@ type unsignedMarshaler[T constraints.Unsigned] struct{}
 
 func (unsignedMarshaler[T]) Marshal(v T) (variable.Literal, error) {
 	return variable.Literal{
-		String: fmt.Sprintf("%d", v),
+		String: formatUnsigned(v),
 	}, nil
 }
 
 func (unsignedMarshaler[T]) Unmarshal(v variable.Literal) (T, error) {
 	n, err := strconv.ParseUint(v.String, 10, reflectx.BitSize[T]())
-	if err != nil {
-		return 0, err
-	}
+	return T(n), variable.UnwrapNumericParseError(err, formatUnsigned[T])
+}
 
-	return T(n), nil
+func formatUnsigned[T constraints.Unsigned](v T) string {
+	return fmt.Sprintf("%d", v)
 }

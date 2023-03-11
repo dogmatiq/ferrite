@@ -58,32 +58,32 @@ var _ = Describe("type FloatBuilder", func() {
 					Entry(
 						"underflow",
 						"-3.40282346638528859811704183484516925440e+39",
-						`value of FERRITE_FLOAT (-3.40282346638528859811704183484516925440e+39) is invalid: strconv.ParseFloat: parsing "-3.40282346638528859811704183484516925440e+39": value out of range`,
+						`value of FERRITE_FLOAT (-3.40282346638528859811704183484516925440e+39) is invalid: too low, expected the smallest float32 value of -3.4028235e+38 or greater`,
 					),
 					Entry(
 						"overflow",
 						"3.40282346638528859811704183484516925440e+39",
-						`value of FERRITE_FLOAT (3.40282346638528859811704183484516925440e+39) is invalid: strconv.ParseFloat: parsing "3.40282346638528859811704183484516925440e+39": value out of range`,
+						`value of FERRITE_FLOAT (3.40282346638528859811704183484516925440e+39) is invalid: too high, expected the largest float32 value of +3.4028235e+38 or less`,
 					),
 					Entry(
 						"invalid characters",
 						"123!",
-						`value of FERRITE_FLOAT ('123!') is invalid: strconv.ParseFloat: parsing "123!": invalid syntax`,
+						`value of FERRITE_FLOAT ('123!') is invalid: unrecognized float32 syntax`,
 					),
 					Entry(
 						"not-a-number",
 						"NaN",
-						`value of FERRITE_FLOAT (NaN) is invalid: value must be a finite number`,
+						`value of FERRITE_FLOAT (NaN) is invalid: expected a finite number`,
 					),
 					Entry(
 						"positive infinity",
 						"+Inf",
-						`value of FERRITE_FLOAT (+Inf) is invalid: value must be a finite number`,
+						`value of FERRITE_FLOAT (+Inf) is invalid: expected a finite number`,
 					),
 					Entry(
 						"negative infinity",
 						"-Inf",
-						`value of FERRITE_FLOAT (-Inf) is invalid: value must be a finite number`,
+						`value of FERRITE_FLOAT (-Inf) is invalid: expected a finite number`,
 					),
 				)
 			})
@@ -157,17 +157,32 @@ var _ = Describe("type FloatBuilder", func() {
 					Entry(
 						"underflow",
 						"-3.40282346638528859811704183484516925440e+39",
-						`value of FERRITE_FLOAT (-3.40282346638528859811704183484516925440e+39) is invalid: strconv.ParseFloat: parsing "-3.40282346638528859811704183484516925440e+39": value out of range`,
+						`value of FERRITE_FLOAT (-3.40282346638528859811704183484516925440e+39) is invalid: too low, expected the smallest float32 value of -3.4028235e+38 or greater`,
 					),
 					Entry(
 						"overflow",
 						"3.40282346638528859811704183484516925440e+39",
-						`value of FERRITE_FLOAT (3.40282346638528859811704183484516925440e+39) is invalid: strconv.ParseFloat: parsing "3.40282346638528859811704183484516925440e+39": value out of range`,
+						`value of FERRITE_FLOAT (3.40282346638528859811704183484516925440e+39) is invalid: too high, expected the largest float32 value of +3.4028235e+38 or less`,
 					),
 					Entry(
 						"invalid characters",
 						"123!",
-						`value of FERRITE_FLOAT ('123!') is invalid: strconv.ParseFloat: parsing "123!": invalid syntax`,
+						`value of FERRITE_FLOAT ('123!') is invalid: unrecognized float32 syntax`,
+					),
+					Entry(
+						"not-a-number",
+						"NaN",
+						`value of FERRITE_FLOAT (NaN) is invalid: expected a finite number`,
+					),
+					Entry(
+						"positive infinity",
+						"+Inf",
+						`value of FERRITE_FLOAT (+Inf) is invalid: expected a finite number`,
+					),
+					Entry(
+						"negative infinity",
+						"-Inf",
+						`value of FERRITE_FLOAT (-Inf) is invalid: expected a finite number`,
 					),
 				)
 			})
