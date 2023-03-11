@@ -7,6 +7,8 @@ import (
 // Optional is a specialization of the Input interface for values obtained
 // from deprecated environment variables.
 type Optional[T any] interface {
+	Input
+
 	// Value returns the parsed and validated value built from the environment
 	// variable(s).
 	//
@@ -36,22 +38,28 @@ func optional[T any, S variable.TypedSchema[T]](
 	)
 
 	return optionalFunc[T]{
+		[]variable.Any{v},
 		func() (T, bool, error) {
 			return v.NativeValue()
 		},
 	}
 }
 
-// optionalFunc is an implementation of Optional[T] that obtains the value from an
-// arbitrary function.
+// optionalFunc is an implementation of Optional[T] that obtains the value from
+// an arbitrary function.
 type optionalFunc[T any] struct {
-	fn func() (T, bool, error)
+	vars []variable.Any
+	fn   func() (T, bool, error)
 }
 
-func (d optionalFunc[T]) Value() (T, bool) {
-	n, ok, err := d.fn()
+func (i optionalFunc[T]) Value() (T, bool) {
+	n, ok, err := i.fn()
 	if err != nil {
 		panic(err.Error())
 	}
 	return n, ok
+}
+
+func (i optionalFunc[T]) variables() []variable.Any {
+	return i.vars
 }

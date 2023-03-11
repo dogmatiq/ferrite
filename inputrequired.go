@@ -7,6 +7,8 @@ import (
 // Required is a specialization of the Input interface for values obtained
 // from required (mandatory) environment variables.
 type Required[T any] interface {
+	Input
+
 	// Value returns the parsed and validated value of the environment variable.
 	//
 	// It panics if any of one of the constituent environment variable(s) is
@@ -34,6 +36,7 @@ func required[T any, S variable.TypedSchema[T]](
 	)
 
 	return requiredFunc[T]{
+		[]variable.Any{v},
 		func() (T, error) {
 			n, ok, err := v.NativeValue()
 			if ok || err != nil {
@@ -44,16 +47,21 @@ func required[T any, S variable.TypedSchema[T]](
 	}
 }
 
-// requiredFunc is an implementation of Required[T] that obtains the value
-// from an arbitrary function.
+// requiredFunc is an implementation of Required[T] that obtains the value from
+// an arbitrary function.
 type requiredFunc[T any] struct {
-	fn func() (T, error)
+	vars []variable.Any
+	fn   func() (T, error)
 }
 
-func (d requiredFunc[T]) Value() T {
-	n, err := d.fn()
+func (i requiredFunc[T]) Value() T {
+	n, err := i.fn()
 	if err != nil {
 		panic(err.Error())
 	}
 	return n
+}
+
+func (i requiredFunc[T]) variables() []variable.Any {
+	return i.vars
 }

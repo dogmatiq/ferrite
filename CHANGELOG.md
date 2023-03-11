@@ -10,6 +10,12 @@ The format is based on [Keep a Changelog], and this project adheres to
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+### Unreleased
+
+### Added
+
+- Added `SeeAlso()` method to all builders, which links to another variable for documentation purposes
+
 ## [0.4.2] - 2023-03-11
 
 ### Added

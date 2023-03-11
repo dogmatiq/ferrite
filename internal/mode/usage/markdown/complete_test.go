@@ -42,4 +42,18 @@ var _ = DescribeTable(
 				Required(variable.WithRegistry(reg))
 		},
 	),
+	Entry(
+		"see also",
+		"see-also.md",
+		func(reg *variable.Registry) {
+			verbose := ferrite.
+				Bool("VERBOSE", "enable verbose logging").
+				Optional(variable.WithRegistry(reg))
+
+			ferrite.
+				Bool("DEBUG", "enable or disable debugging features").
+				SeeAlso(verbose).
+				Optional(variable.WithRegistry(reg))
+		},
+	),
 )

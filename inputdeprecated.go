@@ -7,6 +7,8 @@ import (
 // Deprecated is a specialization of the Input interface for values obtained
 // from deprecated environment variables.
 type Deprecated[T any] interface {
+	Input
+
 	// DeprecatedValue returns the parsed and validated value built from the
 	// environment variable(s).
 	//
@@ -40,6 +42,7 @@ func deprecated[T any, S variable.TypedSchema[T]](
 
 	// interface is currently empty so we don't need an implementation
 	return deprecatedFunc[T]{
+		[]variable.Any{v},
 		func() (T, bool, error) {
 			return v.NativeValue()
 		},
@@ -49,13 +52,18 @@ func deprecated[T any, S variable.TypedSchema[T]](
 // deprecatedFunc is an implementation of Deprecated[T] that obtains the value
 // from an arbitrary function.
 type deprecatedFunc[T any] struct {
-	fn func() (T, bool, error)
+	vars []variable.Any
+	fn   func() (T, bool, error)
 }
 
-func (d deprecatedFunc[T]) DeprecatedValue() (T, bool) {
-	n, ok, err := d.fn()
+func (i deprecatedFunc[T]) DeprecatedValue() (T, bool) {
+	n, ok, err := i.fn()
 	if err != nil {
 		panic(err.Error())
 	}
 	return n, ok
+}
+
+func (i deprecatedFunc[T]) variables() []variable.Any {
+	return i.vars
 }
