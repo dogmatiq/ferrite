@@ -8,10 +8,24 @@ import (
 
 var _ = DescribeTable(
 	"func Run()",
-	tableTest("usage"),
+	tableTest("complete"),
 	Entry(
-		"usage",
-		"usage.md",
+		"no variables",
+		"empty.md",
+		func(reg *variable.Registry) {},
+	),
+	Entry(
+		"non-normative examples",
+		"non-normative.md",
+		func(reg *variable.Registry) {
+			ferrite.
+				String("READ_DSN", "database connection string for read-models").
+				Required(variable.WithRegistry(reg))
+		},
+	),
+	Entry(
+		"platform examples",
+		"platform-examples.md",
 		func(reg *variable.Registry) {
 			ferrite.
 				Bool("DEBUG", "enable or disable debugging features").
@@ -19,8 +33,8 @@ var _ = DescribeTable(
 		},
 	),
 	Entry(
-		"usage shows the default value in examples if available",
-		"usage-shows-default.md",
+		"platform examples use default values as examples when available",
+		"platform-examples-use-defaults.md",
 		func(reg *variable.Registry) {
 			ferrite.
 				NetworkPort("PORT", "an environment variable that has a default value").

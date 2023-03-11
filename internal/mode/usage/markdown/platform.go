@@ -2,15 +2,15 @@ package markdown
 
 import "github.com/dogmatiq/ferrite/variable"
 
-func (r *renderer) renderUsage() {
+func (r *renderer) renderPlatformExamples() {
 	r.line("## Usage Examples")
 	r.gap()
-	r.renderKubernetesUsage()
+	r.renderKubernetesExample()
 	r.gap()
-	r.renderDockerUsage()
+	r.renderDockerExample()
 }
 
-func (r *renderer) renderKubernetesUsage() {
+func (r *renderer) renderKubernetesExample() {
 	r.line("<details>")
 	r.line("<summary>Kubernetes</summary>")
 
@@ -82,7 +82,7 @@ func (r *renderer) renderKubernetesUsage() {
 	r.line("</details>")
 }
 
-func (r *renderer) renderDockerUsage() {
+func (r *renderer) renderDockerExample() {
 	r.line("<details>")
 	r.line("<summary>Docker</summary>")
 	r.gap()
