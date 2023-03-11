@@ -29,6 +29,16 @@ func ExampleInit_validation() {
 		WithMembers("foo", "bar", "baz").
 		Required()
 
+	os.Setenv("FERRITE_NETWORK_PORT", "8080")
+	ferrite.
+		NetworkPort("FERRITE_NETWORK_PORT", "example network port").
+		Required()
+
+	os.Setenv("FERRITE_NUM_FLOAT", "-123.45")
+	ferrite.
+		Float[float32]("FERRITE_NUM_FLOAT", "example float-point").
+		Required()
+
 	os.Setenv("FERRITE_NUM_SIGNED", "-123")
 	ferrite.
 		Signed[int16]("FERRITE_NUM_SIGNED", "example signed integer").
@@ -73,6 +83,8 @@ func ExampleInit_validation() {
 	//    FERRITE_BOOL              example bool                             true | false       ✓ set to true
 	//    FERRITE_DURATION          example duration                         1ns ...            ✓ set to 3h20m
 	//    FERRITE_ENUM              example enum                             foo | bar | baz    ✓ set to foo
+	//    FERRITE_NETWORK_PORT      example network port                     <string>           ✓ set to 8080
+	//    FERRITE_NUM_FLOAT         example float-point                      <float32>          ✓ set to -123.45
 	//    FERRITE_NUM_SIGNED        example signed integer                   <int16>            ✓ set to -123
 	//    FERRITE_NUM_UNSIGNED      example unsigned integer                 <uint16>           ✓ set to 456
 	//    FERRITE_STRING            example string                           <string>           ✓ set to 'hello, world!'
@@ -102,6 +114,16 @@ func ExampleInit_validationWithDefaultValues() {
 		Enum("FERRITE_ENUM", "example enum").
 		WithMembers("foo", "bar", "baz").
 		WithDefault("bar").
+		Required()
+
+	ferrite.
+		NetworkPort("FERRITE_NETWORK_PORT", "example network port").
+		WithDefault("8080").
+		Required()
+
+	ferrite.
+		Float[float32]("FERRITE_NUM_FLOAT", "example float-point").
+		WithDefault(-123.45).
 		Required()
 
 	ferrite.
@@ -147,6 +169,8 @@ func ExampleInit_validationWithDefaultValues() {
 	//    FERRITE_BOOL              example bool                           [ true | false ] = true             ✓ using default value
 	//    FERRITE_DURATION          example duration                       [ 1ns ... ] = 10s                   ✓ using default value
 	//    FERRITE_ENUM              example enum                           [ foo | bar | baz ] = bar           ✓ using default value
+	//    FERRITE_NETWORK_PORT      example network port                   [ <string> ] = 8080                 ✓ using default value
+	//    FERRITE_NUM_FLOAT         example float-point                    [ <float32> ] = -123.45             ✓ using default value
 	//    FERRITE_NUM_SIGNED        example signed integer                 [ <int16> ] = -123                  ✓ using default value
 	//    FERRITE_NUM_UNSIGNED      example unsigned integer               [ <uint16> ] = 123                  ✓ using default value
 	//    FERRITE_STRING            example string                         [ <string> ] = 'hello, world!'      ✓ using default value
@@ -173,6 +197,14 @@ func ExampleInit_validationWithOptionalValues() {
 	ferrite.
 		Enum("FERRITE_ENUM", "example enum").
 		WithMembers("foo", "bar", "baz").
+		Optional()
+
+	ferrite.
+		NetworkPort("FERRITE_NETWORK_PORT", "example network port").
+		Optional()
+
+	ferrite.
+		Float[float32]("FERRITE_NUM_FLOAT", "example float-point").
 		Optional()
 
 	ferrite.
@@ -212,6 +244,8 @@ func ExampleInit_validationWithOptionalValues() {
 	//    FERRITE_BOOL              example bool                           [ true | false ]     • undefined
 	//    FERRITE_DURATION          example duration                       [ 1ns ... ]          • undefined
 	//    FERRITE_ENUM              example enum                           [ foo | bar | baz ]  • undefined
+	//    FERRITE_NETWORK_PORT      example network port                   [ <string> ]         • undefined
+	//    FERRITE_NUM_FLOAT         example float-point                    [ <float32> ]        • undefined
 	//    FERRITE_NUM_SIGNED        example signed integer                 [ <int16> ]          • undefined
 	//    FERRITE_NUM_UNSIGNED      example unsigned integer               [ <uint16> ]         • undefined
 	//    FERRITE_STRING            example string                         [ <string> ]         • undefined
@@ -264,6 +298,16 @@ func ExampleInit_validationWithInvalidValues() {
 	ferrite.
 		Enum("FERRITE_ENUM", "example enum").
 		WithMembers("foo", "bar", "baz").
+		Required()
+
+	os.Setenv("FERRITE_NETWORK_PORT", "<invalid port>")
+	ferrite.
+		NetworkPort("FERRITE_NETWORK_PORT", "example network port").
+		Required()
+
+	os.Setenv("FERRITE_NUM_FLOAT", "-123w45")
+	ferrite.
+		Float[float32]("FERRITE_NUM_FLOAT", "example float-point").
 		Required()
 
 	os.Setenv("FERRITE_NUM_SIGNED", "123.3")
@@ -324,6 +368,8 @@ func ExampleInit_validationWithInvalidValues() {
 	//  ❯ FERRITE_BOOL              example bool                             true | false       ✗ set to yes, expected either true or false
 	//  ❯ FERRITE_DURATION          example duration                         1ns ...            ✗ set to -+10s, expected duration
 	//  ❯ FERRITE_ENUM              example enum                             foo | bar | baz    ✗ set to qux, expected foo, bar or baz
+	//  ❯ FERRITE_NETWORK_PORT      example network port                     <string>           ✗ set to '<invalid port>', IANA service name must contain only ASCII letters, digits and hyphen
+	//  ❯ FERRITE_NUM_FLOAT         example float-point                      <float32>          ✗ set to -123w45, expected float32
 	//  ❯ FERRITE_NUM_SIGNED        example signed integer                   <int16>            ✗ set to 123.3, expected integer between -32768 and +32767
 	//  ❯ FERRITE_NUM_UNSIGNED      example unsigned integer                 <uint16>           ✗ set to -123, expected integer between 0 and 65535
 	//  ❯ FERRITE_STRING            example string                           <string>           ✗ set to 'foo bar', must not contain whitespace
