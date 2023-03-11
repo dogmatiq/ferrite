@@ -59,7 +59,7 @@ var DefaultRegistry = Registry{
 
 // Register registers a new variable.
 func Register[T any, Option RegisterOption](
-	spec TypedSpec[T],
+	spec *TypedSpec[T],
 	options ...Option,
 ) *OfType[T] {
 	opts := registerOptions{

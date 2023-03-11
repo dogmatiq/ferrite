@@ -25,7 +25,7 @@ type Any interface {
 
 // OfType is an environment variable depicted by type T.
 type OfType[T any] struct {
-	spec TypedSpec[T]
+	spec *TypedSpec[T]
 	env  Environment
 
 	once     sync.Once

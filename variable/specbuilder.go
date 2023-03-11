@@ -109,14 +109,14 @@ func (b *TypedSpecBuilder[T]) Documentation() DocumentationBuilder {
 }
 
 // Done builds the specification and registers the variable.
-func (b *TypedSpecBuilder[T]) Done(schema TypedSchema[T]) TypedSpec[T] {
+func (b *TypedSpecBuilder[T]) Done(schema TypedSchema[T]) *TypedSpec[T] {
 	b.spec.schema = schema
 
 	if err := b.finalize(); err != nil {
 		panic(err.Error())
 	}
 
-	return b.spec
+	return &b.spec
 }
 
 func (b *TypedSpecBuilder[T]) finalize() error {

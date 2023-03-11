@@ -68,45 +68,45 @@ type TypedSpec[T any] struct {
 }
 
 // Name returns the name of the variable.
-func (s TypedSpec[T]) Name() string {
+func (s *TypedSpec[T]) Name() string {
 	return s.name
 }
 
 // Description returns a human-readable description of the variable.
-func (s TypedSpec[T]) Description() string {
+func (s *TypedSpec[T]) Description() string {
 	return s.desc
 }
 
 // Schema returns the schema that applies to the variable's value.
-func (s TypedSpec[T]) Schema() Schema {
+func (s *TypedSpec[T]) Schema() Schema {
 	return s.schema
 }
 
 // Default returns the string representation of the default value.
-func (s TypedSpec[T]) Default() (Literal, bool) {
+func (s *TypedSpec[T]) Default() (Literal, bool) {
 	return maybe.Map(s.def, valueOf[T].Canonical).Get()
 }
 
 // IsRequired returns true if the application MUST have a value for this
 // variable (even if it is fulfilled by a default value).
-func (s TypedSpec[T]) IsRequired() bool {
+func (s *TypedSpec[T]) IsRequired() bool {
 	return s.required
 }
 
 // IsSensitive returns true if the variable's value contains sensitive
 // information.
-func (s TypedSpec[T]) IsSensitive() bool {
+func (s *TypedSpec[T]) IsSensitive() bool {
 	return s.sensitive
 }
 
 // IsDeprecated returns true if the variable is deprecated.
-func (s TypedSpec[T]) IsDeprecated() bool {
+func (s *TypedSpec[T]) IsDeprecated() bool {
 	return s.deprecated
 }
 
 // Constraints returns a list of additional constraints on the variable's
 // value.
-func (s TypedSpec[T]) Constraints() []Constraint {
+func (s *TypedSpec[T]) Constraints() []Constraint {
 	constraints := make([]Constraint, len(s.constraints))
 	for i, c := range s.constraints {
 		constraints[i] = c
@@ -115,18 +115,18 @@ func (s TypedSpec[T]) Constraints() []Constraint {
 }
 
 // Examples returns a list of examples of valid values.
-func (s TypedSpec[T]) Examples() []Example {
+func (s *TypedSpec[T]) Examples() []Example {
 	return s.examples
 }
 
 // Documentation returns a list of chunks of documentation text.
-func (s TypedSpec[T]) Documentation() []Documentation {
+func (s *TypedSpec[T]) Documentation() []Documentation {
 	return s.docs
 }
 
 // CheckConstraints returns an error if v does not satisfy any one of the
 // specification's constraints.
-func (s TypedSpec[T]) CheckConstraints(v T) ConstraintError {
+func (s *TypedSpec[T]) CheckConstraints(v T) ConstraintError {
 	for _, c := range s.constraints {
 		if err := c.Check(v); err != nil {
 			return err
@@ -140,7 +140,7 @@ func (s TypedSpec[T]) CheckConstraints(v T) ConstraintError {
 //
 // It returns an error if v does not meet the specification's constraints or
 // marshaling fails at the schema level.
-func (s TypedSpec[T]) Marshal(v T) (Literal, error) {
+func (s *TypedSpec[T]) Marshal(v T) (Literal, error) {
 	if err := s.CheckConstraints(v); err != nil {
 		return Literal{}, err
 	}
@@ -152,7 +152,7 @@ func (s TypedSpec[T]) Marshal(v T) (Literal, error) {
 //
 // It returns an error if v does not meet the specification's constraints or
 // unmarshaling fails at the schema level.
-func (s TypedSpec[T]) Unmarshal(v Literal) (T, Literal, error) {
+func (s *TypedSpec[T]) Unmarshal(v Literal) (T, Literal, error) {
 	n, err := s.schema.Unmarshal(v)
 	if err != nil {
 		return n, Literal{}, err
