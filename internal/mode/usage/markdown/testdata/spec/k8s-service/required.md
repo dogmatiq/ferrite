@@ -17,7 +17,7 @@ export REDIS_SERVICE_HOST=foo # (non-normative)
 
 #### See Also
 
-- [`REDIS_SERVICE_PORT`](#REDIS_SERVICE_PORT) — kubernetes "redis" service port
+- [`REDIS_SERVICE_PORT`] — kubernetes "redis" service port
 
 ### `REDIS_SERVICE_PORT`
 
@@ -44,4 +44,9 @@ UNIX-like systems. Standard service names are published by IANA.
 
 #### See Also
 
-- [`REDIS_SERVICE_HOST`](#REDIS_SERVICE_HOST) — kubernetes "redis" service host
+- [`REDIS_SERVICE_HOST`] — kubernetes "redis" service host
+
+<!-- references -->
+
+[`redis_service_host`]: #REDIS_SERVICE_HOST
+[`redis_service_port`]: #REDIS_SERVICE_PORT

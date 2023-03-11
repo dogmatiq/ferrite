@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/dogmatiq/ferrite/variable"
 	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
 )
@@ -12,6 +13,7 @@ func (r *renderer) renderRefs() {
 	r.line("<!-- references -->")
 	r.gap()
 
+	keys := maps.Keys(r.refs)
 	urls := map[string]string{
 		"docker service":        "https://docs.docker.com/compose/environment-variables/#set-environment-variables-in-containers",
 		"ferrite":               "https://github.com/dogmatiq/ferrite",
@@ -19,7 +21,13 @@ func (r *renderer) renderRefs() {
 		"kubernetes container":  "https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#define-an-environment-variable-for-a-container",
 	}
 
-	keys := maps.Keys(r.refs)
+	for _, s := range r.Specs {
+		key := "`" + strings.ToLower(s.Name()) + "`"
+		if _, ok := r.refs[key]; ok {
+			urls[key] = "#" + s.Name()
+		}
+	}
+
 	slices.SortFunc(
 		keys,
 		func(a, b string) bool {
@@ -40,6 +48,7 @@ func (r *renderer) renderRefs() {
 
 		r.line("[%s]: %s", k, u)
 	}
+
 }
 
 func (r *renderer) link(text string, ref ...string) string {
@@ -59,6 +68,20 @@ func (r *renderer) link(text string, ref ...string) string {
 	default:
 		panic("too many arguments")
 	}
+}
+
+func (r *renderer) linkToSpec(s variable.Spec) string {
+	if r.refs == nil {
+		r.refs = map[string]struct{}{}
+	}
+
+	key := fmt.Sprintf(
+		"`%s`",
+		strings.ToLower(s.Name()),
+	)
+	r.refs[key] = struct{}{}
+
+	return fmt.Sprintf("[`%s`]", s.Name())
 }
 
 func cutPrefix(s, prefix string) (after string, found bool) {

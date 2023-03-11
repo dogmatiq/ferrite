@@ -15,9 +15,8 @@ func (r *renderer) renderIndex() {
 
 func (r *renderer) renderIndexItem(s variable.Spec) {
 	r.line(
-		"- [`%s`](#%s) — %s",
-		s.Name(),
-		s.Name(),
+		"- %s — %s",
+		r.linkToSpec(s),
 		s.Description(),
 	)
 }

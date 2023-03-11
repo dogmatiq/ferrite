@@ -19,7 +19,7 @@ document are to be interpreted as described in [RFC 2119].
 
 ## Index
 
-- [`READ_DSN`](#READ_DSN) — database connection string for read-models
+- [`READ_DSN`] — database connection string for read-models
 
 ## Specification
 
@@ -104,4 +104,5 @@ service:
 [ferrite]: https://github.com/dogmatiq/ferrite
 [kubernetes config map]: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables
 [kubernetes container]: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#define-an-environment-variable-for-a-container
+[`read_dsn`]: #READ_DSN
 [rfc 2119]: https://www.rfc-editor.org/rfc/rfc2119.html
