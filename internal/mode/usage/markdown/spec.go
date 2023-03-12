@@ -124,7 +124,7 @@ func (r *specRenderer) renderPrimaryRequirement(f string, v ...any) {
 		text = "⚠️ The `%s` variable is **deprecated**; its use is **NOT RECOMMENDED** as it may be removed in a future version."
 		args = []any{r.spec.Name()}
 
-		relationships := variable.FilterRelationships[variable.IsSupersededBy](r.spec)
+		relationships := variable.FilterRelationships[variable.SupersededBy](r.spec)
 		if len(relationships) != 0 {
 			for i, rel := range relationships {
 				if i == len(relationships)-1 {

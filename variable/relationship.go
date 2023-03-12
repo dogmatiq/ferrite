@@ -28,7 +28,7 @@ type RelationshipVisitor interface {
 	VisitRefersTo(RefersTo)
 	VisitIsReferredToBy(IsReferredToBy)
 	VisitSupersedes(Supersedes)
-	VisitIsSupersededBy(IsSupersededBy)
+	VisitSupersededBy(SupersededBy)
 }
 
 // FilterRelationships returns the relationships of s that are of type T.
