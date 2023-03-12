@@ -20,9 +20,14 @@ func (r Supersedes) Inverse() Relationship {
 	return SupersededBy{r.Supersedes, r.Spec}
 }
 
-// AcceptVisitor passes r to the appropriate method of v.
-func (r Supersedes) AcceptVisitor(v RelationshipVisitor) {
-	v.VisitSupersedes(r)
+// ConflictsWith returns true if this relationship conflicts with r.
+//
+// The subject of both relationships must be the same specification.
+func (r Supersedes) ConflictsWith(c Relationship) bool {
+	if c, ok := c.(SupersededBy); ok {
+		return c.SupersededBy == r.Supersedes
+	}
+	return false
 }
 
 // SupersededBy is a relationship that indicates that a (usually deprecated)
@@ -53,9 +58,4 @@ func (r SupersededBy) ConflictsWith(c Relationship) bool {
 		return c.Supersedes == r.SupersededBy
 	}
 	return false
-}
-
-// AcceptVisitor passes r to the appropriate method of v.
-func (r SupersededBy) AcceptVisitor(v RelationshipVisitor) {
-	v.VisitSupersededBy(r)
 }

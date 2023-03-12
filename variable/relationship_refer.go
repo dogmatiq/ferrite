@@ -20,9 +20,11 @@ func (r RefersTo) Inverse() Relationship {
 	return IsReferredToBy{r.RefersTo, r.Spec}
 }
 
-// AcceptVisitor passes r to the appropriate method of v.
-func (r RefersTo) AcceptVisitor(v RelationshipVisitor) {
-	v.VisitRefersTo(r)
+// ConflictsWith returns true if this relationship conflicts with r.
+//
+// The subject of both relationships must be the same specification.
+func (r RefersTo) ConflictsWith(c Relationship) bool {
+	return false
 }
 
 // IsReferredToBy is a relationship that indicates that a variable is
@@ -45,7 +47,9 @@ func (r IsReferredToBy) Inverse() Relationship {
 	return RefersTo{r.IsReferredToBy, r.Spec}
 }
 
-// AcceptVisitor passes r to the appropriate method of v.
-func (r IsReferredToBy) AcceptVisitor(v RelationshipVisitor) {
-	v.VisitIsReferredToBy(r)
+// ConflictsWith returns true if this relationship conflicts with r.
+//
+// The subject of both relationships must be the same specification.
+func (r IsReferredToBy) ConflictsWith(c Relationship) bool {
+	return false
 }

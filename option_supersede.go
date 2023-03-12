@@ -17,7 +17,9 @@ func SupersededBy(i Input, options ...SupersededByOption) DeprecatedOption {
 					opt.applySupersededByOption(&rel)
 				}
 
-				variable.ApplyRelationship(rel)
+				if err := variable.ApplyRelationship(rel); err != nil {
+					panic(err.Error())
+				}
 			}
 		},
 	}

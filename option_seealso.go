@@ -36,5 +36,7 @@ func seeAlso(
 		opt.applySeeAlsoOption(&rel)
 	}
 
-	variable.ApplyRelationship(rel)
+	if err := variable.ApplyRelationship(rel); err != nil {
+		panic(err.Error())
+	}
 }

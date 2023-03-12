@@ -1,5 +1,7 @@
 package variable
 
+import "errors"
+
 // Relationship represents a relationship between two variables.
 type Relationship interface {
 	// Subject returns the spec of the variable that is the subject of the
@@ -9,26 +11,37 @@ type Relationship interface {
 	// Related returns the spec of the related variable.
 	Related() Spec
 
-	// Inverse returns the inverse of the relationship.
+	// Inverse returns the inverse of the relationship, such that the related
+	// variable becomes the subject.
 	Inverse() Relationship
 
-	// AcceptVisitor passes the schema to the appropriate method of v.
-	AcceptVisitor(v RelationshipVisitor)
+	// ConflictsWith returns true if this relationship conflicts with r.
+	ConflictsWith(c Relationship) bool
 }
 
-// ApplyRelationship adds the relationship to the subject and related
-// variable specifications.
-func ApplyRelationship(rel Relationship) {
-	rel.Subject().addRelationship(rel)
-	rel.Related().addRelationship(rel.Inverse())
-}
+// ApplyRelationship adds the relationship to the subject and related variable
+// specifications.
+func ApplyRelationship(r Relationship) error {
+	sub := r.Subject()
+	rel := r.Related()
+	inv := r.Inverse()
 
-// RelationshipVisitor dispatches based on a relationship's type.
-type RelationshipVisitor interface {
-	VisitRefersTo(RefersTo)
-	VisitIsReferredToBy(IsReferredToBy)
-	VisitSupersedes(Supersedes)
-	VisitSupersededBy(SupersededBy)
+	for _, x := range sub.Relationships() {
+		if x.ConflictsWith(r) {
+			return errors.New("<error>")
+		}
+	}
+
+	for _, x := range rel.Relationships() {
+		if x.ConflictsWith(r) {
+			return errors.New("<error>")
+		}
+	}
+
+	sub.addRelationship(r)
+	rel.addRelationship(inv)
+
+	return nil
 }
 
 // FilterRelationships returns the relationships of s that are of type T.
