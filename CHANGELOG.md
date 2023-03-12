@@ -12,9 +12,17 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## Unreleased
 
+### Added
+
+- Added `SeeAlso()` option
+
 ### Changed
 
 - **[BC]** `SupersededBy()` now only accepts a single input
+
+### Removed
+
+- **[BC]** Removed `SeeAlso()` method from all builder types, use the new `SeeAlso()` option instead
 
 ## [0.5.0] - 2023-03-12
 

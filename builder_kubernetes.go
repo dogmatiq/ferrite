@@ -152,13 +152,6 @@ func (b *KubernetesServiceBuilder) WithDefault(host, port string) *KubernetesSer
 	return b
 }
 
-// SeeAlso creates a relationship between this variable and those used by i.
-func (b *KubernetesServiceBuilder) SeeAlso(i Input, options ...SeeAlsoOption) *KubernetesServiceBuilder {
-	seeAlsoInput(&b.hostSpec, i, options...)
-	seeAlsoInput(&b.portSpec, i, options...)
-	return b
-}
-
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *KubernetesServiceBuilder) Required(options ...RequiredOption) Required[KubernetesAddress] {

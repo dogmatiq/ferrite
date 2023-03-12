@@ -45,12 +45,6 @@ func (b *NetworkPortBuilder) WithDefault(v string) *NetworkPortBuilder {
 	return b
 }
 
-// SeeAlso creates a relationship between this variable and those used by i.
-func (b *NetworkPortBuilder) SeeAlso(i Input, options ...SeeAlsoOption) *NetworkPortBuilder {
-	seeAlsoInput(&b.spec, i, options...)
-	return b
-}
-
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *NetworkPortBuilder) Required(options ...RequiredOption) Required[string] {

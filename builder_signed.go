@@ -73,12 +73,6 @@ func (b *SignedBuilder[T]) WithMaximum(v T) *SignedBuilder[T] {
 	return b
 }
 
-// SeeAlso creates a relationship between this variable and those used by i.
-func (b *SignedBuilder[T]) SeeAlso(i Input, options ...SeeAlsoOption) *SignedBuilder[T] {
-	seeAlsoInput(&b.spec, i, options...)
-	return b
-}
-
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *SignedBuilder[T]) Required(options ...RequiredOption) Required[T] {

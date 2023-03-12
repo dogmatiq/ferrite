@@ -69,12 +69,6 @@ func (b *BoolBuilder[T]) WithDefault(v T) *BoolBuilder[T] {
 	return b
 }
 
-// SeeAlso creates a relationship between this variable and those used by i.
-func (b *BoolBuilder[T]) SeeAlso(i Input, options ...SeeAlsoOption) *BoolBuilder[T] {
-	seeAlsoInput(&b.spec, i, options...)
-	return b
-}
-
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *BoolBuilder[T]) Required(options ...RequiredOption) Required[T] {

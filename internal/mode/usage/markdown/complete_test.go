@@ -52,8 +52,10 @@ var _ = DescribeTable(
 
 			ferrite.
 				Bool("DEBUG", "enable or disable debugging features").
-				SeeAlso(verbose).
-				Optional(ferrite.WithRegistry(reg))
+				Optional(
+					ferrite.WithRegistry(reg),
+					ferrite.SeeAlso(verbose),
+				)
 		},
 	),
 	Entry(

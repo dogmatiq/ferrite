@@ -63,12 +63,6 @@ func (b *StringBuilder[T]) WithSensitiveContent() *StringBuilder[T] {
 	return b
 }
 
-// SeeAlso creates a relationship between this variable and those used by i.
-func (b *StringBuilder[T]) SeeAlso(i Input, options ...SeeAlsoOption) *StringBuilder[T] {
-	seeAlsoInput(&b.spec, i, options...)
-	return b
-}
-
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *StringBuilder[T]) Required(options ...RequiredOption) Required[T] {

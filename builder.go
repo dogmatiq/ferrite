@@ -16,7 +16,6 @@ func undefinedError(v variable.Any) error {
 
 // isBuilderOf makes a static assertion that B meats
 type isBuilderOf[T any, B interface {
-	SeeAlso(input Input, options ...SeeAlsoOption) B
 	Required(options ...RequiredOption) Required[T]
 	Optional(options ...OptionalOption) Optional[T]
 	Deprecated(options ...DeprecatedOption) Deprecated[T]

@@ -69,12 +69,6 @@ func (b *URLBuilder) WithDefault(v string) *URLBuilder {
 	return b
 }
 
-// SeeAlso creates a relationship between this variable and those used by i.
-func (b *URLBuilder) SeeAlso(i Input, options ...SeeAlsoOption) *URLBuilder {
-	seeAlsoInput(&b.spec, i, options...)
-	return b
-}
-
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *URLBuilder) Required(options ...RequiredOption) Required[*url.URL] {

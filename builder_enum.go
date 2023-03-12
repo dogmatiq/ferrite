@@ -85,12 +85,6 @@ func (b *EnumBuilder[T]) WithDefault(v T) *EnumBuilder[T] {
 	return b
 }
 
-// SeeAlso creates a relationship between this variable and those used by i.
-func (b *EnumBuilder[T]) SeeAlso(i Input, options ...SeeAlsoOption) *EnumBuilder[T] {
-	seeAlsoInput(&b.spec, i, options...)
-	return b
-}
-
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *EnumBuilder[T]) Required(options ...RequiredOption) Required[T] {

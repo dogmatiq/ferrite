@@ -13,6 +13,5 @@ func Example_seeAlso() {
 
 	ferrite.
 		Bool("DEBUG", "enable or disable debugging features").
-		SeeAlso(verbose).
-		Optional()
+		Optional(ferrite.SeeAlso(verbose))
 }

@@ -72,12 +72,6 @@ func (b *UnsignedBuilder[T]) WithMaximum(v T) *UnsignedBuilder[T] {
 	return b
 }
 
-// SeeAlso creates a relationship between this variable and those used by i.
-func (b *UnsignedBuilder[T]) SeeAlso(i Input, options ...SeeAlsoOption) *UnsignedBuilder[T] {
-	seeAlsoInput(&b.spec, i, options...)
-	return b
-}
-
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *UnsignedBuilder[T]) Required(options ...RequiredOption) Required[T] {

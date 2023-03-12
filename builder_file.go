@@ -35,12 +35,6 @@ func (b *FileBuilder) WithDefault(v string) *FileBuilder {
 	return b
 }
 
-// SeeAlso creates a relationship between this variable and those used by i.
-func (b *FileBuilder) SeeAlso(i Input, options ...SeeAlsoOption) *FileBuilder {
-	seeAlsoInput(&b.spec, i, options...)
-	return b
-}
-
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *FileBuilder) Required(options ...RequiredOption) Required[FileName] {
