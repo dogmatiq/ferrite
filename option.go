@@ -23,18 +23,20 @@ func WithRegistry(reg *variable.Registry) interface {
 	}
 }
 
-// option is an implementation of the InitOption, DeprecatedOption,
-// RequiredOption and OptionalOption interfaces.
+// option is an implementation of various option interfaces.
 //
-// It is used to implement the various options. Functions that return options
-// should return an anonymous interface type that embeds one or more of the
-// option interfaces.
+// Functions that return options should return an anonymous interface type that
+// embeds one or more of the option interfaces.
 type option struct {
-	Init       func(*initConfig)
+	Init func(*initConfig)
+
 	Input      func(*inputConfig)
 	Deprecated func(*deprecatedConfig)
 	Optional   func(*optionalConfig)
 	Required   func(*requiredConfig)
+
+	RefersTo     func(*variable.RefersTo)
+	SupersededBy func(*variable.SupersededBy)
 }
 
 func (o option) applyInitOption(opts *initConfig) {
@@ -70,5 +72,17 @@ func (o option) applyRequiredOption(opts *requiredConfig) {
 
 	if o.Required != nil {
 		o.Required(opts)
+	}
+}
+
+func (o option) applyRefersToOption(r *variable.RefersTo) {
+	if o.RefersTo != nil {
+		o.RefersTo(r)
+	}
+}
+
+func (o option) applySupersededByOption(r *variable.SupersededBy) {
+	if o.SupersededBy != nil {
+		o.SupersededBy(r)
 	}
 }

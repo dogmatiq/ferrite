@@ -20,7 +20,7 @@ func SeeAlso(i Input, options ...SeeAlsoOption) interface {
 
 // SeeAlsoOption changes the behavior of the SeeAlso() option.
 type SeeAlsoOption interface {
-	applySeeAlsoOption(*variable.RefersTo)
+	applyRefersToOption(*variable.RefersTo)
 }
 
 func seeAlso(
@@ -28,12 +28,12 @@ func seeAlso(
 	options ...SeeAlsoOption,
 ) {
 	rel := variable.RefersTo{
-		Spec:     from,
+		Sub:      from,
 		RefersTo: to,
 	}
 
 	for _, opt := range options {
-		opt.applySeeAlsoOption(&rel)
+		opt.applyRefersToOption(&rel)
 	}
 
 	if err := variable.ApplyRelationship(rel); err != nil {

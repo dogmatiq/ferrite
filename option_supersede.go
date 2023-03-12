@@ -9,7 +9,7 @@ func SupersededBy(i Input, options ...SupersededByOption) DeprecatedOption {
 		Deprecated: func(cfg *deprecatedConfig) {
 			for _, v := range i.variables() {
 				rel := variable.SupersededBy{
-					Spec:         cfg.Spec.Peek(),
+					Sub:          cfg.Spec.Peek(),
 					SupersededBy: v.Spec(),
 				}
 

@@ -2,12 +2,14 @@ package variable
 
 // RefersTo is a relationship that indicates that a variable refers to
 // another variable for information/documentation purposes.
-type RefersTo struct{ Spec, RefersTo Spec }
+type RefersTo struct {
+	Sub, RefersTo Spec
+}
 
 // Subject returns the spec of the variable that is the subject of the
 // relationship.
 func (r RefersTo) Subject() Spec {
-	return r.Spec
+	return r.Sub
 }
 
 // Related returns the spec of the related variable.
@@ -17,7 +19,7 @@ func (r RefersTo) Related() Spec {
 
 // Inverse returns the inverse of r.
 func (r RefersTo) Inverse() Relationship {
-	return IsReferredToBy{r.RefersTo, r.Spec}
+	return IsReferredToBy{r.RefersTo, r.Sub}
 }
 
 // ConflictsWith returns true if this relationship conflicts with r.
@@ -29,12 +31,14 @@ func (r RefersTo) ConflictsWith(c Relationship) bool {
 
 // IsReferredToBy is a relationship that indicates that a variable is
 // referred to by another variable.
-type IsReferredToBy struct{ Spec, IsReferredToBy Spec }
+type IsReferredToBy struct {
+	Sub, IsReferredToBy Spec
+}
 
 // Subject returns the spec of the variable that is the subject of the
 // relationship.
 func (r IsReferredToBy) Subject() Spec {
-	return r.Spec
+	return r.Sub
 }
 
 // Related returns the spec of the related variable.
@@ -44,7 +48,7 @@ func (r IsReferredToBy) Related() Spec {
 
 // Inverse returns the inverse of r.
 func (r IsReferredToBy) Inverse() Relationship {
-	return RefersTo{r.IsReferredToBy, r.Spec}
+	return RefersTo{r.IsReferredToBy, r.Sub}
 }
 
 // ConflictsWith returns true if this relationship conflicts with r.
