@@ -51,7 +51,7 @@ spec:
       containers:
         - name: example-container
           env:
-            - name: DEBUG # enable or disable debugging features
+            - name: DEBUG # enable or disable debugging features (optional)
               value: "false"
 ```
 
@@ -64,7 +64,7 @@ kind: ConfigMap
 metadata:
   name: example-config-map
 data:
-  DEBUG: "false" # enable or disable debugging features
+  DEBUG: "false" # enable or disable debugging features (optional)
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -92,7 +92,7 @@ when running as a [Docker service] defined in a Docker compose file.
 service:
   example-service:
     environment:
-      DEBUG: "false" # enable or disable debugging features
+      DEBUG: "false" # enable or disable debugging features (optional)
 ```
 
 </details>

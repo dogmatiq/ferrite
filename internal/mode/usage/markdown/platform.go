@@ -1,6 +1,11 @@
 package markdown
 
-import "github.com/dogmatiq/ferrite/variable"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/dogmatiq/ferrite/variable"
+)
 
 func (r *renderer) renderPlatformExamples() {
 	r.line("## Usage Examples")
@@ -34,7 +39,7 @@ func (r *renderer) renderKubernetesExample() {
 	for _, s := range r.Specs {
 		eg := variable.BestExample(s)
 
-		r.line("            - name: %s # %s", r.yaml(s.Name()), s.Description())
+		r.line("            - name: %s %s", r.yaml(s.Name()), renderDescriptionAsYAMLComment(s))
 		r.line("              value: %s", r.yaml(eg.Canonical.String))
 	}
 
@@ -56,10 +61,10 @@ func (r *renderer) renderKubernetesExample() {
 		eg := variable.BestExample(s)
 
 		r.line(
-			"  %s: %s # %s",
+			"  %s: %s %s",
 			r.yaml(s.Name()),
 			r.yaml(eg.Canonical.String),
-			s.Description(),
+			renderDescriptionAsYAMLComment(s),
 		)
 	}
 
@@ -99,10 +104,10 @@ func (r *renderer) renderDockerExample() {
 		eg := variable.BestExample(s)
 
 		r.line(
-			"      %s: %s # %s",
+			"      %s: %s %s",
 			r.yaml(s.Name()),
 			r.yaml(eg.Canonical.String),
-			s.Description(),
+			renderDescriptionAsYAMLComment(s),
 		)
 	}
 
@@ -110,4 +115,21 @@ func (r *renderer) renderDockerExample() {
 
 	r.gap()
 	r.line("</details>")
+}
+
+func renderDescriptionAsYAMLComment(s variable.Spec) string {
+	var w strings.Builder
+
+	w.WriteString("# ")
+	w.WriteString(s.Description())
+
+	if s.IsDeprecated() {
+		w.WriteString(" (deprecated)")
+	} else if def, ok := s.Default(); ok {
+		fmt.Fprintf(&w, " (defaults to %s)", def.Quote())
+	} else if !s.IsRequired() {
+		w.WriteString(" (optional)")
+	}
+
+	return w.String()
 }

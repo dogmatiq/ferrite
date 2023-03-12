@@ -65,7 +65,7 @@ spec:
       containers:
         - name: example-container
           env:
-            - name: PORT # an environment variable that has a default value
+            - name: PORT # an environment variable that has a default value (defaults to ftp)
               value: ftp
 ```
 
@@ -78,7 +78,7 @@ kind: ConfigMap
 metadata:
   name: example-config-map
 data:
-  PORT: ftp # an environment variable that has a default value
+  PORT: ftp # an environment variable that has a default value (defaults to ftp)
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -106,7 +106,7 @@ when running as a [Docker service] defined in a Docker compose file.
 service:
   example-service:
     environment:
-      PORT: ftp # an environment variable that has a default value
+      PORT: ftp # an environment variable that has a default value (defaults to ftp)
 ```
 
 </details>

@@ -1,6 +1,8 @@
 package markdown
 
 import (
+	"strings"
+
 	"github.com/dogmatiq/ferrite/variable"
 )
 
@@ -14,9 +16,24 @@ func (r *renderer) renderIndex() {
 }
 
 func (r *renderer) renderIndexItem(s variable.Spec) {
-	r.line(
-		"- %s — %s",
-		r.linkToSpec(s),
-		s.Description(),
-	)
+	var w strings.Builder
+	strike := ""
+	if s.IsDeprecated() {
+		strike = "~~"
+	}
+
+	w.WriteString("- ")
+	w.WriteString(strike)
+	w.WriteString(r.linkToSpec(s))
+	w.WriteString(strike)
+	w.WriteString(" — ")
+	w.WriteString(strike)
+	w.WriteString(s.Description())
+	w.WriteString(strike)
+
+	if s.IsDeprecated() {
+		w.WriteString(" (deprecated)")
+	}
+
+	r.line(w.String())
 }
