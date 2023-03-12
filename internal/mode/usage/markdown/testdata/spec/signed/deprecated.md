@@ -6,11 +6,9 @@
 
 > weighting for this node
 
-The `WEIGHT` variable **SHOULD** be left undefined. Otherwise, the value
-**MUST** be a whole number.
-
-⚠️ This variable is **deprecated**; its use is discouraged as it may be removed
-in a future version.
+⚠️ The `WEIGHT` variable is **deprecated**; its use is **NOT RECOMMENDED** as it
+may be removed in a future version. If defined, the value **MUST** be a whole
+number.
 
 ```bash
 export WEIGHT=-13 # (non-normative)

@@ -6,11 +6,9 @@
 
 > weighting for this node
 
-The `WEIGHT` variable **SHOULD** be left undefined. Otherwise, the value
-**MUST** be a number with an **OPTIONAL** fractional part.
-
-⚠️ This variable is **deprecated**; its use is discouraged as it may be removed
-in a future version.
+⚠️ The `WEIGHT` variable is **deprecated**; its use is **NOT RECOMMENDED** as it
+may be removed in a future version. If defined, the value **MUST** be a number
+with an **OPTIONAL** fractional part.
 
 ```bash
 export WEIGHT=-3.4028235e+37 # (non-normative)

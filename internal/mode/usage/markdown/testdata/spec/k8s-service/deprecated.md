@@ -6,14 +6,12 @@
 
 > kubernetes "redis" service host
 
-The `REDIS_SERVICE_HOST` variable **SHOULD** be left undefined. Otherwise, the
-value **MUST** be a valid hostname.
+⚠️ The `REDIS_SERVICE_HOST` variable is **deprecated**; its use is **NOT
+RECOMMENDED** as it may be removed in a future version. If defined, the value
+**MUST** be a valid hostname.
 
 It is expected that this variable will be implicitly defined by Kubernetes; it
 typically does not need to be specified in the pod manifest.
-
-⚠️ This variable is **deprecated**; its use is discouraged as it may be removed
-in a future version.
 
 ```bash
 export REDIS_SERVICE_HOST=foo # (non-normative)
@@ -27,14 +25,12 @@ export REDIS_SERVICE_HOST=foo # (non-normative)
 
 > kubernetes "redis" service port
 
-The `REDIS_SERVICE_PORT` variable **SHOULD** be left undefined. Otherwise, the
-value **MUST** be a valid network port.
+⚠️ The `REDIS_SERVICE_PORT` variable is **deprecated**; its use is **NOT
+RECOMMENDED** as it may be removed in a future version. If defined, the value
+**MUST** be a valid network port.
 
 It is expected that this variable will be implicitly defined by Kubernetes; it
 typically does not need to be specified in the pod manifest.
-
-⚠️ This variable is **deprecated**; its use is discouraged as it may be removed
-in a future version.
 
 ```bash
 export REDIS_SERVICE_PORT=foo # (non-normative)

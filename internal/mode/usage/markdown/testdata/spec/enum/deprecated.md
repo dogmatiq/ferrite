@@ -6,11 +6,9 @@
 
 > the minimum log level to record
 
-The `LOG_LEVEL` variable **SHOULD** be left undefined. Otherwise, the value
-**MUST** be one of the values shown in the examples below.
-
-⚠️ This variable is **deprecated**; its use is discouraged as it may be removed
-in a future version.
+⚠️ The `LOG_LEVEL` variable is **deprecated**; its use is **NOT RECOMMENDED** as
+it may be removed in a future version. If defined, the value **MUST** be one of
+the values shown in the examples below.
 
 ```bash
 export LOG_LEVEL=debug # show information for developers

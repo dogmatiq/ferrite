@@ -6,11 +6,9 @@
 
 > listen port for the HTTP server
 
-The `PORT` variable **SHOULD** be left undefined. Otherwise, the value **MUST**
-be a valid network port.
-
-⚠️ This variable is **deprecated**; its use is discouraged as it may be removed
-in a future version.
+⚠️ The `PORT` variable is **deprecated**; its use is **NOT RECOMMENDED** as it
+may be removed in a future version. If defined, the value **MUST** be a valid
+network port.
 
 ```bash
 export PORT=8000  # (non-normative) a port commonly used for private web servers

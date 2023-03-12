@@ -6,11 +6,9 @@
 
 > the URL of the REST API
 
-The `API_URL` variable **SHOULD** be left undefined. Otherwise, the value
-**MUST** be a fully-qualified URL.
-
-⚠️ This variable is **deprecated**; its use is discouraged as it may be removed
-in a future version.
+⚠️ The `API_URL` variable is **deprecated**; its use is **NOT RECOMMENDED** as
+it may be removed in a future version. If defined, the value **MUST** be a
+fully-qualified URL.
 
 ```bash
 export API_URL=https://example.org/path # (non-normative) a typical URL for a web page

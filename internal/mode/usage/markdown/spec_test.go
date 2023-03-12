@@ -63,16 +63,6 @@ var _ = DescribeTable(
 		},
 	),
 	Entry(
-		"bool + deprecated + default",
-		"bool/deprecated-with-default.md",
-		func(reg *variable.Registry) {
-			ferrite.
-				Bool("DEBUG", "enable or disable debugging features").
-				WithDefault(false).
-				Deprecated(ferrite.WithRegistry(reg))
-		},
-	),
-	Entry(
 		"bool + deprecated",
 		"bool/deprecated.md",
 		func(reg *variable.Registry) {
@@ -143,21 +133,6 @@ var _ = DescribeTable(
 		},
 	),
 	Entry(
-		"enum + deprecated + default",
-		"enum/deprecated-with-default.md",
-		func(reg *variable.Registry) {
-			ferrite.
-				Enum("LOG_LEVEL", "the minimum log level to record").
-				WithMember("debug", "show information for developers").
-				WithMember("info", "standard log messages").
-				WithMember("warn", "important, but don't need individual human review").
-				WithMember("error", "a healthy application shouldn't produce any errors").
-				WithMember("fatal", "the application cannot proceed").
-				WithDefault("error").
-				Deprecated(ferrite.WithRegistry(reg))
-		},
-	),
-	Entry(
 		"enum + deprecated",
 		"enum/deprecated.md",
 		func(reg *variable.Registry) {
@@ -223,16 +198,6 @@ var _ = DescribeTable(
 		},
 	),
 	Entry(
-		"duration + deprecated + default",
-		"duration/deprecated-with-default.md",
-		func(reg *variable.Registry) {
-			ferrite.
-				Duration("GRPC_TIMEOUT", "gRPC request timeout").
-				WithDefault(10 * time.Millisecond).
-				Deprecated(ferrite.WithRegistry(reg))
-		},
-	),
-	Entry(
 		"duration + deprecated",
 		"duration/deprecated.md",
 		func(reg *variable.Registry) {
@@ -283,16 +248,6 @@ var _ = DescribeTable(
 		},
 	),
 	Entry(
-		"k8s service + deprecated + default",
-		"k8s-service/deprecated-with-default.md",
-		func(reg *variable.Registry) {
-			ferrite.
-				KubernetesService("redis").
-				WithDefault("redis.example.org", "6379").
-				Deprecated(ferrite.WithRegistry(reg))
-		},
-	),
-	Entry(
 		"k8s service + deprecated",
 		"k8s-service/deprecated.md",
 		func(reg *variable.Registry) {
@@ -339,16 +294,6 @@ var _ = DescribeTable(
 			ferrite.
 				NetworkPort("PORT", "listen port for the HTTP server").
 				Required(ferrite.WithRegistry(reg))
-		},
-	),
-	Entry(
-		"network port + deprecated + default",
-		"network-port/deprecated-with-default.md",
-		func(reg *variable.Registry) {
-			ferrite.
-				NetworkPort("PORT", "listen port for the HTTP server").
-				WithDefault("8080").
-				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -433,16 +378,6 @@ var _ = DescribeTable(
 		},
 	),
 	Entry(
-		"float + deprecated + default",
-		"float/deprecated-with-default.md",
-		func(reg *variable.Registry) {
-			ferrite.
-				Float[float32]("WEIGHT", "weighting for this node").
-				WithDefault(123.5).
-				Deprecated(ferrite.WithRegistry(reg))
-		},
-	),
-	Entry(
 		"float + deprecated",
 		"float/deprecated.md",
 		func(reg *variable.Registry) {
@@ -521,16 +456,6 @@ var _ = DescribeTable(
 				WithMinimum(-10).
 				WithMaximum(+20).
 				Required(ferrite.WithRegistry(reg))
-		},
-	),
-	Entry(
-		"signed + deprecated + default",
-		"signed/deprecated-with-default.md",
-		func(reg *variable.Registry) {
-			ferrite.
-				Signed[int8]("WEIGHT", "weighting for this node").
-				WithDefault(100).
-				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -615,16 +540,6 @@ var _ = DescribeTable(
 		},
 	),
 	Entry(
-		"unsigned + deprecated + default",
-		"unsigned/deprecated-with-default.md",
-		func(reg *variable.Registry) {
-			ferrite.
-				Unsigned[uint16]("WEIGHT", "weighting for this node").
-				WithDefault(900).
-				Deprecated(ferrite.WithRegistry(reg))
-		},
-	),
-	Entry(
 		"unsigned + deprecated",
 		"unsigned/deprecated.md",
 		func(reg *variable.Registry) {
@@ -672,16 +587,6 @@ var _ = DescribeTable(
 			ferrite.
 				String("READ_DSN", "database connection string for read-models").
 				Required(ferrite.WithRegistry(reg))
-		},
-	),
-	Entry(
-		"string + deprecated + default",
-		"string/deprecated-with-default.md",
-		func(reg *variable.Registry) {
-			ferrite.
-				String("READ_DSN", "database connection string for read-models").
-				WithDefault("host=localhost dbname=readmodels user=projector").
-				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(
@@ -782,16 +687,6 @@ var _ = DescribeTable(
 			ferrite.
 				URL("API_URL", "the URL of the REST API").
 				Required(ferrite.WithRegistry(reg))
-		},
-	),
-	Entry(
-		"url + deprecated + default",
-		"url/deprecated-with-default.md",
-		func(reg *variable.Registry) {
-			ferrite.
-				URL("API_URL", "the URL of the REST API").
-				WithDefault("http://localhost:8080").
-				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
 	Entry(

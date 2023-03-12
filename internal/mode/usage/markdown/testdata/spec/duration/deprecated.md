@@ -6,11 +6,9 @@
 
 > gRPC request timeout
 
-The `GRPC_TIMEOUT` variable **SHOULD** be left undefined. Otherwise, the value
-**MUST** be `1ns` or greater.
-
-⚠️ This variable is **deprecated**; its use is discouraged as it may be removed
-in a future version.
+⚠️ The `GRPC_TIMEOUT` variable is **deprecated**; its use is **NOT RECOMMENDED**
+as it may be removed in a future version. If defined, the value **MUST** be
+`1ns` or greater.
 
 ```bash
 export GRPC_TIMEOUT=1ns                      # (non-normative) the minimum accepted value

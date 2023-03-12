@@ -23,14 +23,6 @@ func (r *specRenderer) Render() {
 
 	r.renderImportantDocumentation()
 
-	if r.spec.IsDeprecated() {
-		r.ren.paragraph(
-			"⚠️ This variable is **deprecated**;",
-			"its use is discouraged as it may be removed in a future version.",
-		)()
-
-	}
-
 	if r.spec.IsSensitive() {
 		r.ren.paragraph(
 			"⚠️ This variable is **sensitive**;",
@@ -128,14 +120,17 @@ func (r *specRenderer) renderPrimaryRequirement(f string, v ...any) {
 	var text string
 	var args []any
 
-	undefinedModalVerb := "MAY"
 	if r.spec.IsDeprecated() {
-		undefinedModalVerb = "SHOULD"
-	}
+		text = "⚠️ The `%s` variable is **deprecated**; its use is **NOT RECOMMENDED** as it may be removed in a future version."
+		args = []any{r.spec.Name()}
 
-	if def, ok := r.renderDefaultValueFragment(); ok {
-		text = "The `%s` variable **%s** be left undefined, in which case %s is used."
-		args = []any{r.spec.Name(), undefinedModalVerb, def}
+		if req != "" {
+			text += " If defined, the value %s."
+			args = append(args, req)
+		}
+	} else if def, ok := r.renderDefaultValueFragment(); ok {
+		text = "The `%s` variable **MAY** be left undefined, in which case %s is used."
+		args = []any{r.spec.Name(), def}
 
 		if req != "" {
 			text += " Otherwise, the value %s."
@@ -150,8 +145,8 @@ func (r *specRenderer) renderPrimaryRequirement(f string, v ...any) {
 			args = []any{r.spec.Name()}
 		}
 	} else {
-		text = "The `%s` variable **%s** be left undefined."
-		args = []any{r.spec.Name(), undefinedModalVerb}
+		text = "The `%s` variable **MAY** be left undefined."
+		args = []any{r.spec.Name()}
 
 		if req != "" {
 			text += " Otherwise, the value %s."

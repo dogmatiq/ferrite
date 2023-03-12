@@ -6,11 +6,9 @@
 
 > enable or disable debugging features
 
-The `DEBUG` variable **SHOULD** be left undefined. Otherwise, the value **MUST**
-be either `true` or `false`.
-
-⚠️ This variable is **deprecated**; its use is discouraged as it may be removed
-in a future version.
+⚠️ The `DEBUG` variable is **deprecated**; its use is **NOT RECOMMENDED** as it
+may be removed in a future version. If defined, the value **MUST** be either
+`true` or `false`.
 
 ```bash
 export DEBUG=true
