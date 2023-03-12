@@ -47,6 +47,25 @@ func buildDeprecatedConfig(
 	return cfg
 }
 
+// SupersededBy is a deprecation option that indicates i is a direct
+// replacement for the deprecated variable(s).
+func SupersededBy(inputs ...Input) DeprecatedOption {
+	return option{
+		Deprecated: func(cfg *deprecatedConfig) {
+			for _, i := range inputs {
+				for _, v := range i.variables() {
+					variable.ApplyRelationship(
+						variable.IsSupersededBy{
+							Spec:         cfg.Spec.Peek(),
+							SupersededBy: v.Spec(),
+						},
+					)
+				}
+			}
+		},
+	}
+}
+
 // deprecated is a convenience function that registers and returns a
 // deprecated[T] that maps one-to-one with an environment variable of the same
 // type.

@@ -56,4 +56,32 @@ var _ = DescribeTable(
 				Optional(ferrite.WithRegistry(reg))
 		},
 	),
+	Entry(
+		"deprecated + superseded",
+		"deprecated-superseded.md",
+		func(reg *variable.Registry) {
+			addr := ferrite.
+				String(`BIND_HOST`, "listen host for the HTTP server").
+				WithDefault("0.0.0.0").
+				Required(ferrite.WithRegistry(reg))
+
+			port := ferrite.
+				NetworkPort("BIND_PORT", "listen port for the HTTP server").
+				WithDefault("8080").
+				Required(ferrite.WithRegistry(reg))
+
+			version := ferrite.
+				String("BIND_VERSION", "IP version for the HTTP server").
+				WithDefault("4").
+				Required(ferrite.WithRegistry(reg))
+
+			ferrite.
+				String("BIND_ADDRESS", "listen address for the HTTP server").
+				WithDefault("0.0.0.0:8080").
+				Deprecated(
+					ferrite.SupersededBy(addr, port, version),
+					ferrite.WithRegistry(reg),
+				)
+		},
+	),
 )

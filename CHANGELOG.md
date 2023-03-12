@@ -15,7 +15,8 @@ The format is based on [Keep a Changelog], and this project adheres to
 ### Added
 
 - Added `SeeAlso()` method to all builders, which links to another variable for documentation purposes
-- Added `WithRegistry()`
+- Added `WithRegistry()` option
+- Added `SupersededBy()` option
 
 ### Changed
 

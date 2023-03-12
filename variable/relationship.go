@@ -27,15 +27,19 @@ func ApplyRelationship(rel Relationship) {
 type RelationshipVisitor interface {
 	VisitRefersTo(RefersTo)
 	VisitIsReferredToBy(IsReferredToBy)
+	VisitSupersedes(Supersedes)
+	VisitIsSupersededBy(IsSupersededBy)
 }
 
 // FilterRelationships returns the relationships of s that are of type T.
 func FilterRelationships[T Relationship](s Spec) []T {
 	var result []T
+
 	for _, rel := range s.Relationships() {
 		if rel, ok := rel.(T); ok {
 			result = append(result, rel)
 		}
 	}
+
 	return result
 }
