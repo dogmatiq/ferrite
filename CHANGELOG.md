@@ -10,23 +10,23 @@ The format is based on [Keep a Changelog], and this project adheres to
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
-### Unreleased
+## [0.5.0] - 2023-03-12
 
 ### Added
 
 - Added `SeeAlso()` method to all builders, which links to another variable for documentation purposes
-- Added `WithRegistry()` option
-- Added `SupersededBy()` option
+- Added `SupersededBy()` option, which indicates which variables to use instead of a deprecated one
+- Added `WithRegistry()` option to allow registration of variables in custom variable registries
 
 ### Changed
 
-- **[BC]** Floating point variables no longer accepted `NaN`, `+Inf` or `-Inf` as valid values
-- **[BC]** `variable.Register()` now directly accepts a `Registry` instead of using functional options
+- **[BC]** Floating point variables no longer accept `NaN`, `+Inf` or `-Inf` as valid values
 - **[BC]** Replaced `WithConstraintFunc()` with `WithConstraint()`
+- `variable.Register()` now directly accepts a `Registry` instead of using functional options
 
 ### Removed
 
-- **[BC]** Removed `variable.Option` type and `variable.WithRegistry()` option
+- Removed `variable.Option` type and `variable.WithRegistry()` option
 
 ### Fixed
 
@@ -158,6 +158,7 @@ The two most important changes in usage are:
 [0.4.0]: https://github.com/dogmatiq/ferrite/releases/tag/v0.4.0
 [0.4.1]: https://github.com/dogmatiq/ferrite/releases/tag/v0.4.1
 [0.4.2]: https://github.com/dogmatiq/ferrite/releases/tag/v0.4.2
+[0.5.0]: https://github.com/dogmatiq/ferrite/releases/tag/v0.5.0
 
 <!-- version template
 ## [0.0.1] - YYYY-MM-DD
