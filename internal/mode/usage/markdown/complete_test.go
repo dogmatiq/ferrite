@@ -79,8 +79,10 @@ var _ = DescribeTable(
 				String("BIND_ADDRESS", "listen address for the HTTP server").
 				WithDefault("0.0.0.0:8080").
 				Deprecated(
-					ferrite.SupersededBy(addr, port, version),
 					ferrite.WithRegistry(reg),
+					ferrite.SupersededBy(addr),
+					ferrite.SupersededBy(port),
+					ferrite.SupersededBy(version),
 				)
 		},
 	),
