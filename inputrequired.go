@@ -29,11 +29,17 @@ type requiredConfig struct {
 
 // buildRequiredConfig returns a new requiredConfig, built from the given
 // options.
-func buildRequiredConfig(options ...RequiredOption) requiredConfig {
+func buildRequiredConfig(
+	spec variable.SpecBuilder,
+	options ...RequiredOption,
+) requiredConfig {
 	var cfg requiredConfig
+	cfg.Spec = spec
+
 	for _, opt := range options {
 		opt.applyRequiredOption(&cfg)
 	}
+
 	return cfg
 }
 
@@ -46,7 +52,7 @@ func required[T any, S variable.TypedSchema[T]](
 ) Required[T] {
 	spec.MarkRequired()
 
-	cfg := buildRequiredConfig(options...)
+	cfg := buildRequiredConfig(spec, options...)
 
 	v := variable.Register(
 		cfg.Registry,

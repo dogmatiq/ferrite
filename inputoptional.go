@@ -33,11 +33,17 @@ type optionalConfig struct {
 
 // buildOptionalConfig returns a new optionalConfig, built from the given
 // options.
-func buildOptionalConfig(options ...OptionalOption) optionalConfig {
+func buildOptionalConfig(
+	spec variable.SpecBuilder,
+	options ...OptionalOption,
+) optionalConfig {
 	var cfg optionalConfig
+	cfg.Spec = spec
+
 	for _, opt := range options {
 		opt.applyOptionalOption(&cfg)
 	}
+
 	return cfg
 }
 
@@ -48,7 +54,7 @@ func optional[T any, S variable.TypedSchema[T]](
 	spec *variable.TypedSpecBuilder[T],
 	options ...OptionalOption,
 ) Optional[T] {
-	cfg := buildOptionalConfig(options...)
+	cfg := buildOptionalConfig(spec, options...)
 
 	v := variable.Register(
 		cfg.Registry,

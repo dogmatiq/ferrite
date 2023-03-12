@@ -17,5 +17,6 @@ type Input interface {
 }
 
 type inputConfig struct {
+	Spec     variable.SpecBuilder
 	Registry *variable.Registry
 }

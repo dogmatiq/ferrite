@@ -33,11 +33,17 @@ type deprecatedConfig struct {
 
 // buildDeprecatedConfig returns a new deprecatedConfig, built from the given
 // options.
-func buildDeprecatedConfig(options ...DeprecatedOption) deprecatedConfig {
+func buildDeprecatedConfig(
+	spec variable.SpecBuilder,
+	options ...DeprecatedOption,
+) deprecatedConfig {
 	var cfg deprecatedConfig
+	cfg.Spec = spec
+
 	for _, opt := range options {
 		opt.applyDeprecatedOption(&cfg)
 	}
+
 	return cfg
 }
 
@@ -51,7 +57,7 @@ func deprecated[T any, S variable.TypedSchema[T]](
 ) Deprecated[T] {
 	spec.MarkDeprecated()
 
-	cfg := buildDeprecatedConfig(options...)
+	cfg := buildDeprecatedConfig(spec, options...)
 
 	v := variable.Register(
 		cfg.Registry,
