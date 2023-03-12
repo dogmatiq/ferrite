@@ -2,6 +2,8 @@ package wordwrap
 
 import (
 	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/rivo/uniseg"
 )
@@ -21,9 +23,12 @@ func Wrap(text string, width int) []string {
 		// [lower, upper) is the range within the text that holds the next line
 		// to be appended to the wrapped slice.
 		//
-		// If lower < mid < upper, mid is the position within [lower, upper)
-		// at which a line break CAN be made if neccessary.
-		lower, mid, upper pos
+		// If lower < mid < upper, mid is the position within [lower, upper) at
+		// which a line break CAN be made if neccessary.
+		//
+		// [lower, nonspace) is the range within [lower, upper) without trailing
+		// whitespace.
+		lower, mid, nonspace, upper pos
 
 		// remaining is the subset of text containing the grapheme clusters that
 		// have not yet been processed.
@@ -41,45 +46,55 @@ func Wrap(text string, width int) []string {
 		state = -1
 	)
 
-	// wrap writes the a line of text to the wrapped slice, if it is not empty.
-	wrap := func() {
-		if lower != upper {
-			line := text[lower.index:mid.index]
-			lower = mid
-			wrapped = append(wrapped, strings.TrimSpace(line))
+	wrap := func(force bool) {
+		if lower.index >= mid.index {
+			// wrap not possible
+			return
 		}
+
+		if !force && nonspace.width-lower.width <= width {
+			// wrap not needed
+			return
+		}
+
+		line := text[lower.index:mid.index]
+		lower = mid
+		wrapped = append(wrapped, strings.TrimSpace(line))
 	}
 
 	for len(remaining) > 0 {
 		cluster, remaining, boundaries, state = uniseg.Step(remaining, state)
 
 		clusterWidth := boundaries >> uniseg.ShiftWidth
-
 		upper.index += len(cluster)
 		upper.width += clusterWidth
+		if !isSpace(cluster) {
+			nonspace = upper
+		}
 
-		lineWidth := upper.width - lower.width
-		wrapNeeded := lineWidth > width
-		wrapPossible := lower.index < mid.index
+		wrap(false)
 
 		switch boundaries & uniseg.MaskLine {
 		case uniseg.LineCanBreak:
 			mid = upper
-			wrapPossible = true
 		case uniseg.LineMustBreak:
 			mid = upper
-			wrapNeeded = true
-			wrapPossible = true
+			wrap(true)
 		}
-
-		if wrapNeeded && wrapPossible {
-			wrap()
-		}
-
 	}
 
-	// Add any remaining text as the last line.
-	wrap()
-
 	return wrapped
+}
+
+func isSpace(cluster []byte) bool {
+	for len(cluster) > 0 {
+		r, n := utf8.DecodeRune(cluster)
+		if !unicode.IsSpace(r) {
+			return false
+		}
+
+		cluster = cluster[n:]
+	}
+
+	return true
 }

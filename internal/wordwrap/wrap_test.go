@@ -113,5 +113,23 @@ var _ = Describe("func Wrap()", func() {
 				"bar",
 			},
 		),
+		Entry(
+			"first part of hyphenated word falls exactly on max columns",
+			"⚠️ The `API_URL` variable is **deprecated**; its use is **NOT RECOMMENDED** as it may be removed in a future version. If defined, the value **MUST** be a fully-qualified URL.",
+			[]string{
+				"⚠️ The `API_URL` variable is **deprecated**; its use is **NOT RECOMMENDED** as",
+				"it may be removed in a future version. If defined, the value **MUST** be a",
+				"fully-qualified URL.",
+			},
+		),
+		Entry(
+			"second part of hyphenated word exceeds max columns",
+			"⚠️ The `WEIGHT` variable is **deprecated**; its use is **NOT RECOMMENDED** as it may be removed in a future version. If defined, the value **MUST** be a non-negative whole number.",
+			[]string{
+				"⚠️ The `WEIGHT` variable is **deprecated**; its use is **NOT RECOMMENDED** as it",
+				"may be removed in a future version. If defined, the value **MUST** be a non-",
+				"negative whole number.",
+			},
+		),
 	)
 })
