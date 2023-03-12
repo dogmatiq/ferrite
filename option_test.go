@@ -14,4 +14,20 @@ func Example_seeAlso() {
 	ferrite.
 		Bool("DEBUG", "enable or disable debugging features").
 		Optional(ferrite.SeeAlso(verbose))
+
+	// Output:
+}
+
+func Example_supersededBy() {
+	defer example()()
+
+	verbose := ferrite.
+		Bool("VERBOSE", "enable verbose logging").
+		Optional()
+
+	ferrite.
+		Bool("DEBUG", "enable debug logging").
+		Deprecated(ferrite.SupersededBy(verbose))
+
+	// Output:
 }

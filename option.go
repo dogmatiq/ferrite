@@ -1,10 +1,34 @@
 package ferrite
 
-import (
-	"github.com/dogmatiq/ferrite/variable"
-)
+import "github.com/dogmatiq/ferrite/variable"
 
-// option is an implementation of all of the XXXOption interfaces.
+// WithRegistry is an option that sets the variable registry to use.
+func WithRegistry(reg *variable.Registry) interface {
+	InitOption
+	DeprecatedOption
+	OptionalOption
+	RequiredOption
+} {
+	if reg == nil {
+		panic("registry must not be nil")
+	}
+
+	return option{
+		Init: func(opts *initConfig) {
+			opts.ModeConfig.Registry = reg
+		},
+		Input: func(opts *inputConfig) {
+			opts.Registry = reg
+		},
+	}
+}
+
+// option is an implementation of the InitOption, DeprecatedOption,
+// RequiredOption and OptionalOption interfaces.
+//
+// It is used to implement the various options. Functions that return options
+// should return an anonymous interface type that embeds one or more of the
+// option interfaces.
 type option struct {
 	Init       func(*initConfig)
 	Input      func(*inputConfig)
@@ -46,26 +70,5 @@ func (o option) applyRequiredOption(opts *requiredConfig) {
 
 	if o.Required != nil {
 		o.Required(opts)
-	}
-}
-
-// WithRegistry is an option that sets the variable registry to use.
-func WithRegistry(reg *variable.Registry) interface {
-	InitOption
-	DeprecatedOption
-	OptionalOption
-	RequiredOption
-} {
-	if reg == nil {
-		panic("registry must not be nil")
-	}
-
-	return option{
-		Init: func(opts *initConfig) {
-			opts.ModeConfig.Registry = reg
-		},
-		Input: func(opts *inputConfig) {
-			opts.Registry = reg
-		},
 	}
 }

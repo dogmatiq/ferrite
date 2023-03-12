@@ -18,7 +18,7 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Changed
 
-- **[BC]** `SupersededBy()` now only accepts a single input
+- **[BC]** `SupersededBy()` now accepts a single input and variadic options
 
 ### Removed
 

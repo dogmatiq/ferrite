@@ -18,8 +18,7 @@ func SeeAlso(i Input, options ...SeeAlsoOption) interface {
 	}
 }
 
-// SeeAlsoOption changes the behavior of a call the SeeAlso() method of the
-// various builder implementations.
+// SeeAlsoOption changes the behavior of the SeeAlso() option.
 type SeeAlsoOption interface {
 	applySeeAlsoOption(*variable.RefersTo)
 }
