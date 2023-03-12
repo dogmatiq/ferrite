@@ -1,13 +1,11 @@
 package ferrite_test
 
 import (
-	"errors"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/dogmatiq/ferrite"
-	"github.com/dogmatiq/ferrite/variable"
 )
 
 func ExampleInit_validation() {
@@ -323,13 +321,10 @@ func ExampleInit_validationWithInvalidValues() {
 	os.Setenv("FERRITE_STRING", "foo bar")
 	ferrite.
 		String("FERRITE_STRING", "example string").
-		WithConstraintFunc(
-			"MUST NOT contain whitespace",
-			func(s string) variable.ConstraintError {
-				if strings.ContainsRune(s, ' ') {
-					return errors.New("must not contain whitespace")
-				}
-				return nil
+		WithConstraint(
+			"must not contain whitespace",
+			func(s string) bool {
+				return !strings.ContainsRune(s, ' ')
 			},
 		).
 		Required()
@@ -337,13 +332,10 @@ func ExampleInit_validationWithInvalidValues() {
 	os.Setenv("FERRITE_STRING_SENSITIVE", "foo bar")
 	ferrite.
 		String("FERRITE_STRING_SENSITIVE", "example sensitive string").
-		WithConstraintFunc(
-			"MUST NOT contain whitespace",
-			func(s string) variable.ConstraintError {
-				if strings.ContainsRune(s, ' ') {
-					return errors.New("must not contain whitespace")
-				}
-				return nil
+		WithConstraint(
+			"must not contain whitespace",
+			func(s string) bool {
+				return !strings.ContainsRune(s, ' ')
 			},
 		).
 		WithSensitiveContent().

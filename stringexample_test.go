@@ -1,12 +1,10 @@
 package ferrite_test
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
 	"github.com/dogmatiq/ferrite"
-	"github.com/dogmatiq/ferrite/variable"
 )
 
 func ExampleString_required() {
@@ -66,10 +64,12 @@ func ExampleString_sensitive() {
 	os.Setenv("FERRITE_STRING", "hunter2")
 	ferrite.
 		String("FERRITE_STRING", "example sensitive string variable").
-		WithConstraintFunc(
+		WithConstraint(
 			"always fail",
-			func(s string) variable.ConstraintError {
-				return errors.New("always fail")
+			func(s string) bool {
+				// Force the variable to be considered invalid so that the
+				// variable table is rendered to the console.
+				return false
 			},
 		).
 		WithSensitiveContent().

@@ -57,11 +57,21 @@ func (b *TypedSpecBuilder[T]) BuiltInConstraint(
 // UserConstraint adds a user-defined constraint to the variable's value.
 func (b *TypedSpecBuilder[T]) UserConstraint(
 	desc string,
-	fn func(T) ConstraintError,
+	fn func(T) bool,
 ) {
 	b.spec.constraints = append(
 		b.spec.constraints,
-		constraint[T]{desc, true, fn},
+		constraint[T]{
+			desc,
+			true,
+			func(v T) ConstraintError {
+				if fn(v) {
+					return nil
+				}
+
+				return errors.New(desc)
+			},
+		},
 	)
 }
 

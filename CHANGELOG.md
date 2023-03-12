@@ -22,6 +22,7 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 - **[BC]** Floating point variables no longer accepted `NaN`, `+Inf` or `-Inf` as valid values
 - **[BC]** `variable.Register()` now directly accepts a `Registry` instead of using functional options
+- **[BC]** Replaced `WithConstraintFunc()` with `WithConstraint()`
 
 ### Removed
 
