@@ -47,7 +47,7 @@ func (r *renderer) renderKubernetesExample() {
 
 	r.gap()
 	r.line("Alternatively, the environment variables can be defined within a %s", r.link("config map", "kubernetes config map"))
-	r.line("then referenced a deployment manifest using `configMapRef`.")
+	r.line("then referenced from a deployment manifest using `configMapRef`.")
 	r.gap()
 
 	r.line("```yaml")

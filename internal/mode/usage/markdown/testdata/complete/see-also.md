@@ -75,7 +75,7 @@ spec:
 ```
 
 Alternatively, the environment variables can be defined within a [config map][kubernetes config map]
-then referenced a deployment manifest using `configMapRef`.
+then referenced from a deployment manifest using `configMapRef`.
 
 ```yaml
 apiVersion: v1
