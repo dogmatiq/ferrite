@@ -33,7 +33,7 @@ func (r *specRenderer) Render() {
 	}
 
 	r.renderUnimportantDocumentation()
-	r.renderRelationships()
+	r.renderSeeAlso()
 }
 
 // VisitNumeric renders the primary requirement for spec that uses the "numeric"

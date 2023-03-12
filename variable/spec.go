@@ -46,8 +46,8 @@ type Spec interface {
 	// Relationships returns a list of relationships that involve this variable.
 	Relationships() []Relationship
 
-	// AddRelationship adds a relationship that involves this variable.
-	AddRelationship(r Relationship)
+	// addRelationship adds a relationship that involves this variable.
+	addRelationship(r Relationship)
 }
 
 // IsDefault returns true if v is the default value of the given spec.
@@ -137,7 +137,7 @@ func (s TypedSpec[T]) Relationships() []Relationship {
 }
 
 // AddRelationship adds a relationship that involves this variable.
-func (s *TypedSpec[T]) AddRelationship(r Relationship) {
+func (s *TypedSpec[T]) addRelationship(r Relationship) {
 	s.relationships = append(s.relationships, r)
 }
 

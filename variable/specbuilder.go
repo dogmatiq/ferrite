@@ -15,7 +15,6 @@ type SpecBuilder interface {
 	MarkDeprecated()
 	MarkSensitive()
 	Documentation() DocumentationBuilder
-	Relationship(Relationship)
 	Peek() Spec
 }
 
@@ -108,11 +107,6 @@ func (b *TypedSpecBuilder[T]) Documentation() DocumentationBuilder {
 	return DocumentationBuilder{
 		docs: &b.spec.docs,
 	}
-}
-
-// Relationship adds a relationship that involves this variable.
-func (b *TypedSpecBuilder[T]) Relationship(rel Relationship) {
-	b.spec.AddRelationship(rel)
 }
 
 // Peek returns the (potentially invalid) spec that is being built.
