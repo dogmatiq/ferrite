@@ -10,15 +10,24 @@ import (
 	"github.com/dogmatiq/ferrite/internal/mode/validate"
 )
 
-// Init initializes ferrite.
+// Init initializes Ferrite.
 //
-// By default it validates all of the environment variables that have been
-// defined. If any environment variables are invalid it prints a report
-// describing the problems and exits the process with a non-zero exit code.
+// Different modes can be selected by setting the `FERRITE_MODE` environment
+// variable.
 //
-// If the FERRITE_MODE environment variable is set to "usage/markdown" it prints
-// information about the environment variables in Markdown format, then exits
-// the process successfully.
+// "validate" mode: This is the default mode. If one or more environment
+// variables are invalid, this mode renders a description of all declared
+// environment variables and their associated values and validation failures to
+// `STDERR`, then exits the process with a non-zero exit code.
+//
+// It also shows warnings if deprecated environment variables are used.
+//
+// "usage/markdown" mode: This mode renders Markdown documentation about the
+// environment variables to `STDOUT`. The output is designed to be included in
+// the application's `README.md` file or a similar file.
+//
+// "export/dotenv" mode: This mode renders environment variables to `STDOUT` in
+// a format suitable for use as a `.env` file.
 func Init(options ...InitOption) {
 	cfg := initConfig{
 		mode.DefaultConfig,
