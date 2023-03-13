@@ -8,11 +8,11 @@ func Example_seeAlso() {
 	defer example()()
 
 	verbose := ferrite.
-		Bool("VERBOSE", "enable verbose logging").
+		Bool("FERRITE_VERBOSE", "enable verbose logging").
 		Optional()
 
 	ferrite.
-		Bool("DEBUG", "enable or disable debugging features").
+		Bool("FERRITE_DEBUG", "enable or disable debugging features").
 		Optional(ferrite.SeeAlso(verbose))
 
 	// Output:

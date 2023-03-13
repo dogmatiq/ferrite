@@ -81,7 +81,7 @@ func (o option) applyRefersToOption(r *variable.RefersTo) {
 	}
 }
 
-func (o option) applySupersededByOption(r *variable.Supersedes) {
+func (o option) applySupersedesOption(r *variable.Supersedes) {
 	if o.Supersedes != nil {
 		o.Supersedes(r)
 	}

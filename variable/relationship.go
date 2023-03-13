@@ -1,12 +1,9 @@
 package variable
 
-import "errors"
-
 // Relationship represents a relationship between two variables.
 type Relationship interface {
 	subject() Spec
 	object() Spec
-	conflictsWith(rel Relationship) bool
 }
 
 // AddRelationship adds the relationship to the subject and related variable
@@ -14,18 +11,6 @@ type Relationship interface {
 func AddRelationship(rel Relationship) error {
 	sub := rel.subject()
 	obj := rel.object()
-
-	for _, x := range sub.Relationships() {
-		if x.conflictsWith(rel) || rel.conflictsWith(x) {
-			return errors.New("<error>")
-		}
-	}
-
-	for _, x := range obj.Relationships() {
-		if x.conflictsWith(rel) || rel.conflictsWith(x) {
-			return errors.New("<error>")
-		}
-	}
 
 	sub.addRelationship(rel)
 	obj.addRelationship(rel)
@@ -77,14 +62,6 @@ func (r Supersedes) object() Spec {
 	return r.Supersedes
 }
 
-func (r Supersedes) conflictsWith(rel Relationship) bool {
-	if rel, ok := rel.(Supersedes); ok {
-		return rel.Subject == r.Supersedes &&
-			rel.Supersedes == r.Subject
-	}
-	return false
-}
-
 // RefersTo is a relationship type that indicates that a variable refers to
 // another variable for information/documentation purposes.
 type RefersTo struct {
@@ -97,8 +74,4 @@ func (r RefersTo) subject() Spec {
 
 func (r RefersTo) object() Spec {
 	return r.RefersTo
-}
-
-func (r RefersTo) conflictsWith(rel Relationship) bool {
-	return false
 }
