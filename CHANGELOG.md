@@ -18,7 +18,8 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Changed
 
-- **[BC]** `SupersededBy()` now accepts a single input and variadic options
+- **[BC]** `SupersededBy()` now accepts a single variable set and variadic options
+- **[BC]** Renamed `Input` to `VariableSet`
 
 ### Removed
 

@@ -14,10 +14,10 @@ func WithRegistry(reg *variable.Registry) interface {
 	}
 
 	return option{
-		Init: func(opts *initConfig) {
+		ApplyToInitConfig: func(opts *initConfig) {
 			opts.ModeConfig.Registry = reg
 		},
-		Input: func(opts *inputConfig) {
+		ApplyToSetConfig: func(opts *variableSetConfig) {
 			opts.Registry = reg
 		},
 	}
@@ -28,61 +28,61 @@ func WithRegistry(reg *variable.Registry) interface {
 // Functions that return options should return an anonymous interface type that
 // embeds one or more of the option interfaces.
 type option struct {
-	Init func(*initConfig)
+	ApplyToInitConfig func(*initConfig)
 
-	Input      func(*inputConfig)
-	Deprecated func(*deprecatedConfig)
-	Optional   func(*optionalConfig)
-	Required   func(*requiredConfig)
+	ApplyToSetConfig           func(*variableSetConfig)
+	ApplyToSpec                func(variable.SpecBuilder)
+	ApplyToRequiredSetConfig   func(*variableSetConfig)
+	ApplyToSpecInRequiredSet   func(variable.SpecBuilder)
+	ApplyToOptionalSetConfig   func(*variableSetConfig)
+	ApplyToSpecInOptionalSet   func(variable.SpecBuilder)
+	ApplyToDeprecatedSetConfig func(*variableSetConfig)
+	ApplyToSpecInDeprecatedSet func(variable.SpecBuilder)
 
-	RefersTo   func(*variable.RefersTo)
-	Supersedes func(*variable.Supersedes)
+	ApplyToRefersToRelationship   func(*variable.RefersTo)
+	ApplyToSupersedesRelationship func(*variable.Supersedes)
 }
 
 func (o option) applyInitOption(opts *initConfig) {
-	if o.Init != nil {
-		o.Init(opts)
-	}
+	applyOption(opts, o.ApplyToInitConfig)
 }
 
-func (o option) applyDeprecatedOption(opts *deprecatedConfig) {
-	if o.Input != nil {
-		o.Input(&opts.inputConfig)
-	}
-
-	if o.Deprecated != nil {
-		o.Deprecated(opts)
-	}
+func (o option) applyRequiredOptionToConfig(opts *variableSetConfig) {
+	applyOption(opts, o.ApplyToSetConfig, o.ApplyToRequiredSetConfig)
 }
 
-func (o option) applyOptionalOption(opts *optionalConfig) {
-	if o.Input != nil {
-		o.Input(&opts.inputConfig)
-	}
-
-	if o.Optional != nil {
-		o.Optional(opts)
-	}
+func (o option) applyRequiredOptionToSpec(spec variable.SpecBuilder) {
+	applyOption(spec, o.ApplyToSpec, o.ApplyToSpecInRequiredSet)
 }
 
-func (o option) applyRequiredOption(opts *requiredConfig) {
-	if o.Input != nil {
-		o.Input(&opts.inputConfig)
-	}
+func (o option) applyOptionalOptionToConfig(opts *variableSetConfig) {
+	applyOption(opts, o.ApplyToSetConfig, o.ApplyToOptionalSetConfig)
+}
 
-	if o.Required != nil {
-		o.Required(opts)
-	}
+func (o option) applyOptionalOptionToSpec(spec variable.SpecBuilder) {
+	applyOption(spec, o.ApplyToSpec, o.ApplyToSpecInOptionalSet)
+}
+
+func (o option) applyDeprecatedOptionToConfig(opts *variableSetConfig) {
+	applyOption(opts, o.ApplyToSetConfig, o.ApplyToDeprecatedSetConfig)
+}
+
+func (o option) applyDeprecatedOptionToSpec(spec variable.SpecBuilder) {
+	applyOption(spec, o.ApplyToSpec, o.ApplyToSpecInDeprecatedSet)
 }
 
 func (o option) applyRefersToOption(r *variable.RefersTo) {
-	if o.RefersTo != nil {
-		o.RefersTo(r)
-	}
+	applyOption(r, o.ApplyToRefersToRelationship)
 }
 
 func (o option) applySupersedesOption(r *variable.Supersedes) {
-	if o.Supersedes != nil {
-		o.Supersedes(r)
+	applyOption(r, o.ApplyToSupersedesRelationship)
+}
+
+func applyOption[T any](cfg T, funcs ...func(T)) {
+	for _, fn := range funcs {
+		if fn != nil {
+			fn(cfg)
+		}
 	}
 }

@@ -20,8 +20,8 @@ func (a KubernetesAddress) String() string {
 	return net.JoinHostPort(a.Host, a.Port)
 }
 
-// KubernetesService reads Kubernetes service discovery environment variables for a
-// service's port.
+// KubernetesService configures environment variables used to obtain the network
+// address of a specific Kubernetes service.
 //
 // svc is the name of the Kubernetes service, NOT the environment variable.
 //
@@ -152,22 +152,26 @@ func (b *KubernetesServiceBuilder) WithDefault(host, port string) *KubernetesSer
 	return b
 }
 
-// Required completes the build process and registers a required variable with
+// Required completes the build process and registers required variables with
 // Ferrite's validation system.
 func (b *KubernetesServiceBuilder) Required(options ...RequiredOption) Required[KubernetesAddress] {
 	b.hostSpec.MarkRequired()
 	b.portSpec.MarkRequired()
 
-	hostConfig := buildRequiredConfig(&b.hostSpec, options...)
-	portConfig := buildRequiredConfig(&b.portSpec, options...)
+	var cfg variableSetConfig
+	for _, opt := range options {
+		opt.applyRequiredOptionToConfig(&cfg)
+		opt.applyRequiredOptionToSpec(&b.hostSpec)
+		opt.applyRequiredOptionToSpec(&b.portSpec)
+	}
 
 	host := variable.Register(
-		hostConfig.Registry,
+		cfg.Registry,
 		b.hostSpec.Done(b.hostSchema),
 	)
 
 	port := variable.Register(
-		portConfig.Registry,
+		cfg.Registry,
 		b.portSpec.Done(b.portSchema),
 	)
 
@@ -197,19 +201,23 @@ func (b *KubernetesServiceBuilder) Required(options ...RequiredOption) Required[
 	}
 }
 
-// Optional completes the build process and registers an optional variable with
+// Optional completes the build process and registers optional variables with
 // Ferrite's validation system.
 func (b *KubernetesServiceBuilder) Optional(options ...OptionalOption) Optional[KubernetesAddress] {
-	hostConfig := buildOptionalConfig(&b.hostSpec, options...)
-	portConfig := buildOptionalConfig(&b.portSpec, options...)
+	var cfg variableSetConfig
+	for _, opt := range options {
+		opt.applyOptionalOptionToConfig(&cfg)
+		opt.applyOptionalOptionToSpec(&b.hostSpec)
+		opt.applyOptionalOptionToSpec(&b.portSpec)
+	}
 
 	host := variable.Register(
-		hostConfig.Registry,
+		cfg.Registry,
 		b.hostSpec.Done(b.hostSchema),
 	)
 
 	port := variable.Register(
-		portConfig.Registry,
+		cfg.Registry,
 		b.portSpec.Done(b.portSchema),
 	)
 
@@ -219,22 +227,26 @@ func (b *KubernetesServiceBuilder) Optional(options ...OptionalOption) Optional[
 	}
 }
 
-// Deprecated completes the build process and registers a deprecated variable
+// Deprecated completes the build process and registers deprecated variables
 // with Ferrite's validation system.
 func (b *KubernetesServiceBuilder) Deprecated(options ...DeprecatedOption) Deprecated[KubernetesAddress] {
 	b.hostSpec.MarkDeprecated()
 	b.portSpec.MarkDeprecated()
 
-	hostConfig := buildDeprecatedConfig(&b.hostSpec, options...)
-	portConfig := buildDeprecatedConfig(&b.portSpec, options...)
+	var cfg variableSetConfig
+	for _, opt := range options {
+		opt.applyDeprecatedOptionToConfig(&cfg)
+		opt.applyDeprecatedOptionToSpec(&b.hostSpec)
+		opt.applyDeprecatedOptionToSpec(&b.portSpec)
+	}
 
 	host := variable.Register(
-		hostConfig.Registry,
+		cfg.Registry,
 		b.hostSpec.Done(b.hostSchema),
 	)
 
 	port := variable.Register(
-		portConfig.Registry,
+		cfg.Registry,
 		b.portSpec.Done(b.portSchema),
 	)
 

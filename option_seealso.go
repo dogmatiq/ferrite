@@ -2,17 +2,17 @@ package ferrite
 
 import "github.com/dogmatiq/ferrite/variable"
 
-// SeeAlso is an option that adds i to the "see also" section of the generated
-// documentation.
-func SeeAlso(i Input, options ...SeeAlsoOption) interface {
+// SeeAlso is an option that the variables in s to the "see also" section of the
+// generated documentation.
+func SeeAlso(s VariableSet, options ...SeeAlsoOption) interface {
 	DeprecatedOption
 	RequiredOption
 	OptionalOption
 } {
 	return option{
-		Input: func(cfg *inputConfig) {
-			for _, v := range i.variables() {
-				seeAlso(cfg.Spec.Peek(), v.Spec(), options...)
+		ApplyToSpec: func(spec variable.SpecBuilder) {
+			for _, v := range s.variables() {
+				seeAlso(spec.Peek(), v.Spec(), options...)
 			}
 		},
 	}

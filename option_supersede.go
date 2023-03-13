@@ -2,15 +2,15 @@ package ferrite
 
 import "github.com/dogmatiq/ferrite/variable"
 
-// SupersededBy is a deprecation option that indicates i is a direct
-// replacement for the deprecated variable(s).
-func SupersededBy(i Input, options ...SupersededByOption) DeprecatedOption {
+// SupersededBy is a deprecation option that indicates the variables in s should
+// be used instead of the deprecated variable(s).
+func SupersededBy(s VariableSet, options ...SupersededByOption) DeprecatedOption {
 	return option{
-		Deprecated: func(cfg *deprecatedConfig) {
-			for _, v := range i.variables() {
+		ApplyToSpecInDeprecatedSet: func(spec variable.SpecBuilder) {
+			for _, v := range s.variables() {
 				rel := variable.Supersedes{
 					Subject:    v.Spec(),
-					Supersedes: cfg.Spec.Peek(),
+					Supersedes: spec.Peek(),
 				}
 
 				for _, opt := range options {
