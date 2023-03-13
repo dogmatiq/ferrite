@@ -2,8 +2,8 @@ package ferrite
 
 import "github.com/dogmatiq/ferrite/variable"
 
-// SupersededBy is a deprecation option that indicates the variables in s should
-// be used instead of the deprecated variable(s).
+// SupersededBy is a option for a deprecated variable set that indicates the
+// variables in another set, s, should be used instead.
 func SupersededBy(s VariableSet, options ...SupersededByOption) DeprecatedOption {
 	return option{
 		ApplyToSpecInDeprecatedSet: func(spec variable.SpecBuilder) {

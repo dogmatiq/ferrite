@@ -2,27 +2,6 @@ package ferrite
 
 import "github.com/dogmatiq/ferrite/variable"
 
-// WithRegistry is an option that sets the variable registry to use.
-func WithRegistry(reg *variable.Registry) interface {
-	InitOption
-	DeprecatedOption
-	OptionalOption
-	RequiredOption
-} {
-	if reg == nil {
-		panic("registry must not be nil")
-	}
-
-	return option{
-		ApplyToInitConfig: func(opts *initConfig) {
-			opts.ModeConfig.Registry = reg
-		},
-		ApplyToSetConfig: func(opts *variableSetConfig) {
-			opts.Registry = reg
-		},
-	}
-}
-
 // option is an implementation of various option interfaces.
 //
 // Functions that return options should return an anonymous interface type that
