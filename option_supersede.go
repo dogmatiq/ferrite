@@ -8,16 +8,16 @@ func SupersededBy(i Input, options ...SupersededByOption) DeprecatedOption {
 	return option{
 		Deprecated: func(cfg *deprecatedConfig) {
 			for _, v := range i.variables() {
-				rel := variable.SupersededBy{
-					Sub:          cfg.Spec.Peek(),
-					SupersededBy: v.Spec(),
+				rel := variable.Supersedes{
+					Subject:    v.Spec(),
+					Supersedes: cfg.Spec.Peek(),
 				}
 
 				for _, opt := range options {
-					opt.applySupersededByOption(&rel)
+					opt.applySupersedesOption(&rel)
 				}
 
-				if err := variable.ApplyRelationship(rel); err != nil {
+				if err := variable.AddRelationship(rel); err != nil {
 					panic(err.Error())
 				}
 			}
@@ -27,5 +27,5 @@ func SupersededBy(i Input, options ...SupersededByOption) DeprecatedOption {
 
 // SupersededByOption changes the behavior of the SupersededBy() option.
 type SupersededByOption interface {
-	applySupersededByOption(*variable.SupersededBy)
+	applySupersedesOption(*variable.Supersedes)
 }

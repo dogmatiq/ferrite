@@ -35,8 +35,8 @@ type option struct {
 	Optional   func(*optionalConfig)
 	Required   func(*requiredConfig)
 
-	RefersTo     func(*variable.RefersTo)
-	SupersededBy func(*variable.SupersededBy)
+	RefersTo   func(*variable.RefersTo)
+	Supersedes func(*variable.Supersedes)
 }
 
 func (o option) applyInitOption(opts *initConfig) {
@@ -81,8 +81,8 @@ func (o option) applyRefersToOption(r *variable.RefersTo) {
 	}
 }
 
-func (o option) applySupersededByOption(r *variable.SupersededBy) {
-	if o.SupersededBy != nil {
-		o.SupersededBy(r)
+func (o option) applySupersededByOption(r *variable.Supersedes) {
+	if o.Supersedes != nil {
+		o.Supersedes(r)
 	}
 }

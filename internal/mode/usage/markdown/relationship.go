@@ -5,7 +5,7 @@ import (
 )
 
 func (r *specRenderer) renderSeeAlso() {
-	relationships := variable.FilterRelationships[variable.RefersTo](r.spec)
+	relationships := variable.Relationships[variable.RefersTo](r.spec)
 	if len(relationships) == 0 {
 		return
 	}
@@ -15,6 +15,6 @@ func (r *specRenderer) renderSeeAlso() {
 	r.ren.gap()
 
 	for _, rel := range relationships {
-		r.ren.renderIndexItem(rel.Related())
+		r.ren.renderIndexItem(rel.RefersTo)
 	}
 }

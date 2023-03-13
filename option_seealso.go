@@ -28,7 +28,7 @@ func seeAlso(
 	options ...SeeAlsoOption,
 ) {
 	rel := variable.RefersTo{
-		Sub:      from,
+		Subject:  from,
 		RefersTo: to,
 	}
 
@@ -36,7 +36,7 @@ func seeAlso(
 		opt.applyRefersToOption(&rel)
 	}
 
-	if err := variable.ApplyRelationship(rel); err != nil {
+	if err := variable.AddRelationship(rel); err != nil {
 		panic(err.Error())
 	}
 }
