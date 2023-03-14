@@ -1,7 +1,6 @@
 package ferrite
 
 import (
-	"github.com/dogmatiq/ferrite/maybe"
 	"github.com/dogmatiq/ferrite/variable"
 )
 
@@ -9,7 +8,6 @@ import (
 // due to the environment variables not being defined.
 type Deprecated[T any] interface {
 	VariableSet
-	TypedVariableSet[T]
 
 	// DeprecatedValue returns the parsed and validated value built from the
 	// environment variable(s).
@@ -74,11 +72,11 @@ func (s deprecatedFunc[T]) DeprecatedValue() (T, bool) {
 	return n, ok
 }
 
-func (s deprecatedFunc[T]) value() maybe.Value[T] {
+func (s deprecatedFunc[T]) value() any {
 	if n, ok, _ := s.fn(); ok {
-		return maybe.Some(n)
+		return n
 	}
-	return maybe.None[T]()
+	return nil
 }
 
 func (s deprecatedFunc[T]) variables() []variable.Any {

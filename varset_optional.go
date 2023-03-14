@@ -1,7 +1,6 @@
 package ferrite
 
 import (
-	"github.com/dogmatiq/ferrite/maybe"
 	"github.com/dogmatiq/ferrite/variable"
 )
 
@@ -9,7 +8,6 @@ import (
 // to the environment variables not being defined.
 type Optional[T any] interface {
 	VariableSet
-	TypedVariableSet[T]
 
 	// Value returns the parsed and validated value.
 	//
@@ -71,11 +69,11 @@ func (s optionalFunc[T]) Value() (T, bool) {
 	return n, ok
 }
 
-func (s optionalFunc[T]) value() maybe.Value[T] {
+func (s optionalFunc[T]) value() any {
 	if n, ok, _ := s.fn(); ok {
-		return maybe.Some(n)
+		return n
 	}
-	return maybe.None[T]()
+	return nil
 }
 
 func (s optionalFunc[T]) variables() []variable.Any {

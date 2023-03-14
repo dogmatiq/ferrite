@@ -1,7 +1,6 @@
 package ferrite
 
 import (
-	"github.com/dogmatiq/ferrite/maybe"
 	"github.com/dogmatiq/ferrite/variable"
 )
 
@@ -15,12 +14,7 @@ import (
 // builders produce sets containing multiple variables.
 type VariableSet interface {
 	variables() []variable.Any
-}
-
-// TypedVariableSet is a VariableSet that produces a value of type T.
-type TypedVariableSet[T any] interface {
-	VariableSet
-	value() maybe.Value[T]
+	value() any
 }
 
 // variableSetConfig encapsulates configuration common to all variable sets.

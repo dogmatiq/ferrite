@@ -1,7 +1,6 @@
 package ferrite
 
 import (
-	"github.com/dogmatiq/ferrite/maybe"
 	"github.com/dogmatiq/ferrite/variable"
 )
 
@@ -10,7 +9,6 @@ import (
 // back to defaults.
 type Required[T any] interface {
 	VariableSet
-	TypedVariableSet[T]
 
 	// Value returns the parsed and validated value.
 	//
@@ -69,12 +67,11 @@ func (s requiredFunc[T]) Value() T {
 	return n
 }
 
-func (s requiredFunc[T]) value() maybe.Value[T] {
+func (s requiredFunc[T]) value() any {
 	if n, err := s.fn(); err == nil {
-		return maybe.Some(n)
+		return n
 	}
-	return maybe.None[T]()
-
+	return nil
 }
 
 func (s requiredFunc[T]) variables() []variable.Any {

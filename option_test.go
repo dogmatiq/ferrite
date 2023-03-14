@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/dogmatiq/ferrite"
-	"github.com/dogmatiq/ferrite/is"
 )
 
 func ExampleSeeAlso() {
@@ -40,27 +39,52 @@ func ExampleSupersededBy() {
 	// Output:
 }
 
-func ExampleIgnoreIf() {
+func ExampleRelevantIf_whenRelevant() {
 	defer example()()
 
-	enabled := ferrite.
+	widgetEnabled := ferrite.
 		Bool("FERRITE_WIDGET_ENABLED", "enable the widget").
 		Required()
 
-	speed := ferrite.
+	widgetSpeed := ferrite.
 		Unsigned[uint]("FERRITE_WIDGET_SPEED", "set the speed of the widget").
-		Optional(ferrite.IgnoreIf(enabled, is.Equal(false)))
+		Optional(ferrite.RelevantIf(widgetEnabled))
+
+	os.Setenv("FERRITE_WIDGET_SPEED", "100")    // define the speed
+	os.Setenv("FERRITE_WIDGET_ENABLED", "true") // and enable the widget
+	ferrite.Init()
+
+	if x, ok := widgetSpeed.Value(); ok {
+		fmt.Println("value is", x)
+	} else {
+		fmt.Println("value is not relevant")
+	}
+
+	// Output:
+	// value is 100
+}
+
+func ExampleRelevantIf_whenNotRelevant() {
+	defer example()()
+
+	widgetEnabled := ferrite.
+		Bool("FERRITE_WIDGET_ENABLED", "enable the widget").
+		Required()
+
+	widgetSpeed := ferrite.
+		Unsigned[uint]("FERRITE_WIDGET_SPEED", "set the speed of the widget").
+		Optional(ferrite.RelevantIf(widgetEnabled))
 
 	os.Setenv("FERRITE_WIDGET_SPEED", "100")     // define the speed
 	os.Setenv("FERRITE_WIDGET_ENABLED", "false") // but disable the widget
 	ferrite.Init()
 
-	if x, ok := speed.Value(); ok {
+	if x, ok := widgetSpeed.Value(); ok {
 		fmt.Println("value is", x)
 	} else {
-		fmt.Println("value is ignored")
+		fmt.Println("value is not relevant")
 	}
 
 	// Output:
-	// value is ignored
+	// value is not relevant
 }

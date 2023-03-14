@@ -15,7 +15,7 @@ The format is based on [Keep a Changelog], and this project adheres to
 ### Added
 
 - Added `SeeAlso()` option
-- Added `IgnoreIf()` option
+- Added `RelevantIf()` option
 
 ### Changed
 
