@@ -92,8 +92,16 @@ func KubernetesService(svc string) *KubernetesServiceBuilder {
 
 	buildNetworkPortSyntaxDocumentation(b.portBuilder.Documentation())
 
-	seeAlso(b.hostBuilder.Peek(), b.portBuilder.Peek())
-	seeAlso(b.portBuilder.Peek(), b.hostBuilder.Peek())
+	variable.EstablishRelationships(
+		variable.RefersTo{
+			Subject:  b.hostBuilder.Peek(),
+			RefersTo: b.portBuilder.Peek(),
+		},
+		variable.RefersTo{
+			Subject:  b.portBuilder.Peek(),
+			RefersTo: b.hostBuilder.Peek(),
+		},
+	)
 
 	return b
 }

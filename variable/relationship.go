@@ -6,16 +6,14 @@ type Relationship interface {
 	object() Spec
 }
 
-// AddRelationship adds the relationship to the subject and related variable
-// specifications.
-func AddRelationship(rel Relationship) error {
-	sub := rel.subject()
-	obj := rel.object()
-
-	sub.addRelationship(rel)
-	obj.addRelationship(rel)
-
-	return nil
+// EstablishRelationships establishes the given relationships.
+func EstablishRelationships(relationships ...Relationship) {
+	for _, rel := range relationships {
+		sub := rel.subject()
+		obj := rel.object()
+		sub.addRelationship(rel)
+		obj.addRelationship(rel)
+	}
 }
 
 // Relationships returns a list of relationships where s is the subject.
