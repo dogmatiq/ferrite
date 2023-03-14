@@ -22,11 +22,11 @@ func Example_supersededBy() {
 	defer example()()
 
 	verbose := ferrite.
-		Bool("VERBOSE", "enable verbose logging").
+		Bool("FERRITE_VERBOSE", "enable verbose logging").
 		Optional()
 
 	ferrite.
-		Bool("DEBUG", "enable debug logging").
+		Bool("FERRITE_DEBUG", "enable debug logging").
 		Deprecated(ferrite.SupersededBy(verbose))
 
 	// Output:
