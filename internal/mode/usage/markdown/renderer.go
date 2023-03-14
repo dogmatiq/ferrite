@@ -65,7 +65,7 @@ func (r *renderer) line(f string, v ...any) {
 	}
 }
 
-func (r *renderer) paragraph(text ...string) func(...any) {
+func (r *renderer) paragraphf(text ...string) func(...any) {
 	return func(v ...any) {
 		text := fmt.Sprintf(strings.Join(text, " "), v...)
 
@@ -76,10 +76,60 @@ func (r *renderer) paragraph(text ...string) func(...any) {
 	}
 }
 
+func (r *renderer) paragraph(
+	fn func(
+		func(string, ...any),
+	),
+) {
+	var w strings.Builder
+
+	fn(func(f string, v ...any) {
+		fmt.Fprintf(&w, f, v...)
+	})
+
+	r.paragraphf("%s")(w.String())
+}
+
 func (r *renderer) yaml(v string) string {
 	data, err := yaml.Marshal(v)
 	if err != nil {
 		panic(err)
 	}
 	return strings.TrimSpace(string(data))
+}
+
+func andList[T any](
+	parts []T,
+	format func(T) string,
+) string {
+	return inlineList(parts, format, ", ", " and ")
+}
+
+func orList[T any](
+	parts []T,
+	format func(T) string,
+) string {
+	return inlineList(parts, format, ", ", " or ")
+}
+
+func inlineList[T any](
+	parts []T,
+	format func(T) string,
+	sep, lastSep string,
+) string {
+	w := &strings.Builder{}
+
+	for i, s := range parts {
+		if i > 0 {
+			if i == len(parts)-1 {
+				w.WriteString(lastSep)
+			} else {
+				w.WriteString(sep)
+			}
+		}
+
+		w.WriteString(format(s))
+	}
+
+	return w.String()
 }

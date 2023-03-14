@@ -24,7 +24,7 @@ func (r *specRenderer) Render() {
 	r.renderImportantDocumentation()
 
 	if r.spec.IsSensitive() {
-		r.ren.paragraph(
+		r.ren.paragraphf(
 			"⚠️ This variable is **sensitive**;",
 			"its value may contain private information.",
 		)()
@@ -117,59 +117,112 @@ func (r *specRenderer) VisitOther(s variable.Other) {
 func (r *specRenderer) renderPrimaryRequirement(f string, v ...any) {
 	req := fmt.Sprintf(f, v...)
 
-	var text string
-	var args []any
-
 	if r.spec.IsDeprecated() {
-		text = "⚠️ The `%s` variable is **deprecated**; its use is **NOT RECOMMENDED** as it may be removed in a future version."
-		args = []any{r.spec.Name()}
+		r.renderPrimaryRequirementDeprecated(req)
+	} else if def, ok := r.renderDefaultValueFragment(); ok {
+		r.renderPrimaryRequirementDefault(req, def)
+	} else if r.spec.IsRequired() {
+		r.renderPrimaryRequirementRequired(req)
+	} else {
+		r.renderPrimaryRequirementOptional(req)
+	}
+}
 
-		relationships := variable.InverseRelationships[variable.Supersedes](r.spec)
-		if len(relationships) != 0 {
-			for i, rel := range relationships {
-				if i == len(relationships)-1 {
-					text += " and"
-				} else if i > 0 {
-					text += ","
-				}
+func (r *specRenderer) renderPrimaryRequirementDefault(req, def string) {
+	r.ren.paragraph(
+		func(write func(string, ...any)) {
+			write(
+				"The `%s` variable **MAY** be left undefined, in which case %s is used.",
+				r.spec.Name(),
+				def,
+			)
 
-				text += " " + r.ren.linkToSpec(rel.Subject)
+			if req != "" {
+				write(" Otherwise, the value %s.", req)
 			}
 
-			text += " **SHOULD** be used instead."
-		}
+			if dep := r.renderDependsOnClause(); dep != "" {
+				write(" The value is not used when %s.", dep)
+			}
+		},
+	)
+}
 
-		if req != "" {
-			text += " If defined, the value %s."
-			args = append(args, req)
-		}
-	} else if def, ok := r.renderDefaultValueFragment(); ok {
-		text = "The `%s` variable **MAY** be left undefined, in which case %s is used."
-		args = []any{r.spec.Name(), def}
+func (r *specRenderer) renderPrimaryRequirementRequired(req string) {
+	r.ren.paragraph(
+		func(write func(string, ...any)) {
+			if dependsOn := r.renderDependsOnClause(); dependsOn != "" {
+				write(
+					"The `%s` variable **MAY** be left undefined if and only if %s.",
+					r.spec.Name(),
+					dependsOn,
+				)
 
-		if req != "" {
-			text += " Otherwise, the value %s."
-			args = append(args, req)
-		}
-	} else if r.spec.IsRequired() {
-		if req != "" {
-			text = "The `%s` variable's value %s."
-			args = []any{r.spec.Name(), req}
-		} else {
-			text = "The `%s` variable **MUST NOT** be left undefined."
-			args = []any{r.spec.Name()}
-		}
-	} else {
-		text = "The `%s` variable **MAY** be left undefined."
-		args = []any{r.spec.Name()}
+				if req != "" {
+					write(" Otherwise, the value %s.", req)
+				}
 
-		if req != "" {
-			text += " Otherwise, the value %s."
-			args = append(args, req)
-		}
-	}
+				return
+			}
 
-	r.ren.paragraph(text)(args...)
+			if req != "" {
+				write("The `%s` variable's value %s.", r.spec.Name(), req)
+			} else {
+				write("The `%s` variable **MUST NOT** be left undefined.", r.spec.Name())
+			}
+		},
+	)
+}
+
+func (r *specRenderer) renderPrimaryRequirementOptional(req string) {
+	r.ren.paragraph(
+		func(write func(string, ...any)) {
+			write(
+				"The `%s` variable **MAY** be left undefined.",
+				r.spec.Name(),
+			)
+
+			if req != "" {
+				write(" Otherwise, the value %s.", req)
+			}
+
+			if dep := r.renderDependsOnClause(); dep != "" {
+				write(" The value is not used when %s.", dep)
+			}
+		},
+	)
+}
+
+func (r *specRenderer) renderPrimaryRequirementDeprecated(req string) {
+	r.ren.paragraph(
+		func(write func(string, ...any)) {
+			write(
+				"⚠️ The `%s` variable is **deprecated**; its use is **NOT RECOMMENDED** as it may be removed in a future version.",
+				r.spec.Name(),
+			)
+
+			relationships := variable.InverseRelationships[variable.Supersedes](r.spec)
+			if len(relationships) != 0 {
+				write(
+					" %s **SHOULD** be used instead.",
+					andList(
+						relationships,
+						func(rel variable.Supersedes) string {
+							return r.ren.linkToSpec(rel.Subject)
+						},
+					),
+				)
+			}
+
+			if req != "" {
+				write(" If defined, the value %s.", req)
+			}
+
+			if dep := r.renderDependsOnClause(); dep != "" {
+				write(" The value is not used when %s.", dep)
+			}
+		},
+	)
 }
 
 func (r *specRenderer) renderDefaultValueFragment() (string, bool) {
@@ -183,4 +236,17 @@ func (r *specRenderer) renderDefaultValueFragment() (string, bool) {
 	}
 
 	return fmt.Sprintf("the default value of `%s`", def.String), true
+}
+
+func (r *specRenderer) renderDependsOnClause() string {
+	return orList(
+		variable.Relationships[variable.DependsOn](r.spec),
+		func(rel variable.DependsOn) string {
+			return fmt.Sprintf(
+				"%s is `%s`",
+				r.ren.linkToSpec(rel.DependsOn),
+				rel.DependsOn.Zero().String,
+			)
+		},
+	)
 }

@@ -60,4 +60,106 @@ var _ = DescribeTable(
 				)
 		},
 	),
+	Entry(
+		"depends on + optional + default",
+		"depends-on/with-default.md",
+		func(reg *variable.Registry) {
+			widgetEnabled := ferrite.
+				Bool("WIDGET_ENABLED", "enable the widget").
+				Required(ferrite.WithRegistry(reg))
+
+			ferrite.
+				String("WIDGET_COLOR", "the color of the widget").
+				WithDefault("turquoise").
+				Optional(
+					ferrite.WithRegistry(reg),
+					ferrite.RelevantIf(widgetEnabled),
+				)
+		},
+	),
+	Entry(
+		"depends on + optional",
+		"depends-on/optional.md",
+		func(reg *variable.Registry) {
+			widgetEnabled := ferrite.
+				Bool("WIDGET_ENABLED", "enable the widget").
+				Required(ferrite.WithRegistry(reg))
+
+			ferrite.
+				String("WIDGET_COLOR", "the color of the widget").
+				Optional(
+					ferrite.WithRegistry(reg),
+					ferrite.RelevantIf(widgetEnabled),
+				)
+		},
+	),
+	Entry(
+		"depends on + required + default",
+		"depends-on/with-default.md",
+		func(reg *variable.Registry) {
+			widgetEnabled := ferrite.
+				Bool("WIDGET_ENABLED", "enable the widget").
+				Required(ferrite.WithRegistry(reg))
+
+			ferrite.
+				String("WIDGET_COLOR", "the color of the widget").
+				WithDefault("turquoise").
+				Required(
+					ferrite.WithRegistry(reg),
+					ferrite.RelevantIf(widgetEnabled),
+				)
+		},
+	),
+	Entry(
+		"depends on + required",
+		"depends-on/required.md",
+		func(reg *variable.Registry) {
+			widgetEnabled := ferrite.
+				Bool("WIDGET_ENABLED", "enable the widget").
+				Required(ferrite.WithRegistry(reg))
+
+			ferrite.
+				String("WIDGET_COLOR", "the color of the widget").
+				Required(
+					ferrite.WithRegistry(reg),
+					ferrite.RelevantIf(widgetEnabled),
+				)
+		},
+	),
+	Entry(
+		"depends on + required + constraint",
+		"depends-on/required-with-constraint.md",
+		func(reg *variable.Registry) {
+			widgetEnabled := ferrite.
+				Bool("WIDGET_ENABLED", "enable the widget").
+				Required(ferrite.WithRegistry(reg))
+
+			ferrite.
+				String("WIDGET_COLOR", "the color of the widget").
+				WithConstraint(
+					"must be a valid CSS color",
+					func(s string) bool { return true },
+				).
+				Required(
+					ferrite.WithRegistry(reg),
+					ferrite.RelevantIf(widgetEnabled),
+				)
+		},
+	),
+	Entry(
+		"depends on + deprecated",
+		"depends-on/deprecated.md",
+		func(reg *variable.Registry) {
+			widgetEnabled := ferrite.
+				Bool("WIDGET_ENABLED", "enable the widget").
+				Required(ferrite.WithRegistry(reg))
+
+			ferrite.
+				String("WIDGET_COLOR", "the color of the widget").
+				Deprecated(
+					ferrite.WithRegistry(reg),
+					ferrite.RelevantIf(widgetEnabled),
+				)
+		},
+	),
 )

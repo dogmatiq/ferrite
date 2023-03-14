@@ -17,6 +17,9 @@ type Spec interface {
 	// Schema returns the schema that applies to the variable's value.
 	Schema() Schema
 
+	// Zero returns the string representation of the zero value.
+	Zero() Literal
+
 	// Default returns the string representation of the default value.
 	Default() (Literal, bool)
 
@@ -88,6 +91,16 @@ func (s *TypedSpec[T]) Description() string {
 // Schema returns the schema that applies to the variable's value.
 func (s *TypedSpec[T]) Schema() Schema {
 	return s.schema
+}
+
+// Zero returns the string representation of the zero value.
+func (s *TypedSpec[T]) Zero() Literal {
+	var zero T
+	lit, err := s.schema.Marshal(zero)
+	if err != nil {
+		panic(err)
+	}
+	return lit
 }
 
 // Default returns the string representation of the default value.
