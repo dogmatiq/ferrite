@@ -82,3 +82,27 @@ func ExampleRelevantIf_whenNotRelevant() {
 
 	// Output:
 }
+
+func ExampleRelevantIf_whenNotRelevantBuInvalid() {
+	defer example()()
+
+	widgetEnabled := ferrite.
+		Bool("FERRITE_WIDGET_ENABLED", "enable the widget").
+		Required()
+
+	ferrite.
+		Unsigned[uint]("FERRITE_WIDGET_SPEED", "set the speed of the widget").
+		Required(ferrite.RelevantIf(widgetEnabled))
+
+	// FERRITE_WIDGET_SPEED is not required because FERRITE_WIDGET_ENABLED is
+	// "false". We want to see the error message but not terminate execution.
+	os.Setenv("FERRITE_WIDGET_SPEED", "-100")
+	os.Setenv("FERRITE_WIDGET_ENABLED", "false")
+	ferrite.Init()
+
+	// Output:
+	// Environment Variables:
+	//
+	//    FERRITE_WIDGET_ENABLED  enable the widget              true | false    ✓ set to false
+	//  ❯ FERRITE_WIDGET_SPEED    set the speed of the widget    <uint>          ✗ set to -100, expected integer
+}

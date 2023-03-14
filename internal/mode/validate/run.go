@@ -74,8 +74,14 @@ const (
 func attentionNeeded(v variable.Any) attentionLevel {
 	s := v.Spec()
 
-	if v.Error() != nil && v.Availability() != variable.AvailabilityPreconditionFailed {
-		return attentionError
+	if err := v.Error(); err != nil {
+		if v.Availability() != variable.AvailabilityIgnored {
+			return attentionError
+		}
+
+		if _, ok := err.(variable.ValueError); ok {
+			return attentionWarning
+		}
 	}
 
 	if s.IsDeprecated() && v.Source() == variable.SourceEnvironment {
