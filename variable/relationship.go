@@ -6,16 +6,14 @@ type Relationship interface {
 	object() Spec
 }
 
-// AddRelationship adds the relationship to the subject and related variable
-// specifications.
-func AddRelationship(rel Relationship) error {
-	sub := rel.subject()
-	obj := rel.object()
-
-	sub.addRelationship(rel)
-	obj.addRelationship(rel)
-
-	return nil
+// EstablishRelationships establishes the given relationships.
+func EstablishRelationships(relationships ...Relationship) {
+	for _, rel := range relationships {
+		sub := rel.subject()
+		obj := rel.object()
+		sub.addRelationship(rel)
+		obj.addRelationship(rel)
+	}
 }
 
 // Relationships returns a list of relationships where s is the subject.
@@ -74,4 +72,18 @@ func (r RefersTo) subject() Spec {
 
 func (r RefersTo) object() Spec {
 	return r.RefersTo
+}
+
+// DependsOn is a relationship type that indicates that a variable requires
+// another variable to be "truthy" in order be used.
+type DependsOn struct {
+	Subject, DependsOn Spec
+}
+
+func (r DependsOn) subject() Spec {
+	return r.Subject
+}
+
+func (r DependsOn) object() Spec {
+	return r.DependsOn
 }

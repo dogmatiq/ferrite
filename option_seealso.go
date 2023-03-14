@@ -12,7 +12,12 @@ func SeeAlso(s VariableSet, options ...SeeAlsoOption) interface {
 	return option{
 		ApplyToSpec: func(b variable.SpecBuilder) {
 			for _, v := range s.variables() {
-				seeAlso(b.Peek(), v.Spec(), options...)
+				variable.EstablishRelationships(
+					variable.RefersTo{
+						Subject:  b.Peek(),
+						RefersTo: v.Spec(),
+					},
+				)
 			}
 		},
 	}
@@ -20,23 +25,5 @@ func SeeAlso(s VariableSet, options ...SeeAlsoOption) interface {
 
 // SeeAlsoOption configures the behavior of the SeeAlso() variable set option.
 type SeeAlsoOption interface {
-	applyRefersToOption(*variable.RefersTo)
-}
-
-func seeAlso(
-	subject, refersTo variable.Spec,
-	options ...SeeAlsoOption,
-) {
-	rel := variable.RefersTo{
-		Subject:  subject,
-		RefersTo: refersTo,
-	}
-
-	for _, opt := range options {
-		opt.applyRefersToOption(&rel)
-	}
-
-	if err := variable.AddRelationship(rel); err != nil {
-		panic(err.Error())
-	}
+	future()
 }

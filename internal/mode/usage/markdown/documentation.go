@@ -4,7 +4,7 @@ func (r *specRenderer) renderImportantDocumentation() {
 	for _, d := range r.spec.Documentation() {
 		if d.IsImportant {
 			for _, p := range d.Paragraphs {
-				r.ren.paragraph(p)()
+				r.ren.paragraphf(p)()
 			}
 		}
 	}
@@ -24,7 +24,7 @@ func (r *specRenderer) renderUnimportantDocumentation() {
 		}
 
 		for _, p := range d.Paragraphs {
-			r.ren.paragraph(p)()
+			r.ren.paragraphf(p)()
 		}
 
 		r.ren.gap()

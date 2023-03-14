@@ -72,6 +72,13 @@ func (s deprecatedFunc[T]) DeprecatedValue() (T, bool) {
 	return n, ok
 }
 
+func (s deprecatedFunc[T]) value() any {
+	if n, ok, _ := s.fn(); ok {
+		return n
+	}
+	return nil
+}
+
 func (s deprecatedFunc[T]) variables() []variable.Any {
 	return s.vars
 }

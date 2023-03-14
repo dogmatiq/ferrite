@@ -14,6 +14,7 @@ import (
 // builders produce sets containing multiple variables.
 type VariableSet interface {
 	variables() []variable.Any
+	value() any
 }
 
 // variableSetConfig encapsulates configuration common to all variable sets.

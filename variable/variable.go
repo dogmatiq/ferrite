@@ -15,21 +15,16 @@ const (
 	// default value has been specified.
 	AvailabilityNone Availability = iota
 
-	// AvailabilityMissing indicates that the variable's value is not available
-	// AND that it is required.
-	AvailabilityMissing
-
-	// AvailabilityInvalid indicates that the variable has a value available and
-	// that value is invalid.
+	// AvailabilityInvalid indicates that the variable is defined with an
+	// invalid value.
 	AvailabilityInvalid
 
-	// AvailabilityPreconditionFailed indicates that the variable's value is
-	// present and valid but it should not be made available to the user because
-	// at least one of the spec's preconditions is not met.
-	AvailabilityPreconditionFailed
+	// AvailabilityIgnored indicates that the variable's value valid but it
+	// should not be made available to the user.
+	AvailabilityIgnored
 
 	// AvailabilityOK indicates that the variable's value is valid and available
-	// for use by the user.
+	// to the user.
 	AvailabilityOK
 )
 
@@ -121,54 +116,49 @@ func (v *OfType[T]) Error() Error {
 
 func (v *OfType[T]) resolve() {
 	v.once.Do(func() {
+		// Override the availability to AvailabilityIgnored if any of the
+		// preconditions fail.
+		defer func() {
+			for _, fn := range v.spec.preconditions {
+				if !fn() {
+					v.availability = AvailabilityIgnored
+					break
+				}
+			}
+		}()
+
 		lit := v.env.Get(v.spec.name)
 
-		if lit.String != "" {
-			// The environment variable is defined explicitly.
-			v.source = SourceEnvironment
-
-			// Unmarshal the string into the native value.
-			n, c, err := v.spec.Unmarshal(lit)
-			if err != nil {
-				v.availability = AvailabilityInvalid
-				v.err = valueError{
-					name:    v.spec.name,
-					literal: lit,
-					cause:   err,
-				}
-
-				// If the value is invalid we report it as such _even_ if the
-				// preconditions have failed. This ensures that a user cannot
-				// provide an invalid value only to discover that it is invalid
-				// in the future when the preconditions change.
-				return
+		if lit.String == "" {
+			if def, ok := v.spec.def.Get(); ok {
+				v.availability = AvailabilityOK
+				v.source = SourceDefault
+				v.value = def
+			} else if v.spec.required {
+				v.availability = AvailabilityNone
+				v.err = undefinedError{v.spec.Name()}
 			}
-
-			v.availability = AvailabilityOK
-			v.value = valueOf[T]{
-				verbatim:  lit,
-				native:    n,
-				canonical: c,
-			}
-		} else if def, ok := v.spec.def.Get(); ok {
-			// Fallback to the default value.
-			v.availability = AvailabilityOK
-			v.source = SourceDefault
-			v.value = def
-		} else if v.spec.required {
-			// If there is no defaults, and the variable is required, then
-			// this is an error.
-			v.availability = AvailabilityMissing
-			v.err = undefinedError{v.spec.Name()}
+			return
 		}
 
-		// checkPreconditions sets the availability to
-		// AvailabilityPreconditionFailed if any of the preconditions fail.
-		for _, fn := range v.spec.preconditions {
-			if !fn() {
-				v.availability = AvailabilityPreconditionFailed
-				break
+		v.source = SourceEnvironment
+
+		n, c, err := v.spec.Unmarshal(lit)
+		if err != nil {
+			v.availability = AvailabilityInvalid
+			v.err = valueError{
+				name:    v.spec.name,
+				literal: lit,
+				cause:   err,
 			}
+			return
+		}
+
+		v.availability = AvailabilityOK
+		v.value = valueOf[T]{
+			verbatim:  lit,
+			native:    n,
+			canonical: c,
 		}
 	})
 }

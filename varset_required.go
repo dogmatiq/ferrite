@@ -67,6 +67,13 @@ func (s requiredFunc[T]) Value() T {
 	return n
 }
 
+func (s requiredFunc[T]) value() any {
+	if n, err := s.fn(); err == nil {
+		return n
+	}
+	return nil
+}
+
 func (s requiredFunc[T]) variables() []variable.Any {
 	return s.vars
 }

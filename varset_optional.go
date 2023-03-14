@@ -69,6 +69,13 @@ func (s optionalFunc[T]) Value() (T, bool) {
 	return n, ok
 }
 
+func (s optionalFunc[T]) value() any {
+	if n, ok, _ := s.fn(); ok {
+		return n
+	}
+	return nil
+}
+
 func (s optionalFunc[T]) variables() []variable.Any {
 	return s.vars
 }
