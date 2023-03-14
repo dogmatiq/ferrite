@@ -20,9 +20,9 @@ func URL(name, desc string) *URLBuilder {
 		},
 	}
 
-	b.spec.Name(name)
-	b.spec.Description(desc)
-	b.spec.BuiltInConstraint(
+	b.builder.Name(name)
+	b.builder.Description(desc)
+	b.builder.BuiltInConstraint(
 		"**MUST** be a fully-qualified URL",
 		func(v *url.URL) variable.ConstraintError {
 			if v.Scheme == "" {
@@ -36,11 +36,11 @@ func URL(name, desc string) *URLBuilder {
 			return nil
 		},
 	)
-	b.spec.NonNormativeExample(
+	b.builder.NonNormativeExample(
 		mustParseURL("https://example.org/path"),
 		"a typical URL for a web page",
 	)
-	b.spec.Documentation().
+	b.builder.Documentation().
 		Summary("URL syntax").
 		Paragraph(
 			"A fully-qualified URL includes both a scheme (protocol) and a hostname.",
@@ -55,8 +55,8 @@ func URL(name, desc string) *URLBuilder {
 
 // URLBuilder builds a specification for a URL variable.
 type URLBuilder struct {
-	schema variable.TypedOther[*url.URL]
-	spec   variable.TypedSpecBuilder[*url.URL]
+	schema  variable.TypedOther[*url.URL]
+	builder variable.TypedSpecBuilder[*url.URL]
 }
 
 var _ isBuilderOf[*url.URL, *URLBuilder]
@@ -65,26 +65,26 @@ var _ isBuilderOf[*url.URL, *URLBuilder]
 //
 // It is used when the environment variable is undefined or empty.
 func (b *URLBuilder) WithDefault(v string) *URLBuilder {
-	b.spec.Default(mustParseURL(v))
+	b.builder.Default(mustParseURL(v))
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *URLBuilder) Required(options ...RequiredOption) Required[*url.URL] {
-	return required(b.schema, &b.spec, options...)
+	return required(b.schema, &b.builder, options...)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *URLBuilder) Optional(options ...OptionalOption) Optional[*url.URL] {
-	return optional(b.schema, &b.spec, options...)
+	return optional(b.schema, &b.builder, options...)
 }
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
 func (b *URLBuilder) Deprecated(options ...DeprecatedOption) Deprecated[*url.URL] {
-	return deprecated(b.schema, &b.spec, options...)
+	return deprecated(b.schema, &b.builder, options...)
 }
 
 type urlMarshaler struct{}

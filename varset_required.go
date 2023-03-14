@@ -26,22 +26,22 @@ type RequiredOption interface {
 
 // required registers a variable that produces a value of type T and returns a
 // Required[T] that maps one-to-one to that variable.
-func required[T any, S variable.TypedSchema[T]](
-	schema S,
-	spec *variable.TypedSpecBuilder[T],
+func required[T any, Schema variable.TypedSchema[T]](
+	s Schema,
+	b *variable.TypedSpecBuilder[T],
 	options ...RequiredOption,
 ) Required[T] {
-	spec.MarkRequired()
+	b.MarkRequired()
 
 	var cfg variableSetConfig
 	for _, opt := range options {
 		opt.applyRequiredOptionToConfig(&cfg)
-		opt.applyRequiredOptionToSpec(spec)
+		opt.applyRequiredOptionToSpec(b)
 	}
 
 	v := variable.Register(
 		cfg.Registry,
-		spec.Done(schema),
+		b.Done(s),
 	)
 
 	return requiredFunc[T]{

@@ -20,16 +20,16 @@ func String(name, desc string) *StringBuilder[string] {
 func StringAs[T ~string](name, desc string) *StringBuilder[T] {
 	b := &StringBuilder[T]{}
 
-	b.spec.Name(name)
-	b.spec.Description(desc)
+	b.builder.Name(name)
+	b.builder.Description(desc)
 
 	return b
 }
 
 // StringBuilder builds a specification for a string variable.
 type StringBuilder[T ~string] struct {
-	schema variable.TypedString[T]
-	spec   variable.TypedSpecBuilder[T]
+	schema  variable.TypedString[T]
+	builder variable.TypedSpecBuilder[T]
 }
 
 var _ isBuilderOf[string, *StringBuilder[string]]
@@ -38,7 +38,7 @@ var _ isBuilderOf[string, *StringBuilder[string]]
 //
 // It is used when the environment variable is undefined or empty.
 func (b *StringBuilder[T]) WithDefault(v T) *StringBuilder[T] {
-	b.spec.Default(v)
+	b.builder.Default(v)
 	return b
 }
 
@@ -50,7 +50,7 @@ func (b *StringBuilder[T]) WithConstraint(
 	desc string,
 	fn func(T) bool,
 ) *StringBuilder[T] {
-	b.spec.UserConstraint(desc, fn)
+	b.builder.UserConstraint(desc, fn)
 	return b
 }
 
@@ -59,24 +59,24 @@ func (b *StringBuilder[T]) WithConstraint(
 // Values of sensitive variables are not printed to the console or included in
 // generated documentation.
 func (b *StringBuilder[T]) WithSensitiveContent() *StringBuilder[T] {
-	b.spec.MarkSensitive()
+	b.builder.MarkSensitive()
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *StringBuilder[T]) Required(options ...RequiredOption) Required[T] {
-	return required(b.schema, &b.spec, options...)
+	return required(b.schema, &b.builder, options...)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *StringBuilder[T]) Optional(options ...OptionalOption) Optional[T] {
-	return optional(b.schema, &b.spec, options...)
+	return optional(b.schema, &b.builder, options...)
 }
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
 func (b *StringBuilder[T]) Deprecated(options ...DeprecatedOption) Deprecated[T] {
-	return deprecated(b.schema, &b.spec, options...)
+	return deprecated(b.schema, &b.builder, options...)
 }

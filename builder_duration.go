@@ -24,9 +24,9 @@ func Duration(name, desc string) *DurationBuilder {
 		},
 	}
 
-	b.spec.Name(name)
-	b.spec.Description(desc)
-	b.spec.Documentation().
+	b.builder.Name(name)
+	b.builder.Description(desc)
+	b.builder.Documentation().
 		Summary("Duration syntax").
 		Paragraph(
 			"Durations are specified as a sequence of decimal numbers, each with an optional fraction and a unit suffix, such as `300ms`, `-1.5h` or `2h45m`.",
@@ -40,8 +40,8 @@ func Duration(name, desc string) *DurationBuilder {
 
 // DurationBuilder builds a specification for a duration variable.
 type DurationBuilder struct {
-	schema variable.TypedNumeric[time.Duration]
-	spec   variable.TypedSpecBuilder[time.Duration]
+	schema  variable.TypedNumeric[time.Duration]
+	builder variable.TypedSpecBuilder[time.Duration]
 }
 
 var _ isBuilderOf[time.Duration, *DurationBuilder]
@@ -50,7 +50,7 @@ var _ isBuilderOf[time.Duration, *DurationBuilder]
 //
 // It is used when the environment variable is undefined or empty.
 func (b *DurationBuilder) WithDefault(v time.Duration) *DurationBuilder {
-	b.spec.Default(v)
+	b.builder.Default(v)
 	return b
 }
 
@@ -69,19 +69,19 @@ func (b *DurationBuilder) WithMaximum(v time.Duration) *DurationBuilder {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *DurationBuilder) Required(options ...RequiredOption) Required[time.Duration] {
-	return required(b.schema, &b.spec, options...)
+	return required(b.schema, &b.builder, options...)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *DurationBuilder) Optional(options ...OptionalOption) Optional[time.Duration] {
-	return optional(b.schema, &b.spec, options...)
+	return optional(b.schema, &b.builder, options...)
 }
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
 func (b *DurationBuilder) Deprecated(options ...DeprecatedOption) Deprecated[time.Duration] {
-	return deprecated(b.schema, &b.spec, options...)
+	return deprecated(b.schema, &b.builder, options...)
 }
 
 type durationMarshaler struct{}

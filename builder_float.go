@@ -22,9 +22,9 @@ func Float[T constraints.Float](name, desc string) *FloatBuilder[T] {
 		},
 	}
 
-	b.spec.Name(name)
-	b.spec.Description(desc)
-	b.spec.BuiltInConstraint(
+	b.builder.Name(name)
+	b.builder.Description(desc)
+	b.builder.BuiltInConstraint(
 		"must be a finite number",
 		func(v T) variable.ConstraintError {
 			v64 := float64(v)
@@ -34,7 +34,7 @@ func Float[T constraints.Float](name, desc string) *FloatBuilder[T] {
 			return nil
 		},
 	)
-	b.spec.Documentation().
+	b.builder.Documentation().
 		Summary("Floating-point syntax").
 		Paragraph(
 			"Floating-point values can be specified using decimal (base-10) or hexadecimal (base-16) notation, and may use scientific notation.",
@@ -63,8 +63,8 @@ func Float[T constraints.Float](name, desc string) *FloatBuilder[T] {
 
 // FloatBuilder builds a specification for a floating-point number.
 type FloatBuilder[T constraints.Float] struct {
-	schema variable.TypedNumeric[T]
-	spec   variable.TypedSpecBuilder[T]
+	schema  variable.TypedNumeric[T]
+	builder variable.TypedSpecBuilder[T]
 }
 
 var _ isBuilderOf[float32, *FloatBuilder[float32]]
@@ -73,7 +73,7 @@ var _ isBuilderOf[float32, *FloatBuilder[float32]]
 //
 // It is used when the environment variable is undefined or empty.
 func (b *FloatBuilder[T]) WithDefault(v T) *FloatBuilder[T] {
-	b.spec.Default(v)
+	b.builder.Default(v)
 	return b
 }
 
@@ -92,19 +92,19 @@ func (b *FloatBuilder[T]) WithMaximum(v T) *FloatBuilder[T] {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *FloatBuilder[T]) Required(options ...RequiredOption) Required[T] {
-	return required(b.schema, &b.spec, options...)
+	return required(b.schema, &b.builder, options...)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *FloatBuilder[T]) Optional(options ...OptionalOption) Optional[T] {
-	return optional(b.schema, &b.spec, options...)
+	return optional(b.schema, &b.builder, options...)
 }
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
 func (b *FloatBuilder[T]) Deprecated(options ...DeprecatedOption) Deprecated[T] {
-	return deprecated(b.schema, &b.spec, options...)
+	return deprecated(b.schema, &b.builder, options...)
 }
 
 type floatMarshaler[T constraints.Float] struct{}

@@ -32,16 +32,16 @@ func BoolAs[T ~bool](name, desc string) *BoolBuilder[T] {
 		},
 	}
 
-	b.spec.Name(name)
-	b.spec.Description(desc)
+	b.builder.Name(name)
+	b.builder.Description(desc)
 
 	return b
 }
 
 // BoolBuilder builds a specification for a boolean value.
 type BoolBuilder[T ~bool] struct {
-	schema variable.TypedSet[T]
-	spec   variable.TypedSpecBuilder[T]
+	schema  variable.TypedSet[T]
+	builder variable.TypedSpecBuilder[T]
 }
 
 var _ isBuilderOf[bool, *BoolBuilder[bool]]
@@ -65,24 +65,24 @@ func (b *BoolBuilder[T]) WithLiterals(t, f string) *BoolBuilder[T] {
 //
 // It is used when the environment variable is undefined or empty.
 func (b *BoolBuilder[T]) WithDefault(v T) *BoolBuilder[T] {
-	b.spec.Default(v)
+	b.builder.Default(v)
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *BoolBuilder[T]) Required(options ...RequiredOption) Required[T] {
-	return required(b.schema, &b.spec, options...)
+	return required(b.schema, &b.builder, options...)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *BoolBuilder[T]) Optional(options ...OptionalOption) Optional[T] {
-	return optional(b.schema, &b.spec, options...)
+	return optional(b.schema, &b.builder, options...)
 }
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
 func (b *BoolBuilder[T]) Deprecated(options ...DeprecatedOption) Deprecated[T] {
-	return deprecated(b.schema, &b.spec, options...)
+	return deprecated(b.schema, &b.builder, options...)
 }

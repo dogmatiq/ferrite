@@ -10,9 +10,9 @@ func SeeAlso(s VariableSet, options ...SeeAlsoOption) interface {
 	DeprecatedOption
 } {
 	return option{
-		ApplyToSpec: func(spec variable.SpecBuilder) {
+		ApplyToSpec: func(b variable.SpecBuilder) {
 			for _, v := range s.variables() {
-				seeAlso(spec.Peek(), v.Spec(), options...)
+				seeAlso(b.Peek(), v.Spec(), options...)
 			}
 		},
 	}

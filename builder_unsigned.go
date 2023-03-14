@@ -21,9 +21,9 @@ func Unsigned[T constraints.Unsigned](name, desc string) *UnsignedBuilder[T] {
 		},
 	}
 
-	b.spec.Name(name)
-	b.spec.Description(desc)
-	b.spec.Documentation().
+	b.builder.Name(name)
+	b.builder.Description(desc)
+	b.builder.Documentation().
 		Summary("Unsigned integer syntax").
 		Paragraph(
 			"Unsigned integers can only be specified using decimal (base-10) notation.",
@@ -46,8 +46,8 @@ func Unsigned[T constraints.Unsigned](name, desc string) *UnsignedBuilder[T] {
 
 // UnsignedBuilder builds a specification for an unsigned integer value.
 type UnsignedBuilder[T constraints.Unsigned] struct {
-	schema variable.TypedNumeric[T]
-	spec   variable.TypedSpecBuilder[T]
+	schema  variable.TypedNumeric[T]
+	builder variable.TypedSpecBuilder[T]
 }
 
 var _ isBuilderOf[uint, *UnsignedBuilder[uint]]
@@ -56,7 +56,7 @@ var _ isBuilderOf[uint, *UnsignedBuilder[uint]]
 //
 // It is used when the environment variable is undefined or empty.
 func (b *UnsignedBuilder[T]) WithDefault(v T) *UnsignedBuilder[T] {
-	b.spec.Default(v)
+	b.builder.Default(v)
 	return b
 }
 
@@ -75,19 +75,19 @@ func (b *UnsignedBuilder[T]) WithMaximum(v T) *UnsignedBuilder[T] {
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *UnsignedBuilder[T]) Required(options ...RequiredOption) Required[T] {
-	return required(b.schema, &b.spec, options...)
+	return required(b.schema, &b.builder, options...)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *UnsignedBuilder[T]) Optional(options ...OptionalOption) Optional[T] {
-	return optional(b.schema, &b.spec, options...)
+	return optional(b.schema, &b.builder, options...)
 }
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
 func (b *UnsignedBuilder[T]) Deprecated(options ...DeprecatedOption) Deprecated[T] {
-	return deprecated(b.schema, &b.spec, options...)
+	return deprecated(b.schema, &b.builder, options...)
 }
 
 type unsignedMarshaler[T constraints.Unsigned] struct{}

@@ -6,11 +6,11 @@ import "github.com/dogmatiq/ferrite/variable"
 // variables in another set, s, should be used instead.
 func SupersededBy(s VariableSet, options ...SupersededByOption) DeprecatedOption {
 	return option{
-		ApplyToSpecInDeprecatedSet: func(spec variable.SpecBuilder) {
+		ApplyToSpecInDeprecatedSet: func(b variable.SpecBuilder) {
 			for _, v := range s.variables() {
 				rel := variable.Supersedes{
 					Subject:    v.Spec(),
-					Supersedes: spec.Peek(),
+					Supersedes: b.Peek(),
 				}
 
 				for _, opt := range options {

@@ -14,15 +14,15 @@ import (
 // human-readable description of the environment variable.
 func File(name, desc string) *FileBuilder {
 	b := &FileBuilder{}
-	b.spec.Name(name)
-	b.spec.Description(desc)
+	b.builder.Name(name)
+	b.builder.Description(desc)
 	return b
 }
 
 // FileBuilder builds a specification for a boolean value.
 type FileBuilder struct {
-	schema variable.TypedString[FileName]
-	spec   variable.TypedSpecBuilder[FileName]
+	schema  variable.TypedString[FileName]
+	builder variable.TypedSpecBuilder[FileName]
 }
 
 var _ isBuilderOf[FileName, *FileBuilder]
@@ -31,26 +31,26 @@ var _ isBuilderOf[FileName, *FileBuilder]
 //
 // It is used when the environment variable is undefined or empty.
 func (b *FileBuilder) WithDefault(v string) *FileBuilder {
-	b.spec.Default(FileName(v))
+	b.builder.Default(FileName(v))
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *FileBuilder) Required(options ...RequiredOption) Required[FileName] {
-	return required(b.schema, &b.spec, options...)
+	return required(b.schema, &b.builder, options...)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *FileBuilder) Optional(options ...OptionalOption) Optional[FileName] {
-	return optional(b.schema, &b.spec, options...)
+	return optional(b.schema, &b.builder, options...)
 }
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
 func (b *FileBuilder) Deprecated(options ...DeprecatedOption) Deprecated[FileName] {
-	return deprecated(b.schema, &b.spec, options...)
+	return deprecated(b.schema, &b.builder, options...)
 }
 
 // FileName is the name of a file.

@@ -29,22 +29,22 @@ type DeprecatedOption interface {
 
 // deprecated registers a variable that produces a value of type T and returns a
 // Deprecated[T] that maps one-to-one to that variable.
-func deprecated[T any, S variable.TypedSchema[T]](
-	schema S,
-	spec *variable.TypedSpecBuilder[T],
+func deprecated[T any, Schema variable.TypedSchema[T]](
+	s Schema,
+	b *variable.TypedSpecBuilder[T],
 	options ...DeprecatedOption,
 ) Deprecated[T] {
-	spec.MarkDeprecated()
+	b.MarkDeprecated()
 
 	var cfg variableSetConfig
 	for _, opt := range options {
 		opt.applyDeprecatedOptionToConfig(&cfg)
-		opt.applyDeprecatedOptionToSpec(spec)
+		opt.applyDeprecatedOptionToSpec(b)
 	}
 
 	v := variable.Register(
 		cfg.Registry,
-		spec.Done(schema),
+		b.Done(s),
 	)
 
 	return deprecatedFunc[T]{

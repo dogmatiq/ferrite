@@ -30,24 +30,24 @@ func (o option) applyRequiredOptionToConfig(opts *variableSetConfig) {
 	applyOption(opts, o.ApplyToSetConfig, o.ApplyToRequiredSetConfig)
 }
 
-func (o option) applyRequiredOptionToSpec(spec variable.SpecBuilder) {
-	applyOption(spec, o.ApplyToSpec, o.ApplyToSpecInRequiredSet)
+func (o option) applyRequiredOptionToSpec(b variable.SpecBuilder) {
+	applyOption(b, o.ApplyToSpec, o.ApplyToSpecInRequiredSet)
 }
 
 func (o option) applyOptionalOptionToConfig(opts *variableSetConfig) {
 	applyOption(opts, o.ApplyToSetConfig, o.ApplyToOptionalSetConfig)
 }
 
-func (o option) applyOptionalOptionToSpec(spec variable.SpecBuilder) {
-	applyOption(spec, o.ApplyToSpec, o.ApplyToSpecInOptionalSet)
+func (o option) applyOptionalOptionToSpec(b variable.SpecBuilder) {
+	applyOption(b, o.ApplyToSpec, o.ApplyToSpecInOptionalSet)
 }
 
 func (o option) applyDeprecatedOptionToConfig(opts *variableSetConfig) {
 	applyOption(opts, o.ApplyToSetConfig, o.ApplyToDeprecatedSetConfig)
 }
 
-func (o option) applyDeprecatedOptionToSpec(spec variable.SpecBuilder) {
-	applyOption(spec, o.ApplyToSpec, o.ApplyToSpecInDeprecatedSet)
+func (o option) applyDeprecatedOptionToSpec(b variable.SpecBuilder) {
+	applyOption(b, o.ApplyToSpec, o.ApplyToSpecInDeprecatedSet)
 }
 
 func (o option) applyRefersToOption(r *variable.RefersTo) {

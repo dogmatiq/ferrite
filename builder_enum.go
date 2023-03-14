@@ -30,16 +30,16 @@ func EnumAs[T any](name, desc string) *EnumBuilder[T] {
 		},
 	}
 
-	b.spec.Name(name)
-	b.spec.Description(desc)
+	b.builder.Name(name)
+	b.builder.Description(desc)
 
 	return b
 }
 
 // EnumBuilder is the specification for an enumeration.
 type EnumBuilder[T any] struct {
-	schema variable.TypedSet[T]
-	spec   variable.TypedSpecBuilder[T]
+	schema  variable.TypedSet[T]
+	builder variable.TypedSpecBuilder[T]
 }
 
 var _ isBuilderOf[any, *EnumBuilder[any]]
@@ -81,24 +81,24 @@ func (b *EnumBuilder[T]) WithRenderer(fn func(T) variable.Literal) *EnumBuilder[
 //
 // It is used when the environment variable is undefined or empty.
 func (b *EnumBuilder[T]) WithDefault(v T) *EnumBuilder[T] {
-	b.spec.Default(v)
+	b.builder.Default(v)
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *EnumBuilder[T]) Required(options ...RequiredOption) Required[T] {
-	return required(b.schema, &b.spec, options...)
+	return required(b.schema, &b.builder, options...)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *EnumBuilder[T]) Optional(options ...OptionalOption) Optional[T] {
-	return optional(b.schema, &b.spec, options...)
+	return optional(b.schema, &b.builder, options...)
 }
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
 func (b *EnumBuilder[T]) Deprecated(options ...DeprecatedOption) Deprecated[T] {
-	return deprecated(b.schema, &b.spec, options...)
+	return deprecated(b.schema, &b.builder, options...)
 }

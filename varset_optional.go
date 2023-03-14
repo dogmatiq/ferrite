@@ -28,20 +28,20 @@ type OptionalOption interface {
 
 // required registers a variable that produces a value of type T and returns a
 // Optional[T] that maps one-to-one to that variable.
-func optional[T any, S variable.TypedSchema[T]](
-	schema S,
-	spec *variable.TypedSpecBuilder[T],
+func optional[T any, Schema variable.TypedSchema[T]](
+	s Schema,
+	b *variable.TypedSpecBuilder[T],
 	options ...OptionalOption,
 ) Optional[T] {
 	var cfg variableSetConfig
 	for _, opt := range options {
 		opt.applyOptionalOptionToConfig(&cfg)
-		opt.applyOptionalOptionToSpec(spec)
+		opt.applyOptionalOptionToSpec(b)
 	}
 
 	v := variable.Register(
 		cfg.Registry,
-		spec.Done(schema),
+		b.Done(s),
 	)
 
 	return optionalFunc[T]{

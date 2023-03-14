@@ -14,25 +14,25 @@ import (
 func NetworkPort(name, desc string) *NetworkPortBuilder {
 	b := &NetworkPortBuilder{}
 
-	b.spec.Name(name)
-	b.spec.Description(desc)
-	b.spec.BuiltInConstraint(
+	b.builder.Name(name)
+	b.builder.Description(desc)
+	b.builder.BuiltInConstraint(
 		"**MUST** be a valid network port",
 		func(v string) variable.ConstraintError {
 			return validatePort(v)
 		},
 	)
-	b.spec.NonNormativeExample("8000", "a port commonly used for private web servers")
-	b.spec.NonNormativeExample("https", "the IANA service name that maps to port 443")
-	buildNetworkPortSyntaxDocumentation(b.spec.Documentation())
+	b.builder.NonNormativeExample("8000", "a port commonly used for private web servers")
+	b.builder.NonNormativeExample("https", "the IANA service name that maps to port 443")
+	buildNetworkPortSyntaxDocumentation(b.builder.Documentation())
 
 	return b
 }
 
 // NetworkPortBuilder builds a specification for a network port variable.
 type NetworkPortBuilder struct {
-	schema variable.TypedString[string]
-	spec   variable.TypedSpecBuilder[string]
+	schema  variable.TypedString[string]
+	builder variable.TypedSpecBuilder[string]
 }
 
 var _ isBuilderOf[string, *NetworkPortBuilder]
@@ -41,26 +41,26 @@ var _ isBuilderOf[string, *NetworkPortBuilder]
 //
 // It is used when the environment variable is undefined or empty.
 func (b *NetworkPortBuilder) WithDefault(v string) *NetworkPortBuilder {
-	b.spec.Default(v)
+	b.builder.Default(v)
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *NetworkPortBuilder) Required(options ...RequiredOption) Required[string] {
-	return required(b.schema, &b.spec, options...)
+	return required(b.schema, &b.builder, options...)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
 func (b *NetworkPortBuilder) Optional(options ...OptionalOption) Optional[string] {
-	return optional(b.schema, &b.spec, options...)
+	return optional(b.schema, &b.builder, options...)
 }
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
 func (b *NetworkPortBuilder) Deprecated(options ...DeprecatedOption) Deprecated[string] {
-	return deprecated(b.schema, &b.spec, options...)
+	return deprecated(b.schema, &b.builder, options...)
 }
 
 // validateHost returns an error of port is not a valid numeric port or IANA
