@@ -15,6 +15,7 @@ type SpecBuilder interface {
 	MarkDeprecated()
 	MarkSensitive()
 	Documentation() DocumentationBuilder
+	Precondition(func() bool)
 	Peek() Spec
 }
 
@@ -117,6 +118,15 @@ func (b *TypedSpecBuilder[T]) Documentation() DocumentationBuilder {
 	return DocumentationBuilder{
 		docs: &b.spec.docs,
 	}
+}
+
+// Precondition adds a predicate that must be satisfied in order for the
+// variable's value to be made available.
+//
+// If any precondition fails the variable is treated as though it were undefined
+// and without a default value.
+func (b *TypedSpecBuilder[T]) Precondition(fn func() bool) {
+	b.spec.preconditions = append(b.spec.preconditions, fn)
 }
 
 // Peek returns the (potentially invalid) spec that is being built.

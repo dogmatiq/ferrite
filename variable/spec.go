@@ -72,6 +72,7 @@ type TypedSpec[T any] struct {
 	docs          []Documentation
 	constraints   []TypedConstraint[T]
 	relationships []Relationship
+	preconditions []func() bool
 }
 
 // Name returns the name of the variable.

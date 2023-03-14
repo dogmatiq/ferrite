@@ -23,8 +23,13 @@ const (
 	// that value is invalid.
 	AvailabilityInvalid
 
-	// AvailabilityOK indicates that the variable's value is valid
-	// and available for use by the user.
+	// AvailabilityPreconditionFailed indicates that the variable's value is
+	// present and valid but it should not be made available to the user because
+	// at least one of the spec's preconditions is not met.
+	AvailabilityPreconditionFailed
+
+	// AvailabilityOK indicates that the variable's value is valid and available
+	// for use by the user.
 	AvailabilityOK
 )
 
@@ -52,18 +57,6 @@ type Any interface {
 	Source() Source
 	Value() Value
 	Error() Error
-}
-
-	// IsValid returns true if the variable is valid.
-	IsValid() bool
-
-	// IsExplicit returns true if the variable has been explicitly defined in
-	// the environment, irrespective of its validity or the presence of a
-	// default value.
-	IsExplicit() bool
-
-	// Value returns the variable's value.
-	Value() (Value, bool, ValueError)
 }
 
 // OfType is an environment variable depicted by type T.
@@ -130,36 +123,52 @@ func (v *OfType[T]) resolve() {
 	v.once.Do(func() {
 		lit := v.env.Get(v.spec.name)
 
-		if lit.String == "" {
-			if def, ok := v.spec.def.Get(); ok {
-				v.availability = AvailabilityOK
-				v.source = SourceDefault
-				v.value = def
-			} else if v.spec.required {
-				v.availability = AvailabilityMissing
-				v.err = undefinedError{v.spec.Name()}
+		if lit.String != "" {
+			// The environment variable is defined explicitly.
+			v.source = SourceEnvironment
+
+			// Unmarshal the string into the native value.
+			n, c, err := v.spec.Unmarshal(lit)
+			if err != nil {
+				v.availability = AvailabilityInvalid
+				v.err = valueError{
+					name:    v.spec.name,
+					literal: lit,
+					cause:   err,
+				}
+
+				// If the value is invalid we report it as such _even_ if the
+				// preconditions have failed. This ensures that a user cannot
+				// provide an invalid value only to discover that it is invalid
+				// in the future when the preconditions change.
+				return
 			}
-			return
+
+			v.availability = AvailabilityOK
+			v.value = valueOf[T]{
+				verbatim:  lit,
+				native:    n,
+				canonical: c,
+			}
+		} else if def, ok := v.spec.def.Get(); ok {
+			// Fallback to the default value.
+			v.availability = AvailabilityOK
+			v.source = SourceDefault
+			v.value = def
+		} else if v.spec.required {
+			// If there is no defaults, and the variable is required, then
+			// this is an error.
+			v.availability = AvailabilityMissing
+			v.err = undefinedError{v.spec.Name()}
 		}
 
-		v.source = SourceEnvironment
-
-		n, c, err := v.spec.Unmarshal(lit)
-		if err != nil {
-			v.availability = AvailabilityInvalid
-			v.err = valueError{
-				name:    v.spec.name,
-				literal: lit,
-				cause:   err,
+		// checkPreconditions sets the availability to
+		// AvailabilityPreconditionFailed if any of the preconditions fail.
+		for _, fn := range v.spec.preconditions {
+			if !fn() {
+				v.availability = AvailabilityPreconditionFailed
+				break
 			}
-			return
-		}
-
-		v.availability = AvailabilityOK
-		v.value = valueOf[T]{
-			verbatim:  lit,
-			native:    n,
-			canonical: c,
 		}
 	})
 }
