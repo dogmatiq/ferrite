@@ -75,3 +75,17 @@ func (r RefersTo) subject() Spec {
 func (r RefersTo) object() Spec {
 	return r.RefersTo
 }
+
+// DependsOn is a relationship type that indicates that a variable requires
+// another variable to be "truthy" in order be used.
+type DependsOn struct {
+	Subject, DependsOn Spec
+}
+
+func (r DependsOn) subject() Spec {
+	return r.Subject
+}
+
+func (r DependsOn) object() Spec {
+	return r.DependsOn
+}
