@@ -50,8 +50,8 @@ func ExampleRelevantIf_whenRelevant() {
 		Unsigned[uint]("FERRITE_WIDGET_SPEED", "set the speed of the widget").
 		Optional(ferrite.RelevantIf(widgetEnabled))
 
-	os.Setenv("FERRITE_WIDGET_SPEED", "100")    // define the speed
-	os.Setenv("FERRITE_WIDGET_ENABLED", "true") // and enable the widget
+	os.Setenv("FERRITE_WIDGET_SPEED", "100")
+	os.Setenv("FERRITE_WIDGET_ENABLED", "true")
 	ferrite.Init()
 
 	if x, ok := widgetSpeed.Value(); ok {
@@ -71,20 +71,14 @@ func ExampleRelevantIf_whenNotRelevant() {
 		Bool("FERRITE_WIDGET_ENABLED", "enable the widget").
 		Required()
 
-	widgetSpeed := ferrite.
+	ferrite.
 		Unsigned[uint]("FERRITE_WIDGET_SPEED", "set the speed of the widget").
-		Optional(ferrite.RelevantIf(widgetEnabled))
+		Required(ferrite.RelevantIf(widgetEnabled))
 
-	os.Setenv("FERRITE_WIDGET_SPEED", "100")     // define the speed
-	os.Setenv("FERRITE_WIDGET_ENABLED", "false") // but disable the widget
+	// FERRITE_WIDGET_SPEED is "required" but we can leave it undefined when
+	// FERRITE_WIDGET_ENABLED is "false" without causing a validation failure.
+	os.Setenv("FERRITE_WIDGET_ENABLED", "false")
 	ferrite.Init()
 
-	if x, ok := widgetSpeed.Value(); ok {
-		fmt.Println("value is", x)
-	} else {
-		fmt.Println("value is not relevant")
-	}
-
 	// Output:
-	// value is not relevant
 }

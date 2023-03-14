@@ -26,11 +26,11 @@ func Run(opts mode.Config) {
 			value(v),
 		)
 
-		if needsAttention(v) {
+		switch attentionNeeded(v) {
+		case attentionWarning:
 			show = true
-		}
-
-		if v.Error() != nil {
+		case attentionError:
+			show = true
 			valid = false
 		}
 	}
@@ -62,17 +62,25 @@ const (
 	iconAttention = "❯"
 )
 
-// needsAttention returns true if v needs attention from the user.
-func needsAttention(v variable.Any) bool {
+type attentionLevel int
+
+const (
+	attentionNone attentionLevel = iota
+	attentionWarning
+	attentionError
+)
+
+// attentionNeeded returns true if v needs attention from the user.
+func attentionNeeded(v variable.Any) attentionLevel {
 	s := v.Spec()
 
-	if v.Error() != nil {
-		return true
+	if v.Error() != nil && v.Availability() != variable.AvailabilityPreconditionFailed {
+		return attentionError
 	}
 
 	if s.IsDeprecated() && v.Source() == variable.SourceEnvironment {
-		return true
+		return attentionWarning
 	}
 
-	return false
+	return attentionNone
 }

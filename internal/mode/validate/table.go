@@ -10,7 +10,6 @@ import (
 
 // table renders a column-aligned table.
 type table struct {
-
 	// rows is the rows of the table, each containing a slice of text with an
 	// element for each column.
 	rows [][]string

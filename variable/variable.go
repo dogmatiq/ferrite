@@ -162,8 +162,8 @@ func (v *OfType[T]) resolve() {
 			v.err = undefinedError{v.spec.Name()}
 		}
 
-		// checkPreconditions sets the availability to
-		// AvailabilityPreconditionFailed if any of the preconditions fail.
+		// Override the availability to AvailabilityPreconditionFailed if any of
+		// the preconditions fail.
 		for _, fn := range v.spec.preconditions {
 			if !fn() {
 				v.availability = AvailabilityPreconditionFailed

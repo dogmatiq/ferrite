@@ -11,7 +11,7 @@ func name(v variable.Any) string {
 	s := v.Spec()
 
 	icon := " "
-	if needsAttention(v) {
+	if attentionNeeded(v) != attentionNone {
 		icon = iconAttention
 	}
 
