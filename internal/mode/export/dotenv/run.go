@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/dogmatiq/ferrite/internal/mode"
+	"github.com/dogmatiq/ferrite/variable"
 	"github.com/dogmatiq/iago/must"
 )
 
@@ -40,27 +41,31 @@ func Run(opts mode.Config) {
 		must.Fprintf(opts.Out, ")\n")
 		must.Fprintf(opts.Out, "%s=", s.Name())
 
-		value, ok, err := v.Value()
-		if err != nil {
-			must.Fprintf(
-				opts.Out,
-				" # %s is invalid: %s",
-				err.Literal().Quote(),
-				err.Unwrap(),
-			)
-		} else if ok && v.IsExplicit() && !s.IsSensitive() {
-			must.Fprintf(
-				opts.Out,
-				"%s",
-				value.Verbatim().Quote(),
-			)
-
-			if value.Verbatim() != value.Canonical() {
+		if v.Source() == variable.SourceEnvironment && !s.IsSensitive() {
+			err := v.Error()
+			if err, ok := err.(variable.ValueError); ok {
 				must.Fprintf(
 					opts.Out,
-					" # equivalent to %s",
-					value.Canonical().Quote(),
+					" # %s is invalid: %s",
+					err.Literal().Quote(),
+					err.Unwrap(),
 				)
+			} else {
+				value := v.Value()
+
+				must.Fprintf(
+					opts.Out,
+					"%s",
+					value.Verbatim().Quote(),
+				)
+
+				if value.Verbatim() != value.Canonical() {
+					must.Fprintf(
+						opts.Out,
+						" # equivalent to %s",
+						value.Canonical().Quote(),
+					)
+				}
 			}
 		}
 

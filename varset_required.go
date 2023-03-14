@@ -47,11 +47,7 @@ func required[T any, Schema variable.TypedSchema[T]](
 	return requiredFunc[T]{
 		[]variable.Any{v},
 		func() (T, error) {
-			n, ok, err := v.NativeValue()
-			if ok || err != nil {
-				return n, err
-			}
-			return n, undefinedError(v)
+			return v.NativeValue(), v.Error()
 		},
 	}
 }

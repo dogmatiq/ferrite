@@ -30,7 +30,7 @@ func Run(opts mode.Config) {
 			show = true
 		}
 
-		if !v.IsValid() {
+		if v.Error() != nil {
 			valid = false
 		}
 	}
@@ -66,11 +66,11 @@ const (
 func needsAttention(v variable.Any) bool {
 	s := v.Spec()
 
-	if !v.IsValid() {
+	if v.Error() != nil {
 		return true
 	}
 
-	if s.IsDeprecated() && v.IsExplicit() {
+	if s.IsDeprecated() && v.Source() == variable.SourceEnvironment {
 		return true
 	}
 

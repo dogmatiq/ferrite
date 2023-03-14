@@ -47,7 +47,9 @@ func optional[T any, Schema variable.TypedSchema[T]](
 	return optionalFunc[T]{
 		[]variable.Any{v},
 		func() (T, bool, error) {
-			return v.NativeValue()
+			return v.NativeValue(),
+				v.Availability() == variable.AvailabilityOK,
+				v.Error()
 		},
 	}
 }

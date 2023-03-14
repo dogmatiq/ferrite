@@ -178,25 +178,18 @@ func (b *KubernetesServiceBuilder) Required(options ...RequiredOption) Required[
 	return requiredFunc[KubernetesAddress]{
 		[]variable.Any{host, port},
 		func() (KubernetesAddress, error) {
-			h, ok, err := host.NativeValue()
-			if err != nil {
+			if err := host.Error(); err != nil {
 				return KubernetesAddress{}, err
 			}
 
-			if !ok {
-				return KubernetesAddress{}, undefinedError(host)
-			}
-
-			p, ok, err := port.NativeValue()
-			if err != nil {
+			if err := port.Error(); err != nil {
 				return KubernetesAddress{}, err
 			}
 
-			if !ok {
-				return KubernetesAddress{}, undefinedError(port)
-			}
-
-			return KubernetesAddress{h, p}, nil
+			return KubernetesAddress{
+				host.NativeValue(),
+				port.NativeValue(),
+			}, nil
 		},
 	}
 }
@@ -260,37 +253,32 @@ func (b *KubernetesServiceBuilder) optionalResolver(
 	host, port *variable.OfType[string],
 ) func() (KubernetesAddress, bool, error) {
 	return func() (KubernetesAddress, bool, error) {
-		h, hostOk, err := host.NativeValue()
-		if err != nil {
+		if err := host.Error(); err != nil {
+			return KubernetesAddress{}, false, err
+		}
+		if err := port.Error(); err != nil {
 			return KubernetesAddress{}, false, err
 		}
 
-		p, portOk, err := port.NativeValue()
-		if err != nil {
-			return KubernetesAddress{}, false, err
-		}
+		availability := host.Availability()
 
-		if hostOk && portOk {
-			return KubernetesAddress{h, p}, true, nil
-		}
+		if port.Availability() != availability {
+			def, undef := host, port
+			if availability != variable.AvailabilityOK {
+				def, undef = undef, def
+			}
 
-		if hostOk {
 			return KubernetesAddress{}, false, fmt.Errorf(
 				"%s is defined but %s is not, define both or neither",
-				host.Spec().Name(),
-				port.Spec().Name(),
+				def.Spec().Name(),
+				undef.Spec().Name(),
 			)
 		}
 
-		if portOk {
-			return KubernetesAddress{}, false, fmt.Errorf(
-				"%s is defined but %s is not, define both or neither",
-				port.Spec().Name(),
-				host.Spec().Name(),
-			)
-		}
-
-		return KubernetesAddress{}, false, nil
+		return KubernetesAddress{
+			host.NativeValue(),
+			port.NativeValue(),
+		}, availability == variable.AvailabilityOK, nil
 	}
 }
 

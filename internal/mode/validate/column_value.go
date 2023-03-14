@@ -32,41 +32,42 @@ func value(v variable.Any) string {
 		return out.String()
 	}
 
-	val, ok, err := v.Value()
-	if err != nil {
-		return renderExplicit(
-			iconError,
-			err.Literal(),
-			renderError(s, err),
-		)
-	}
+	switch v.Source() {
+	case variable.SourceNone:
+		if s.IsRequired() {
+			return fmt.Sprintf("%s undefined", iconError)
+		}
+		return fmt.Sprintf("%s undefined", iconNeutral)
 
-	if v.IsExplicit() {
+	case variable.SourceDefault:
+		return fmt.Sprintf("%s using default value", iconOK)
+
+	default:
+		if err, ok := v.Error().(variable.ValueError); ok {
+			return renderExplicit(
+				iconError,
+				err.Literal(),
+				renderError(s, err),
+			)
+		}
+
 		icon := iconOK
 		if s.IsDeprecated() {
 			icon = iconWarn
 		}
 
+		value := v.Value()
 		message := ""
-		if val.Verbatim() != val.Canonical() {
+
+		if value.Verbatim() != value.Canonical() {
 			message = fmt.Sprintf(
 				"equivalent to %s",
-				renderValue(s, val.Canonical()),
+				renderValue(s, value.Canonical()),
 			)
 		}
 
-		return renderExplicit(icon, val.Verbatim(), message)
+		return renderExplicit(icon, value.Verbatim(), message)
 	}
-
-	if ok {
-		return fmt.Sprintf("%s using default value", iconOK)
-	}
-
-	if s.IsRequired() {
-		return fmt.Sprintf("%s undefined", iconError)
-	}
-
-	return fmt.Sprintf("%s undefined", iconNeutral)
 }
 
 func renderValue(s variable.Spec, v variable.Literal) string {

@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 - **[BC]** `SupersededBy()` now accepts a single variable set and variadic options
 - **[BC]** Renamed `Input` to `VariableSet`
+- Refactored internal `variable.Variable` to allow for more flexible implementations
 
 ### Removed
 
