@@ -38,7 +38,7 @@ func (r *renderer) renderRefs() {
 	for _, k := range keys {
 		u, ok := urls[k]
 		if !ok {
-			n, ok := cutPrefix(k, "rfc ")
+			n, ok := strings.CutPrefix(k, "rfc ")
 			if !ok {
 				panic("unknown reference: " + k)
 			}
@@ -82,11 +82,4 @@ func (r *renderer) linkToSpec(s variable.Spec) string {
 	r.refs[key] = struct{}{}
 
 	return fmt.Sprintf("[`%s`]", s.Name())
-}
-
-func cutPrefix(s, prefix string) (after string, found bool) {
-	if !strings.HasPrefix(s, prefix) {
-		return s, false
-	}
-	return s[len(prefix):], true
 }

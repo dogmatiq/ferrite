@@ -1,6 +1,6 @@
 module github.com/dogmatiq/ferrite
 
-go 1.19
+go 1.20
 
 require (
 	github.com/dogmatiq/iago v0.4.0
