@@ -66,6 +66,12 @@ func (b *DurationBuilder) WithMaximum(v time.Duration) *DurationBuilder {
 	return b
 }
 
+// WithExample adds an example value to the documentation.
+func (b *DurationBuilder) WithExample(v time.Duration, desc string) *DurationBuilder {
+	b.builder.NormativeExample(v, desc)
+	return b
+}
+
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *DurationBuilder) Required(options ...RequiredOption) Required[time.Duration] {

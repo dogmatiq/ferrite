@@ -315,3 +315,23 @@ func ExampleDuration_deprecated() {
 	//
 	// value is 10m30s
 }
+
+func ExampleDuration_exampleValue() {
+	defer example()()
+
+	v := ferrite.
+		Duration("FERRITE_DURATION", "example duration variable").
+		WithExample(1*time.Second, "wait for one second").
+		Optional()
+
+	ferrite.Init()
+
+	if x, ok := v.Value(); ok {
+		fmt.Println("value is", x)
+	} else {
+		fmt.Println("value is undefined")
+	}
+
+	// Output:
+	// value is undefined
+}
