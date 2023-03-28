@@ -16,6 +16,8 @@ func File(name, desc string) *FileBuilder {
 	b := &FileBuilder{}
 	b.builder.Name(name)
 	b.builder.Description(desc)
+	b.builder.NonNormativeExample("/path/to/file", "an absolute file path")
+	b.builder.NonNormativeExample("./path/to/file", "a relative file path")
 	return b
 }
 
