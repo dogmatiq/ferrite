@@ -1,4 +1,4 @@
-package validate
+package markdown
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"github.com/rivo/uniseg"
 )
 
-// table renders a column-aligned table.
+// table renders a column-aligned markdown table.
 type table struct {
 	// rows is the rows of the table, each containing a slice of text with an
 	// element for each column.
@@ -51,25 +51,50 @@ func (t *table) AddRow(columns ...string) {
 func (t *table) WriteTo(w io.Writer) (int64, error) {
 	var count int64
 
-	for _, columns := range t.rows {
-		for index, text := range columns[:t.columns-1] {
-			size, err := fmt.Fprintf(
-				w,
-				"%-*s  ",
-				t.widths[index],
-				text,
-			)
-			count += int64(size)
+	for i, columns := range t.rows {
+		n, err := t.writeRow(w, columns)
+		count += int64(n)
+		if err != nil {
+			return count, err
+		}
+
+		if i == 0 {
+			var values []string
+			for _, width := range t.widths {
+				values = append(values, strings.Repeat("-", width))
+			}
+			n, err := t.writeRow(w, values)
+			count += int64(n)
 			if err != nil {
 				return count, err
 			}
 		}
 
-		n, err := fmt.Fprintln(w, columns[t.columns-1])
-		count += int64(n)
+	}
+
+	return count, nil
+}
+
+func (t *table) writeRow(w io.Writer, columns []string) (int64, error) {
+	var count int64
+
+	for index, text := range columns {
+		size, err := fmt.Fprintf(
+			w,
+			"| %-*s ",
+			t.widths[index],
+			text,
+		)
+		count += int64(size)
 		if err != nil {
 			return count, err
 		}
+	}
+
+	n, err := fmt.Fprintln(w, "|")
+	count += int64(n)
+	if err != nil {
+		return count, err
 	}
 
 	return count, nil

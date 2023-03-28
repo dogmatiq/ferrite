@@ -2,8 +2,10 @@
 
 ## Index
 
-- ~~[`WIDGET_COLOR`]~~ — ~~the color of the widget~~ (deprecated)
-- **[`WIDGET_ENABLED`]** — **enable the widget** (required)
+| Name                 | Optionality          | Description             |
+| -------------------- | -------------------- | ----------------------- |
+| ~~[`WIDGET_COLOR`]~~ | optional, deprecated | the color of the widget |
+| [`WIDGET_ENABLED`]   | required             | enable the widget       |
 
 ## Specification
 

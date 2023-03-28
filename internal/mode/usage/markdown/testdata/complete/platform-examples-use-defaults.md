@@ -19,7 +19,9 @@ document are to be interpreted as described in [RFC 2119].
 
 ## Index
 
-- [`PORT`] — an environment variable that has a default value (defaults to `ftp`)
+| Name     | Optionality       | Description                                      |
+| -------- | ----------------- | ------------------------------------------------ |
+| [`PORT`] | defaults to `ftp` | an environment variable that has a default value |
 
 ## Specification
 

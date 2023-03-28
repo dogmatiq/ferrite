@@ -19,7 +19,9 @@ document are to be interpreted as described in [RFC 2119].
 
 ## Index
 
-- **[`READ_DSN`]** — **database connection string for read-models** (required)
+| Name         | Optionality | Description                                |
+| ------------ | ----------- | ------------------------------------------ |
+| [`READ_DSN`] | required    | database connection string for read-models |
 
 ## Specification
 
