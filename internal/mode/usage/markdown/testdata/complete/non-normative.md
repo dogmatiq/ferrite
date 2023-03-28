@@ -19,7 +19,7 @@ document are to be interpreted as described in [RFC 2119].
 
 ## Index
 
-- [`READ_DSN`] — database connection string for read-models
+- **[`READ_DSN`]** — **database connection string for read-models** (required)
 
 ## Specification
 

@@ -1,6 +1,7 @@
 package markdown
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/dogmatiq/ferrite/variable"
@@ -17,23 +18,34 @@ func (r *renderer) renderIndex() {
 
 func (r *renderer) renderIndexItem(s variable.Spec) {
 	var w strings.Builder
-	strike := ""
+
+	style := ""
+	label := ""
 	if s.IsDeprecated() {
-		strike = "~~"
+		style = "~~"
+		label = "deprecated"
+	} else if def, ok := s.Default(); ok {
+		label = fmt.Sprintf("defaults to `%s`", def.Quote())
+	} else if !s.IsRequired() {
+		label = "optional"
+	} else if len(variable.Relationships[variable.DependsOn](s)) != 0 {
+		label = "conditional"
+	} else {
+		style = "**"
+		label = "required"
 	}
 
 	w.WriteString("- ")
-	w.WriteString(strike)
+	w.WriteString(style)
 	w.WriteString(r.linkToSpec(s))
-	w.WriteString(strike)
+	w.WriteString(style)
 	w.WriteString(" — ")
-	w.WriteString(strike)
+	w.WriteString(style)
 	w.WriteString(s.Description())
-	w.WriteString(strike)
-
-	if s.IsDeprecated() {
-		w.WriteString(" (deprecated)")
-	}
+	w.WriteString(style)
+	w.WriteString(" (")
+	w.WriteString(label)
+	w.WriteString(")")
 
 	r.line(w.String())
 }

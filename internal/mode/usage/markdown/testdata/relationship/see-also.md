@@ -2,8 +2,8 @@
 
 ## Index
 
-- [`DEBUG`] — enable or disable debugging features
-- [`VERBOSE`] — enable verbose logging
+- [`DEBUG`] — enable or disable debugging features (optional)
+- [`VERBOSE`] — enable verbose logging (optional)
 
 ## Specification
 

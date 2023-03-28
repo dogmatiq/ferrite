@@ -2,8 +2,8 @@
 
 ## Index
 
-- [`WIDGET_COLOR`] — the color of the widget
-- [`WIDGET_ENABLED`] — enable the widget
+- [`WIDGET_COLOR`] — the color of the widget (conditional)
+- **[`WIDGET_ENABLED`]** — **enable the widget** (required)
 
 ## Specification
 

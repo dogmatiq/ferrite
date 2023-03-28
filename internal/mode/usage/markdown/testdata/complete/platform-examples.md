@@ -16,7 +16,7 @@ document are to be interpreted as described in [RFC 2119].
 
 ## Index
 
-- [`DEBUG`] — enable or disable debugging features
+- [`DEBUG`] — enable or disable debugging features (optional)
 
 ## Specification
 

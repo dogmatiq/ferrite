@@ -3,9 +3,9 @@
 ## Index
 
 - ~~[`BIND_ADDRESS`]~~ — ~~listen address for the HTTP server~~ (deprecated)
-- [`BIND_HOST`] — listen host for the HTTP server
-- [`BIND_PORT`] — listen port for the HTTP server
-- [`BIND_VERSION`] — IP version for the HTTP server
+- [`BIND_HOST`] — listen host for the HTTP server (defaults to `0.0.0.0`)
+- [`BIND_PORT`] — listen port for the HTTP server (defaults to `8080`)
+- [`BIND_VERSION`] — IP version for the HTTP server (defaults to `4`)
 
 ## Specification
 
