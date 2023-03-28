@@ -25,8 +25,8 @@ func ExampleInit_markdownUsage() {
 	//
 	// **There do not appear to be any environment variables.**
 	//
-	// ⚠️ The application may consume other undocumented environment variables; this
-	// document only shows those variables declared using [Ferrite].
+	// ⚠️ `ferrite.test` may consume other undocumented environment variables. This
+	// document only shows variables declared using [Ferrite].
 	//
 	// <!-- references -->
 	//

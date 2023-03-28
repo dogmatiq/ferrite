@@ -1,7 +1,5 @@
 # Environment Variables
 
-## Index
-
 | Name        | Optionality | Description                          |
 | ----------- | ----------- | ------------------------------------ |
 | [`DEBUG`]   | optional    | enable or disable debugging features |

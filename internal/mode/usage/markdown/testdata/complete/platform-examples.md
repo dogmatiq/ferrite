@@ -2,25 +2,22 @@
 
 This document describes the environment variables used by `<app>`.
 
-If any of the environment variable values do not meet the requirements herein,
-the application will print usage information to `STDERR` then exit with a
-non-zero exit code. Please note that **undefined** variables and **empty**
-values are considered equivalent.
-
-⚠️ The application may consume other undocumented environment variables; this
-document only shows those variables declared using [Ferrite].
-
-The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**,
-**SHOULD**, **SHOULD NOT**, **RECOMMENDED**, **MAY**, and **OPTIONAL** in this
-document are to be interpreted as described in [RFC 2119].
-
-## Index
-
 | Name      | Optionality | Description                          |
 | --------- | ----------- | ------------------------------------ |
 | [`DEBUG`] | optional    | enable or disable debugging features |
 
+⚠️ `<app>` may consume other undocumented environment variables. This document
+only shows variables declared using [Ferrite].
+
 ## Specification
+
+All environment variables described below must meet the stated requirements.
+Otherwise, `<app>` prints usage information to `STDERR` then exits.
+**Undefined** variables and **empty** values are equivalent.
+
+The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**,
+**SHOULD**, **SHOULD NOT**, **RECOMMENDED**, **MAY**, and **OPTIONAL** in this
+document are to be interpreted as described in [RFC 2119].
 
 ### `DEBUG`
 

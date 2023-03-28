@@ -14,7 +14,8 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Changed
 
-- Render a table of environment variables in markdown documentation instead of bullet points
+- Render a table of environment variables in Markdown documentation instead of bullet points
+- Simplify language in generated documentation
 
 ## [1.0.0] - 2023-03-17
 

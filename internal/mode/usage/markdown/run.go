@@ -33,11 +33,11 @@ func WithoutUsageExamples() Option {
 	}
 }
 
-// WithoutPreamble disables the inclusion of the preamble in the rendered
-// output.
-func WithoutPreamble() Option {
+// WithoutExplanatoryText disables the inclusion of the informational paragraphs
+// in the rendered output.
+func WithoutExplanatoryText() Option {
 	return func(r *renderer) {
-		r.withoutPreamble = true
+		r.withoutExplanatoryText = true
 	}
 }
 

@@ -44,10 +44,10 @@ var _ = Describe("func Wrap()", func() {
 		),
 		Entry(
 			"multi-byte character, multiple lines",
-			"⚠️ The application may consume other undocumented environment variables; this document only shows those variables declared using [Ferrite].",
+			"⚠️ The application may consume other undocumented environment variables. This document only shows variables declared using [Ferrite].",
 			[]string{
-				"⚠️ The application may consume other undocumented environment variables; this",
-				"document only shows those variables declared using [Ferrite].",
+				"⚠️ The application may consume other undocumented environment variables. This",
+				"document only shows variables declared using [Ferrite].",
 			},
 		),
 		Entry(

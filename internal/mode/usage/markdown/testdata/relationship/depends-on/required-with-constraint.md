@@ -1,7 +1,5 @@
 # Environment Variables
 
-## Index
-
 | Name               | Optionality | Description             |
 | ------------------ | ----------- | ----------------------- |
 | [`WIDGET_COLOR`]   | conditional | the color of the widget |

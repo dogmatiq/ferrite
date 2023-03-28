@@ -1,7 +1,5 @@
 # Environment Variables
 
-## Index
-
 | Name                 | Optionality           | Description                        |
 | -------------------- | --------------------- | ---------------------------------- |
 | ~~[`BIND_ADDRESS`]~~ | optional, deprecated  | listen address for the HTTP server |

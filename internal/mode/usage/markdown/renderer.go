@@ -15,28 +15,65 @@ type renderer struct {
 	Specs  []variable.Spec
 	Output io.Writer
 
-	withoutPreamble      bool
-	withoutIndex         bool
-	withoutUsageExamples bool
-	refs                 map[string]struct{}
+	withoutExplanatoryText bool
+	withoutIndex           bool
+	withoutUsageExamples   bool
+	refs                   map[string]struct{}
 }
 
 func (r *renderer) Render() {
 	r.line("# Environment Variables")
 
-	if !r.withoutPreamble {
+	if !r.withoutExplanatoryText {
 		r.gap()
-		r.renderPreamble()
+		r.line("This document describes the environment variables used by `%s`.", r.App)
+	}
+
+	if !r.withoutIndex {
+		r.gap()
+		r.renderIndex()
+	}
+
+	if !r.withoutExplanatoryText {
+		r.paragraphf(
+			"⚠️ `%s` may consume other undocumented environment variables.",
+			"This document only shows variables declared using %s.",
+		)(
+			r.App,
+			r.link("Ferrite"),
+		)
 	}
 
 	if len(r.Specs) != 0 {
-		if !r.withoutIndex {
-			r.gap()
-			r.renderIndex()
-		}
-
 		r.gap()
 		r.line("## Specification")
+
+		if !r.withoutExplanatoryText {
+			r.paragraphf(
+				"All environment variables described below must meet the stated requirements.",
+				"Otherwise, `%s` prints usage information to `STDERR` then exits.",
+				"**Undefined** variables and **empty** values are equivalent.",
+			)(
+				r.App,
+			)
+
+			if r.hasNonNormativeExamples() {
+				r.paragraphf(
+					"⚠️ This section includes **non-normative** example values.",
+					"These examples are syntactically valid, but may not be meaningful to `%s`.",
+				)(
+					r.App,
+				)
+			}
+
+			r.paragraphf(
+				"The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**,",
+				"**SHOULD**, **SHOULD NOT**, **RECOMMENDED**, **MAY**, and **OPTIONAL** in this",
+				"document are to be interpreted as described in %s.",
+			)(
+				r.link("RFC 2119"),
+			)
+		}
 
 		for _, s := range r.Specs {
 			sr := specRenderer{r, s}

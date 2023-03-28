@@ -17,7 +17,7 @@ var _ = DescribeTable(
 	"func Run()",
 	tableTest(
 		"spec",
-		WithoutPreamble(),
+		WithoutExplanatoryText(),
 		WithoutIndex(),
 		WithoutUsageExamples(),
 	),

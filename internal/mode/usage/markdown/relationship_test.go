@@ -11,7 +11,7 @@ var _ = DescribeTable(
 	"func Run()",
 	tableTest(
 		"relationship",
-		WithoutPreamble(),
+		WithoutExplanatoryText(),
 		WithoutUsageExamples(),
 	),
 	Entry(
