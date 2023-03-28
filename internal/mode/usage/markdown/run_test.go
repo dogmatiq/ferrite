@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/dogmatiq/ferrite/internal/mode"
 	. "github.com/dogmatiq/ferrite/internal/mode/usage/markdown"
@@ -53,7 +54,13 @@ func tableTest(
 			},
 			options...,
 		)
-		ExpectWithOffset(1, actual.String()).To(EqualX(string(expect)))
+
+		// Split strings into lines which producers a more human-friendly diff
+		// in case of a failure.
+		actualLines := strings.Split(actual.String(), "\n")
+		expectLines := strings.Split(string(expect), "\n")
+
+		ExpectWithOffset(1, actualLines).To(EqualX(expectLines))
 		Expect(exited).To(BeTrue())
 	}
 }
