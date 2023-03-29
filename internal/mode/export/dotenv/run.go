@@ -39,7 +39,7 @@ func Run(opts mode.Config) {
 		}
 
 		must.Fprintf(opts.Out, ")\n")
-		must.Fprintf(opts.Out, "%s=", s.Name())
+		must.Fprintf(opts.Out, "export %s=", s.Name())
 
 		if v.Source() == variable.SourceEnvironment && !s.IsSensitive() {
 			err := v.Error()

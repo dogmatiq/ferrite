@@ -74,39 +74,39 @@ func ExampleInit_exportDotEnvFile() {
 
 	// Output:
 	// # example bool (required)
-	// FERRITE_BOOL=true
+	// export FERRITE_BOOL=true
 	//
 	// # example duration (default: 1h)
-	// FERRITE_DURATION=620s # equivalent to 10m20s
+	// export FERRITE_DURATION=620s # equivalent to 10m20s
 	//
 	// # example enum (default: bar)
-	// FERRITE_ENUM=
+	// export FERRITE_ENUM=
 	//
 	// # example network port (optional)
-	// FERRITE_NETWORK_PORT=8080
+	// export FERRITE_NETWORK_PORT=8080
 	//
 	// # example floating-point (required)
-	// FERRITE_NUM_FLOAT=
+	// export FERRITE_NUM_FLOAT=
 	//
 	// # example signed integer (required)
-	// FERRITE_NUM_SIGNED=
+	// export FERRITE_NUM_SIGNED=
 	//
 	// # example unsigned integer (required)
-	// FERRITE_NUM_UNSIGNED=
+	// export FERRITE_NUM_UNSIGNED=
 	//
 	// # example string (required)
-	// FERRITE_STRING='hello, world!'
+	// export FERRITE_STRING='hello, world!'
 	//
 	// # example sensitive string (default: ********, sensitive)
-	// FERRITE_STRING_SENSITIVE=
+	// export FERRITE_STRING_SENSITIVE=
 	//
 	// # kubernetes "ferrite-svc" service host (deprecated)
-	// FERRITE_SVC_SERVICE_HOST=host.example.org
+	// export FERRITE_SVC_SERVICE_HOST=host.example.org
 	//
 	// # kubernetes "ferrite-svc" service port (deprecated)
-	// FERRITE_SVC_SERVICE_PORT=443
+	// export FERRITE_SVC_SERVICE_PORT=443
 	//
 	// # example URL (required)
-	// FERRITE_URL= # https//example.org is invalid: URL must have a scheme
+	// export FERRITE_URL= # https//example.org is invalid: URL must have a scheme
 	// <process exited successfully>
 }

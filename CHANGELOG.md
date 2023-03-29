@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Unreleased
 
+### Fixed
+
+- Added `export` keyword to output of `export/dotenv` mode
+
 ### Changed
 
 - Improve example values for `File()` builder
