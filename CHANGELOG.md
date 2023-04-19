@@ -10,6 +10,12 @@ The format is based on [Keep a Changelog], and this project adheres to
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+## [1.0.3] - 2023-04-20
+
+### Changed
+
+- `export/dotenv` mode now includes sensitive values in the output
+
 ## [1.0.2] - 2023-03-29
 
 ### Fixed
@@ -201,6 +207,7 @@ The two most important changes in usage are:
 [1.0.0]: https://github.com/dogmatiq/ferrite/releases/tag/v1.0.0
 [1.0.1]: https://github.com/dogmatiq/ferrite/releases/tag/v1.0.1
 [1.0.2]: https://github.com/dogmatiq/ferrite/releases/tag/v1.0.2
+[1.0.3]: https://github.com/dogmatiq/ferrite/releases/tag/v1.0.3
 
 <!-- version template
 ## [0.0.1] - YYYY-MM-DD

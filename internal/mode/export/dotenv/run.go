@@ -23,7 +23,7 @@ func Run(opts mode.Config) {
 		if def, ok := s.Default(); ok {
 			x := def.Quote()
 			if s.IsSensitive() {
-				x = strings.Repeat("*", len(def.String))
+				x = strings.Repeat("*", len(x))
 			}
 			must.Fprintf(opts.Out, "default: %s", x)
 		} else if s.IsDeprecated() {
@@ -41,7 +41,7 @@ func Run(opts mode.Config) {
 		must.Fprintf(opts.Out, ")\n")
 		must.Fprintf(opts.Out, "export %s=", s.Name())
 
-		if v.Source() == variable.SourceEnvironment && !s.IsSensitive() {
+		if v.Source() == variable.SourceEnvironment {
 			err := v.Error()
 			if err, ok := err.(variable.ValueError); ok {
 				must.Fprintf(

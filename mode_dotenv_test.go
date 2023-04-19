@@ -98,7 +98,7 @@ func ExampleInit_exportDotEnvFile() {
 	// export FERRITE_STRING='hello, world!'
 	//
 	// # example sensitive string (default: ********, sensitive)
-	// export FERRITE_STRING_SENSITIVE=
+	// export FERRITE_STRING_SENSITIVE=hunter2
 	//
 	// # kubernetes "ferrite-svc" service host (deprecated)
 	// export FERRITE_SVC_SERVICE_HOST=host.example.org
