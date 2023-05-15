@@ -14,11 +14,11 @@ func WithRegistry(reg *variable.Registry) interface {
 	}
 
 	return option{
-		ApplyToInitConfig: func(opts *initConfig) {
-			opts.ModeConfig.Registry = reg
+		ApplyToInitConfig: func(cfg *initConfig) {
+			cfg.ModeConfig.Registry = reg
 		},
-		ApplyToSetConfig: func(opts *variableSetConfig) {
-			opts.Registry = reg
+		ApplyToSetConfig: func(cfg *variableSetConfig) {
+			cfg.Registry = reg
 		},
 	}
 }

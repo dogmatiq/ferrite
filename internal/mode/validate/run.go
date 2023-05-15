@@ -13,12 +13,12 @@ import (
 // for display in the console.
 //
 // It returns true if all variables are valid.
-func Run(opts mode.Config) {
+func Run(cfg mode.Config) {
 	show := false
 	valid := true
 
 	t := table{}
-	for _, v := range opts.Registry.Variables() {
+	for _, v := range cfg.Registry.Variables() {
 		t.AddRow(
 			name(v),
 			description(v),
@@ -36,21 +36,21 @@ func Run(opts mode.Config) {
 	}
 
 	if show {
-		if _, err := io.WriteString(opts.Err, "Environment Variables:\n\n"); err != nil {
+		if _, err := io.WriteString(cfg.Err, "Environment Variables:\n\n"); err != nil {
 			panic(err)
 		}
 
-		if _, err := t.WriteTo(opts.Err); err != nil {
+		if _, err := t.WriteTo(cfg.Err); err != nil {
 			panic(err)
 		}
 
-		if _, err := io.WriteString(opts.Err, "\n"); err != nil {
+		if _, err := io.WriteString(cfg.Err, "\n"); err != nil {
 			panic(err)
 		}
 	}
 
 	if !valid {
-		opts.Exit(1)
+		cfg.Exit(1)
 	}
 }
 

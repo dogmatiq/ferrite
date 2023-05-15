@@ -10,42 +10,42 @@ import (
 
 // Run generates and env file describing the environment variables and their
 // current values.
-func Run(opts mode.Config) {
-	for i, v := range opts.Registry.Variables() {
+func Run(cfg mode.Config) {
+	for i, v := range cfg.Registry.Variables() {
 		s := v.Spec()
 
 		if i > 0 {
-			must.Fprintf(opts.Out, "\n")
+			must.Fprintf(cfg.Out, "\n")
 		}
 
-		must.Fprintf(opts.Out, "# %s (", s.Description())
+		must.Fprintf(cfg.Out, "# %s (", s.Description())
 
 		if def, ok := s.Default(); ok {
 			x := def.Quote()
 			if s.IsSensitive() {
 				x = strings.Repeat("*", len(x))
 			}
-			must.Fprintf(opts.Out, "default: %s", x)
+			must.Fprintf(cfg.Out, "default: %s", x)
 		} else if s.IsDeprecated() {
-			must.Fprintf(opts.Out, "deprecated")
+			must.Fprintf(cfg.Out, "deprecated")
 		} else if s.IsRequired() {
-			must.Fprintf(opts.Out, "required")
+			must.Fprintf(cfg.Out, "required")
 		} else {
-			must.Fprintf(opts.Out, "optional")
+			must.Fprintf(cfg.Out, "optional")
 		}
 
 		if s.IsSensitive() {
-			must.Fprintf(opts.Out, ", sensitive")
+			must.Fprintf(cfg.Out, ", sensitive")
 		}
 
-		must.Fprintf(opts.Out, ")\n")
-		must.Fprintf(opts.Out, "export %s=", s.Name())
+		must.Fprintf(cfg.Out, ")\n")
+		must.Fprintf(cfg.Out, "export %s=", s.Name())
 
 		if v.Source() == variable.SourceEnvironment {
 			err := v.Error()
 			if err, ok := err.(variable.ValueError); ok {
 				must.Fprintf(
-					opts.Out,
+					cfg.Out,
 					" # %s is invalid: %s",
 					err.Literal().Quote(),
 					err.Unwrap(),
@@ -54,14 +54,14 @@ func Run(opts mode.Config) {
 				value := v.Value()
 
 				must.Fprintf(
-					opts.Out,
+					cfg.Out,
 					"%s",
 					value.Verbatim().Quote(),
 				)
 
 				if value.Verbatim() != value.Canonical() {
 					must.Fprintf(
-						opts.Out,
+						cfg.Out,
 						" # equivalent to %s",
 						value.Canonical().Quote(),
 					)
@@ -69,8 +69,8 @@ func Run(opts mode.Config) {
 			}
 		}
 
-		must.Fprintf(opts.Out, "\n")
+		must.Fprintf(cfg.Out, "\n")
 	}
 
-	opts.Exit(0)
+	cfg.Exit(0)
 }

@@ -7,11 +7,11 @@ import (
 )
 
 // Run generates environment variable usage instructions in markdown format.
-func Run(opts mode.Config, options ...Option) {
+func Run(cfg mode.Config, options ...Option) {
 	r := renderer{
-		App:    filepath.Base(opts.Args[0]),
-		Specs:  opts.Registry.Specs(),
-		Output: opts.Out,
+		App:    filepath.Base(cfg.Args[0]),
+		Specs:  cfg.Registry.Specs(),
+		Output: cfg.Out,
 	}
 
 	for _, opt := range options {
@@ -19,7 +19,7 @@ func Run(opts mode.Config, options ...Option) {
 	}
 
 	r.Render()
-	opts.Exit(0)
+	cfg.Exit(0)
 }
 
 // Option is a function that changes the behavior of a renderer.

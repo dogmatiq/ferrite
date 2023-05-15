@@ -32,6 +32,7 @@ func Init(options ...InitOption) {
 	cfg := initConfig{
 		mode.DefaultConfig,
 	}
+
 	for _, opt := range options {
 		opt.applyInitOption(&cfg)
 	}

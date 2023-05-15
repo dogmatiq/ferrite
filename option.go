@@ -22,28 +22,28 @@ type option struct {
 	ApplyToSupersedesRelationship func(*variable.Supersedes)
 }
 
-func (o option) applyInitOption(opts *initConfig) {
-	applyOption(opts, o.ApplyToInitConfig)
+func (o option) applyInitOption(cfg *initConfig) {
+	applyOption(cfg, o.ApplyToInitConfig)
 }
 
-func (o option) applyRequiredOptionToConfig(opts *variableSetConfig) {
-	applyOption(opts, o.ApplyToSetConfig, o.ApplyToRequiredSetConfig)
+func (o option) applyRequiredOptionToConfig(cfg *variableSetConfig) {
+	applyOption(cfg, o.ApplyToSetConfig, o.ApplyToRequiredSetConfig)
 }
 
 func (o option) applyRequiredOptionToSpec(b variable.SpecBuilder) {
 	applyOption(b, o.ApplyToSpec, o.ApplyToSpecInRequiredSet)
 }
 
-func (o option) applyOptionalOptionToConfig(opts *variableSetConfig) {
-	applyOption(opts, o.ApplyToSetConfig, o.ApplyToOptionalSetConfig)
+func (o option) applyOptionalOptionToConfig(cfg *variableSetConfig) {
+	applyOption(cfg, o.ApplyToSetConfig, o.ApplyToOptionalSetConfig)
 }
 
 func (o option) applyOptionalOptionToSpec(b variable.SpecBuilder) {
 	applyOption(b, o.ApplyToSpec, o.ApplyToSpecInOptionalSet)
 }
 
-func (o option) applyDeprecatedOptionToConfig(opts *variableSetConfig) {
-	applyOption(opts, o.ApplyToSetConfig, o.ApplyToDeprecatedSetConfig)
+func (o option) applyDeprecatedOptionToConfig(cfg *variableSetConfig) {
+	applyOption(cfg, o.ApplyToSetConfig, o.ApplyToDeprecatedSetConfig)
 }
 
 func (o option) applyDeprecatedOptionToSpec(b variable.SpecBuilder) {

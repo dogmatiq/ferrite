@@ -43,9 +43,6 @@ func tearDown() {
 }
 
 var _ = Describe("func Init()", func() {
-	BeforeEach(func() {
-	})
-
 	AfterEach(func() {
 		tearDown()
 	})
