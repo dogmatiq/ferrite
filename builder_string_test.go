@@ -6,6 +6,7 @@ import (
 
 	"github.com/dogmatiq/ferrite"
 	. "github.com/dogmatiq/ferrite"
+	"github.com/dogmatiq/ferrite/internal/encoders"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
@@ -46,6 +47,35 @@ var _ = Describe("type StringBuilder", func() {
 						Value()
 
 					Expect(v).To(Equal(userDefinedString("<value>")))
+				})
+			})
+		})
+
+		When("the value is encoded", func() {
+			Describe("encoding.Hex", func() {
+				It("decodes a hex string", func() {
+					os.Setenv("FERRITE_STRING", "484558")
+					// "484558" == "HEX"
+
+					v := builder.
+						WithEncoder(encoders.Hex).
+						Required().
+						Value()
+
+					Expect(v).To(Equal(userDefinedString("HEX")))
+				})
+			})
+			Describe("encoding.Base64", func() {
+				It("decodes a hex string", func() {
+					os.Setenv("FERRITE_STRING", "SEVY")
+					// "SEVY" == "HEX"
+
+					v := builder.
+						WithEncoder(encoders.Base64).
+						Required().
+						Value()
+
+					Expect(v).To(Equal(userDefinedString("HEX")))
 				})
 			})
 		})

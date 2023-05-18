@@ -1,6 +1,7 @@
 package ferrite
 
 import (
+	"github.com/dogmatiq/ferrite/internal/encoders"
 	"github.com/dogmatiq/ferrite/variable"
 )
 
@@ -60,6 +61,12 @@ func (b *StringBuilder[T]) WithConstraint(
 // generated documentation.
 func (b *StringBuilder[T]) WithSensitiveContent() *StringBuilder[T] {
 	b.builder.MarkSensitive()
+	return b
+}
+
+// WithEncoder sets the encoder for parsing the value source.
+func (b *StringBuilder[T]) WithEncoder(encoder encoders.Encoder) *StringBuilder[T] {
+	b.schema.Encoder = encoder
 	return b
 }
 

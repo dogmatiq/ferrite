@@ -1,10 +1,13 @@
 package variable
 
 import (
+	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"math"
 	"reflect"
 
+	"github.com/dogmatiq/ferrite/internal/encoders"
 	"github.com/dogmatiq/ferrite/internal/reflectx"
 	"github.com/dogmatiq/ferrite/maybe"
 )
@@ -22,6 +25,7 @@ type String interface {
 
 // TypedString is a string value depicted by type T.
 type TypedString[T ~string] struct {
+	Encoder        encoders.Encoder
 	MinLen, MaxLen maybe.Value[int]
 }
 
@@ -80,6 +84,25 @@ func (s TypedString[T]) Marshal(v T) (Literal, error) {
 
 // Unmarshal converts a literal value to it's native representation.
 func (s TypedString[T]) Unmarshal(v Literal) (T, error) {
+	switch s.Encoder {
+	case encoders.Hex:
+		keyBuf, err := hex.DecodeString(v.String)
+		if err != nil {
+			return T(v.String), err
+		}
+
+		n := T(string(keyBuf))
+		return n, s.validate(n)
+	case encoders.Base64:
+		val, err := base64.URLEncoding.DecodeString(v.String)
+		if err != nil {
+			return T(v.String), err
+		}
+
+		n := T(string(val))
+		return n, s.validate(n)
+	}
+
 	n := T(v.String)
 	return n, s.validate(n)
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/dogmatiq/ferrite/internal/encoders"
 	"github.com/dogmatiq/ferrite/internal/mode"
 	"github.com/dogmatiq/ferrite/internal/mode/export/dotenv"
 	"github.com/dogmatiq/ferrite/internal/mode/usage/markdown"
@@ -31,6 +32,7 @@ import (
 func Init(options ...InitOption) {
 	cfg := initConfig{
 		mode.DefaultConfig,
+		encoders.None,
 	}
 
 	for _, opt := range options {
@@ -59,4 +61,5 @@ type InitOption interface {
 // InitOption values.
 type initConfig struct {
 	ModeConfig mode.Config
+	Encoder    encoders.Encoder
 }
