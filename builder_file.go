@@ -2,7 +2,6 @@ package ferrite
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 
 	"github.com/dogmatiq/ferrite/variable"
@@ -65,7 +64,7 @@ func (n FileName) Reader() (io.ReadCloser, error) {
 
 // ReadBytes returns the contents of the file as a byte slice.
 func (n FileName) ReadBytes() ([]byte, error) {
-	return ioutil.ReadFile(string(n))
+	return os.ReadFile(string(n))
 }
 
 // ReadString returns the contents of the file as a string.
