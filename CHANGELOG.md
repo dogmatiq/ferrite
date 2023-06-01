@@ -12,9 +12,13 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
-### Changed
+### Removed
 
-- `io/ioutil.ReadFile` replaced with `os.ReadFile` in file builder
+- Removed "platform" examples from generated documentation. These are too
+  opinionated and organization-specific to be included in every project's
+  documentation. Instead, we will provide different export modes that can be
+  used to generate Docker/Kubernetes/etc configurations, similar to the existing
+  `export/dotenv` mode.
 
 ## [1.0.3] - 2023-04-20
 

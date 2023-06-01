@@ -79,11 +79,6 @@ func (r *renderer) Render() {
 			sr := specRenderer{r, s}
 			sr.Render()
 		}
-
-		if !r.withoutUsageExamples {
-			r.gap()
-			r.renderPlatformExamples()
-		}
 	}
 
 	if len(r.refs) != 0 {

@@ -15,10 +15,7 @@ func (r *renderer) renderRefs() {
 
 	keys := maps.Keys(r.refs)
 	urls := map[string]string{
-		"docker service":        "https://docs.docker.com/compose/environment-variables/#set-environment-variables-in-containers",
-		"ferrite":               "https://github.com/dogmatiq/ferrite",
-		"kubernetes config map": "https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables",
-		"kubernetes container":  "https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/#define-an-environment-variable-for-a-container",
+		"ferrite": "https://github.com/dogmatiq/ferrite",
 	}
 
 	for _, s := range r.Specs {

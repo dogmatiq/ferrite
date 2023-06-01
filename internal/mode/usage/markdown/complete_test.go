@@ -23,23 +23,4 @@ var _ = DescribeTable(
 				Required(ferrite.WithRegistry(reg))
 		},
 	),
-	Entry(
-		"platform examples",
-		"platform-examples.md",
-		func(reg *variable.Registry) {
-			ferrite.
-				Bool("DEBUG", "enable or disable debugging features").
-				Optional(ferrite.WithRegistry(reg))
-		},
-	),
-	Entry(
-		"platform examples use default values as examples when available",
-		"platform-examples-use-defaults.md",
-		func(reg *variable.Registry) {
-			ferrite.
-				NetworkPort("PORT", "an environment variable that has a default value").
-				WithDefault("ftp").
-				Required(ferrite.WithRegistry(reg))
-		},
-	),
 )
