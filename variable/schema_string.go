@@ -11,13 +11,7 @@ import (
 
 // String is a schema that allows arbitrary string input.
 type String interface {
-	Schema
-
-	// MinLength returns the minimum permitted length of the string.
-	MinLength() (int, bool)
-
-	// MaxLength returns the maximum permitted length of the string.
-	MaxLength() (int, bool)
+	LengthLimited
 }
 
 // TypedString is a string value depicted by type T.
@@ -25,13 +19,25 @@ type TypedString[T ~string] struct {
 	MinLen, MaxLen maybe.Value[int]
 }
 
-// MinLength returns the minimum permitted length of the string.
-func (s TypedString[T]) MinLength() (int, bool) {
+// MinLengthLiteral returns the minimum permitted length of the literal
+// environment variable value, in bytes.
+func (s TypedString[T]) MinLengthLiteral() (int, bool) {
+	return s.MinLengthNative()
+}
+
+// MaxLengthLiteral returns the maximum permitted length of the literal
+// environment variable value, in bytes.
+func (s TypedString[T]) MaxLengthLiteral() (int, bool) {
+	return s.MaxLengthNative()
+}
+
+// MinLengthNative returns the minimum permitted length of the native value.
+func (s TypedString[T]) MinLengthNative() (int, bool) {
 	return s.MinLen.Get()
 }
 
-// MaxLength returns the maximum permitted length of the string.
-func (s TypedString[T]) MaxLength() (int, bool) {
+// MaxLengthNative returns the maximum permitted length of the native value.
+func (s TypedString[T]) MaxLengthNative() (int, bool) {
 	return s.MaxLen.Get()
 }
 
@@ -144,67 +150,4 @@ func (s TypedString[T]) validate(v T) error {
 	}
 
 	return nil
-}
-
-// MinLengthError indicates that a string value was shorter than the minimum
-// permitted length.
-type MinLengthError struct {
-	String String
-}
-
-var _ SchemaError = MinLengthError{}
-
-// Schema returns the schema that was violated.
-func (e MinLengthError) Schema() Schema {
-	return e.String
-}
-
-// AcceptVisitor passes the error to the appropriate method of v.
-func (e MinLengthError) AcceptVisitor(v SchemaErrorVisitor) {
-	v.VisitMinLengthError(e)
-}
-
-func (e MinLengthError) Error() string {
-	return fmt.Sprintf("too short, %s", explainLengthError(e.String))
-}
-
-// MaxLengthError indicates that a string value was greater than the maximum
-// permitted value.
-type MaxLengthError struct {
-	String String
-}
-
-var _ SchemaError = MaxLengthError{}
-
-// Schema returns the schema that was violated.
-func (e MaxLengthError) Schema() Schema {
-	return e.String
-}
-
-// AcceptVisitor passes the error to the appropriate method of v.
-func (e MaxLengthError) AcceptVisitor(v SchemaErrorVisitor) {
-	v.VisitMaxLengthError(e)
-}
-
-func (e MaxLengthError) Error() string {
-	return fmt.Sprintf("too long, %s", explainLengthError(e.String))
-}
-
-func explainLengthError(s String) string {
-	min, hasMin := s.MinLength()
-	max, hasMax := s.MaxLength()
-
-	if !hasMin {
-		return fmt.Sprintf("expected length to be %d bytes or fewer", max)
-	}
-
-	if !hasMax {
-		return fmt.Sprintf("expected length to be %d bytes or more", max)
-	}
-
-	if min == max {
-		return fmt.Sprintf("expected length to be exactly %d bytes", min)
-	}
-
-	return fmt.Sprintf("expected length to be between %d and %d bytes", min, max)
 }

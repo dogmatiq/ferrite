@@ -4,7 +4,7 @@ import (
 	"reflect"
 )
 
-// Schema describes the valid values of an environment value.
+// Schema describes the valid values of an environment variable value.
 type Schema interface {
 	// Type returns the type of the native value.
 	Type() reflect.Type
@@ -16,6 +16,26 @@ type Schema interface {
 
 	// AcceptVisitor passes the schema to the appropriate method of v.
 	AcceptVisitor(v SchemaVisitor)
+}
+
+// LengthLimited is an interface for a [Schema] that impose a minimum
+// and/or maximum length on an environment variable value.
+type LengthLimited interface {
+	Schema
+
+	// MinLengthLiteral returns the minimum permitted length of the literal
+	// environment variable value, in bytes.
+	MinLengthLiteral() (int, bool)
+
+	// MaxLengthLiteral returns the maximum permitted length of the literal
+	// environment variable value, in bytes.
+	MaxLengthLiteral() (int, bool)
+
+	// MinLengthNative returns the minimum permitted length of the native value.
+	MinLengthNative() (int, bool)
+
+	// MaxLengthNative returns the maximum permitted length of the native value.
+	MaxLengthNative() (int, bool)
 }
 
 // SchemaError indicates that a value is invalid because it violates its schema.

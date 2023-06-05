@@ -12,6 +12,19 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+All backwards-incompatible changes in this version are within the `variable`
+sub-package, which remains experimental and outside the scope of the Ferrite
+project's stability guarantees.
+
+### Added
+
+- Added `variable.LengthLimited` schema for values that have minimum or maximum lengths
+
+### Changed
+
+- **[BC]** Replace `String` schema field of `variable.MinLengthError` and `MaxLengthError` with a `LengthLimited` schema
+- **[BC]** `variable.String` now implements the new `LengthLimited` interface
+
 ### Removed
 
 - Removed "platform" examples from generated documentation. These are too
