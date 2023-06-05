@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/dogmatiq/ferrite/internal/mode/internal/render"
 	"github.com/dogmatiq/ferrite/variable"
 )
 
@@ -22,7 +23,7 @@ func value(v variable.Any) string {
 		}
 
 		out.WriteString("set to ")
-		out.WriteString(renderValue(s, lit))
+		out.WriteString(render.Value(s, lit))
 
 		if message != "" {
 			out.WriteString(", ")
@@ -62,54 +63,10 @@ func value(v variable.Any) string {
 		if value.Verbatim() != value.Canonical() {
 			message = fmt.Sprintf(
 				"equivalent to %s",
-				renderValue(s, value.Canonical()),
+				render.Value(s, value.Canonical()),
 			)
 		}
 
 		return renderExplicit(icon, value.Verbatim(), message)
-	}
-}
-
-func renderValue(s variable.Spec, v variable.Literal) string {
-	vis := &valueRenderer{
-		Spec: s,
-		In:   v,
-	}
-	s.Schema().AcceptVisitor(vis)
-
-	return vis.Out
-}
-
-type valueRenderer struct {
-	Spec variable.Spec
-	In   variable.Literal
-	Out  string
-}
-
-func (r *valueRenderer) VisitBinary(s variable.Binary) {
-	r.Out = fmt.Sprintf("%d-byte value", len(r.In.String))
-}
-
-func (r *valueRenderer) VisitNumeric(s variable.Numeric) {
-	r.visitGeneric(s)
-}
-
-func (r *valueRenderer) VisitSet(s variable.Set) {
-	r.visitGeneric(s)
-}
-
-func (r *valueRenderer) VisitString(s variable.String) {
-	r.visitGeneric(s)
-}
-
-func (r *valueRenderer) VisitOther(s variable.Other) {
-	r.visitGeneric(s)
-}
-
-func (r *valueRenderer) visitGeneric(s variable.Schema) {
-	if r.Spec.IsSensitive() {
-		r.Out = strings.Repeat("*", len(r.In.String))
-	} else {
-		r.Out = r.In.Quote()
 	}
 }

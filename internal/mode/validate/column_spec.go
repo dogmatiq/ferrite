@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/dogmatiq/ferrite/internal/mode/internal/render"
 	"github.com/dogmatiq/ferrite/variable"
 )
 
@@ -21,7 +22,7 @@ func spec(v variable.Any) string {
 		return fmt.Sprintf(
 			"[ %s ] = %s",
 			out,
-			renderValue(s, def),
+			render.Value(s, def),
 		)
 	}
 

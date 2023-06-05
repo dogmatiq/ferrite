@@ -57,6 +57,18 @@ func (b *BinaryBuilder[T, B]) WithDefault(v T) *BinaryBuilder[T, B] {
 	return b
 }
 
+// WithDefaultString sets a default value of the variable to a string value.
+//
+// It is used when the environment variable is undefined or empty.
+func (b *BinaryBuilder[T, B]) WithDefaultString(v string) *BinaryBuilder[T, B] {
+	data := make(T, len(v))
+	for i := 0; i < len(v); i++ {
+		data[i] = B(v[i])
+	}
+	b.builder.Default(data)
+	return b
+}
+
 // WithConstraint adds a constraint to the variable.
 //
 // fn is called with the environment variable value after it is parsed. If fn

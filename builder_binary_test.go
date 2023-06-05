@@ -202,7 +202,7 @@ func ExampleBinary_sensitive() {
 	// Output:
 	// Environment Variables:
 	//
-	//  ❯ FERRITE_BINARY  example sensitive binary variable    <base64>    ✗ set to 12-byte value, always fail
+	//  ❯ FERRITE_BINARY  example sensitive binary variable    <base64>    ✗ set to {12 bytes}, always fail
 	//
 	// <process exited with error code 1>
 }
@@ -226,7 +226,7 @@ func ExampleBinary_deprecated() {
 	// Output:
 	// Environment Variables:
 	//
-	//  ❯ FERRITE_BINARY  example binary variable  [ <base64> ]  ⚠ deprecated variable set to 12-byte value
+	//  ❯ FERRITE_BINARY  example binary variable  [ <base64> ]  ⚠ deprecated variable set to {12 bytes}
 	//
 	// value is <value>
 }

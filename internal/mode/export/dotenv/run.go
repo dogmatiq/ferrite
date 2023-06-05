@@ -1,9 +1,8 @@
 package dotenv
 
 import (
-	"strings"
-
 	"github.com/dogmatiq/ferrite/internal/mode"
+	"github.com/dogmatiq/ferrite/internal/mode/internal/render"
 	"github.com/dogmatiq/ferrite/variable"
 	"github.com/dogmatiq/iago/must"
 )
@@ -21,11 +20,8 @@ func Run(cfg mode.Config) {
 		must.Fprintf(cfg.Out, "# %s (", s.Description())
 
 		if def, ok := s.Default(); ok {
-			x := def.Quote()
-			if s.IsSensitive() {
-				x = strings.Repeat("*", len(x))
-			}
-			must.Fprintf(cfg.Out, "default: %s", x)
+			must.WriteString(cfg.Out, "default: ")
+			must.WriteString(cfg.Out, render.Value(s, def))
 		} else if s.IsDeprecated() {
 			must.Fprintf(cfg.Out, "deprecated")
 		} else if s.IsRequired() {
