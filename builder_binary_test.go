@@ -1,6 +1,7 @@
 package ferrite_test
 
 import (
+	"encoding/base64"
 	"fmt"
 	"os"
 
@@ -205,6 +206,40 @@ func ExampleBinary_sensitive() {
 	//  ❯ FERRITE_BINARY  example sensitive binary variable    <base64>    ✗ set to {12 bytes}, always fail
 	//
 	// <process exited with error code 1>
+}
+
+func ExampleBinary_base64url() {
+	defer example()()
+
+	v := ferrite.
+		Binary("FERRITE_BINARY", "example binary variable").
+		WithBase64Encoding(base64.RawURLEncoding).
+		Required()
+
+	os.Setenv("FERRITE_BINARY", "_w") // would be "/w==" with standard base64 encoding
+	ferrite.Init()
+
+	fmt.Println("value is", v.Value())
+
+	// Output:
+	// value is [255]
+}
+
+func ExampleBinary_hex() {
+	defer example()()
+
+	v := ferrite.
+		Binary("FERRITE_BINARY", "example binary variable").
+		WithHexEncoding().
+		Required()
+
+	os.Setenv("FERRITE_BINARY", "3c76616c75653e")
+	ferrite.Init()
+
+	fmt.Println("value is", string(v.Value()))
+
+	// Output:
+	// value is <value>
 }
 
 func ExampleBinary_deprecated() {
