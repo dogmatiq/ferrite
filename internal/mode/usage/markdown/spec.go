@@ -60,8 +60,8 @@ func (r *specRenderer) VisitNumeric(s variable.Numeric) {
 	}
 }
 
-// VisitSet renders the primary requirement for spec that uses the "set" schema
-// type.
+// VisitSet renders the primary requirement for a spec that uses the "set"
+// schema type.
 func (r *specRenderer) VisitSet(s variable.Set) {
 	if lits := s.Literals(); len(lits) == 2 {
 		r.renderPrimaryRequirement(
