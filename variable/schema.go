@@ -51,6 +51,7 @@ type SchemaError interface {
 
 // SchemaVisitor dispatches based on a variable's schema.
 type SchemaVisitor interface {
+	VisitBinary(Binary)
 	VisitNumeric(Numeric)
 	VisitSet(Set)
 	VisitString(String)

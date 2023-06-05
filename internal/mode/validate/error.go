@@ -27,12 +27,8 @@ func (r *errorRenderer) VisitGenericError(err error) {
 	r.Schema.AcceptVisitor(r)
 }
 
-func (r *errorRenderer) VisitSet(s variable.Set) {
+func (r *errorRenderer) VisitBinary(s variable.Binary) {
 	r.Output.WriteString(r.Error.Unwrap().Error())
-}
-
-func (r *errorRenderer) VisitSetMembershipError(err variable.SetMembershipError) {
-	r.Output.WriteString(err.Error())
 }
 
 func (r *errorRenderer) VisitNumeric(s variable.Numeric) {
@@ -63,6 +59,14 @@ func (r *errorRenderer) VisitMinError(err variable.MinError) {
 }
 
 func (r *errorRenderer) VisitMaxError(err variable.MaxError) {
+	r.Output.WriteString(err.Error())
+}
+
+func (r *errorRenderer) VisitSet(s variable.Set) {
+	r.Output.WriteString(r.Error.Unwrap().Error())
+}
+
+func (r *errorRenderer) VisitSetMembershipError(err variable.SetMembershipError) {
 	r.Output.WriteString(err.Error())
 }
 

@@ -36,8 +36,14 @@ func (r *specRenderer) Render() {
 	r.renderSeeAlso()
 }
 
-// VisitNumeric renders the primary requirement for spec that uses the "numeric"
-// schema type.
+// VisitBinary renders the primary requirement for a spec that uses the
+// "binary" schema type.
+func (r *specRenderer) VisitBinary(s variable.Binary) {
+	panic("not implemented")
+}
+
+// VisitNumeric renders the primary requirement for a spec that uses the
+// "numeric" schema type.
 func (r *specRenderer) VisitNumeric(s variable.Numeric) {
 	min, hasMin := s.Min()
 	max, hasMax := s.Max()

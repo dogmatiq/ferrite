@@ -71,9 +71,45 @@ func value(v variable.Any) string {
 }
 
 func renderValue(s variable.Spec, v variable.Literal) string {
-	if s.IsSensitive() {
-		return strings.Repeat("*", len(v.String))
+	vis := &valueRenderer{
+		Spec: s,
+		In:   v,
 	}
+	s.Schema().AcceptVisitor(vis)
 
-	return v.Quote()
+	return vis.Out
+}
+
+type valueRenderer struct {
+	Spec variable.Spec
+	In   variable.Literal
+	Out  string
+}
+
+func (r *valueRenderer) VisitBinary(s variable.Binary) {
+	r.Out = fmt.Sprintf("%d-byte value", len(r.In.String))
+}
+
+func (r *valueRenderer) VisitNumeric(s variable.Numeric) {
+	r.visitGeneric(s)
+}
+
+func (r *valueRenderer) VisitSet(s variable.Set) {
+	r.visitGeneric(s)
+}
+
+func (r *valueRenderer) VisitString(s variable.String) {
+	r.visitGeneric(s)
+}
+
+func (r *valueRenderer) VisitOther(s variable.Other) {
+	r.visitGeneric(s)
+}
+
+func (r *valueRenderer) visitGeneric(s variable.Schema) {
+	if r.Spec.IsSensitive() {
+		r.Out = strings.Repeat("*", len(r.In.String))
+	} else {
+		r.Out = r.In.Quote()
+	}
 }

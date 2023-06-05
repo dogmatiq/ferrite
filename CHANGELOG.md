@@ -18,6 +18,7 @@ project's stability guarantees.
 
 ### Added
 
+- Added `Binary()` and `BinaryAs()` builders for binary variables
 - Added `variable.LengthLimited` schema for values that have minimum or maximum lengths
 
 ### Changed
