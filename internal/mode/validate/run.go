@@ -18,7 +18,7 @@ func Run(cfg mode.Config) {
 	valid := true
 
 	t := table{}
-	for _, v := range cfg.Registry.Variables() {
+	for _, v := range cfg.Registries.Variables() {
 		t.AddRow(
 			name(v),
 			description(v),

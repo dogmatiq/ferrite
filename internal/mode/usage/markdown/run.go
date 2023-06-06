@@ -10,7 +10,7 @@ import (
 func Run(cfg mode.Config, options ...Option) {
 	r := renderer{
 		App:    filepath.Base(cfg.Args[0]),
-		Specs:  cfg.Registry.Specs(),
+		Specs:  cfg.Registries.Specs(),
 		Output: cfg.Out,
 	}
 

@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/dogmatiq/ferrite/internal/environment"
 	"github.com/dogmatiq/ferrite/internal/mode"
 	. "github.com/dogmatiq/ferrite/internal/mode/usage/markdown"
 	"github.com/dogmatiq/ferrite/internal/variable"
@@ -24,9 +25,10 @@ func tableTest(
 		file string,
 		setup func(*variable.Registry),
 	) {
-		reg := &variable.Registry{
-			Environment: &variable.MemoryEnvironment{},
-		}
+		reg := &variable.Registry{}
+
+		snapshot := environment.TakeSnapshot()
+		defer environment.RestoreSnapshot(snapshot)
 
 		setup(reg)
 
@@ -42,18 +44,17 @@ func tableTest(
 		actual := &bytes.Buffer{}
 		exited := false
 
-		Run(
-			mode.Config{
-				Registry: reg,
-				Args:     []string{"<app>"},
-				Out:      actual,
-				Exit: func(code int) {
-					exited = true
-					Expect(code).To(Equal(0))
-				},
+		cfg := mode.Config{
+			Args: []string{"<app>"},
+			Out:  actual,
+			Exit: func(code int) {
+				exited = true
+				Expect(code).To(Equal(0))
 			},
-			options...,
-		)
+		}
+		cfg.Registries.Add(reg)
+
+		Run(cfg, options...)
 
 		// Split strings into lines which producers a more human-friendly diff
 		// in case of a failure.

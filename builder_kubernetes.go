@@ -174,12 +174,12 @@ func (b *KubernetesServiceBuilder) Required(options ...RequiredOption) Required[
 	}
 
 	host := variable.Register(
-		cfg.Registry,
+		cfg.Registries,
 		b.hostBuilder.Done(b.hostSchema),
 	)
 
 	port := variable.Register(
-		cfg.Registry,
+		cfg.Registries,
 		b.portBuilder.Done(b.portSchema),
 	)
 
@@ -213,12 +213,11 @@ func (b *KubernetesServiceBuilder) Optional(options ...OptionalOption) Optional[
 	}
 
 	host := variable.Register(
-		cfg.Registry,
+		cfg.Registries,
 		b.hostBuilder.Done(b.hostSchema),
 	)
-
 	port := variable.Register(
-		cfg.Registry,
+		cfg.Registries,
 		b.portBuilder.Done(b.portSchema),
 	)
 
@@ -242,12 +241,12 @@ func (b *KubernetesServiceBuilder) Deprecated(options ...DeprecatedOption) Depre
 	}
 
 	host := variable.Register(
-		cfg.Registry,
+		cfg.Registries,
 		b.hostBuilder.Done(b.hostSchema),
 	)
 
 	port := variable.Register(
-		cfg.Registry,
+		cfg.Registries,
 		b.portBuilder.Done(b.portSchema),
 	)
 

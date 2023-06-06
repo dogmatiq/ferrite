@@ -19,5 +19,5 @@ type VariableSet interface {
 
 // variableSetConfig encapsulates configuration common to all variable sets.
 type variableSetConfig struct {
-	Registry *variable.Registry
+	Registries []*variable.Registry
 }
