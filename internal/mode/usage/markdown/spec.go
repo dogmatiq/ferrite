@@ -39,7 +39,23 @@ func (r *specRenderer) Render() {
 // VisitBinary renders the primary requirement for a spec that uses the
 // "binary" schema type.
 func (r *specRenderer) VisitBinary(s variable.Binary) {
-	panic("not implemented")
+	// Find the best constraint to use as the "primary" requirement, favoring
+	// non-user-defined constraints.
+	var con variable.Constraint
+	for _, c := range r.spec.Constraints() {
+		if !c.IsUserDefined() {
+			con = c
+			break
+		} else if con == nil {
+			con = c
+		}
+	}
+
+	if con == nil {
+		r.renderPrimaryRequirement("**MUST** be a binary value expressed using the `%s` encoding scheme", s.EncodingDescription())
+	} else {
+		r.renderPrimaryRequirement(con.Description())
+	}
 }
 
 // VisitNumeric renders the primary requirement for a spec that uses the
