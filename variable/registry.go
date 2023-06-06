@@ -3,6 +3,7 @@ package variable
 import (
 	"sync"
 
+	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
 )
 
@@ -10,7 +11,8 @@ import (
 type Registry struct {
 	Environment Environment
 
-	vars sync.Map // map[String]Variable
+	m    sync.RWMutex
+	vars map[string]Any
 }
 
 // Specs returns the specs of the variables in the library, sorted by name.
@@ -27,12 +29,9 @@ func (r *Registry) Specs() []Spec {
 
 // Variables returns the variables in the registry, sorted by name.
 func (r *Registry) Variables() []Any {
-	var variables []Any
-
-	r.vars.Range(func(_, v any) bool {
-		variables = append(variables, v.(Any))
-		return true
-	})
+	r.m.RLock()
+	variables := maps.Values(r.vars)
+	r.m.RUnlock()
 
 	slices.SortFunc(
 		variables,
@@ -46,10 +45,9 @@ func (r *Registry) Variables() []Any {
 
 // Reset removes all variables from the registry.
 func (r *Registry) Reset() {
-	r.vars.Range(func(k, _ any) bool {
-		r.vars.Delete(k)
-		return true
-	})
+	r.m.Lock()
+	r.vars = nil
+	r.m.Unlock()
 }
 
 // DefaultRegistry is the default specification registry.
@@ -63,12 +61,23 @@ func Register[T any](reg *Registry, spec *TypedSpec[T]) *OfType[T] {
 		reg = &DefaultRegistry
 	}
 
+	name := normalizeVariableName(spec.name)
+
+	reg.m.Lock()
+	defer reg.m.Unlock()
+
+	if reg.vars == nil {
+		reg.vars = map[string]Any{}
+	} else if _, ok := reg.vars[name]; ok {
+		panic("a variable named " + spec.name + " is already registered")
+	}
+
 	v := &OfType[T]{
 		spec: spec,
 		env:  reg.Environment,
 	}
 
-	reg.vars.Store(spec.name, v)
+	reg.vars[name] = v
 
 	return v
 }
