@@ -43,7 +43,7 @@ func Of[T constraints.Integer | constraints.Float]() (min, max T) {
 		return limits[float32, T](-math.MaxFloat32, +math.MaxFloat32)
 
 	default:
-		panic("not implemented")
+		panic("type does not meet expected constraints")
 	}
 }
 

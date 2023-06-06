@@ -11,6 +11,17 @@ import (
 func ExampleInit_validation() {
 	defer example()()
 
+	os.Setenv("FERRITE_BINARY", "PHZhbHVlPg==")
+	ferrite.
+		Binary("FERRITE_BINARY", "example binary").
+		Required()
+
+	os.Setenv("FERRITE_BINARY_SENSITIVE", "aHVudGVyMg==")
+	ferrite.
+		Binary("FERRITE_BINARY_SENSITIVE", "example sensitive binary").
+		WithSensitiveContent().
+		Required()
+
 	os.Setenv("FERRITE_BOOL", "true")
 	ferrite.
 		Bool("FERRITE_BOOL", "example bool").
@@ -78,6 +89,8 @@ func ExampleInit_validation() {
 	// Output:
 	// Environment Variables:
 	//
+	//    FERRITE_BINARY            example binary                           <base64>           ✓ set to {12 bytes}
+	//    FERRITE_BINARY_SENSITIVE  example sensitive binary                 <base64>           ✓ set to {12 bytes}
 	//    FERRITE_BOOL              example bool                             true | false       ✓ set to true
 	//    FERRITE_DURATION          example duration                         1ns ...            ✓ set to 3h20m
 	//    FERRITE_ENUM              example enum                             foo | bar | baz    ✓ set to foo
@@ -99,6 +112,17 @@ func ExampleInit_validationWithDefaultValues() {
 	defer example()()
 
 	ferrite.
+		Binary("FERRITE_BINARY", "example binary").
+		WithEncodedDefault("PHZhbHVlPg==").
+		Required()
+
+	ferrite.
+		Binary("FERRITE_BINARY_SENSITIVE", "example sensitive binary").
+		WithEncodedDefault("aHVudGVyMg==").
+		WithSensitiveContent().
+		Required()
+
+	ferrite.
 		Bool("FERRITE_BOOL", "example bool").
 		WithDefault(true).
 		Required()
@@ -106,7 +130,7 @@ func ExampleInit_validationWithDefaultValues() {
 	ferrite.
 		Duration("FERRITE_DURATION", "example duration").
 		WithDefault(10 * time.Second).
-		Optional()
+		Required()
 
 	ferrite.
 		Enum("FERRITE_ENUM", "example enum").
@@ -132,7 +156,7 @@ func ExampleInit_validationWithDefaultValues() {
 	ferrite.
 		Unsigned[uint16]("FERRITE_NUM_UNSIGNED", "example unsigned integer").
 		WithDefault(123).
-		Optional()
+		Required()
 
 	ferrite.
 		String("FERRITE_STRING", "example string").
@@ -148,7 +172,7 @@ func ExampleInit_validationWithDefaultValues() {
 	ferrite.
 		KubernetesService("ferrite-svc").
 		WithDefault("host.example.org", "443").
-		Optional()
+		Required()
 
 	ferrite.
 		URL("FERRITE_URL", "example URL").
@@ -164,6 +188,8 @@ func ExampleInit_validationWithDefaultValues() {
 	// Output:
 	// Environment Variables:
 	//
+	//    FERRITE_BINARY            example binary                         [ <base64> ] = {12 bytes}           ✓ using default value
+	//    FERRITE_BINARY_SENSITIVE  example sensitive binary               [ <base64> ] = {12 bytes}           ✓ using default value
 	//    FERRITE_BOOL              example bool                           [ true | false ] = true             ✓ using default value
 	//    FERRITE_DURATION          example duration                       [ 1ns ... ] = 10s                   ✓ using default value
 	//    FERRITE_ENUM              example enum                           [ foo | bar | baz ] = bar           ✓ using default value
@@ -183,6 +209,15 @@ func ExampleInit_validationWithDefaultValues() {
 
 func ExampleInit_validationWithOptionalValues() {
 	defer example()()
+
+	ferrite.
+		Binary("FERRITE_BINARY", "example binary").
+		Optional()
+
+	ferrite.
+		Binary("FERRITE_BINARY_SENSITIVE", "example sensitive binary").
+		WithSensitiveContent().
+		Optional()
 
 	ferrite.
 		Bool("FERRITE_BOOL", "example bool").
@@ -239,6 +274,8 @@ func ExampleInit_validationWithOptionalValues() {
 	// Output:
 	// Environment Variables:
 	//
+	//    FERRITE_BINARY            example binary                         [ <base64> ]         • undefined
+	//    FERRITE_BINARY_SENSITIVE  example sensitive binary               [ <base64> ]         • undefined
 	//    FERRITE_BOOL              example bool                           [ true | false ]     • undefined
 	//    FERRITE_DURATION          example duration                       [ 1ns ... ]          • undefined
 	//    FERRITE_ENUM              example enum                           [ foo | bar | baz ]  • undefined
@@ -281,6 +318,17 @@ func ExampleInit_validationWithNonCanonicalValues() {
 
 func ExampleInit_validationWithInvalidValues() {
 	defer example()()
+
+	os.Setenv("FERRITE_BINARY", "<invalid base64>")
+	ferrite.
+		Binary("FERRITE_BINARY", "example binary").
+		Required()
+
+	os.Setenv("FERRITE_BINARY_SENSITIVE", "<invalid base64>")
+	ferrite.
+		Binary("FERRITE_BINARY_SENSITIVE", "example sensitive binary").
+		WithSensitiveContent().
+		Required()
 
 	os.Setenv("FERRITE_BOOL", "yes")
 	ferrite.
@@ -339,7 +387,7 @@ func ExampleInit_validationWithInvalidValues() {
 			},
 		).
 		WithSensitiveContent().
-		Optional()
+		Required()
 
 	os.Setenv("FERRITE_SVC_SERVICE_HOST", ".local")
 	os.Setenv("FERRITE_SVC_SERVICE_PORT", "https-")
@@ -357,6 +405,8 @@ func ExampleInit_validationWithInvalidValues() {
 	// Output:
 	// Environment Variables:
 	//
+	//  ❯ FERRITE_BINARY            example binary                           <base64>           ✗ set to {16 bytes}, illegal base64 data at input byte 0
+	//  ❯ FERRITE_BINARY_SENSITIVE  example sensitive binary                 <base64>           ✗ set to {16 bytes}, illegal base64 data at input byte 0
 	//  ❯ FERRITE_BOOL              example bool                             true | false       ✗ set to yes, expected either true or false
 	//  ❯ FERRITE_DURATION          example duration                         1ns ...            ✗ set to -+10s, expected duration
 	//  ❯ FERRITE_ENUM              example enum                             foo | bar | baz    ✗ set to qux, expected foo, bar or baz
@@ -365,7 +415,7 @@ func ExampleInit_validationWithInvalidValues() {
 	//  ❯ FERRITE_NUM_SIGNED        example signed integer                   <int16>            ✗ set to 123.3, expected integer between -32768 and +32767
 	//  ❯ FERRITE_NUM_UNSIGNED      example unsigned integer                 <uint16>           ✗ set to -123, expected integer between 0 and 65535
 	//  ❯ FERRITE_STRING            example string                           <string>           ✗ set to 'foo bar', must not contain whitespace
-	//  ❯ FERRITE_STRING_SENSITIVE  example sensitive string               [ <string> ]         ✗ set to *******, must not contain whitespace
+	//  ❯ FERRITE_STRING_SENSITIVE  example sensitive string                 <string>           ✗ set to *******, must not contain whitespace
 	//  ❯ FERRITE_SVC_SERVICE_HOST  kubernetes "ferrite-svc" service host    <string>           ✗ set to .local, host must not begin or end with a dot
 	//  ❯ FERRITE_SVC_SERVICE_PORT  kubernetes "ferrite-svc" service port    <string>           ✗ set to https-, IANA service name must not begin or end with a hyphen
 	//  ❯ FERRITE_URL               example URL                              <string>           ✗ set to /relative/path, URL must have a scheme

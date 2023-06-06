@@ -185,7 +185,7 @@ func ExampleString_sensitive() {
 		String("FERRITE_STRING", "example sensitive string variable").
 		WithConstraint(
 			"always fail",
-			func(s string) bool {
+			func(v string) bool {
 				// Force the variable to be considered invalid so that the
 				// variable table is rendered to the console.
 				return false

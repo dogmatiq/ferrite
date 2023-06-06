@@ -12,6 +12,16 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Added `Binary()` and `BinaryAs()` builders for binary variables
+- Added `variable.LengthLimited` schema for values that have minimum or maximum lengths
+
+### Changed
+
+- `variable.String` now implements the new `LengthLimited` interface
+- Rename the `variable.[Min|Max]LengthError.String` to `ViolatedSchema` and change its type to `LengthLimited`
+
 ### Removed
 
 - Removed "platform" examples from generated documentation. These are too

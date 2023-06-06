@@ -36,8 +36,18 @@ func (r *specRenderer) Render() {
 	r.renderSeeAlso()
 }
 
-// VisitNumeric renders the primary requirement for spec that uses the "numeric"
-// schema type.
+// VisitBinary renders the primary requirement for a spec that uses the
+// "binary" schema type.
+func (r *specRenderer) VisitBinary(s variable.Binary) {
+	if con := r.bestConstraint(); con != nil {
+		r.renderPrimaryRequirement(con.Description())
+	} else {
+		r.renderPrimaryRequirement("**MUST** be a binary value expressed using the `%s` encoding scheme", s.EncodingDescription())
+	}
+}
+
+// VisitNumeric renders the primary requirement for a spec that uses the
+// "numeric" schema type.
 func (r *specRenderer) VisitNumeric(s variable.Numeric) {
 	min, hasMin := s.Min()
 	max, hasMax := s.Max()
@@ -60,8 +70,8 @@ func (r *specRenderer) VisitNumeric(s variable.Numeric) {
 	}
 }
 
-// VisitSet renders the primary requirement for spec that uses the "set" schema
-// type.
+// VisitSet renders the primary requirement for a spec that uses the "set"
+// schema type.
 func (r *specRenderer) VisitSet(s variable.Set) {
 	if lits := s.Literals(); len(lits) == 2 {
 		r.renderPrimaryRequirement(
@@ -77,22 +87,10 @@ func (r *specRenderer) VisitSet(s variable.Set) {
 // VisitString renders the primary requirement for a spec that uses the "string"
 // schema type.
 func (r *specRenderer) VisitString(variable.String) {
-	// Find the best constraint to use as the "primary" requirement, favoring
-	// non-user-defined constraints.
-	var con variable.Constraint
-	for _, c := range r.spec.Constraints() {
-		if !c.IsUserDefined() {
-			con = c
-			break
-		} else if con == nil {
-			con = c
-		}
-	}
-
-	if con == nil {
-		r.renderPrimaryRequirement("")
-	} else {
+	if con := r.bestConstraint(); con != nil {
 		r.renderPrimaryRequirement(con.Description())
+	} else {
+		r.renderPrimaryRequirement("")
 	}
 }
 
@@ -249,4 +247,22 @@ func (r *specRenderer) renderDependsOnClause() string {
 			)
 		},
 	)
+}
+
+// bestConstraint returns the constraint to use as the "primary"
+// requirement, favoring non-user-defined constraints.
+func (r *specRenderer) bestConstraint() (con variable.Constraint) {
+	constraints := r.spec.Constraints()
+
+	for _, c := range constraints {
+		if !c.IsUserDefined() {
+			return c
+		}
+	}
+
+	for _, c := range constraints {
+		return c
+	}
+
+	return nil
 }

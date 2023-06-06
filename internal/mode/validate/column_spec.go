@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/dogmatiq/ferrite/internal/mode/internal/render"
 	"github.com/dogmatiq/ferrite/variable"
 )
 
@@ -21,7 +22,7 @@ func spec(v variable.Any) string {
 		return fmt.Sprintf(
 			"[ %s ] = %s",
 			out,
-			renderValue(s, def),
+			render.Value(s, def),
 		)
 	}
 
@@ -36,14 +37,10 @@ type schemaRenderer struct {
 	Output *strings.Builder
 }
 
-func (r *schemaRenderer) VisitSet(s variable.Set) {
-	for i, m := range s.Literals() {
-		if i > 0 {
-			r.Output.WriteString(" | ")
-		}
-
-		r.Output.WriteString(m.Quote())
-	}
+func (r *schemaRenderer) VisitBinary(s variable.Binary) {
+	r.Output.WriteByte('<')
+	r.Output.WriteString(s.EncodingDescription())
+	r.Output.WriteByte('>')
 }
 
 func (r *schemaRenderer) VisitNumeric(s variable.Numeric) {
@@ -75,6 +72,16 @@ func (r *schemaRenderer) VisitNumeric(s variable.Numeric) {
 			"<%s>",
 			s.Type().Kind(),
 		)
+	}
+}
+
+func (r *schemaRenderer) VisitSet(s variable.Set) {
+	for i, m := range s.Literals() {
+		if i > 0 {
+			r.Output.WriteString(" | ")
+		}
+
+		r.Output.WriteString(m.Quote())
 	}
 }
 

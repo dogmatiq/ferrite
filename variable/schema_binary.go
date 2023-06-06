@@ -2,42 +2,54 @@ package variable
 
 import (
 	"fmt"
-	"math"
+	"math/rand"
 	"reflect"
 
 	"github.com/dogmatiq/ferrite/internal/reflectx"
 	"github.com/dogmatiq/ferrite/maybe"
 )
 
-// String is a schema that allows arbitrary string input.
-type String interface {
+// Binary is a schema that allows input of binary data.
+type Binary interface {
 	LengthLimited
+
+	// EncodingDescription returns a short (one word, ideally) human-readable
+	// description of the encoding scheme.
+	EncodingDescription() string
 }
 
-// TypedString is a string value depicted by type T.
-type TypedString[T ~string] struct {
+// TypedBinary is a string value depicted by type T.
+type TypedBinary[T ~[]B, B ~byte] struct {
+	Marshaler      Marshaler[T]
 	MinLen, MaxLen maybe.Value[int]
+	EncodingDesc   string
 }
 
 // MinLength returns the minimum permitted length of the native value.
-func (s TypedString[T]) MinLength() (int, bool) {
+func (s TypedBinary[T, B]) MinLength() (int, bool) {
 	return s.MinLen.Get()
 }
 
 // MaxLength returns the maximum permitted length of the native value.
-func (s TypedString[T]) MaxLength() (int, bool) {
+func (s TypedBinary[T, B]) MaxLength() (int, bool) {
 	return s.MaxLen.Get()
 }
 
+// EncodingDescription returns a short (one word, ideally) human-readable
+// description of the encoding scheme.
+func (s TypedBinary[T, B]) EncodingDescription() string {
+	return s.EncodingDesc
+}
+
 // Type returns the type of the native value.
-func (s TypedString[T]) Type() reflect.Type {
+func (s TypedBinary[T, B]) Type() reflect.Type {
 	return reflectx.TypeOf[T]()
 }
 
 // Finalize prepares the schema for use.
 //
 // It returns an error if schema is invalid.
-func (s TypedString[T]) Finalize() error {
+func (s TypedBinary[T, B]) Finalize() error {
 	min := 1
 
 	if v, ok := s.MinLen.Get(); ok {
@@ -57,67 +69,52 @@ func (s TypedString[T]) Finalize() error {
 }
 
 // AcceptVisitor passes s to the appropriate method of v.
-func (s TypedString[T]) AcceptVisitor(v SchemaVisitor) {
-	v.VisitString(s)
+func (s TypedBinary[T, B]) AcceptVisitor(v SchemaVisitor) {
+	v.VisitBinary(s)
 }
 
 // Marshal converts a value to its literal representation.
-func (s TypedString[T]) Marshal(v T) (Literal, error) {
+func (s TypedBinary[T, B]) Marshal(v T) (Literal, error) {
 	if err := s.validate(v); err != nil {
 		return Literal{}, err
 	}
 
-	return Literal{
-		String: string(v),
-	}, nil
+	return s.Marshaler.Marshal(v)
 }
 
 // Unmarshal converts a literal value to it's native representation.
-func (s TypedString[T]) Unmarshal(v Literal) (T, error) {
-	n := T(v.String)
+func (s TypedBinary[T, B]) Unmarshal(v Literal) (T, error) {
+	n, err := s.Marshaler.Unmarshal(v)
+	if err != nil {
+		return nil, err
+	}
+
 	return n, s.validate(n)
 }
 
 // Examples returns a (possibly empty) set of examples of valid values.
-func (s TypedString[T]) Examples(hasOtherExamples bool) []TypedExample[T] {
+func (s TypedBinary[T, B]) Examples(hasOtherExamples bool) []TypedExample[T] {
 	if hasOtherExamples {
 		return nil
 	}
 
-	min, ok := s.MinLen.Get()
+	size, ok := s.MinLen.Get()
 	if !ok {
-		min = 1
-	}
+		size = 16
 
-	max, ok := s.MaxLen.Get()
-	if !ok {
-		max = math.MaxInt
-	}
-
-	words := [...]T{
-		"foo", "bar", "baz",
-		"qux", "quux", "corge",
-		"grault", "garply", "waldo",
-		"fred", "plugh", "xyzzy",
-	}
-
-	var example T
-	word := 0
-
-	// Add enough words to meet the minimum requirement.
-	for len(example) < min {
-		if example != "" {
-			example += " "
+		if max, ok := s.MaxLen.Get(); ok {
+			if size > max {
+				size = max
+			}
 		}
-
-		example += words[word%len(words)]
-		word++
 	}
 
-	// If the variable is too long truncate it to the max length, and ensure it
-	// doesn't end in a space.
-	if len(example) > max {
-		example = example[:max-1] + "x"
+	example := make(T, size)
+
+	// Use a *deterministic* random value to as the example.
+	src := rand.NewSource(int64(size))
+	for i := range example {
+		example[i] = B(src.Int63())
 	}
 
 	return []TypedExample[T]{
@@ -128,7 +125,7 @@ func (s TypedString[T]) Examples(hasOtherExamples bool) []TypedExample[T] {
 }
 
 // validate returns an error if v is invalid.
-func (s TypedString[T]) validate(v T) error {
+func (s TypedBinary[T, B]) validate(v T) error {
 	if min, ok := s.MinLen.Get(); ok && len(v) < min {
 		return MinLengthError{s}
 	}

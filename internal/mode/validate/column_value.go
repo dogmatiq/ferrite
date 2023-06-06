@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/dogmatiq/ferrite/internal/mode/internal/render"
 	"github.com/dogmatiq/ferrite/variable"
 )
 
@@ -22,7 +23,7 @@ func value(v variable.Any) string {
 		}
 
 		out.WriteString("set to ")
-		out.WriteString(renderValue(s, lit))
+		out.WriteString(render.Value(s, lit))
 
 		if message != "" {
 			out.WriteString(", ")
@@ -62,18 +63,10 @@ func value(v variable.Any) string {
 		if value.Verbatim() != value.Canonical() {
 			message = fmt.Sprintf(
 				"equivalent to %s",
-				renderValue(s, value.Canonical()),
+				render.Value(s, value.Canonical()),
 			)
 		}
 
 		return renderExplicit(icon, value.Verbatim(), message)
 	}
-}
-
-func renderValue(s variable.Spec, v variable.Literal) string {
-	if s.IsSensitive() {
-		return strings.Repeat("*", len(v.String))
-	}
-
-	return v.Quote()
 }

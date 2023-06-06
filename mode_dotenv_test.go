@@ -10,6 +10,18 @@ import (
 func ExampleInit_exportDotEnvFile() {
 	defer example()()
 
+	os.Setenv("FERRITE_BINARY", "PHZhbHVlPg==")
+	ferrite.
+		Binary("FERRITE_BINARY", "example binary").
+		Required()
+
+	os.Setenv("FERRITE_BINARY_SENSITIVE", "aHVudGVyMg==")
+	ferrite.
+		Binary("FERRITE_BINARY_SENSITIVE", "example sensitive binary").
+		WithDefault([]byte("password")).
+		WithSensitiveContent().
+		Required()
+
 	os.Setenv("FERRITE_BOOL", "true")
 	ferrite.
 		Bool("FERRITE_BOOL", "example bool").
@@ -73,6 +85,12 @@ func ExampleInit_exportDotEnvFile() {
 	ferrite.Init()
 
 	// Output:
+	// # example binary (required)
+	// export FERRITE_BINARY=PHZhbHVlPg==
+	//
+	// # example sensitive binary (default: {12 bytes}, sensitive)
+	// export FERRITE_BINARY_SENSITIVE=aHVudGVyMg==
+	//
 	// # example bool (required)
 	// export FERRITE_BOOL=true
 	//
