@@ -160,6 +160,22 @@ func ExampleBinary_default() {
 	// value is <default>
 }
 
+func ExampleBinary_encodedDefault() {
+	defer example()()
+
+	v := ferrite.
+		Binary("FERRITE_BINARY", "example binary variable").
+		WithEncodedDefault("PGRlZmF1bHQ+").
+		Required()
+
+	ferrite.Init()
+
+	fmt.Println("value is", string(v.Value()))
+
+	// Output:
+	// value is <default>
+}
+
 func ExampleBinary_optional() {
 	defer example()()
 

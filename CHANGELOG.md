@@ -12,10 +12,6 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
-All backwards-incompatible changes in this version are within the `variable`
-sub-package, which remains experimental and outside the scope of the Ferrite
-project's stability guarantees.
-
 ### Added
 
 - Added `Binary()` and `BinaryAs()` builders for binary variables
@@ -23,8 +19,8 @@ project's stability guarantees.
 
 ### Changed
 
-- **[BC]** Replace `String` schema field of `variable.MinLengthError` and `MaxLengthError` with a `LengthLimited` schema
-- **[BC]** `variable.String` now implements the new `LengthLimited` interface
+- `variable.String` now implements the new `LengthLimited` interface
+- Rename the `variable.[Min|Max]LengthError.String` to `ViolatedSchema` and change its type to `LengthLimited`
 
 ### Removed
 

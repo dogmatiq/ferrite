@@ -48,7 +48,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				Binary("FAVICON", "the content of the favicon.png file").
-				WithDefaultString("<favicon content>").
+				WithDefault([]byte("<favicon content>")).
 				Optional(ferrite.WithRegistry(reg))
 		},
 	),
@@ -58,7 +58,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				Binary("FAVICON", "the content of the favicon.png file").
-				WithDefaultString("<favicon content>").
+				WithDefault([]byte("<favicon content>")).
 				Required(ferrite.WithRegistry(reg))
 		},
 	),
@@ -92,7 +92,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				Binary("SECRET_KEY", "a very secret machine-readable key").
-				WithDefaultString("hunter2").
+				WithDefault([]byte("hunter2")).
 				WithSensitiveContent().
 				Optional(
 					ferrite.WithRegistry(reg),
@@ -105,7 +105,7 @@ var _ = DescribeTable(
 		func(reg *variable.Registry) {
 			ferrite.
 				Binary("SECRET_KEY", "a very secret machine-readable key").
-				WithDefaultString("hunter2").
+				WithDefault([]byte("hunter2")).
 				WithSensitiveContent().
 				Required(
 					ferrite.WithRegistry(reg),

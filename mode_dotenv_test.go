@@ -18,7 +18,7 @@ func ExampleInit_exportDotEnvFile() {
 	os.Setenv("FERRITE_BINARY_SENSITIVE", "aHVudGVyMg==")
 	ferrite.
 		Binary("FERRITE_BINARY_SENSITIVE", "example sensitive binary").
-		WithDefaultString("password").
+		WithDefault([]byte("password")).
 		WithSensitiveContent().
 		Required()
 

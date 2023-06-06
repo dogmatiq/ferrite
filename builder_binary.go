@@ -51,22 +51,33 @@ var _ isBuilderOf[[]byte, *BinaryBuilder[[]byte, byte]]
 
 // WithDefault sets a default value of the variable.
 //
+// v is the raw binary value, not the encoded representation used within the
+// environment variable.
+//
 // It is used when the environment variable is undefined or empty.
 func (b *BinaryBuilder[T, B]) WithDefault(v T) *BinaryBuilder[T, B] {
 	b.builder.Default(v)
 	return b
 }
 
-// WithDefaultString sets a default value of the variable to a string value.
+// WithEncodedDefault sets a default value of the variable from its encoded
+// string representation.
+//
+// v is the encoded binary value as used in the environment variable. For
+// example, it may be a base64 string.
 //
 // It is used when the environment variable is undefined or empty.
-func (b *BinaryBuilder[T, B]) WithDefaultString(v string) *BinaryBuilder[T, B] {
-	data := make(T, len(v))
-	for i := 0; i < len(v); i++ {
-		data[i] = B(v[i])
+func (b *BinaryBuilder[T, B]) WithEncodedDefault(v string) *BinaryBuilder[T, B] {
+	enc, err := b.schema.Marshaler.Unmarshal(
+		variable.Literal{
+			String: v,
+		},
+	)
+	if err != nil {
+		panic(err)
 	}
-	b.builder.Default(data)
-	return b
+
+	return b.WithDefault(enc)
 }
 
 // WithConstraint adds a constraint to the variable.

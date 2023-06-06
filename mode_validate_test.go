@@ -113,12 +113,12 @@ func ExampleInit_validationWithDefaultValues() {
 
 	ferrite.
 		Binary("FERRITE_BINARY", "example binary").
-		WithDefaultString("PHZhbHVlPg==").
+		WithEncodedDefault("PHZhbHVlPg==").
 		Required()
 
 	ferrite.
 		Binary("FERRITE_BINARY_SENSITIVE", "example sensitive binary").
-		WithDefaultString("aHVudGVyMg==").
+		WithEncodedDefault("aHVudGVyMg==").
 		WithSensitiveContent().
 		Required()
 
@@ -188,8 +188,8 @@ func ExampleInit_validationWithDefaultValues() {
 	// Output:
 	// Environment Variables:
 	//
-	//    FERRITE_BINARY            example binary                         [ <base64> ] = {16 bytes}           ✓ using default value
-	//    FERRITE_BINARY_SENSITIVE  example sensitive binary               [ <base64> ] = {16 bytes}           ✓ using default value
+	//    FERRITE_BINARY            example binary                         [ <base64> ] = {12 bytes}           ✓ using default value
+	//    FERRITE_BINARY_SENSITIVE  example sensitive binary               [ <base64> ] = {12 bytes}           ✓ using default value
 	//    FERRITE_BOOL              example bool                           [ true | false ] = true             ✓ using default value
 	//    FERRITE_DURATION          example duration                       [ 1ns ... ] = 10s                   ✓ using default value
 	//    FERRITE_ENUM              example enum                           [ foo | bar | baz ] = bar           ✓ using default value
