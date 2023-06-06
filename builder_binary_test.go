@@ -307,12 +307,12 @@ func ExampleBinary_encoding() {
 	custom := base64.NewEncoding("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz)!@#$%^&*(-_")
 
 	ferrite.
-		Binary("FERRITE_BINARY_BASE64_NONSTD", "base64 encoding, custom alphabet").
+		Binary("FERRITE_BINARY_BASE64_CUSTOM", "base64 encoding, custom alphabet").
 		WithBase64Encoding(custom).
 		Required()
 
 	ferrite.
-		Binary("FERRITE_BINARY_BASE64_NONSTD_RAW", "base64 encoding, custom alphabet, no padding").
+		Binary("FERRITE_BINARY_BASE64_CUSTOM_RAW", "base64 encoding, custom alphabet, no padding").
 		WithBase64Encoding(custom.WithPadding(base64.NoPadding)).
 		Required()
 
@@ -327,8 +327,8 @@ func ExampleBinary_encoding() {
 	// Environment Variables:
 	//
 	//  ❯ FERRITE_BINARY_BASE64             base64 encoding                                 <base64>                  ✗ undefined
-	//  ❯ FERRITE_BINARY_BASE64_NONSTD      base64 encoding, custom alphabet                <non-canonical base64>    ✗ undefined
-	//  ❯ FERRITE_BINARY_BASE64_NONSTD_RAW  base64 encoding, custom alphabet, no padding    <non-canonical base64>    ✗ undefined
+	//  ❯ FERRITE_BINARY_BASE64_CUSTOM      base64 encoding, custom alphabet                <non-canonical base64>    ✗ undefined
+	//  ❯ FERRITE_BINARY_BASE64_CUSTOM_RAW  base64 encoding, custom alphabet, no padding    <non-canonical base64>    ✗ undefined
 	//  ❯ FERRITE_BINARY_BASE64_RAW         base64 encoding, no padding                     <unpadded base64>         ✗ undefined
 	//  ❯ FERRITE_BINARY_BASE64_URL         base64 encoding, url safe                       <padded base64url>        ✗ undefined
 	//  ❯ FERRITE_BINARY_BASE64_URL_RAW     base64 encoding, url safe, no padding           <base64url>               ✗ undefined
