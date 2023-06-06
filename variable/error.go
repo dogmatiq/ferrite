@@ -56,8 +56,8 @@ func (e MaxLengthError) Error() string {
 }
 
 func explainLengthError(s LengthLimited) string {
-	min, hasMin := s.MinLengthNative()
-	max, hasMax := s.MaxLengthNative()
+	min, hasMin := s.MinLength()
+	max, hasMax := s.MaxLength()
 
 	if !hasMin {
 		return fmt.Sprintf("expected length to be %d bytes or fewer", max)

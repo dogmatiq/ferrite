@@ -23,19 +23,11 @@ type Schema interface {
 type LengthLimited interface {
 	Schema
 
-	// MinLengthLiteral returns the minimum permitted length of the literal
-	// environment variable value, in bytes.
-	MinLengthLiteral() (int, bool)
+	// MinLength returns the minimum permitted length of the native value.
+	MinLength() (int, bool)
 
-	// MaxLengthLiteral returns the maximum permitted length of the literal
-	// environment variable value, in bytes.
-	MaxLengthLiteral() (int, bool)
-
-	// MinLengthNative returns the minimum permitted length of the native value.
-	MinLengthNative() (int, bool)
-
-	// MaxLengthNative returns the maximum permitted length of the native value.
-	MaxLengthNative() (int, bool)
+	// MaxLength returns the maximum permitted length of the native value.
+	MaxLength() (int, bool)
 }
 
 // SchemaError indicates that a value is invalid because it violates its schema.

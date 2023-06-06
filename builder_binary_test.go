@@ -281,3 +281,58 @@ func ExampleBinary_deprecated() {
 	//
 	// value is <value>
 }
+
+func ExampleBinary_encoding() {
+	defer example()()
+
+	ferrite.
+		Binary("FERRITE_BINARY_BASE64", "base64 encoding").
+		Required()
+
+	ferrite.
+		Binary("FERRITE_BINARY_BASE64_RAW", "base64 encoding, no padding").
+		WithBase64Encoding(base64.RawStdEncoding).
+		Required()
+
+	ferrite.
+		Binary("FERRITE_BINARY_BASE64_URL", "base64 encoding, url safe").
+		WithBase64Encoding(base64.URLEncoding).
+		Required()
+
+	ferrite.
+		Binary("FERRITE_BINARY_BASE64_URL_RAW", "base64 encoding, url safe, no padding").
+		WithBase64Encoding(base64.RawURLEncoding).
+		Required()
+
+	custom := base64.NewEncoding("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz)!@#$%^&*(-_")
+
+	ferrite.
+		Binary("FERRITE_BINARY_BASE64_NONSTD", "base64 encoding, custom alphabet").
+		WithBase64Encoding(custom).
+		Required()
+
+	ferrite.
+		Binary("FERRITE_BINARY_BASE64_NONSTD_RAW", "base64 encoding, custom alphabet, no padding").
+		WithBase64Encoding(custom.WithPadding(base64.NoPadding)).
+		Required()
+
+	ferrite.
+		Binary("FERRITE_BINARY_HEX", "hexadecimal encoding").
+		WithHexEncoding().
+		Required()
+
+	ferrite.Init()
+
+	// Output:
+	// Environment Variables:
+	//
+	//  ❯ FERRITE_BINARY_BASE64             base64 encoding                                 <base64>                  ✗ undefined
+	//  ❯ FERRITE_BINARY_BASE64_NONSTD      base64 encoding, custom alphabet                <non-canonical base64>    ✗ undefined
+	//  ❯ FERRITE_BINARY_BASE64_NONSTD_RAW  base64 encoding, custom alphabet, no padding    <non-canonical base64>    ✗ undefined
+	//  ❯ FERRITE_BINARY_BASE64_RAW         base64 encoding, no padding                     <unpadded base64>         ✗ undefined
+	//  ❯ FERRITE_BINARY_BASE64_URL         base64 encoding, url safe                       <padded base64url>        ✗ undefined
+	//  ❯ FERRITE_BINARY_BASE64_URL_RAW     base64 encoding, url safe, no padding           <base64url>               ✗ undefined
+	//  ❯ FERRITE_BINARY_HEX                hexadecimal encoding                            <hex>                     ✗ undefined
+	//
+	// <process exited with error code 1>
+}

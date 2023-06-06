@@ -19,25 +19,13 @@ type TypedString[T ~string] struct {
 	MinLen, MaxLen maybe.Value[int]
 }
 
-// MinLengthLiteral returns the minimum permitted length of the literal
-// environment variable value, in bytes.
-func (s TypedString[T]) MinLengthLiteral() (int, bool) {
-	return s.MinLengthNative()
-}
-
-// MaxLengthLiteral returns the maximum permitted length of the literal
-// environment variable value, in bytes.
-func (s TypedString[T]) MaxLengthLiteral() (int, bool) {
-	return s.MaxLengthNative()
-}
-
-// MinLengthNative returns the minimum permitted length of the native value.
-func (s TypedString[T]) MinLengthNative() (int, bool) {
+// MinLength returns the minimum permitted length of the native value.
+func (s TypedString[T]) MinLength() (int, bool) {
 	return s.MinLen.Get()
 }
 
-// MaxLengthNative returns the maximum permitted length of the native value.
-func (s TypedString[T]) MaxLengthNative() (int, bool) {
+// MaxLength returns the maximum permitted length of the native value.
+func (s TypedString[T]) MaxLength() (int, bool) {
 	return s.MaxLen.Get()
 }
 

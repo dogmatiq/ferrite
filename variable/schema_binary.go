@@ -18,79 +18,27 @@ type Binary interface {
 	EncodingDescription() string
 }
 
-// BinaryMarshaler is a Marshaler that encodes and decodes binary data.
-type BinaryMarshaler[T ~[]B, B ~byte] interface {
-	Marshaler[T]
-
-	// EncodingDescription returns a short (one word, ideally) human-readable
-	// description of the encoding scheme.
-	EncodingDescription() string
-
-	// EncodedLen returns the minimum and maximum length of the string that
-	// encodes n bytes of binary data.
-	EncodedLen(n int) (min, max int)
-}
-
 // TypedBinary is a string value depicted by type T.
 type TypedBinary[T ~[]B, B ~byte] struct {
-	Marshaler      BinaryMarshaler[T, B]
+	Marshaler      Marshaler[T]
 	MinLen, MaxLen maybe.Value[int]
+	EncodingDesc   string
 }
 
-// MinLengthLiteral returns the minimum permitted length of the literal
-// environment variable value, in bytes.
-func (s TypedBinary[T, B]) MinLengthLiteral() (int, bool) {
-	if min, ok := s.MinLengthNative(); ok {
-		min, _ = s.Marshaler.EncodedLen(min)
-		return min, true
-	}
-	return 0, false
-}
-
-// MaxLengthLiteral returns the maximum permitted length of the literal
-// environment variable value, in bytes.
-func (s TypedBinary[T, B]) MaxLengthLiteral() (int, bool) {
-	if max, ok := s.MaxLengthNative(); ok {
-		_, max = s.Marshaler.EncodedLen(max)
-		return max, true
-	}
-	return 0, false
-}
-
-// MinLengthNative returns the minimum permitted length of the native value.
-func (s TypedBinary[T, B]) MinLengthNative() (int, bool) {
+// MinLength returns the minimum permitted length of the native value.
+func (s TypedBinary[T, B]) MinLength() (int, bool) {
 	return s.MinLen.Get()
 }
 
-// MaxLengthNative returns the maximum permitted length of the native value.
-func (s TypedBinary[T, B]) MaxLengthNative() (int, bool) {
+// MaxLength returns the maximum permitted length of the native value.
+func (s TypedBinary[T, B]) MaxLength() (int, bool) {
 	return s.MaxLen.Get()
-}
-
-// MinLengthEncoded returns the minimum permitted length of the encoded
-// data, in bytes.
-func (s TypedBinary[T, B]) MinLengthEncoded() (int, bool) {
-	if min, ok := s.MinLen.Get(); ok {
-		min, _ = s.Marshaler.EncodedLen(min)
-		return min, true
-	}
-	return 0, false
-}
-
-// MaxLengthEncoded returns the maximum permitted length of the encoded
-// data, in bytes.
-func (s TypedBinary[T, B]) MaxLengthEncoded() (int, bool) {
-	if max, ok := s.MaxLen.Get(); ok {
-		max, _ = s.Marshaler.EncodedLen(max)
-		return max, true
-	}
-	return 0, false
 }
 
 // EncodingDescription returns a short (one word, ideally) human-readable
 // description of the encoding scheme.
 func (s TypedBinary[T, B]) EncodingDescription() string {
-	return s.Marshaler.EncodingDescription()
+	return s.EncodingDesc
 }
 
 // Type returns the type of the native value.

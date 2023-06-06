@@ -104,13 +104,30 @@ func (b *BinaryBuilder[T, B]) WithSensitiveContent() *BinaryBuilder[T, B] {
 // WithBase64Encoding configures the variable to use base64 encoding to
 // represent the binary value within the environment.
 func (b *BinaryBuilder[T, B]) WithBase64Encoding(enc *base64.Encoding) *BinaryBuilder[T, B] {
+	switch *enc {
+	case *base64.StdEncoding:
+		b.schema.EncodingDesc = "base64"
+	case *base64.RawStdEncoding:
+		b.schema.EncodingDesc = "unpadded base64"
+	case *base64.URLEncoding:
+		b.schema.EncodingDesc = "padded base64url"
+	case *base64.RawURLEncoding:
+		// base64url is USUALLY used unpadded, because the "=" character is
+		// itself problematic in URLs, so we refer to it simply as "base64url".
+		b.schema.EncodingDesc = "base64url"
+	default:
+		b.schema.EncodingDesc = "non-canonical base64"
+	}
+
 	b.schema.Marshaler = base64BinaryMarshaler[T, B]{Encoding: enc}
+
 	return b
 }
 
 // WithHexEncoding configures the variable to use hexadecimal encoding to
 // represent the binary value within the environment.
 func (b *BinaryBuilder[T, B]) WithHexEncoding() *BinaryBuilder[T, B] {
+	b.schema.EncodingDesc = "hex"
 	b.schema.Marshaler = hexBinaryMarshaler[T, B]{}
 	return b
 }
@@ -148,35 +165,7 @@ func (m base64BinaryMarshaler[T, B]) Unmarshal(v variable.Literal) (T, error) {
 	return fromByteSlice[T](data), err
 }
 
-func (m base64BinaryMarshaler[T, B]) EncodingDescription() string {
-	switch *m.Encoding {
-	case *base64.StdEncoding:
-		return "base64"
-	case *base64.RawStdEncoding:
-		return "base64-nopad"
-	case *base64.URLEncoding:
-		return "base64url"
-	case *base64.RawURLEncoding:
-		return "base64url-nopad"
-	default:
-		name := "base64-noncanonical"
-		if m.Encoding.EncodedLen(1) != base64.StdEncoding.EncodedLen(1) {
-			name += "-nopad"
-		}
-		return name
-	}
-}
-
-func (m base64BinaryMarshaler[T, B]) EncodedLen(n int) (min, max int) {
-	n = m.Encoding.EncodedLen(n)
-	return n, n
-}
-
 type hexBinaryMarshaler[T ~[]B, B ~byte] struct{}
-
-func (m hexBinaryMarshaler[T, B]) EncodingDescription() string {
-	return "hex"
-}
 
 func (m hexBinaryMarshaler[T, B]) Marshal(v T) (variable.Literal, error) {
 	return variable.Literal{
@@ -187,11 +176,6 @@ func (m hexBinaryMarshaler[T, B]) Marshal(v T) (variable.Literal, error) {
 func (m hexBinaryMarshaler[T, B]) Unmarshal(v variable.Literal) (T, error) {
 	data, err := hex.DecodeString(v.String)
 	return fromByteSlice[T](data), err
-}
-
-func (m hexBinaryMarshaler[T, B]) EncodedLen(n int) (min, max int) {
-	n = hex.EncodedLen(n)
-	return n, n
 }
 
 // toByteSlice converts a slice of user-defined-byte type to []byte.
