@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/dogmatiq/ferrite/maybe"
+	"github.com/dogmatiq/ferrite/internal/maybe"
 )
 
 // SpecBuilder builds a specification for an environment variable.

@@ -5,8 +5,8 @@ import (
 	"math/rand"
 	"reflect"
 
+	"github.com/dogmatiq/ferrite/internal/maybe"
 	"github.com/dogmatiq/ferrite/internal/reflectx"
-	"github.com/dogmatiq/ferrite/maybe"
 )
 
 // Binary is a schema that allows input of binary data.

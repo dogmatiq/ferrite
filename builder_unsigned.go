@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/dogmatiq/ferrite/internal/maybe"
 	"github.com/dogmatiq/ferrite/internal/reflectx"
-	"github.com/dogmatiq/ferrite/maybe"
 	"github.com/dogmatiq/ferrite/variable"
 	"golang.org/x/exp/constraints"
 )

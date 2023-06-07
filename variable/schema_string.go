@@ -5,8 +5,8 @@ import (
 	"math"
 	"reflect"
 
+	"github.com/dogmatiq/ferrite/internal/maybe"
 	"github.com/dogmatiq/ferrite/internal/reflectx"
-	"github.com/dogmatiq/ferrite/maybe"
 )
 
 // String is a schema that allows arbitrary string input.

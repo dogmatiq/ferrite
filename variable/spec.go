@@ -3,7 +3,7 @@ package variable
 import (
 	"fmt"
 
-	"github.com/dogmatiq/ferrite/maybe"
+	"github.com/dogmatiq/ferrite/internal/maybe"
 )
 
 // Spec is a specification of a variable.

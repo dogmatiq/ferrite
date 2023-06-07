@@ -9,8 +9,8 @@ import (
 	"unsafe"
 
 	"github.com/dogmatiq/ferrite/internal/limits"
+	"github.com/dogmatiq/ferrite/internal/maybe"
 	"github.com/dogmatiq/ferrite/internal/reflectx"
-	"github.com/dogmatiq/ferrite/maybe"
 	"golang.org/x/exp/constraints"
 )
 

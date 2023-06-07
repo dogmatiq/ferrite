@@ -1,7 +1,7 @@
 package variable
 
 import (
-	"github.com/dogmatiq/ferrite/maybe"
+	"github.com/dogmatiq/ferrite/internal/maybe"
 )
 
 // Marshaler converts values to/from their native/literal representations.

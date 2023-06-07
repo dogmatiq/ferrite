@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dogmatiq/ferrite/maybe"
+	"github.com/dogmatiq/ferrite/internal/maybe"
 	"github.com/dogmatiq/ferrite/variable"
 )
 

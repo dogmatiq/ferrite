@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## Unreleased
 
+### Removed
+
+- Removed the experimental `maybe` sub-package
+
 ### Fixed
 
 - Prevent registration of multiple environment variables with the same name
