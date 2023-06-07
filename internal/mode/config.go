@@ -4,7 +4,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/dogmatiq/ferrite/variable"
+	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
 // Config is the configuration used when running a mode.

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strconv"
 
-	"github.com/dogmatiq/ferrite/variable"
+	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
 // NetworkPort configures an environment variable as a network port.

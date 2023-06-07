@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/dogmatiq/ferrite/variable"
+	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
 // Value returns a value rendered for display within documentation and other

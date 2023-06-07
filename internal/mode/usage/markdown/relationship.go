@@ -3,7 +3,7 @@ package markdown
 import (
 	"strings"
 
-	"github.com/dogmatiq/ferrite/variable"
+	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
 func (r *specRenderer) renderSeeAlso() {

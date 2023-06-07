@@ -8,7 +8,7 @@ import (
 
 	"github.com/dogmatiq/ferrite/internal/mode"
 	. "github.com/dogmatiq/ferrite/internal/mode/usage/markdown"
-	"github.com/dogmatiq/ferrite/variable"
+	"github.com/dogmatiq/ferrite/internal/variable"
 	. "github.com/jmalloc/gomegax"
 	. "github.com/onsi/gomega"
 )

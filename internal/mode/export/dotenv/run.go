@@ -3,7 +3,7 @@ package dotenv
 import (
 	"github.com/dogmatiq/ferrite/internal/mode"
 	"github.com/dogmatiq/ferrite/internal/mode/internal/render"
-	"github.com/dogmatiq/ferrite/variable"
+	"github.com/dogmatiq/ferrite/internal/variable"
 	"github.com/dogmatiq/iago/must"
 )
 

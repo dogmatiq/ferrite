@@ -3,7 +3,7 @@ package ferrite
 import (
 	"fmt"
 
-	"github.com/dogmatiq/ferrite/variable"
+	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
 // Bool configures an environment variable as a boolean.

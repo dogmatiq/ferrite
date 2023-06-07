@@ -8,7 +8,7 @@ import (
 	"github.com/dogmatiq/ferrite"
 	. "github.com/dogmatiq/ferrite"
 	"github.com/dogmatiq/ferrite/internal/mode"
-	"github.com/dogmatiq/ferrite/variable"
+	"github.com/dogmatiq/ferrite/internal/variable"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )

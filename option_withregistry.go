@@ -1,6 +1,6 @@
 package ferrite
 
-import "github.com/dogmatiq/ferrite/variable"
+import "github.com/dogmatiq/ferrite/internal/variable"
 
 // WithRegistry is an option that sets the variable registry to use.
 func WithRegistry(reg *variable.Registry) interface {

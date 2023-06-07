@@ -1,7 +1,7 @@
 package markdown
 
 import (
-	"github.com/dogmatiq/ferrite/variable"
+	"github.com/dogmatiq/ferrite/internal/variable"
 	"github.com/mattn/go-runewidth"
 )
 

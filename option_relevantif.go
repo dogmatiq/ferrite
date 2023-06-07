@@ -3,7 +3,7 @@ package ferrite
 import (
 	"reflect"
 
-	"github.com/dogmatiq/ferrite/variable"
+	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
 // RelevantIf is an option that enables a variable set only if the value

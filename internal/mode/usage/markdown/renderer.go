@@ -5,8 +5,8 @@ import (
 	"io"
 	"strings"
 
+	"github.com/dogmatiq/ferrite/internal/variable"
 	"github.com/dogmatiq/ferrite/internal/wordwrap"
-	"github.com/dogmatiq/ferrite/variable"
 	"gopkg.in/yaml.v3"
 )
 

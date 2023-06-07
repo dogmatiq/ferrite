@@ -1,6 +1,6 @@
 package ferrite
 
-import "github.com/dogmatiq/ferrite/variable"
+import "github.com/dogmatiq/ferrite/internal/variable"
 
 // option is an implementation of various option interfaces.
 //

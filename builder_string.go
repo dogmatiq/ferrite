@@ -1,7 +1,7 @@
 package ferrite
 
 import (
-	"github.com/dogmatiq/ferrite/variable"
+	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
 // String configures an environment variable as a string.

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/dogmatiq/ferrite/internal/maybe"
-	"github.com/dogmatiq/ferrite/variable"
+	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
 // Duration configures an environment variable as a duration.

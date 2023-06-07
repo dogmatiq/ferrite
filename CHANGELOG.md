@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Removed
 
-- Removed the experimental `maybe` sub-package
+- Removed the experimental `maybe` and `variable` sub-packages
 
 ### Fixed
 

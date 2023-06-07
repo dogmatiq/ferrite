@@ -4,7 +4,7 @@ import (
 	"io"
 
 	"github.com/dogmatiq/ferrite/internal/mode"
-	"github.com/dogmatiq/ferrite/variable"
+	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
 // Run validates the variables in the given registry.

@@ -2,7 +2,7 @@ package markdown_test
 
 import (
 	"github.com/dogmatiq/ferrite"
-	"github.com/dogmatiq/ferrite/variable"
+	"github.com/dogmatiq/ferrite/internal/variable"
 	. "github.com/onsi/ginkgo/v2"
 )
 

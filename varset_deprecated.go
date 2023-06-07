@@ -1,7 +1,7 @@
 package ferrite
 
 import (
-	"github.com/dogmatiq/ferrite/variable"
+	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
 // Deprecated is a VariableSet used to obtain a value that may be unavailable,

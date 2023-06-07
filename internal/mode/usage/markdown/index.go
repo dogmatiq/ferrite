@@ -3,7 +3,7 @@ package markdown
 import (
 	"fmt"
 
-	"github.com/dogmatiq/ferrite/variable"
+	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
 func (r *renderer) renderIndex() {

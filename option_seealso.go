@@ -1,6 +1,6 @@
 package ferrite
 
-import "github.com/dogmatiq/ferrite/variable"
+import "github.com/dogmatiq/ferrite/internal/variable"
 
 // SeeAlso is an option for a variable set that adds the variables in another
 // set, s, to the "see also" section of the generated documentation.

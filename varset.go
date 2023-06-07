@@ -1,7 +1,7 @@
 package ferrite
 
 import (
-	"github.com/dogmatiq/ferrite/variable"
+	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
 // VariableSet is the application-facing interface for obtaining a value

@@ -3,7 +3,7 @@ package validate
 import (
 	"fmt"
 
-	"github.com/dogmatiq/ferrite/variable"
+	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
 // name renders a column containing the variable's name.

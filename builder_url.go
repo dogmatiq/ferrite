@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/url"
 
-	"github.com/dogmatiq/ferrite/variable"
+	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
 // URL configures an environment variable as a URL.

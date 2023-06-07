@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/dogmatiq/ferrite/internal/mode/internal/render"
-	"github.com/dogmatiq/ferrite/variable"
+	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
 // value renders a column describing the variable's value.

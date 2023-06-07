@@ -3,7 +3,7 @@ package ferrite
 import (
 	"fmt"
 
-	"github.com/dogmatiq/ferrite/variable"
+	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
 // Enum configures an environment variable as an enumeration.

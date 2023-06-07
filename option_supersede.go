@@ -1,6 +1,6 @@
 package ferrite
 
-import "github.com/dogmatiq/ferrite/variable"
+import "github.com/dogmatiq/ferrite/internal/variable"
 
 // SupersededBy is a option for a deprecated variable set that indicates the
 // variables in another set, s, should be used instead.
