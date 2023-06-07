@@ -30,7 +30,7 @@ The format is based on [Keep a Changelog], and this project adheres to
 ### Changed
 
 - `variable.String` now implements the new `LengthLimited` interface
-- Rename the `variable.[Min|Max]LengthError.String` to `ViolatedSchema` and change its type to `LengthLimited`
+- Rename the `variable.[Min|Max]LengthError.String` field to `ViolatedSchema` and change its type to `LengthLimited`
 
 ### Removed
 
