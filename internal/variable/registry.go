@@ -2,6 +2,7 @@ package variable
 
 import (
 	"fmt"
+	"net/url"
 	"sync"
 
 	"github.com/dogmatiq/ferrite/internal/environment"
@@ -11,6 +12,7 @@ import (
 // Registry is a collection of environment variable specifications.
 type Registry struct {
 	Name string
+	URL  *url.URL
 	vars sync.Map // map[string]Any
 }
 

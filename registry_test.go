@@ -6,7 +6,10 @@ func ExampleRegistry() {
 	defer example()()
 
 	// Create a custom registry.
-	reg := ferrite.NewRegistry("custom-registry")
+	reg := ferrite.NewRegistry(
+		"my-registry",
+		"https://example.com/registry.html",
+	)
 
 	// Define an environment variable specification within that registry.
 	ferrite.
