@@ -12,7 +12,7 @@ import (
 
 type renderer struct {
 	App       string
-	Variables []variable.Any
+	Variables []variable.RegisteredVariable
 	Output    io.Writer
 
 	withoutExplanatoryText bool
