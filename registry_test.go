@@ -8,7 +8,8 @@ func ExampleRegistry() {
 	// Create a custom registry.
 	reg := ferrite.NewRegistry(
 		"my-registry",
-		"https://example.com/registry.html",
+		"My Registry",
+		ferrite.WithDocumentationURL("https://example.com/registry.html"),
 	)
 
 	// Define an environment variable specification within that registry.

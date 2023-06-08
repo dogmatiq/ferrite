@@ -11,8 +11,9 @@ import (
 
 // Registry is a collection of environment variable specifications.
 type Registry struct {
-	Name string
-	URL  *url.URL
+	Key, Name string
+	URL       *url.URL
+
 	vars sync.Map // map[string]Any
 }
 
@@ -27,6 +28,7 @@ func (r *Registry) register(v Any) {
 
 func (r *Registry) clone() *Registry {
 	c := &Registry{
+		Key:  r.Key,
 		Name: r.Name,
 	}
 
@@ -48,7 +50,8 @@ func ResetDefaultRegistry() {
 
 // DefaultRegistry is the default specification registry.
 var DefaultRegistry = Registry{
-	Name: "default",
+	Key:  "default",
+	Name: "Default",
 }
 
 // Register registers a new variable with one or more registries.
@@ -91,8 +94,8 @@ func (s *RegistrySet) Add(r *Registry) {
 				panic(fmt.Sprintf(
 					"the %q environment variable is defined in both the %q and %q registries",
 					v.(Any).Spec().Name(),
-					x.Name,
-					r.Name,
+					x.Key,
+					r.Key,
 				))
 			}
 			return true

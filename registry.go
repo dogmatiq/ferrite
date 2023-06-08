@@ -2,7 +2,6 @@ package ferrite
 
 import (
 	"fmt"
-	urls "net/url"
 
 	"github.com/dogmatiq/ferrite/internal/variable"
 )
@@ -19,26 +18,28 @@ type RegistryOption interface {
 //
 // Use the [WithRegistry] option to configure an environment variable definition
 // or [Init] call to use a specific registry.
-func NewRegistry(name, url string, options ...RegistryOption) Registry {
+func NewRegistry(
+	key, name string,
+	options ...RegistryOption,
+) Registry {
+	if key == "" {
+		panic("registry key must not be empty")
+	}
+
+	if key == variable.DefaultRegistry.Key {
+		panic(fmt.Sprintf(
+			"registry key must not be %q",
+			variable.DefaultRegistry.Key,
+		))
+	}
+
 	if name == "" {
 		panic("registry name must not be empty")
 	}
 
-	if name == variable.DefaultRegistry.Name {
-		panic(fmt.Sprintf(
-			"registry name must not be %q",
-			variable.DefaultRegistry.Name,
-		))
-	}
-
-	u, err := urls.Parse(url)
-	if err != nil {
-		panic("invalid URL: " + err.Error())
-	}
-
 	reg := &variable.Registry{
+		Key:  key,
 		Name: name,
-		URL:  u,
 	}
 
 	for _, opt := range options {
