@@ -9,9 +9,9 @@ import (
 // Run generates environment variable usage instructions in markdown format.
 func Run(cfg mode.Config, options ...Option) {
 	r := renderer{
-		App:    filepath.Base(cfg.Args[0]),
-		Specs:  cfg.Registries.Specs(),
-		Output: cfg.Out,
+		App:       filepath.Base(cfg.Args[0]),
+		Variables: cfg.Registries.Variables(),
+		Output:    cfg.Out,
 	}
 
 	for _, opt := range options {

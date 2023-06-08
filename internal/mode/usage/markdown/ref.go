@@ -18,7 +18,8 @@ func (r *renderer) renderRefs() {
 		"ferrite": "https://github.com/dogmatiq/ferrite",
 	}
 
-	for _, s := range r.Specs {
+	for _, v := range r.Variables {
+		s := v.Spec()
 		key := "`" + strings.ToLower(s.Name()) + "`"
 		if _, ok := r.refs[key]; ok {
 			urls[key] = "#" + s.Name()

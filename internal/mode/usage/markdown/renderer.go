@@ -11,9 +11,9 @@ import (
 )
 
 type renderer struct {
-	App    string
-	Specs  []variable.Spec
-	Output io.Writer
+	App       string
+	Variables []variable.Any
+	Output    io.Writer
 
 	withoutExplanatoryText bool
 	withoutIndex           bool
@@ -44,7 +44,7 @@ func (r *renderer) Render() {
 		)
 	}
 
-	if len(r.Specs) != 0 {
+	if len(r.Variables) != 0 {
 		r.gap()
 		r.line("## Specification")
 
@@ -75,8 +75,8 @@ func (r *renderer) Render() {
 			)
 		}
 
-		for _, s := range r.Specs {
-			sr := specRenderer{r, s}
+		for _, v := range r.Variables {
+			sr := specRenderer{r, v.Spec()}
 			sr.Render()
 		}
 	}

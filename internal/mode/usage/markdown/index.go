@@ -7,14 +7,15 @@ import (
 )
 
 func (r *renderer) renderIndex() {
-	if len(r.Specs) == 0 {
+	if len(r.Variables) == 0 {
 		r.line("**There do not appear to be any environment variables.**")
 	} else {
 		var t table
 
 		t.AddRow("Name", "Optionality", "Description")
 
-		for _, s := range r.Specs {
+		for _, v := range r.Variables {
+			s := v.Spec()
 			name := r.linkToSpec(s)
 			optionality := "required"
 

@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/dogmatiq/ferrite/internal/environment"
+	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
 )
 
@@ -78,7 +79,9 @@ func Register[T any](
 
 // RegistrySet is a set of multiple environment variable registries
 type RegistrySet struct {
-	registries []*Registry
+	registries         map[string]*Registry
+	variables          map[string]Any
+	registryByVariable map[Any]*Registry
 }
 
 // Add adds r to the set.
@@ -88,45 +91,43 @@ type RegistrySet struct {
 //
 // Any changes to r after it is added to the set are not reflected in the set.
 func (s *RegistrySet) Add(r *Registry) {
-	for _, x := range s.registries {
-		x.vars.Range(func(k, _ any) bool {
-			if v, ok := r.vars.Load(k); ok {
-				panic(fmt.Sprintf(
-					"the %q environment variable is defined in both the %q and %q registries",
-					v.(Any).Spec().Name(),
-					x.Key,
-					r.Key,
-				))
-			}
-			return true
-		})
+	if _, ok := s.registries[r.Key]; ok {
+		panic(fmt.Sprintf(
+			"the set already contains the %s registry",
+			r.Key,
+		))
 	}
 
-	s.registries = append(s.registries, r.clone())
-}
-
-// Specs returns the specs of the variables in the registries, sorted by name.
-func (s *RegistrySet) Specs() []Spec {
-	variables := s.Variables()
-	specs := make([]Spec, len(variables))
-
-	for i, v := range variables {
-		specs[i] = v.Spec()
+	for k, v := range s.variables {
+		if _, ok := r.vars.Load(k); ok {
+			panic(fmt.Sprintf(
+				"the %q environment variable is defined in both the %q and %q registries",
+				v.Spec().Name(),
+				s.registryByVariable[v].Key,
+				r.Key,
+			))
+		}
 	}
 
-	return specs
+	if s.variables == nil {
+		s.variables = map[string]Any{}
+	}
+
+	r.vars.Range(func(k, v any) bool {
+		s.variables[k.(string)] = v.(Any)
+		return true
+	})
+
+	if s.registries == nil {
+		s.registries = make(map[string]*Registry)
+	}
+
+	s.registries[r.Key] = r
 }
 
 // Variables returns the variables in the registries, sorted by name.
 func (s *RegistrySet) Variables() []Any {
-	var variables []Any
-
-	for _, r := range s.registries {
-		r.vars.Range(func(_, v any) bool {
-			variables = append(variables, v.(Any))
-			return true
-		})
-	}
+	variables := maps.Values(s.variables)
 
 	slices.SortFunc(
 		variables,
@@ -136,6 +137,15 @@ func (s *RegistrySet) Variables() []Any {
 	)
 
 	return variables
+}
+
+// SourceRegistry returns the registry that contains v.
+func (s *RegistrySet) SourceRegistry(v Any) *Registry {
+	r, ok := s.registryByVariable[v]
+	if !ok {
+		panic("unrecognized variable")
+	}
+	return r
 }
 
 // IsEmpty returns true if the set contains no registries.
