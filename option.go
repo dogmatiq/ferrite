@@ -8,6 +8,7 @@ import "github.com/dogmatiq/ferrite/internal/variable"
 // embeds one or more of the option interfaces.
 type option struct {
 	ApplyToInitConfig func(*initConfig)
+	ApplyToRegistry   func(*variable.Registry)
 
 	ApplyToSetConfig           func(*variableSetConfig)
 	ApplyToSpec                func(variable.SpecBuilder)
@@ -24,6 +25,10 @@ type option struct {
 
 func (o option) applyInitOption(cfg *initConfig) {
 	applyOption(cfg, o.ApplyToInitConfig)
+}
+
+func (o option) applyRegistryOption(reg *variable.Registry) {
+	applyOption(reg, o.ApplyToRegistry)
 }
 
 func (o option) applyRequiredOptionToConfig(cfg *variableSetConfig) {
