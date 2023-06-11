@@ -34,7 +34,7 @@ func Init(options ...InitOption) {
 		mode.DefaultConfig,
 	}
 
-	cfg.ModeConfig.Registries.Add(&variable.DefaultRegistry)
+	cfg.ModeConfig.Registries.Add(variable.DefaultRegistry)
 
 	for _, opt := range options {
 		opt.applyInitOption(&cfg)

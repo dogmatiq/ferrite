@@ -2,7 +2,6 @@ package markdown_test
 
 import (
 	"github.com/dogmatiq/ferrite"
-	"github.com/dogmatiq/ferrite/internal/variable"
 	. "github.com/onsi/ginkgo/v2"
 )
 
@@ -12,12 +11,12 @@ var _ = DescribeTable(
 	Entry(
 		"no variables",
 		"empty.md",
-		func(reg *variable.Registry) {},
+		func(reg ferrite.Registry) {},
 	),
 	Entry(
 		"non-normative examples",
 		"non-normative.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				String("READ_DSN", "database connection string for read-models").
 				Required(ferrite.WithRegistry(reg))

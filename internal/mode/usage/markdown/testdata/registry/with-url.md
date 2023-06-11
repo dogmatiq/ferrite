@@ -12,7 +12,7 @@ The `READ_DSN` variable **MUST NOT** be left undefined.
 export READ_DSN=foo # (non-normative)
 ```
 
-This variable is imported from [Some Third-party Product](registry:3p).
+This variable is imported from [Third-party Product](registry:3p).
 
 <!-- references -->
 

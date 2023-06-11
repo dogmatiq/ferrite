@@ -3,7 +3,6 @@ package markdown_test
 import (
 	"github.com/dogmatiq/ferrite"
 	. "github.com/dogmatiq/ferrite/internal/mode/usage/markdown"
-	"github.com/dogmatiq/ferrite/internal/variable"
 	. "github.com/onsi/ginkgo/v2"
 )
 
@@ -18,7 +17,7 @@ var _ = DescribeTable(
 	Entry(
 		"deprecated",
 		"deprecated.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Unsigned[uint16]("WEIGHT", "weighting for this node").
 				Deprecated(ferrite.WithRegistry(reg))
@@ -27,7 +26,7 @@ var _ = DescribeTable(
 	Entry(
 		"optional",
 		"optional.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Unsigned[uint16]("WEIGHT", "weighting for this node").
 				Optional(ferrite.WithRegistry(reg))
@@ -36,7 +35,7 @@ var _ = DescribeTable(
 	Entry(
 		"required",
 		"required.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Unsigned[uint16]("WEIGHT", "weighting for this node").
 				Required(ferrite.WithRegistry(reg))
@@ -45,7 +44,7 @@ var _ = DescribeTable(
 	Entry(
 		"optional with default value",
 		"with-default.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Unsigned[uint16]("WEIGHT", "weighting for this node").
 				WithDefault(900).
@@ -55,7 +54,7 @@ var _ = DescribeTable(
 	Entry(
 		"required with default value",
 		"with-default.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Unsigned[uint16]("WEIGHT", "weighting for this node").
 				WithDefault(900).
@@ -64,7 +63,7 @@ var _ = DescribeTable(
 	), Entry(
 		"with minimum value",
 		"with-min.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Unsigned[uint16]("WEIGHT", "weighting for this node").
 				WithMinimum(10).
@@ -74,7 +73,7 @@ var _ = DescribeTable(
 	Entry(
 		"with maximum value",
 		"with-max.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Unsigned[uint16]("WEIGHT", "weighting for this node").
 				WithMaximum(20).
@@ -84,7 +83,7 @@ var _ = DescribeTable(
 	Entry(
 		"with minimum and maximum values",
 		"with-minmax.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Unsigned[uint16]("WEIGHT", "weighting for this node").
 				WithMinimum(10).

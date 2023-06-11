@@ -5,7 +5,9 @@ import (
 )
 
 // A Registry is a collection of environment variable specifications.
-type Registry = *variable.Registry
+type Registry interface {
+	variable.ProtectedRegistry
+}
 
 // RegistryOption is an option that configures the behavior of a registry.
 type RegistryOption interface {

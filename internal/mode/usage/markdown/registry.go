@@ -1,7 +1,7 @@
 package markdown
 
 func (r *specRenderer) renderRegistry() {
-	if r.reg.Key == "" {
+	if r.reg.IsDefault {
 		return
 	}
 

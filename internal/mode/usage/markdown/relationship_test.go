@@ -3,7 +3,6 @@ package markdown_test
 import (
 	"github.com/dogmatiq/ferrite"
 	. "github.com/dogmatiq/ferrite/internal/mode/usage/markdown"
-	"github.com/dogmatiq/ferrite/internal/variable"
 	. "github.com/onsi/ginkgo/v2"
 )
 
@@ -17,7 +16,7 @@ var _ = DescribeTable(
 	Entry(
 		"see also",
 		"see-also.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			verbose := ferrite.
 				Bool("VERBOSE", "enable verbose logging").
 				Optional(ferrite.WithRegistry(reg))
@@ -33,7 +32,7 @@ var _ = DescribeTable(
 	Entry(
 		"deprecated + superseded",
 		"deprecated-superseded.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			addr := ferrite.
 				String(`BIND_HOST`, "listen host for the HTTP server").
 				WithDefault("0.0.0.0").
@@ -63,7 +62,7 @@ var _ = DescribeTable(
 	Entry(
 		"depends on + optional + default",
 		"depends-on/with-default.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			widgetEnabled := ferrite.
 				Bool("WIDGET_ENABLED", "enable the widget").
 				Required(ferrite.WithRegistry(reg))
@@ -80,7 +79,7 @@ var _ = DescribeTable(
 	Entry(
 		"depends on + optional",
 		"depends-on/optional.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			widgetEnabled := ferrite.
 				Bool("WIDGET_ENABLED", "enable the widget").
 				Required(ferrite.WithRegistry(reg))
@@ -96,7 +95,7 @@ var _ = DescribeTable(
 	Entry(
 		"depends on + required + default",
 		"depends-on/with-default.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			widgetEnabled := ferrite.
 				Bool("WIDGET_ENABLED", "enable the widget").
 				Required(ferrite.WithRegistry(reg))
@@ -113,7 +112,7 @@ var _ = DescribeTable(
 	Entry(
 		"depends on + required",
 		"depends-on/required.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			widgetEnabled := ferrite.
 				Bool("WIDGET_ENABLED", "enable the widget").
 				Required(ferrite.WithRegistry(reg))
@@ -129,7 +128,7 @@ var _ = DescribeTable(
 	Entry(
 		"depends on + required + constraint",
 		"depends-on/required-with-constraint.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			widgetEnabled := ferrite.
 				Bool("WIDGET_ENABLED", "enable the widget").
 				Required(ferrite.WithRegistry(reg))
@@ -149,7 +148,7 @@ var _ = DescribeTable(
 	Entry(
 		"depends on + deprecated",
 		"depends-on/deprecated.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			widgetEnabled := ferrite.
 				Bool("WIDGET_ENABLED", "enable the widget").
 				Required(ferrite.WithRegistry(reg))

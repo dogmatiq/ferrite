@@ -12,18 +12,23 @@ var _ = DescribeTable(
 	tableTest(
 		"registry",
 		WithoutExplanatoryText(),
-		WithoutIndex(),
 		WithoutUsageExamples(),
 	),
 	Entry(
 		"with URL",
 		"with-url.md",
-		func(reg *variable.Registry) {
-			*reg = *ferrite.NewRegistry(
-				"3p",
-				"Some Third-party Product",
-				ferrite.WithDocumentationURL("https://example.org/docs/registry.html"),
-			)
+		func(reg ferrite.Registry) {
+			variable.
+				ExposeRegistry(reg).
+				Assign(
+					variable.ExposeRegistry(
+						ferrite.NewRegistry(
+							"3p",
+							"Third-party Product",
+							ferrite.WithDocumentationURL("https://example.org/docs/registry.html"),
+						),
+					),
+				)
 
 			ferrite.
 				String("READ_DSN", "database connection string for read-models").
@@ -33,11 +38,17 @@ var _ = DescribeTable(
 	Entry(
 		"without URL",
 		"without-url.md",
-		func(reg *variable.Registry) {
-			*reg = *ferrite.NewRegistry(
-				"3p",
-				"Some Third-party Product",
-			)
+		func(reg ferrite.Registry) {
+			variable.
+				ExposeRegistry(reg).
+				Assign(
+					variable.ExposeRegistry(
+						ferrite.NewRegistry(
+							"3p",
+							"Third-party Product",
+						),
+					),
+				)
 
 			ferrite.
 				String("READ_DSN", "database connection string for read-models").

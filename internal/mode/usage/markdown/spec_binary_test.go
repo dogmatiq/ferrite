@@ -3,7 +3,6 @@ package markdown_test
 import (
 	"github.com/dogmatiq/ferrite"
 	. "github.com/dogmatiq/ferrite/internal/mode/usage/markdown"
-	"github.com/dogmatiq/ferrite/internal/variable"
 	. "github.com/onsi/ginkgo/v2"
 )
 
@@ -18,7 +17,7 @@ var _ = DescribeTable(
 	Entry(
 		"deprecated",
 		"deprecated.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Binary("FAVICON", "the content of the favicon.png file").
 				Deprecated(ferrite.WithRegistry(reg))
@@ -27,7 +26,7 @@ var _ = DescribeTable(
 	Entry(
 		"optional",
 		"optional.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Binary("FAVICON", "the content of the favicon.png file").
 				Optional(ferrite.WithRegistry(reg))
@@ -36,7 +35,7 @@ var _ = DescribeTable(
 	Entry(
 		"required",
 		"required.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Binary("FAVICON", "the content of the favicon.png file").
 				Required(ferrite.WithRegistry(reg))
@@ -45,7 +44,7 @@ var _ = DescribeTable(
 	Entry(
 		"optional with default value",
 		"with-default.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Binary("FAVICON", "the content of the favicon.png file").
 				WithDefault([]byte("<favicon content>")).
@@ -55,7 +54,7 @@ var _ = DescribeTable(
 	Entry(
 		"required with default value",
 		"with-default.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Binary("FAVICON", "the content of the favicon.png file").
 				WithDefault([]byte("<favicon content>")).
@@ -65,7 +64,7 @@ var _ = DescribeTable(
 	Entry(
 		"optional with sensitive content",
 		"with-sensitive-optional.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Binary("SECRET_KEY", "a very secret machine-readable key").
 				WithSensitiveContent().
@@ -77,7 +76,7 @@ var _ = DescribeTable(
 	Entry(
 		"required with sensitive content",
 		"with-sensitive-required.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Binary("SECRET_KEY", "a very secret machine-readable key").
 				WithSensitiveContent().
@@ -89,7 +88,7 @@ var _ = DescribeTable(
 	Entry(
 		"optional with sensitive content and default value",
 		"with-sensitive-with-default.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Binary("SECRET_KEY", "a very secret machine-readable key").
 				WithDefault([]byte("hunter2")).
@@ -102,7 +101,7 @@ var _ = DescribeTable(
 	Entry(
 		"required with sensitive content and default value",
 		"with-sensitive-with-default.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Binary("SECRET_KEY", "a very secret machine-readable key").
 				WithDefault([]byte("hunter2")).

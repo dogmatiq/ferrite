@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/dogmatiq/ferrite"
 	"github.com/dogmatiq/ferrite/internal/environment"
 	"github.com/dogmatiq/ferrite/internal/mode"
 	. "github.com/dogmatiq/ferrite/internal/mode/usage/markdown"
@@ -19,13 +20,15 @@ func tableTest(
 	options ...Option,
 ) func(
 	file string,
-	setup func(*variable.Registry),
+	setup func(ferrite.Registry),
 ) {
 	return func(
 		file string,
-		setup func(*variable.Registry),
+		setup func(ferrite.Registry),
 	) {
-		reg := &variable.Registry{}
+		reg := &variable.Registry{
+			IsDefault: true,
+		}
 
 		snapshot := environment.TakeSnapshot()
 		defer environment.RestoreSnapshot(snapshot)
