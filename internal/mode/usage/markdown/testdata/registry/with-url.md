@@ -1,5 +1,9 @@
 # Environment Variables
 
+| Name         | Optionality | Description                                | Imported From                      |
+| ------------ | ----------- | ------------------------------------------ | ---------------------------------- |
+| [`READ_DSN`] | required    | database connection string for read-models | [Third-party Product](registry:3p) |
+
 ## Specification
 
 ### `READ_DSN`
@@ -16,4 +20,5 @@ This variable is imported from [Third-party Product](registry:3p).
 
 <!-- references -->
 
+[`read_dsn`]: #READ_DSN
 [registry:3p]: https://example.org/docs/registry.html

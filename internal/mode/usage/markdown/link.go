@@ -58,6 +58,22 @@ func (r *renderer) linkToSpec(s variable.Spec) string {
 	)
 }
 
+// linkToRegistry returns markdown that links to the given registry.
+//
+// If the registry does not have a documentation URL, it returns the registry
+// name without any link.
+func (r *renderer) linkToRegistry(reg *variable.Registry) string {
+	if reg.URL == nil {
+		return reg.Name
+	}
+
+	return r.linkToURL(
+		reg.Name,
+		reg.URL.String(),
+		"registry:"+reg.Key,
+	)
+}
+
 // renderLinkRefs renders the map of reference names to URLs.
 func (r *renderer) renderLinkRefs() {
 	if len(r.links) == 0 {

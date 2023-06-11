@@ -14,7 +14,8 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Added
 
-- Add `Registry` and `NewRegistry()`
+- Added `Registry` and `NewRegistry()`
+- Added `RegistryOption` and `WithDocumentationURL()`
 
 ### Changed
 

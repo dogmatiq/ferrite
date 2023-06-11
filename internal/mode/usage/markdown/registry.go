@@ -1,20 +1,11 @@
 package markdown
 
 func (r *specRenderer) renderRegistry() {
-	if r.reg.IsDefault {
-		return
-	}
-
-	r.ren.gap()
-
-	link := r.reg.Name
-	if r.reg.URL != nil {
-		link = r.ren.linkToURL(
-			r.reg.Name,
-			r.reg.URL.String(),
-			"registry:"+r.reg.Key,
+	if !r.reg.IsDefault {
+		r.ren.gap()
+		r.ren.line(
+			"This variable is imported from %s.",
+			r.ren.linkToRegistry(r.reg),
 		)
 	}
-
-	r.ren.line("This variable is imported from %s.", link)
 }
