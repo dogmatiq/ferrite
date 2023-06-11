@@ -79,7 +79,11 @@ func (r *renderer) Render() {
 		}
 
 		for _, v := range r.Variables {
-			sr := specRenderer{r, v.Spec()}
+			sr := specRenderer{
+				r,
+				v.Spec(),
+				v.Registry,
+			}
 			sr.Render()
 		}
 	}
