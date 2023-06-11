@@ -1,8 +1,6 @@
 package ferrite
 
 import (
-	"fmt"
-
 	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
@@ -24,13 +22,6 @@ func NewRegistry(
 ) Registry {
 	if key == "" {
 		panic("registry key must not be empty")
-	}
-
-	if key == variable.DefaultRegistry.Key {
-		panic(fmt.Sprintf(
-			"registry key must not be %q",
-			variable.DefaultRegistry.Key,
-		))
 	}
 
 	if name == "" {

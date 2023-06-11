@@ -49,10 +49,7 @@ func ResetDefaultRegistry() {
 }
 
 // DefaultRegistry is the default specification registry.
-var DefaultRegistry = Registry{
-	Key:  "default",
-	Name: "Default",
-}
+var DefaultRegistry = Registry{}
 
 // Register registers a new variable with one or more registries.
 //
