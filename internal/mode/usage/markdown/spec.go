@@ -10,6 +10,7 @@ import (
 type specRenderer struct {
 	ren  *renderer
 	spec variable.Spec
+	reg  *variable.Registry
 }
 
 func (r *specRenderer) Render() {
@@ -32,6 +33,7 @@ func (r *specRenderer) Render() {
 		r.renderExamples()
 	}
 
+	r.renderRegistry()
 	r.renderUnimportantDocumentation()
 	r.renderSeeAlso()
 }

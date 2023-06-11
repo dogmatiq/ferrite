@@ -2,12 +2,13 @@ package ferrite
 
 import (
 	"fmt"
-	"os"
 
+	"github.com/dogmatiq/ferrite/internal/environment"
 	"github.com/dogmatiq/ferrite/internal/mode"
 	"github.com/dogmatiq/ferrite/internal/mode/export/dotenv"
 	"github.com/dogmatiq/ferrite/internal/mode/usage/markdown"
 	"github.com/dogmatiq/ferrite/internal/mode/validate"
+	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
 // Init initializes Ferrite.
@@ -33,11 +34,13 @@ func Init(options ...InitOption) {
 		mode.DefaultConfig,
 	}
 
+	cfg.ModeConfig.Registries.Add(variable.DefaultRegistry)
+
 	for _, opt := range options {
 		opt.applyInitOption(&cfg)
 	}
 
-	switch m := os.Getenv("FERRITE_MODE"); m {
+	switch m := environment.Get("FERRITE_MODE"); m {
 	case "validate", "":
 		validate.Run(cfg.ModeConfig)
 	case "usage/markdown":

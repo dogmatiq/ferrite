@@ -32,7 +32,7 @@ func example() func() {
 // tearDown resets the environemnt and Ferrite global state after a test.
 func tearDown() {
 	mode.ResetDefaultConfig()
-	variable.DefaultRegistry.Reset()
+	variable.ResetDefaultRegistry()
 
 	for _, env := range os.Environ() {
 		if strings.HasPrefix(env, "FERRITE_") {

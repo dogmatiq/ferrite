@@ -10,7 +10,7 @@ import (
 // Run generates and env file describing the environment variables and their
 // current values.
 func Run(cfg mode.Config) {
-	for i, v := range cfg.Registry.Variables() {
+	for i, v := range cfg.Registries.Variables() {
 		s := v.Spec()
 
 		if i > 0 {

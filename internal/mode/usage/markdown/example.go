@@ -8,8 +8,8 @@ import (
 // hasNonNormativeExamples returns true if any of the specs have non-normative
 // examples.
 func (r *renderer) hasNonNormativeExamples() bool {
-	for _, s := range r.Specs {
-		for _, eg := range s.Examples() {
+	for _, v := range r.Variables {
+		for _, eg := range v.Spec().Examples() {
 			if !eg.IsNormative {
 				return true
 			}

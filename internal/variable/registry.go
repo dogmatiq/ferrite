@@ -1,83 +1,103 @@
 package variable
 
 import (
+	"net/url"
 	"sync"
 
-	"golang.org/x/exp/maps"
-	"golang.org/x/exp/slices"
+	"github.com/dogmatiq/ferrite/internal/environment"
 )
 
 // Registry is a collection of environment variable specifications.
 type Registry struct {
-	Environment Environment
+	Key, Name string
+	URL       *url.URL
+	IsDefault bool
 
-	m    sync.RWMutex
-	vars map[string]Any
+	vars sync.Map // map[string]Any
 }
 
-// Specs returns the specs of the variables in the library, sorted by name.
-func (r *Registry) Specs() []Spec {
-	variables := r.Variables()
-	specs := make([]Spec, len(variables))
+// Register registers a new variable with the registry.
+func (r *Registry) Register(v Any) {
+	name := v.Spec().Name()
+	norm := environment.NormalizeName(name)
 
-	for i, v := range variables {
-		specs[i] = v.Spec()
+	if _, loaded := r.vars.LoadOrStore(norm, v); loaded {
+		panic("a variable named " + name + " is already registered")
 	}
-
-	return specs
 }
 
-// Variables returns the variables in the registry, sorted by name.
-func (r *Registry) Variables() []Any {
-	r.m.RLock()
-	variables := maps.Values(r.vars)
-	r.m.RUnlock()
+// Assign copies the contents of reg into r.
+func (r *Registry) Assign(reg *Registry) {
+	r.Key = reg.Key
+	r.Name = reg.Name
+	r.URL = reg.URL
+	r.IsDefault = reg.IsDefault
 
-	slices.SortFunc(
-		variables,
-		func(a, b Any) bool {
-			return a.Spec().Name() < b.Spec().Name()
-		},
-	)
+	r.vars.Range(func(k any, _ any) bool {
+		DefaultRegistry.vars.Delete(k)
+		return true
+	})
 
-	return variables
+	reg.vars.Range(func(k any, v any) bool {
+		r.vars.Store(k, v)
+		return true
+	})
 }
 
-// Reset removes all variables from the registry.
-func (r *Registry) Reset() {
-	r.m.Lock()
-	r.vars = nil
-	r.m.Unlock()
+// Clone returns a copy of the registry.
+func (r *Registry) Clone() *Registry {
+	c := &Registry{}
+	c.Assign(r)
+	return c
 }
 
 // DefaultRegistry is the default specification registry.
-var DefaultRegistry = Registry{
-	Environment: OSEnvironment,
+var DefaultRegistry = &Registry{
+	IsDefault: true,
 }
 
-// Register registers a new variable.
-func Register[T any](reg *Registry, spec *TypedSpec[T]) *OfType[T] {
-	if reg == nil {
-		reg = &DefaultRegistry
-	}
+// ResetDefaultRegistry removes all variables from [DefaultRegistry].
+func ResetDefaultRegistry() {
+	DefaultRegistry.Assign(
+		&Registry{
+			IsDefault: true,
+		},
+	)
+}
 
-	name := normalizeVariableName(spec.name)
-
-	reg.m.Lock()
-	defer reg.m.Unlock()
-
-	if reg.vars == nil {
-		reg.vars = map[string]Any{}
-	} else if _, ok := reg.vars[name]; ok {
-		panic("a variable named " + spec.name + " is already registered")
+// Register registers a new variable with one or more registries.
+//
+// If no registries are specified, [DefaultRegistry] is used.
+func Register[T any](
+	registries []*Registry,
+	spec *TypedSpec[T],
+) *OfType[T] {
+	if len(registries) == 0 {
+		registries = append(registries, DefaultRegistry)
 	}
 
 	v := &OfType[T]{
 		spec: spec,
-		env:  reg.Environment,
 	}
 
-	reg.vars[name] = v
+	for _, reg := range registries {
+		reg.Register(v)
+	}
 
 	return v
+}
+
+// ProtectedRegistry is an interface that allows access to the internals of a
+// [Registry].
+type ProtectedRegistry interface {
+	expose() *Registry
+}
+
+// ExposeRegistry returns exposes the underlying registry of r.
+func ExposeRegistry(r ProtectedRegistry) *Registry {
+	return r.expose()
+}
+
+func (r *Registry) expose() *Registry {
+	return r
 }

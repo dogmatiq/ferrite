@@ -12,6 +12,16 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## Unreleased
 
+### Added
+
+- Added `Registry` and `NewRegistry()`
+- Added `RegistryOption` and `WithDocumentationURL()`
+
+### Changed
+
+- Changed `WithRegistry()` to accept a `ferrite.Registry` instead of the experimental `variable.Registry` type
+- Passing `WithRegistry()` to `Init()` is now additive, instead of replacing the default registry
+
 ### Removed
 
 - Removed the experimental `maybe` and `variable` sub-packages

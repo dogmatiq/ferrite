@@ -11,14 +11,14 @@ import (
 )
 
 type renderer struct {
-	App    string
-	Specs  []variable.Spec
-	Output io.Writer
+	App       string
+	Variables []variable.RegisteredVariable
+	Output    io.Writer
 
 	withoutExplanatoryText bool
 	withoutIndex           bool
 	withoutUsageExamples   bool
-	refs                   map[string]struct{}
+	links                  map[string]string
 }
 
 func (r *renderer) Render() {
@@ -40,11 +40,14 @@ func (r *renderer) Render() {
 			"This document only shows variables declared using %s.",
 		)(
 			r.App,
-			r.link("Ferrite"),
+			r.linkToURL(
+				"Ferrite",
+				"https://github.com/dogmatiq/ferrite",
+			),
 		)
 	}
 
-	if len(r.Specs) != 0 {
+	if len(r.Variables) != 0 {
 		r.gap()
 		r.line("## Specification")
 
@@ -71,20 +74,21 @@ func (r *renderer) Render() {
 				"**SHOULD**, **SHOULD NOT**, **RECOMMENDED**, **MAY**, and **OPTIONAL** in this",
 				"document are to be interpreted as described in %s.",
 			)(
-				r.link("RFC 2119"),
+				r.linkToRFC(2119),
 			)
 		}
 
-		for _, s := range r.Specs {
-			sr := specRenderer{r, s}
+		for _, v := range r.Variables {
+			sr := specRenderer{
+				r,
+				v.Spec(),
+				v.Registry,
+			}
 			sr.Render()
 		}
 	}
 
-	if len(r.refs) != 0 {
-		r.gap()
-		r.renderRefs()
-	}
+	r.renderLinkRefs()
 }
 
 func (r *renderer) gap() {

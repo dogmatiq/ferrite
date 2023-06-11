@@ -3,7 +3,6 @@ package markdown_test
 import (
 	"github.com/dogmatiq/ferrite"
 	. "github.com/dogmatiq/ferrite/internal/mode/usage/markdown"
-	"github.com/dogmatiq/ferrite/internal/variable"
 	. "github.com/onsi/ginkgo/v2"
 )
 
@@ -18,7 +17,7 @@ var _ = DescribeTable(
 	Entry(
 		"deprecated",
 		"deprecated.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Enum("LOG_LEVEL", "the minimum log level to record").
 				WithMember("debug", "show information for developers").
@@ -32,7 +31,7 @@ var _ = DescribeTable(
 	Entry(
 		"optional",
 		"optional.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Enum("LOG_LEVEL", "the minimum log level to record").
 				WithMember("debug", "show information for developers").
@@ -46,7 +45,7 @@ var _ = DescribeTable(
 	Entry(
 		"required",
 		"required.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Enum("LOG_LEVEL", "the minimum log level to record").
 				WithMember("debug", "show information for developers").
@@ -60,7 +59,7 @@ var _ = DescribeTable(
 	Entry(
 		"optional with default value",
 		"with-default.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Enum("LOG_LEVEL", "the minimum log level to record").
 				WithMember("debug", "show information for developers").
@@ -75,7 +74,7 @@ var _ = DescribeTable(
 	Entry(
 		"required with default value",
 		"with-default.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				Enum("LOG_LEVEL", "the minimum log level to record").
 				WithMember("debug", "show information for developers").

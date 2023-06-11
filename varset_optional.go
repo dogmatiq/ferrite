@@ -40,7 +40,7 @@ func optional[T any, Schema variable.TypedSchema[T]](
 	}
 
 	v := variable.Register(
-		cfg.Registry,
+		cfg.Registries,
 		b.Done(s),
 	)
 

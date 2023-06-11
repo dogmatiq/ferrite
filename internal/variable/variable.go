@@ -3,6 +3,8 @@ package variable
 import (
 	"fmt"
 	"sync"
+
+	"github.com/dogmatiq/ferrite/internal/environment"
 )
 
 // Availability is an enumeration describing why a variable is or is not
@@ -57,7 +59,6 @@ type Any interface {
 // OfType is an environment variable depicted by type T.
 type OfType[T any] struct {
 	spec *TypedSpec[T]
-	env  Environment
 
 	once         sync.Once
 	availability Availability
@@ -127,7 +128,9 @@ func (v *OfType[T]) resolve() {
 			}
 		}()
 
-		lit := v.env.Get(v.spec.name)
+		lit := Literal{
+			String: environment.Get(v.spec.name),
+		}
 
 		if lit.String == "" {
 			if def, ok := v.spec.def.Get(); ok {

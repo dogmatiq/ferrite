@@ -3,7 +3,6 @@ package markdown_test
 import (
 	"github.com/dogmatiq/ferrite"
 	. "github.com/dogmatiq/ferrite/internal/mode/usage/markdown"
-	"github.com/dogmatiq/ferrite/internal/variable"
 	. "github.com/onsi/ginkgo/v2"
 )
 
@@ -18,7 +17,7 @@ var _ = DescribeTable(
 	Entry(
 		"deprecated",
 		"deprecated.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				File("PRIVATE_KEY", "path to the private key file").
 				Deprecated(ferrite.WithRegistry(reg))
@@ -27,7 +26,7 @@ var _ = DescribeTable(
 	Entry(
 		"optional",
 		"optional.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				File("PRIVATE_KEY", "path to the private key file").
 				Optional(ferrite.WithRegistry(reg))
@@ -36,7 +35,7 @@ var _ = DescribeTable(
 	Entry(
 		"required",
 		"required.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				File("PRIVATE_KEY", "path to the private key file").
 				Required(ferrite.WithRegistry(reg))
@@ -45,7 +44,7 @@ var _ = DescribeTable(
 	Entry(
 		"optional with default value",
 		"with-default.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				File("PRIVATE_KEY", "path to the private key file").
 				WithDefault("/etc/ssh/id_rsa").
@@ -55,7 +54,7 @@ var _ = DescribeTable(
 	Entry(
 		"required with default value",
 		"with-default.md",
-		func(reg *variable.Registry) {
+		func(reg ferrite.Registry) {
 			ferrite.
 				File("PRIVATE_KEY", "path to the private key file").
 				WithDefault("/etc/ssh/id_rsa").
