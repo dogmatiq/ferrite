@@ -18,7 +18,7 @@ type renderer struct {
 	withoutExplanatoryText bool
 	withoutIndex           bool
 	withoutUsageExamples   bool
-	refs                   map[string]struct{}
+	links                  map[string]string
 }
 
 func (r *renderer) Render() {
@@ -40,7 +40,10 @@ func (r *renderer) Render() {
 			"This document only shows variables declared using %s.",
 		)(
 			r.App,
-			r.link("Ferrite"),
+			r.linkToURL(
+				"Ferrite",
+				"https://github.com/dogmatiq/ferrite",
+			),
 		)
 	}
 
@@ -71,7 +74,7 @@ func (r *renderer) Render() {
 				"**SHOULD**, **SHOULD NOT**, **RECOMMENDED**, **MAY**, and **OPTIONAL** in this",
 				"document are to be interpreted as described in %s.",
 			)(
-				r.link("RFC 2119"),
+				r.linkToRFC(2119),
 			)
 		}
 
@@ -81,10 +84,7 @@ func (r *renderer) Render() {
 		}
 	}
 
-	if len(r.refs) != 0 {
-		r.gap()
-		r.renderRefs()
-	}
+	r.renderLinkRefs()
 }
 
 func (r *renderer) gap() {
