@@ -2,6 +2,7 @@ package variable
 
 import (
 	"fmt"
+	"strings"
 
 	"golang.org/x/exp/slices"
 )
@@ -59,8 +60,8 @@ func (s *RegistrySet) Add(r *Registry) {
 
 	slices.SortFunc(
 		s.variables,
-		func(a, b RegisteredVariable) bool {
-			return a.Spec().Name() < b.Spec().Name()
+		func(a, b RegisteredVariable) int {
+			return strings.Compare(a.Spec().Name(), b.Spec().Name())
 		},
 	)
 

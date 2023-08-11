@@ -9,7 +9,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.11.0
 	github.com/onsi/gomega v1.27.10
 	github.com/rivo/uniseg v0.4.4
-	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e
+	golang.org/x/exp v0.0.0-20230810033253-352e893a4cad
 	gopkg.in/yaml.v3 v3.0.1
 )
 

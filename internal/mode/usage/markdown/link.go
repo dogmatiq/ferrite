@@ -88,10 +88,10 @@ func (r *renderer) renderLinkRefs() {
 
 	slices.SortFunc(
 		refs,
-		func(a, b string) bool {
+		func(a, b string) int {
 			a = strings.Trim(a, "`")
 			b = strings.Trim(b, "`")
-			return a < b
+			return strings.Compare(a, b)
 		},
 	)
 
