@@ -3,8 +3,6 @@ package variable
 import (
 	"fmt"
 	"strings"
-
-	"golang.org/x/exp/slices"
 )
 
 // Documentation is free-form documentation about a variable.
@@ -44,13 +42,17 @@ func (b DocumentationBuilder) Summary(summary string) DocumentationBuilder {
 func (b DocumentationBuilder) Paragraph(text ...string) ParagraphFormatter {
 	return ParagraphFormatter{
 		func(v ...any) DocumentationBuilder {
+			clone := make([]string, len(b.doc.Paragraphs))
+			copy(clone, b.doc.Paragraphs)
+
 			b.doc.Paragraphs = append(
-				slices.Clone(b.doc.Paragraphs),
+				clone,
 				fmt.Sprintf(
 					strings.Join(text, " "),
 					v...,
 				),
 			)
+
 			return b
 		},
 	}

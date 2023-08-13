@@ -2,9 +2,7 @@ package variable
 
 import (
 	"fmt"
-	"strings"
-
-	"golang.org/x/exp/slices"
+	"sort"
 )
 
 // RegistrySet is a set of multiple environment variable registries
@@ -58,10 +56,12 @@ func (s *RegistrySet) Add(r *Registry) {
 		return true
 	})
 
-	slices.SortFunc(
+	sort.Slice(
 		s.variables,
-		func(a, b RegisteredVariable) int {
-			return strings.Compare(a.Spec().Name(), b.Spec().Name())
+		func(i, j int) bool {
+			a := s.variables[i]
+			b := s.variables[j]
+			return a.Spec().Name() < b.Spec().Name()
 		},
 	)
 

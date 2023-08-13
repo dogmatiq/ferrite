@@ -2,11 +2,11 @@ package markdown
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/dogmatiq/ferrite/internal/variable"
 	"golang.org/x/exp/maps"
-	"golang.org/x/exp/slices"
 )
 
 // linkToURL returns the markdown that links to the given URL.
@@ -86,12 +86,12 @@ func (r *renderer) renderLinkRefs() {
 
 	refs := maps.Keys(r.links)
 
-	slices.SortFunc(
+	sort.Slice(
 		refs,
-		func(a, b string) int {
-			a = strings.Trim(a, "`")
-			b = strings.Trim(b, "`")
-			return strings.Compare(a, b)
+		func(i, j int) bool {
+			a := strings.Trim(refs[i], "`")
+			b := strings.Trim(refs[j], "`")
+			return a < b
 		},
 	)
 

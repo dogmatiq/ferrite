@@ -6,7 +6,6 @@ import (
 	"reflect"
 
 	"github.com/dogmatiq/ferrite/internal/reflectx"
-	"golang.org/x/exp/slices"
 )
 
 // Set is a schema that only allows a specific set of static values.
@@ -60,11 +59,13 @@ func (s TypedSet[T]) Finalize() error {
 			return errors.New("literals can not be an empty string")
 		}
 
-		if slices.Contains(uniq, lit) {
-			return fmt.Errorf(
-				"literals must be unique but multiple values are represented as %q",
-				lit.String,
-			)
+		for _, v := range uniq {
+			if v == lit {
+				return fmt.Errorf(
+					"literals must be unique but multiple values are represented as %q",
+					lit.String,
+				)
+			}
 		}
 
 		uniq = append(uniq, lit)
