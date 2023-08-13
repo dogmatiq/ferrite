@@ -10,6 +10,12 @@ The format is based on [Keep a Changelog], and this project adheres to
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+## [Unreleased]
+
+### Changed
+
+- Dropped support for Go v1.19, which reached end-of-life on 2023-08-08
+
 ## [1.2.0] - 2023-06-12
 
 ### Added
