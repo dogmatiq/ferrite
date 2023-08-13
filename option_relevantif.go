@@ -12,7 +12,7 @@ import (
 // A "irrelevant" variable set behaves as though its environment variables are
 // undefined, irrespective of the actual values of the variables and any default
 // values.
-func RelevantIf(s VariableSet, options ...RelevantIfOption) interface {
+func RelevantIf(s VariableSet, _ ...RelevantIfOption) interface {
 	RequiredOption
 	OptionalOption
 	DeprecatedOption

@@ -10,11 +10,16 @@ The format is based on [Keep a Changelog], and this project adheres to
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
-## [Unreleased]
+## [1.2.1] - 2023-08-14
 
 ### Changed
 
 - Dropped support for Go v1.19, which reached end-of-life on 2023-08-08
+- Removed use of the `slices` and `maps` packages from `golang.org/x/exp`. These
+  package are not versioned and as such breaking changes can cause conflicts
+  with other dependencies. The experimental `constraints` package is still used,
+  with the expectation that these will always remain valid for use as type
+  parameter constraints.
 
 ## [1.2.0] - 2023-06-12
 
@@ -256,6 +261,7 @@ The two most important changes in usage are:
 [1.0.3]: https://github.com/dogmatiq/ferrite/releases/tag/v1.0.3
 [1.1.0]: https://github.com/dogmatiq/ferrite/releases/tag/v1.1.0
 [1.2.0]: https://github.com/dogmatiq/ferrite/releases/tag/v1.2.0
+[1.2.1]: https://github.com/dogmatiq/ferrite/releases/tag/v1.2.1
 
 <!-- version template
 ## [0.0.1] - YYYY-MM-DD
