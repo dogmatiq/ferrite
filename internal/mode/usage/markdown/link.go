@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/dogmatiq/ferrite/internal/variable"
-	"golang.org/x/exp/maps"
 )
 
 // linkToURL returns the markdown that links to the given URL.
@@ -84,7 +83,10 @@ func (r *renderer) renderLinkRefs() {
 	r.line("<!-- references -->")
 	r.gap()
 
-	refs := maps.Keys(r.links)
+	refs := make([]string, 0, len(r.links))
+	for ref := range r.links {
+		refs = append(refs, ref)
+	}
 
 	sort.Slice(
 		refs,
