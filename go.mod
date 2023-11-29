@@ -6,7 +6,7 @@ require (
 	github.com/dogmatiq/iago v0.4.0
 	github.com/jmalloc/gomegax v0.0.0-20200507221434-64fca4c0e03a
 	github.com/mattn/go-runewidth v0.0.15
-	github.com/onsi/ginkgo/v2 v2.13.1
+	github.com/onsi/ginkgo/v2 v2.13.2
 	github.com/onsi/gomega v1.30.0
 	github.com/rivo/uniseg v0.4.4
 	golang.org/x/exp v0.0.0-20230810033253-352e893a4cad
