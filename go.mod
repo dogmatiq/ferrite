@@ -8,7 +8,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.15
 	github.com/onsi/ginkgo/v2 v2.15.0
 	github.com/onsi/gomega v1.31.1
-	github.com/rivo/uniseg v0.4.4
+	github.com/rivo/uniseg v0.4.6
 	golang.org/x/exp v0.0.0-20230810033253-352e893a4cad
 	gopkg.in/yaml.v3 v3.0.1
 )
