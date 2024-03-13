@@ -280,11 +280,11 @@ func ExampleFile_contentAsString() {
 func ExampleFile_deprecated() {
 	defer example()()
 
-	os.Setenv("FERRITE_FILE", "testdata/hello.txt")
 	v := ferrite.
 		File("FERRITE_FILE", "example file variable").
 		Deprecated()
 
+	os.Setenv("FERRITE_FILE", "testdata/hello.txt")
 	ferrite.Init()
 
 	if x, ok := v.DeprecatedValue(); ok {

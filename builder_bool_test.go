@@ -285,11 +285,11 @@ func ExampleBool_customLiterals() {
 func ExampleBool_deprecated() {
 	defer example()()
 
-	os.Setenv("FERRITE_BOOL", "true")
 	v := ferrite.
 		Bool("FERRITE_BOOL", "example boolean variable").
 		Deprecated()
 
+	os.Setenv("FERRITE_BOOL", "true")
 	ferrite.Init()
 
 	if x, ok := v.DeprecatedValue(); ok {

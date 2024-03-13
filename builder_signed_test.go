@@ -314,11 +314,11 @@ func ExampleSigned_limits() {
 func ExampleSigned_deprecated() {
 	defer example()()
 
-	os.Setenv("FERRITE_SIGNED", "-123")
 	v := ferrite.
 		Signed[int]("FERRITE_SIGNED", "example signed integer variable").
 		Deprecated()
 
+	os.Setenv("FERRITE_SIGNED", "-123")
 	ferrite.Init()
 
 	if x, ok := v.DeprecatedValue(); ok {

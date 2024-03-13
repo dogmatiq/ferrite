@@ -314,11 +314,11 @@ func ExampleUnsigned_limits() {
 func ExampleUnsigned_deprecated() {
 	defer example()()
 
-	os.Setenv("FERRITE_UNSIGNED", "123")
 	v := ferrite.
 		Unsigned[uint]("FERRITE_UNSIGNED", "example unsigned integer variable").
 		Deprecated()
 
+	os.Setenv("FERRITE_UNSIGNED", "123")
 	ferrite.Init()
 
 	if x, ok := v.DeprecatedValue(); ok {

@@ -178,11 +178,11 @@ func ExampleNetworkPort_optional() {
 func ExampleNetworkPort_deprecated() {
 	defer example()()
 
-	os.Setenv("FERRITE_NETWORK_PORT", "https")
 	v := ferrite.
 		NetworkPort("FERRITE_NETWORK_PORT", "example network port variable").
 		Deprecated()
 
+	os.Setenv("FERRITE_NETWORK_PORT", "https")
 	ferrite.Init()
 
 	if x, ok := v.DeprecatedValue(); ok {

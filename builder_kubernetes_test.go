@@ -749,12 +749,12 @@ func ExampleKubernetesService_namedPort() {
 func ExampleKubernetesService_deprecated() {
 	defer example()()
 
-	os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
-	os.Setenv("FERRITE_SVC_SERVICE_PORT", "12345")
 	v := ferrite.
 		KubernetesService("ferrite-svc").
 		Deprecated()
 
+	os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
+	os.Setenv("FERRITE_SVC_SERVICE_PORT", "12345")
 	ferrite.Init()
 
 	if x, ok := v.DeprecatedValue(); ok {

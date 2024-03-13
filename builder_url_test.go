@@ -177,11 +177,11 @@ func ExampleURL_optional() {
 func ExampleURL_deprecated() {
 	defer example()()
 
-	os.Setenv("FERRITE_URL", "https://example.org/path")
 	v := ferrite.
 		URL("FERRITE_URL", "example URL variable").
 		Deprecated()
 
+	os.Setenv("FERRITE_URL", "https://example.org/path")
 	ferrite.Init()
 
 	if x, ok := v.DeprecatedValue(); ok {

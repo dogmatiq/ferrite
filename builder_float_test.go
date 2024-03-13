@@ -334,11 +334,11 @@ func ExampleFloat_limits() {
 func ExampleFloat_deprecated() {
 	defer example()()
 
-	os.Setenv("FERRITE_FLOAT", "-123.45")
 	v := ferrite.
 		Float[float64]("FERRITE_FLOAT", "example floating-point variable").
 		Deprecated()
 
+	os.Setenv("FERRITE_FLOAT", "-123.45")
 	ferrite.Init()
 
 	if x, ok := v.DeprecatedValue(); ok {

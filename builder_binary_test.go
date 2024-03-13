@@ -238,6 +238,24 @@ func ExampleBinary_encodedDefault() {
 	// value is <default>
 }
 
+func ExampleBinary_limits() {
+	defer example()()
+
+	v := ferrite.
+		Binary("FERRITE_BINARY", "example binary variable").
+		WithMinimumLength(5).
+		WithMaximumLength(10).
+		Required()
+
+	os.Setenv("FERRITE_BINARY", "PHZhbHVlPg==")
+	ferrite.Init()
+
+	fmt.Println("value is", string(v.Value()))
+
+	// Output:
+	// value is <value>
+}
+
 func ExampleBinary_optional() {
 	defer example()()
 
@@ -260,7 +278,6 @@ func ExampleBinary_optional() {
 func ExampleBinary_sensitive() {
 	defer example()()
 
-	os.Setenv("FERRITE_BINARY", "aHVudGVyMg==")
 	ferrite.
 		Binary("FERRITE_BINARY", "example sensitive binary variable").
 		WithConstraint(
@@ -274,6 +291,7 @@ func ExampleBinary_sensitive() {
 		WithSensitiveContent().
 		Required()
 
+	os.Setenv("FERRITE_BINARY", "aHVudGVyMg==")
 	ferrite.Init()
 
 	// Note that the variable's value is obscured in the console output.
@@ -323,11 +341,11 @@ func ExampleBinary_hex() {
 func ExampleBinary_deprecated() {
 	defer example()()
 
-	os.Setenv("FERRITE_BINARY", "PHZhbHVlPg==")
 	v := ferrite.
 		Binary("FERRITE_BINARY", "example binary variable").
 		Deprecated()
 
+	os.Setenv("FERRITE_BINARY", "PHZhbHVlPg==")
 	ferrite.Init()
 
 	if x, ok := v.DeprecatedValue(); ok {

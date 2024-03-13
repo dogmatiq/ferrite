@@ -300,7 +300,6 @@ func ExampleEnum_descriptions() {
 func ExampleEnum_deprecated() {
 	defer example()()
 
-	os.Setenv("FERRITE_ENUM", "red")
 	v := ferrite.
 		Enum("FERRITE_ENUM", "example enum variable").
 		WithMember("red", "the color red").
@@ -308,6 +307,7 @@ func ExampleEnum_deprecated() {
 		WithMember("blue", "the color blue").
 		Deprecated()
 
+	os.Setenv("FERRITE_ENUM", "red")
 	ferrite.Init()
 
 	if x, ok := v.DeprecatedValue(); ok {

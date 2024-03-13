@@ -220,6 +220,24 @@ func ExampleString_default() {
 	// value is <default>
 }
 
+func ExampleString_limits() {
+	defer example()()
+
+	v := ferrite.
+		String("FERRITE_STRING", "example string variable").
+		WithMinimumLength(5).
+		WithMaximumLength(10).
+		Required()
+
+	os.Setenv("FERRITE_STRING", "<value>")
+	ferrite.Init()
+
+	fmt.Println("value is", v.Value())
+
+	// Output:
+	// value is <value>
+}
+
 func ExampleString_optional() {
 	defer example()()
 
@@ -242,7 +260,6 @@ func ExampleString_optional() {
 func ExampleString_sensitive() {
 	defer example()()
 
-	os.Setenv("FERRITE_STRING", "hunter2")
 	ferrite.
 		String("FERRITE_STRING", "example sensitive string variable").
 		WithConstraint(
@@ -256,6 +273,7 @@ func ExampleString_sensitive() {
 		WithSensitiveContent().
 		Required()
 
+	os.Setenv("FERRITE_STRING", "hunter2")
 	ferrite.Init()
 
 	// Note that the variable's value is obscured in the console output.
@@ -271,11 +289,11 @@ func ExampleString_sensitive() {
 func ExampleString_deprecated() {
 	defer example()()
 
-	os.Setenv("FERRITE_STRING", "<value>")
 	v := ferrite.
 		String("FERRITE_STRING", "example string variable").
 		Deprecated()
 
+	os.Setenv("FERRITE_STRING", "<value>")
 	ferrite.Init()
 
 	if x, ok := v.DeprecatedValue(); ok {

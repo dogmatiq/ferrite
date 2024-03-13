@@ -295,11 +295,11 @@ func ExampleDuration_limits() {
 func ExampleDuration_deprecated() {
 	defer example()()
 
-	os.Setenv("FERRITE_DURATION", "630s")
 	v := ferrite.
 		Duration("FERRITE_DURATION", "example duration variable").
 		Deprecated()
 
+	os.Setenv("FERRITE_DURATION", "630s")
 	ferrite.Init()
 
 	if x, ok := v.DeprecatedValue(); ok {
