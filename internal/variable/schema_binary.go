@@ -35,6 +35,12 @@ func (s TypedBinary[T, B]) MaxLength() (int, bool) {
 	return s.MaxLen.Get()
 }
 
+// ExplainLengthError returns a human-readable description of the length
+// constraints, for use in an error message.
+func (s TypedBinary[T, B]) ExplainLengthError() string {
+	return explainLengthError(s, "(unencoded) length")
+}
+
 // EncodingDescription returns a short (one word, ideally) human-readable
 // description of the encoding scheme.
 func (s TypedBinary[T, B]) EncodingDescription() string {
@@ -93,8 +99,8 @@ func (s TypedBinary[T, B]) Unmarshal(v Literal) (T, error) {
 }
 
 // Examples returns a (possibly empty) set of examples of valid values.
-func (s TypedBinary[T, B]) Examples(hasOtherExamples bool) []TypedExample[T] {
-	if hasOtherExamples {
+func (s TypedBinary[T, B]) Examples(conservative bool) []TypedExample[T] {
+	if conservative {
 		return nil
 	}
 
@@ -131,7 +137,7 @@ func (s TypedBinary[T, B]) validate(v T) error {
 	}
 
 	if max, ok := s.MaxLen.Get(); ok && len(v) > max {
-		return MinLengthError{s}
+		return MaxLengthError{s}
 	}
 
 	return nil

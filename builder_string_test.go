@@ -124,6 +124,68 @@ var _ = Describe("type StringBuilder", func() {
 			})
 		})
 	})
+
+	When("the value is shorter than the minimum length", func() {
+		When("the limit is set using WithMinimumLength()", func() {
+			It("panics", func() {
+				Expect(func() {
+					os.Setenv("FERRITE_STRING", "<value>")
+
+					builder.
+						WithMinimumLength(10).
+						Required().
+						Value()
+				}).To(PanicWith(
+					`value of FERRITE_STRING ('<value>') is invalid: too short, expected length to be 10 bytes or more`,
+				))
+			})
+		})
+
+		When("the limit is set using WithLength()", func() {
+			It("panics", func() {
+				Expect(func() {
+					os.Setenv("FERRITE_STRING", "<value>")
+
+					builder.
+						WithLength(10).
+						Required().
+						Value()
+				}).To(PanicWith(
+					`value of FERRITE_STRING ('<value>') is invalid: too short, expected length to be exactly 10 bytes`,
+				))
+			})
+		})
+	})
+
+	When("the value is greater than the maximum length", func() {
+		It("panics", func() {
+			Expect(func() {
+				os.Setenv("FERRITE_STRING", "<value>")
+
+				builder.
+					WithMaximumLength(5).
+					Required().
+					Value()
+			}).To(PanicWith(
+				`value of FERRITE_STRING ('<value>') is invalid: too long, expected length to be 5 bytes or fewer`,
+			))
+		})
+
+		When("the limit is set using WithLength()", func() {
+			It("panics", func() {
+				Expect(func() {
+					os.Setenv("FERRITE_STRING", "<value>")
+
+					builder.
+						WithLength(5).
+						Required().
+						Value()
+				}).To(PanicWith(
+					`value of FERRITE_STRING ('<value>') is invalid: too long, expected length to be exactly 5 bytes`,
+				))
+			})
+		})
+	})
 })
 
 func ExampleString_required() {

@@ -50,6 +50,6 @@ func (s TypedOther[T]) Unmarshal(v Literal) (T, error) {
 }
 
 // Examples returns a (possibly empty) set of examples of valid values.
-func (s TypedOther[T]) Examples(hasOtherExamples bool) []TypedExample[T] {
+func (s TypedOther[T]) Examples(bool) []TypedExample[T] {
 	return nil
 }

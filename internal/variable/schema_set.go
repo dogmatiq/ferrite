@@ -105,7 +105,7 @@ func (s TypedSet[T]) Unmarshal(v Literal) (T, error) {
 }
 
 // Examples returns a (possibly empty) set of examples of valid values.
-func (s TypedSet[T]) Examples(conservative bool) []TypedExample[T] {
+func (s TypedSet[T]) Examples(bool) []TypedExample[T] {
 	var examples []TypedExample[T]
 
 	for _, m := range s.Members {

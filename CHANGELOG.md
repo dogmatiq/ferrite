@@ -10,6 +10,17 @@ The format is based on [Keep a Changelog], and this project adheres to
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+## Unreleased
+
+### Added
+
+- Added `StringBuilder.WithMinimumLength()`, `WithMaximumLength()`, `WithLength()`.
+- Added `BytesBuilder.WithMinimumLength()`, `WithMaximumLength()`, `WithLength()`.
+
+### Fixed
+
+- Fixed error message when a variable exceeds the maximum length.
+
 ## [1.2.1] - 2023-08-14
 
 ### Changed

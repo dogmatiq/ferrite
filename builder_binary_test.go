@@ -126,6 +126,68 @@ var _ = Describe("type BinaryBuilder", func() {
 			})
 		})
 	})
+
+	When("the value is shorter than the minimum length", func() {
+		When("the limit is set using WithMinimumLength()", func() {
+			It("panics", func() {
+				Expect(func() {
+					os.Setenv("FERRITE_BINARY", "PHZhbHVlPg==")
+
+					builder.
+						WithMinimumLength(10).
+						Required().
+						Value()
+				}).To(PanicWith(
+					`value of FERRITE_BINARY (PHZhbHVlPg==) is invalid: too short, expected (unencoded) length to be 10 bytes or more`,
+				))
+			})
+		})
+
+		When("the limit is set using WithLength()", func() {
+			It("panics", func() {
+				Expect(func() {
+					os.Setenv("FERRITE_BINARY", "PHZhbHVlPg==")
+
+					builder.
+						WithLength(10).
+						Required().
+						Value()
+				}).To(PanicWith(
+					`value of FERRITE_BINARY (PHZhbHVlPg==) is invalid: too short, expected (unencoded) length to be exactly 10 bytes`,
+				))
+			})
+		})
+	})
+
+	When("the value is greater than the maximum length", func() {
+		It("panics", func() {
+			Expect(func() {
+				os.Setenv("FERRITE_BINARY", "PHZhbHVlPg==")
+
+				builder.
+					WithMaximumLength(5).
+					Required().
+					Value()
+			}).To(PanicWith(
+				`value of FERRITE_BINARY (PHZhbHVlPg==) is invalid: too long, expected (unencoded) length to be 5 bytes or fewer`,
+			))
+		})
+
+		When("the limit is set using WithLength()", func() {
+			It("panics", func() {
+				Expect(func() {
+					os.Setenv("FERRITE_BINARY", "PHZhbHVlPg==")
+
+					builder.
+						WithLength(5).
+						Required().
+						Value()
+				}).To(PanicWith(
+					`value of FERRITE_BINARY (PHZhbHVlPg==) is invalid: too long, expected (unencoded) length to be exactly 5 bytes`,
+				))
+			})
+		})
+	})
 })
 
 func ExampleBinary_required() {

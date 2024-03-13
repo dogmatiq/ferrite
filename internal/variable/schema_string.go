@@ -29,6 +29,12 @@ func (s TypedString[T]) MaxLength() (int, bool) {
 	return s.MaxLen.Get()
 }
 
+// ExplainLengthError returns a human-readable description of the length
+// constraints, for use in an error message.
+func (s TypedString[T]) ExplainLengthError() string {
+	return explainLengthError(s, "length")
+}
+
 // Type returns the type of the native value.
 func (s TypedString[T]) Type() reflect.Type {
 	return reflectx.TypeOf[T]()
@@ -79,8 +85,8 @@ func (s TypedString[T]) Unmarshal(v Literal) (T, error) {
 }
 
 // Examples returns a (possibly empty) set of examples of valid values.
-func (s TypedString[T]) Examples(hasOtherExamples bool) []TypedExample[T] {
-	if hasOtherExamples {
+func (s TypedString[T]) Examples(conservative bool) []TypedExample[T] {
+	if conservative {
 		return nil
 	}
 
@@ -134,7 +140,7 @@ func (s TypedString[T]) validate(v T) error {
 	}
 
 	if max, ok := s.MaxLen.Get(); ok && len(v) > max {
-		return MinLengthError{s}
+		return MaxLengthError{s}
 	}
 
 	return nil

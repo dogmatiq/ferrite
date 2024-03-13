@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 
+	"github.com/dogmatiq/ferrite/internal/maybe"
 	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
@@ -57,6 +58,28 @@ var _ isBuilderOf[[]byte, *BinaryBuilder[[]byte, byte]]
 // It is used when the environment variable is undefined or empty.
 func (b *BinaryBuilder[T, B]) WithDefault(v T) *BinaryBuilder[T, B] {
 	b.builder.Default(v)
+	return b
+}
+
+// WithMinimumLength sets the minimum permitted length of the raw binary value,
+// in bytes.
+func (b *BinaryBuilder[T, B]) WithMinimumLength(min int) *BinaryBuilder[T, B] {
+	b.schema.MinLen = maybe.Some(min)
+	return b
+}
+
+// WithMaximumLength sets the maximum permitted length of the raw binary value,
+// in bytes.
+func (b *BinaryBuilder[T, B]) WithMaximumLength(max int) *BinaryBuilder[T, B] {
+	b.schema.MaxLen = maybe.Some(max)
+	return b
+}
+
+// WithLength sets the exact permitted length of the raw binary value, in bytes.
+func (b *BinaryBuilder[T, B]) WithLength(n int) *BinaryBuilder[T, B] {
+	l := maybe.Some(n)
+	b.schema.MinLen = l
+	b.schema.MaxLen = l
 	return b
 }
 

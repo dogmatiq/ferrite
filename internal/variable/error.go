@@ -30,7 +30,7 @@ func (e MinLengthError) AcceptVisitor(v SchemaErrorVisitor) {
 }
 
 func (e MinLengthError) Error() string {
-	return fmt.Sprintf("too short, %s", explainLengthError(e.ViolatedSchema))
+	return fmt.Sprintf("too short, %s", e.ViolatedSchema.ExplainLengthError())
 }
 
 // MaxLengthError indicates that a value was greater than the maximum permitted
@@ -52,24 +52,24 @@ func (e MaxLengthError) AcceptVisitor(v SchemaErrorVisitor) {
 }
 
 func (e MaxLengthError) Error() string {
-	return fmt.Sprintf("too long, %s", explainLengthError(e.ViolatedSchema))
+	return fmt.Sprintf("too long, %s", e.ViolatedSchema.ExplainLengthError())
 }
 
-func explainLengthError(s LengthLimited) string {
+func explainLengthError(s LengthLimited, lengthDesc string) string {
 	min, hasMin := s.MinLength()
 	max, hasMax := s.MaxLength()
 
 	if !hasMin {
-		return fmt.Sprintf("expected length to be %d bytes or fewer", max)
+		return fmt.Sprintf("expected %s to be %d bytes or fewer", lengthDesc, max)
 	}
 
 	if !hasMax {
-		return fmt.Sprintf("expected length to be %d bytes or more", max)
+		return fmt.Sprintf("expected %s to be %d bytes or more", lengthDesc, min)
 	}
 
 	if min == max {
-		return fmt.Sprintf("expected length to be exactly %d bytes", min)
+		return fmt.Sprintf("expected %s to be exactly %d bytes", lengthDesc, min)
 	}
 
-	return fmt.Sprintf("expected length to be between %d and %d bytes", min, max)
+	return fmt.Sprintf("expected %s to be between %d and %d bytes", lengthDesc, min, max)
 }

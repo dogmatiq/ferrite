@@ -28,6 +28,10 @@ type LengthLimited interface {
 
 	// MaxLength returns the maximum permitted length of the native value.
 	MaxLength() (int, bool)
+
+	// ExplainLengthError returns a human-readable description of the length
+	// constraints, for use in an error message.
+	ExplainLengthError() string
 }
 
 // SchemaError indicates that a value is invalid because it violates its schema.

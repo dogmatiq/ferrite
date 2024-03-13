@@ -1,6 +1,7 @@
 package ferrite
 
 import (
+	"github.com/dogmatiq/ferrite/internal/maybe"
 	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
@@ -39,6 +40,29 @@ var _ isBuilderOf[string, *StringBuilder[string]]
 // It is used when the environment variable is undefined or empty.
 func (b *StringBuilder[T]) WithDefault(v T) *StringBuilder[T] {
 	b.builder.Default(v)
+	return b
+}
+
+// WithMinimumLength sets the minimum permitted length of the variable, in
+// bytes (not runes).
+func (b *StringBuilder[T]) WithMinimumLength(min int) *StringBuilder[T] {
+	b.schema.MinLen = maybe.Some(min)
+	return b
+}
+
+// WithMaximumLength sets the maximum permitted length of the variable, in
+// bytes (not runes).
+func (b *StringBuilder[T]) WithMaximumLength(max int) *StringBuilder[T] {
+	b.schema.MaxLen = maybe.Some(max)
+	return b
+}
+
+// WithLength sets the exact permitted length of the variable, in bytes (not
+// runes).
+func (b *StringBuilder[T]) WithLength(n int) *StringBuilder[T] {
+	l := maybe.Some(n)
+	b.schema.MinLen = l
+	b.schema.MaxLen = l
 	return b
 }
 
