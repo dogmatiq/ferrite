@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/dogmatiq/ferrite"
+	"github.com/dogmatiq/ferrite/internal/diff"
 	"github.com/dogmatiq/ferrite/internal/environment"
 	"github.com/dogmatiq/ferrite/internal/mode"
 	. "github.com/dogmatiq/ferrite/internal/mode/usage/markdown"
 	"github.com/dogmatiq/ferrite/internal/variable"
-	. "github.com/jmalloc/gomegax"
+	"github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -59,12 +59,18 @@ func tableTest(
 
 		Run(cfg, options...)
 
-		// Split strings into lines which producers a more human-friendly diff
-		// in case of a failure.
-		actualLines := strings.Split(actual.String(), "\n")
-		expectLines := strings.Split(string(expect), "\n")
+		if d := diff.Diff(
+			"actual",
+			actual.Bytes(),
+			"expect",
+			expect,
+		); d != nil {
+			ginkgo.Fail(
+				"Unexpected markdown content:\n"+string(d),
+				1,
+			)
+		}
 
-		ExpectWithOffset(1, actualLines).To(EqualX(expectLines))
 		Expect(exited).To(BeTrue())
 	}
 }

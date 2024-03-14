@@ -62,6 +62,129 @@ var _ = DescribeTable(
 		},
 	),
 	Entry(
+		"deprecated with exact length limit",
+		"with-exact-length-deprecated.md",
+		func(reg ferrite.Registry) {
+			ferrite.
+				String("SEED", "the seed for the random-number generator").
+				WithLength(5).
+				Deprecated(ferrite.WithRegistry(reg))
+		},
+	),
+	Entry(
+		"optional with exact length limit",
+		"with-exact-length-optional.md",
+		func(reg ferrite.Registry) {
+			ferrite.
+				String("SEED", "the seed for the random-number generator").
+				WithLength(5).
+				Optional(ferrite.WithRegistry(reg))
+		},
+	),
+	Entry(
+		"required with exact length limit",
+		"with-exact-length-required.md",
+		func(reg ferrite.Registry) {
+			ferrite.
+				String("SEED", "the seed for the random-number generator").
+				WithLength(5).
+				Required(ferrite.WithRegistry(reg))
+		},
+	),
+	Entry(
+		"deprecated with maximum length limit",
+		"with-max-length-deprecated.md",
+		func(reg ferrite.Registry) {
+			ferrite.
+				String("SEED", "the seed for the random-number generator").
+				WithMaximumLength(10).
+				Deprecated(ferrite.WithRegistry(reg))
+		},
+	),
+	Entry(
+		"optional with maximum length limit",
+		"with-max-length-optional.md",
+		func(reg ferrite.Registry) {
+			ferrite.
+				String("SEED", "the seed for the random-number generator").
+				WithMaximumLength(10).
+				Optional(ferrite.WithRegistry(reg))
+		},
+	),
+	Entry(
+		"required with maximum length limit",
+		"with-max-length-required.md",
+		func(reg ferrite.Registry) {
+			ferrite.
+				String("SEED", "the seed for the random-number generator").
+				WithMaximumLength(10).
+				Required(ferrite.WithRegistry(reg))
+		},
+	),
+	Entry(
+		"deprecated with minimum length limit",
+		"with-min-length-deprecated.md",
+		func(reg ferrite.Registry) {
+			ferrite.
+				String("SEED", "the seed for the random-number generator").
+				WithMinimumLength(5).
+				Deprecated(ferrite.WithRegistry(reg))
+		},
+	),
+	Entry(
+		"optional with minimum length limit",
+		"with-min-length-optional.md",
+		func(reg ferrite.Registry) {
+			ferrite.
+				String("SEED", "the seed for the random-number generator").
+				WithMinimumLength(5).
+				Optional(ferrite.WithRegistry(reg))
+		},
+	),
+	Entry(
+		"required with minimum length limit",
+		"with-min-length-required.md",
+		func(reg ferrite.Registry) {
+			ferrite.
+				String("SEED", "the seed for the random-number generator").
+				WithMinimumLength(5).
+				Required(ferrite.WithRegistry(reg))
+		},
+	),
+	Entry(
+		"deprecated with minimum and maximum length limit",
+		"with-minmax-length-deprecated.md",
+		func(reg ferrite.Registry) {
+			ferrite.
+				String("SEED", "the seed for the random-number generator").
+				WithMinimumLength(5).
+				WithMaximumLength(10).
+				Deprecated(ferrite.WithRegistry(reg))
+		},
+	),
+	Entry(
+		"optional with minimum and maximum length limit",
+		"with-minmax-length-optional.md",
+		func(reg ferrite.Registry) {
+			ferrite.
+				String("SEED", "the seed for the random-number generator").
+				WithMinimumLength(5).
+				WithMaximumLength(10).
+				Optional(ferrite.WithRegistry(reg))
+		},
+	),
+	Entry(
+		"required with minimum and maximum length limit",
+		"with-minmax-length-required.md",
+		func(reg ferrite.Registry) {
+			ferrite.
+				String("SEED", "the seed for the random-number generator").
+				WithMinimumLength(5).
+				WithMaximumLength(10).
+				Required(ferrite.WithRegistry(reg))
+		},
+	),
+	Entry(
 		"optional with sensitive content",
 		"with-sensitive-optional.md",
 		func(reg ferrite.Registry) {

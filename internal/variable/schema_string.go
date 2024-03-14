@@ -29,10 +29,10 @@ func (s TypedString[T]) MaxLength() (int, bool) {
 	return s.MaxLen.Get()
 }
 
-// ExplainLengthError returns a human-readable description of the length
-// constraints, for use in an error message.
-func (s TypedString[T]) ExplainLengthError() string {
-	return explainLengthError(s, "length")
+// LengthDescription returns a human-readable description of the length that the
+// limit applies to.
+func (s TypedString[T]) LengthDescription() string {
+	return "a length"
 }
 
 // Type returns the type of the native value.

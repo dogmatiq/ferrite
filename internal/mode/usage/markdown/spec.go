@@ -98,7 +98,7 @@ func (r *specRenderer) VisitString(variable.String) {
 
 // VisitOther render the primary requirement for a spec that uses the "other"
 // schema type.
-func (r *specRenderer) VisitOther(s variable.Other) {
+func (r *specRenderer) VisitOther(variable.Other) {
 	con := ""
 	for _, c := range r.spec.Constraints() {
 		con = c.Description()
@@ -141,8 +141,8 @@ func (r *specRenderer) renderPrimaryRequirementDefault(req, def string) {
 				write(" Otherwise, the value %s.", req)
 			}
 
-			if dep := r.renderDependsOnClause(); dep != "" {
-				write(" The value is not used when %s.", dep)
+			if dependsOn := r.renderDependsOnClause(); dependsOn != "" {
+				write(" The value is not used when %s.", dependsOn)
 			}
 		},
 	)
@@ -151,6 +151,8 @@ func (r *specRenderer) renderPrimaryRequirementDefault(req, def string) {
 func (r *specRenderer) renderPrimaryRequirementRequired(req string) {
 	r.ren.paragraph(
 		func(write func(string, ...any)) {
+			length := r.renderLengthClause(r.spec.Schema(), req == "")
+
 			if dependsOn := r.renderDependsOnClause(); dependsOn != "" {
 				write(
 					"The `%s` variable **MAY** be left undefined if and only if %s.",
@@ -158,15 +160,23 @@ func (r *specRenderer) renderPrimaryRequirementRequired(req string) {
 					dependsOn,
 				)
 
-				if req != "" {
+				if req != "" && length != "" {
+					write(" Otherwise, the value %s with %s.", req, length)
+				} else if req != "" {
 					write(" Otherwise, the value %s.", req)
+				} else if length != "" {
+					write(" Otherwise, the value **MUST** have %s.", length)
 				}
 
 				return
 			}
 
-			if req != "" {
+			if req != "" && length != "" {
+				write("The `%s` variable's value %s with %s.", r.spec.Name(), req, length)
+			} else if req != "" {
 				write("The `%s` variable's value %s.", r.spec.Name(), req)
+			} else if length != "" {
+				write("The `%s` variable's value **MUST** have %s.", r.spec.Name(), length)
 			} else {
 				write("The `%s` variable **MUST NOT** be left undefined.", r.spec.Name())
 			}
@@ -182,12 +192,18 @@ func (r *specRenderer) renderPrimaryRequirementOptional(req string) {
 				r.spec.Name(),
 			)
 
-			if req != "" {
+			length := r.renderLengthClause(r.spec.Schema(), false)
+
+			if req != "" && length != "" {
+				write(" Otherwise, the value %s with %s.", req, length)
+			} else if req != "" {
 				write(" Otherwise, the value %s.", req)
+			} else if length != "" {
+				write(" Otherwise, the value **MUST** have %s.", length)
 			}
 
-			if dep := r.renderDependsOnClause(); dep != "" {
-				write(" The value is not used when %s.", dep)
+			if dependsOn := r.renderDependsOnClause(); dependsOn != "" {
+				write(" The value is not used when %s.", dependsOn)
 			}
 		},
 	)
@@ -214,12 +230,18 @@ func (r *specRenderer) renderPrimaryRequirementDeprecated(req string) {
 				)
 			}
 
-			if req != "" {
+			length := r.renderLengthClause(r.spec.Schema(), false)
+
+			if req != "" && length != "" {
+				write(" If defined, the value %s with %s.", req, length)
+			} else if req != "" {
 				write(" If defined, the value %s.", req)
+			} else if length != "" {
+				write(" If defined, the value **MUST** have %s.", length)
 			}
 
-			if dep := r.renderDependsOnClause(); dep != "" {
-				write(" The value is not used when %s.", dep)
+			if dependsOn := r.renderDependsOnClause(); dependsOn != "" {
+				write(" The value is not used when %s.", dependsOn)
 			}
 		},
 	)
@@ -267,4 +289,66 @@ func (r *specRenderer) bestConstraint() (con variable.Constraint) {
 	}
 
 	return nil
+}
+
+func (r *specRenderer) renderLengthClause(s variable.Schema, implicitMin bool) string {
+	lim, ok := s.(variable.LengthLimited)
+	if !ok {
+		return ""
+	}
+
+	min, hasMin := lim.MinLength()
+	max, hasMax := lim.MaxLength()
+
+	// In cases where there's not much else to say about the valid value, we
+	// render an "implicit minimum" length of 1.
+	//
+	// This results in wording such as:
+	// 	"The length must be between 1 and 10 bytes."
+	// as opposed to:
+	// 	"The variable must be defined with a length less than 10 bytes."
+	if hasMax && implicitMin {
+		if min < 1 {
+			min = 1
+		}
+		hasMin = true
+	}
+
+	if hasMin && hasMax {
+		if min == max {
+			return fmt.Sprintf(
+				"%s of exactly %d %s",
+				lim.LengthDescription(),
+				min,
+				inflect("byte", min),
+			)
+		}
+
+		return fmt.Sprintf(
+			"%s between %d and %d bytes",
+			lim.LengthDescription(),
+			min,
+			max,
+		)
+	}
+
+	if hasMin {
+		return fmt.Sprintf(
+			"%s of at least %d %s",
+			lim.LengthDescription(),
+			min,
+			inflect("byte", min),
+		)
+	}
+
+	if hasMax {
+		return fmt.Sprintf(
+			"%s of %d %s or fewer",
+			lim.LengthDescription(),
+			max,
+			inflect("byte", max),
+		)
+	}
+
+	return ""
 }

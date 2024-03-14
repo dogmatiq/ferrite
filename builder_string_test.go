@@ -136,7 +136,7 @@ var _ = Describe("type StringBuilder", func() {
 						Required().
 						Value()
 				}).To(PanicWith(
-					`value of FERRITE_STRING ('<value>') is invalid: too short, expected length to be 10 bytes or more`,
+					`value of FERRITE_STRING ('<value>') is invalid: too short, expected a length of 10 bytes or more`,
 				))
 			})
 		})
@@ -151,7 +151,7 @@ var _ = Describe("type StringBuilder", func() {
 						Required().
 						Value()
 				}).To(PanicWith(
-					`value of FERRITE_STRING ('<value>') is invalid: too short, expected length to be exactly 10 bytes`,
+					`value of FERRITE_STRING ('<value>') is invalid: too short, expected a length of exactly 10 bytes`,
 				))
 			})
 		})
@@ -167,7 +167,7 @@ var _ = Describe("type StringBuilder", func() {
 					Required().
 					Value()
 			}).To(PanicWith(
-				`value of FERRITE_STRING ('<value>') is invalid: too long, expected length to be 5 bytes or fewer`,
+				`value of FERRITE_STRING ('<value>') is invalid: too long, expected a length of 5 bytes or fewer`,
 			))
 		})
 
@@ -181,7 +181,7 @@ var _ = Describe("type StringBuilder", func() {
 						Required().
 						Value()
 				}).To(PanicWith(
-					`value of FERRITE_STRING ('<value>') is invalid: too long, expected length to be exactly 5 bytes`,
+					`value of FERRITE_STRING ('<value>') is invalid: too long, expected a length of exactly 5 bytes`,
 				))
 			})
 		})

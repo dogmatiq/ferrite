@@ -35,10 +35,10 @@ func (s TypedBinary[T, B]) MaxLength() (int, bool) {
 	return s.MaxLen.Get()
 }
 
-// ExplainLengthError returns a human-readable description of the length
-// constraints, for use in an error message.
-func (s TypedBinary[T, B]) ExplainLengthError() string {
-	return explainLengthError(s, "(unencoded) length")
+// LengthDescription returns a human-readable description of the length that the
+// limit applies to.
+func (s TypedBinary[T, B]) LengthDescription() string {
+	return "an (unencoded) length"
 }
 
 // EncodingDescription returns a short (one word, ideally) human-readable

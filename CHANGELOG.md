@@ -19,7 +19,7 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Fixed
 
-- Fixed error message when a variable exceeds the maximum length.
+- Fixed wording of error message when a variable exceeds the maximum length.
 
 ## [1.2.1] - 2023-08-14
 

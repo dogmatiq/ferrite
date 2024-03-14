@@ -138,7 +138,7 @@ var _ = Describe("type BinaryBuilder", func() {
 						Required().
 						Value()
 				}).To(PanicWith(
-					`value of FERRITE_BINARY (PHZhbHVlPg==) is invalid: too short, expected (unencoded) length to be 10 bytes or more`,
+					`value of FERRITE_BINARY (PHZhbHVlPg==) is invalid: too short, expected an (unencoded) length of 10 bytes or more`,
 				))
 			})
 		})
@@ -153,7 +153,7 @@ var _ = Describe("type BinaryBuilder", func() {
 						Required().
 						Value()
 				}).To(PanicWith(
-					`value of FERRITE_BINARY (PHZhbHVlPg==) is invalid: too short, expected (unencoded) length to be exactly 10 bytes`,
+					`value of FERRITE_BINARY (PHZhbHVlPg==) is invalid: too short, expected an (unencoded) length of exactly 10 bytes`,
 				))
 			})
 		})
@@ -169,7 +169,7 @@ var _ = Describe("type BinaryBuilder", func() {
 					Required().
 					Value()
 			}).To(PanicWith(
-				`value of FERRITE_BINARY (PHZhbHVlPg==) is invalid: too long, expected (unencoded) length to be 5 bytes or fewer`,
+				`value of FERRITE_BINARY (PHZhbHVlPg==) is invalid: too long, expected an (unencoded) length of 5 bytes or fewer`,
 			))
 		})
 
@@ -183,7 +183,7 @@ var _ = Describe("type BinaryBuilder", func() {
 						Required().
 						Value()
 				}).To(PanicWith(
-					`value of FERRITE_BINARY (PHZhbHVlPg==) is invalid: too long, expected (unencoded) length to be exactly 5 bytes`,
+					`value of FERRITE_BINARY (PHZhbHVlPg==) is invalid: too long, expected an (unencoded) length of exactly 5 bytes`,
 				))
 			})
 		})
