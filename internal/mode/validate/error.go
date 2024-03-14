@@ -23,11 +23,11 @@ type errorRenderer struct {
 	Error  variable.ValueError
 }
 
-func (r *errorRenderer) VisitGenericError(err error) {
+func (r *errorRenderer) VisitGenericError(error) {
 	r.Schema.AcceptVisitor(r)
 }
 
-func (r *errorRenderer) VisitBinary(s variable.Binary) {
+func (r *errorRenderer) VisitBinary(variable.Binary) {
 	r.Output.WriteString(r.Error.Unwrap().Error())
 }
 
@@ -62,7 +62,7 @@ func (r *errorRenderer) VisitMaxError(err variable.MaxError) {
 	r.Output.WriteString(err.Error())
 }
 
-func (r *errorRenderer) VisitSet(s variable.Set) {
+func (r *errorRenderer) VisitSet(variable.Set) {
 	r.Output.WriteString(r.Error.Unwrap().Error())
 }
 
@@ -70,7 +70,7 @@ func (r *errorRenderer) VisitSetMembershipError(err variable.SetMembershipError)
 	r.Output.WriteString(err.Error())
 }
 
-func (r *errorRenderer) VisitString(s variable.String) {
+func (r *errorRenderer) VisitString(variable.String) {
 	r.Output.WriteString(r.Error.Unwrap().Error())
 }
 
@@ -82,6 +82,6 @@ func (r *errorRenderer) VisitMaxLengthError(err variable.MaxLengthError) {
 	r.Output.WriteString(err.Error())
 }
 
-func (r *errorRenderer) VisitOther(s variable.Other) {
+func (r *errorRenderer) VisitOther(variable.Other) {
 	r.Output.WriteString(r.Error.Unwrap().Error())
 }

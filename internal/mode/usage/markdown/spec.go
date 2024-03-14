@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/dogmatiq/ferrite/internal/inflect"
 	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
@@ -320,7 +321,7 @@ func (r *specRenderer) renderLengthClause(s variable.Schema, implicitMin bool) s
 				"%s of exactly %d %s",
 				lim.LengthDescription(),
 				min,
-				inflect("byte", min),
+				inflect.Pluralize("byte", min),
 			)
 		}
 
@@ -337,7 +338,7 @@ func (r *specRenderer) renderLengthClause(s variable.Schema, implicitMin bool) s
 			"%s of at least %d %s",
 			lim.LengthDescription(),
 			min,
-			inflect("byte", min),
+			inflect.Pluralize("byte", min),
 		)
 	}
 
@@ -346,7 +347,7 @@ func (r *specRenderer) renderLengthClause(s variable.Schema, implicitMin bool) s
 			"%s of %d %s or fewer",
 			lim.LengthDescription(),
 			max,
-			inflect("byte", max),
+			inflect.Pluralize("byte", max),
 		)
 	}
 
