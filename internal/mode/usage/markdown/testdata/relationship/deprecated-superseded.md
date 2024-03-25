@@ -7,9 +7,7 @@
 | [`BIND_PORT`]        | defaults to `8080`    | listen port for the HTTP server    |
 | [`BIND_VERSION`]     | defaults to `4`       | IP version for the HTTP server     |
 
-## Specification
-
-### `BIND_ADDRESS`
+## `BIND_ADDRESS`
 
 > listen address for the HTTP server
 
@@ -21,7 +19,7 @@ as it may be removed in a future version. [`BIND_HOST`], [`BIND_PORT`] and
 export BIND_ADDRESS=0.0.0.0:8080 # (default)
 ```
 
-### `BIND_HOST`
+## `BIND_HOST`
 
 > listen host for the HTTP server
 
@@ -32,7 +30,7 @@ value of `0.0.0.0` is used.
 export BIND_HOST=0.0.0.0 # (default)
 ```
 
-### `BIND_PORT`
+## `BIND_PORT`
 
 > listen port for the HTTP server
 
@@ -55,7 +53,7 @@ UNIX-like systems. Standard service names are published by IANA.
 
 </details>
 
-### `BIND_VERSION`
+## `BIND_VERSION`
 
 > IP version for the HTTP server
 

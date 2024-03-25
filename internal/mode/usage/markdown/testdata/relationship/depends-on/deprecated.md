@@ -5,9 +5,7 @@
 | ~~[`WIDGET_COLOR`]~~ | optional, deprecated | the color of the widget |
 | [`WIDGET_ENABLED`]   | required             | enable the widget       |
 
-## Specification
-
-### `WIDGET_COLOR`
+## `WIDGET_COLOR`
 
 > the color of the widget
 
@@ -19,11 +17,11 @@ as it may be removed in a future version. The value is not used when
 export WIDGET_COLOR=foo # (non-normative)
 ```
 
-#### See Also
+### See Also
 
 - [`WIDGET_ENABLED`] — enable the widget
 
-### `WIDGET_ENABLED`
+## `WIDGET_ENABLED`
 
 > enable the widget
 

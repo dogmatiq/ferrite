@@ -1,8 +1,6 @@
 # Environment Variables
 
-## Specification
-
-### `PORT`
+## `PORT`
 
 > listen port for the HTTP server
 

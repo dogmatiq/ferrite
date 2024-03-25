@@ -6,24 +6,11 @@ This document describes the environment variables used by `<app>`.
 | ------------ | -------- | ------------------------------------------ |
 | [`READ_DSN`] | required | database connection string for read-models |
 
-> [!WARNING]
-> This document only shows environment variables declared using [Ferrite].
-> `<app>` may consume other undocumented environment variables.
+> [!TIP]
+> If an environment variable is set to an empty value, `<app>` behaves as if
+> that variable is left undefined.
 
-## Specification
-
-All environment variables described below must meet the stated requirements.
-Otherwise, `<app>` prints usage information to `STDERR` then exits.
-**Undefined** variables and **empty** values are equivalent.
-
-⚠️ This section includes **non-normative** example values. These examples are
-syntactically valid, but may not be meaningful to `<app>`.
-
-The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**,
-**SHOULD**, **SHOULD NOT**, **RECOMMENDED**, **MAY**, and **OPTIONAL** in this
-document are to be interpreted as described in [RFC 2119].
-
-### `READ_DSN`
+## `READ_DSN`
 
 > database connection string for read-models
 
@@ -33,8 +20,18 @@ The `READ_DSN` variable **MUST NOT** be left undefined.
 export READ_DSN=foo # (non-normative)
 ```
 
+---
+
+> [!NOTE]
+> This document only describes environment variables declared using [Ferrite].
+> `<app>` may consume other undocumented environment variables.
+
+> [!IMPORTANT]
+> Some of the example values given in this document are **non-normative**.
+> Although these values are syntactically valid, they may not be meaningful to
+> `<app>`.
+
 <!-- references -->
 
 [ferrite]: https://github.com/dogmatiq/ferrite
 [`read_dsn`]: #READ_DSN
-[rfc 2119]: https://www.rfc-editor.org/rfc/rfc2119.html

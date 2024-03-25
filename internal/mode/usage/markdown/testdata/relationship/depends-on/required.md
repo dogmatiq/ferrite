@@ -5,9 +5,7 @@
 | [`WIDGET_COLOR`]   | conditional | the color of the widget |
 | [`WIDGET_ENABLED`] | required    | enable the widget       |
 
-## Specification
-
-### `WIDGET_COLOR`
+## `WIDGET_COLOR`
 
 > the color of the widget
 
@@ -18,11 +16,11 @@ The `WIDGET_COLOR` variable **MAY** be left undefined if and only if
 export WIDGET_COLOR=foo # (non-normative)
 ```
 
-#### See Also
+### See Also
 
 - [`WIDGET_ENABLED`] — enable the widget
 
-### `WIDGET_ENABLED`
+## `WIDGET_ENABLED`
 
 > enable the widget
 

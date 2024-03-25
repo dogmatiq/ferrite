@@ -1,8 +1,6 @@
 # Environment Variables
 
-## Specification
-
-### `DEBUG`
+## `DEBUG`
 
 > enable or disable debugging features
 

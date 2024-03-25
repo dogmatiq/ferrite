@@ -34,10 +34,32 @@ func (r *renderer) Render() {
 		r.renderIndex()
 	}
 
-	if !r.withoutExplanatoryText {
+	if !r.withoutExplanatoryText && len(r.Variables) > 0 {
 		r.alertf(
-			"WARNING",
-			"This document only shows environment variables declared using %s.",
+			"TIP",
+			"If an environment variable is set to an empty value,",
+			"`%s` behaves as if that variable is left undefined.",
+		)(
+			r.App,
+		)
+	}
+
+	for _, v := range r.Variables {
+		sr := specRenderer{
+			r,
+			v.Spec(),
+			v.Registry,
+		}
+		sr.Render()
+	}
+
+	if !r.withoutExplanatoryText {
+		r.gap()
+		r.line("---")
+
+		r.alertf(
+			"NOTE",
+			"This document only describes environment variables declared using %s.",
 			"`%s` may consume other undocumented environment variables.",
 		)(
 			r.linkToURL(
@@ -46,46 +68,15 @@ func (r *renderer) Render() {
 			),
 			r.App,
 		)
-	}
 
-	if len(r.Variables) != 0 {
-		r.gap()
-		r.line("## Specification")
-
-		if !r.withoutExplanatoryText {
-			r.paragraphf(
-				"All environment variables described below must meet the stated requirements.",
-				"Otherwise, `%s` prints usage information to `STDERR` then exits.",
-				"**Undefined** variables and **empty** values are equivalent.",
+		if r.hasNonNormativeExamples() {
+			r.alertf(
+				"IMPORTANT",
+				"Some of the example values given in this document are **non-normative**.",
+				"Although these values are syntactically valid, they may not be meaningful to `%s`.",
 			)(
 				r.App,
 			)
-
-			if r.hasNonNormativeExamples() {
-				r.paragraphf(
-					"⚠️ This section includes **non-normative** example values.",
-					"These examples are syntactically valid, but may not be meaningful to `%s`.",
-				)(
-					r.App,
-				)
-			}
-
-			r.paragraphf(
-				"The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**,",
-				"**SHOULD**, **SHOULD NOT**, **RECOMMENDED**, **MAY**, and **OPTIONAL** in this",
-				"document are to be interpreted as described in %s.",
-			)(
-				r.linkToRFC(2119),
-			)
-		}
-
-		for _, v := range r.Variables {
-			sr := specRenderer{
-				r,
-				v.Spec(),
-				v.Registry,
-			}
-			sr.Render()
 		}
 	}
 

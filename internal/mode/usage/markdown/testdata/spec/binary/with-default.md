@@ -1,8 +1,6 @@
 # Environment Variables
 
-## Specification
-
-### `FAVICON`
+## `FAVICON`
 
 > the content of the favicon.png file
 

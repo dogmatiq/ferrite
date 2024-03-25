@@ -1,8 +1,6 @@
 # Environment Variables
 
-## Specification
-
-### `WEIGHT`
+## `WEIGHT`
 
 > weighting for this node
 

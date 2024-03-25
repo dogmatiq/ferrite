@@ -5,9 +5,7 @@
 | [`DEBUG`]   | optional | enable or disable debugging features |
 | [`VERBOSE`] | optional | enable verbose logging               |
 
-## Specification
-
-### `DEBUG`
+## `DEBUG`
 
 > enable or disable debugging features
 
@@ -19,11 +17,11 @@ export DEBUG=true
 export DEBUG=false
 ```
 
-#### See Also
+### See Also
 
 - [`VERBOSE`] — enable verbose logging
 
-### `VERBOSE`
+## `VERBOSE`
 
 > enable verbose logging
 

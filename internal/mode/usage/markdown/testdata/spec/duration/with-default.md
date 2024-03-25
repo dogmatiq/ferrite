@@ -1,8 +1,6 @@
 # Environment Variables
 
-## Specification
-
-### `GRPC_TIMEOUT`
+## `GRPC_TIMEOUT`
 
 > gRPC request timeout
 

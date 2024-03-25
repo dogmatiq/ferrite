@@ -1,8 +1,6 @@
 # Environment Variables
 
-## Specification
-
-### `READ_DSN`
+## `READ_DSN`
 
 > database connection string for read-models
 

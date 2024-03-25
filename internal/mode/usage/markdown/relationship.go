@@ -13,7 +13,7 @@ func (r *specRenderer) renderSeeAlso() {
 	}
 
 	r.ren.gap()
-	r.ren.line("#### See Also")
+	r.ren.line("### See Also")
 	r.ren.gap()
 
 	for _, rel := range relationships {
