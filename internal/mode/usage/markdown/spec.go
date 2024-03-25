@@ -179,7 +179,7 @@ func (r *specRenderer) renderPrimaryRequirementRequired(req string) {
 			} else if length != "" {
 				write("The `%s` variable's value **MUST** have %s.", r.spec.Name(), length)
 			} else {
-				write("The `%s` variable **MUST NOT** be left undefined.", r.spec.Name())
+				write("The `%s` variable is **required**. It must have a non-empty value.", r.spec.Name())
 			}
 		},
 	)
