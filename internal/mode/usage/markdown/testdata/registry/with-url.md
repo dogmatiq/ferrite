@@ -1,8 +1,8 @@
 # Environment Variables
 
-| Name         | Optionality | Description                                | Imported From                      |
-| ------------ | ----------- | ------------------------------------------ | ---------------------------------- |
-| [`READ_DSN`] | required    | database connection string for read-models | [Third-party Product](registry:3p) |
+| Name         | Usage    | Description                                | Imported From                      |
+| ------------ | -------- | ------------------------------------------ | ---------------------------------- |
+| [`READ_DSN`] | required | database connection string for read-models | [Third-party Product](registry:3p) |
 
 ## Specification
 

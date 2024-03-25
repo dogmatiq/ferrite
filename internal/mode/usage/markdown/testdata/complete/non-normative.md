@@ -2,12 +2,13 @@
 
 This document describes the environment variables used by `<app>`.
 
-| Name         | Optionality | Description                                |
-| ------------ | ----------- | ------------------------------------------ |
-| [`READ_DSN`] | required    | database connection string for read-models |
+| Name         | Usage    | Description                                |
+| ------------ | -------- | ------------------------------------------ |
+| [`READ_DSN`] | required | database connection string for read-models |
 
-⚠️ `<app>` may consume other undocumented environment variables. This document
-only shows variables declared using [Ferrite].
+> [!WARNING]
+> This document only shows environment variables declared using [Ferrite].
+> `<app>` may consume other undocumented environment variables.
 
 ## Specification
 

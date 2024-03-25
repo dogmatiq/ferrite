@@ -1,9 +1,9 @@
 # Environment Variables
 
-| Name        | Optionality | Description                          |
-| ----------- | ----------- | ------------------------------------ |
-| [`DEBUG`]   | optional    | enable or disable debugging features |
-| [`VERBOSE`] | optional    | enable verbose logging               |
+| Name        | Usage    | Description                          |
+| ----------- | -------- | ------------------------------------ |
+| [`DEBUG`]   | optional | enable or disable debugging features |
+| [`VERBOSE`] | optional | enable verbose logging               |
 
 ## Specification
 
