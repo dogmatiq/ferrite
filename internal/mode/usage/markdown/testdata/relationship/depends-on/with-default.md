@@ -1,6 +1,6 @@
 # Environment Variables
 
-| Name               | Optionality             | Description             |
+| Name               | Usage                   | Description             |
 | ------------------ | ----------------------- | ----------------------- |
 | [`WIDGET_COLOR`]   | defaults to `turquoise` | the color of the widget |
 | [`WIDGET_ENABLED`] | required                | enable the widget       |

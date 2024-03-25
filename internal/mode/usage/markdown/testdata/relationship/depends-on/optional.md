@@ -1,9 +1,9 @@
 # Environment Variables
 
-| Name               | Optionality | Description             |
-| ------------------ | ----------- | ----------------------- |
-| [`WIDGET_COLOR`]   | optional    | the color of the widget |
-| [`WIDGET_ENABLED`] | required    | enable the widget       |
+| Name               | Usage    | Description             |
+| ------------------ | -------- | ----------------------- |
+| [`WIDGET_COLOR`]   | optional | the color of the widget |
+| [`WIDGET_ENABLED`] | required | enable the widget       |
 
 ## Specification
 

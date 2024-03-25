@@ -1,6 +1,6 @@
 # Environment Variables
 
-| Name               | Optionality | Description             |
+| Name               | Usage       | Description             |
 | ------------------ | ----------- | ----------------------- |
 | [`WIDGET_COLOR`]   | conditional | the color of the widget |
 | [`WIDGET_ENABLED`] | required    | enable the widget       |

@@ -35,15 +35,16 @@ func (r *renderer) Render() {
 	}
 
 	if !r.withoutExplanatoryText {
-		r.paragraphf(
-			"⚠️ `%s` may consume other undocumented environment variables.",
-			"This document only shows variables declared using %s.",
+		r.alertf(
+			"WARNING",
+			"This document only shows environment variables declared using %s.",
+			"`%s` may consume other undocumented environment variables.",
 		)(
-			r.App,
 			r.linkToURL(
 				"Ferrite",
 				"https://github.com/dogmatiq/ferrite",
 			),
+			r.App,
 		)
 	}
 
@@ -108,6 +109,18 @@ func (r *renderer) paragraphf(text ...string) func(...any) {
 		r.gap()
 		for _, line := range wordwrap.Wrap(text, 80) {
 			r.line("%s", line)
+		}
+	}
+}
+
+func (r *renderer) alertf(t string, text ...string) func(...any) {
+	return func(v ...any) {
+		text := fmt.Sprintf(strings.Join(text, " "), v...)
+
+		r.gap()
+		r.line("> [!%s]", t)
+		for _, line := range wordwrap.Wrap(text, 78) {
+			r.line("> %s", line)
 		}
 	}
 }

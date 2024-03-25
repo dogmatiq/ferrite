@@ -8,7 +8,7 @@ import (
 
 func (r *renderer) renderIndex() {
 	if len(r.Variables) == 0 {
-		r.line("**There do not appear to be any environment variables.**")
+		r.line("**`%s` does not appear to use any environment variables.**", r.App)
 		return
 	}
 
@@ -23,25 +23,25 @@ func (r *renderer) renderIndex() {
 	var t table
 
 	if hasImportColumn {
-		t.AddRow("Name", "Optionality", "Description", "Imported From")
+		t.AddRow("Name", "Usage", "Description", "Imported From")
 	} else {
-		t.AddRow("Name", "Optionality", "Description")
+		t.AddRow("Name", "Usage", "Description")
 	}
 
 	for _, v := range r.Variables {
 		s := v.Spec()
 		name := r.linkToSpec(s)
-		optionality := "required"
+		usage := "required"
 
 		if s.IsDeprecated() {
 			name = "~~" + name + "~~"
-			optionality = "optional, deprecated"
+			usage = "optional, deprecated"
 		} else if def, ok := s.Default(); ok {
-			optionality = fmt.Sprintf("defaults to `%s`", def.Quote())
+			usage = fmt.Sprintf("defaults to `%s`", def.Quote())
 		} else if !s.IsRequired() {
-			optionality = "optional"
+			usage = "optional"
 		} else if len(variable.Relationships[variable.DependsOn](s)) != 0 {
-			optionality = "conditional"
+			usage = "conditional"
 		}
 
 		if hasImportColumn {
@@ -49,9 +49,9 @@ func (r *renderer) renderIndex() {
 			if !v.Registry.IsDefault {
 				reg = r.linkToRegistry(v.Registry)
 			}
-			t.AddRow(name, optionality, s.Description(), reg)
+			t.AddRow(name, usage, s.Description(), reg)
 		} else {
-			t.AddRow(name, optionality, s.Description())
+			t.AddRow(name, usage, s.Description())
 		}
 	}
 

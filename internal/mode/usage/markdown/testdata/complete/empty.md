@@ -2,10 +2,11 @@
 
 This document describes the environment variables used by `<app>`.
 
-**There do not appear to be any environment variables.**
+**`<app>` does not appear to use any environment variables.**
 
-⚠️ `<app>` may consume other undocumented environment variables. This document
-only shows variables declared using [Ferrite].
+> [!WARNING]
+> This document only shows environment variables declared using [Ferrite].
+> `<app>` may consume other undocumented environment variables.
 
 <!-- references -->
 

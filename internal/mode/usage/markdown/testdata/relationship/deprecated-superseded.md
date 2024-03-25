@@ -1,6 +1,6 @@
 # Environment Variables
 
-| Name                 | Optionality           | Description                        |
+| Name                 | Usage                 | Description                        |
 | -------------------- | --------------------- | ---------------------------------- |
 | ~~[`BIND_ADDRESS`]~~ | optional, deprecated  | listen address for the HTTP server |
 | [`BIND_HOST`]        | defaults to `0.0.0.0` | listen host for the HTTP server    |
