@@ -4,9 +4,7 @@
 | ------------ | -------- | ------------------------------------------ | ---------------------------------- |
 | [`READ_DSN`] | required | database connection string for read-models | [Third-party Product](registry:3p) |
 
-## Specification
-
-### `READ_DSN`
+## `READ_DSN`
 
 > database connection string for read-models
 

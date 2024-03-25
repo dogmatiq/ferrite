@@ -1,8 +1,6 @@
 # Environment Variables
 
-## Specification
-
-### `SEED`
+## `SEED`
 
 > the seed for the random-number generator
 

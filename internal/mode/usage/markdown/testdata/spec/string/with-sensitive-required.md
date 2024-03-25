@@ -1,8 +1,6 @@
 # Environment Variables
 
-## Specification
-
-### `PASSWORD`
+## `PASSWORD`
 
 > a very secret password
 

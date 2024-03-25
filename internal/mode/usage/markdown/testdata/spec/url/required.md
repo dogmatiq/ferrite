@@ -1,8 +1,6 @@
 # Environment Variables
 
-## Specification
-
-### `API_URL`
+## `API_URL`
 
 > the URL of the REST API
 

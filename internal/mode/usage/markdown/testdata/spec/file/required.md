@@ -1,8 +1,6 @@
 # Environment Variables
 
-## Specification
-
-### `PRIVATE_KEY`
+## `PRIVATE_KEY`
 
 > path to the private key file
 

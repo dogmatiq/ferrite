@@ -16,7 +16,7 @@ type specRenderer struct {
 
 func (r *specRenderer) Render() {
 	r.ren.gap()
-	r.ren.line("### `%s`", r.spec.Name())
+	r.ren.line("## `%s`", r.spec.Name())
 
 	r.ren.gap()
 	r.ren.line("> %s", r.spec.Description())

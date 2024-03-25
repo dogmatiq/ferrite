@@ -1,8 +1,6 @@
 # Environment Variables
 
-## Specification
-
-### `LOG_LEVEL`
+## `LOG_LEVEL`
 
 > the minimum log level to record
 

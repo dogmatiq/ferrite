@@ -1,8 +1,6 @@
 # Environment Variables
 
-## Specification
-
-### `SECRET_KEY`
+## `SECRET_KEY`
 
 > a very secret machine-readable key
 
