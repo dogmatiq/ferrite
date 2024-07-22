@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/dogmatiq/iago v0.4.0
-	github.com/mattn/go-runewidth v0.0.15
+	github.com/mattn/go-runewidth v0.0.16
 	github.com/onsi/ginkgo/v2 v2.19.0
 	github.com/onsi/gomega v1.33.1
 	github.com/rivo/uniseg v0.4.7
