@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog], and this project adheres to
 ### Added
 
 - Added `FileBuilder.WithMustExist()` constraint.
+- Added `Dir()` builder for directory paths.
 
 ### Changed
 
