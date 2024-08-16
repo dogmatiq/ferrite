@@ -26,7 +26,7 @@ func Float[T constraints.Float](name, desc string) *FloatBuilder[T] {
 	b.builder.Description(desc)
 	b.builder.BuiltInConstraint(
 		"must be a finite number",
-		func(v T) variable.ConstraintError {
+		func(_ variable.ConstraintContext, v T) variable.ConstraintError {
 			v64 := float64(v)
 			if math.IsNaN(v64) || math.IsInf(v64, 0) {
 				return errors.New("expected a finite number")

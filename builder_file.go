@@ -1,6 +1,7 @@
 package ferrite
 
 import (
+	"errors"
 	"io"
 	"os"
 
@@ -34,6 +35,34 @@ var _ isBuilderOf[FileName, *FileBuilder]
 // It is used when the environment variable is undefined or empty.
 func (b *FileBuilder) WithDefault(v string) *FileBuilder {
 	b.builder.Default(FileName(v))
+	return b
+}
+
+// WithMustExist adds a constraint that requires the file to already exist when
+// the application starts.
+func (b *FileBuilder) WithMustExist() *FileBuilder {
+	b.builder.BuiltInConstraint(
+		"**MUST** refer to a file that already exists",
+		func(ctx variable.ConstraintContext, v FileName) variable.ConstraintError {
+			if ctx != variable.ConstraintContextFinal {
+				return nil
+			}
+
+			info, err := os.Stat(string(v))
+			if err != nil {
+				if os.IsNotExist(err) {
+					return errors.New("the file does not exist")
+				}
+				return err
+			}
+
+			if info.IsDir() {
+				return errors.New("the path refers to a directory, expected a file")
+			}
+
+			return nil
+		},
+	)
 	return b
 }
 

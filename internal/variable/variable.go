@@ -146,7 +146,7 @@ func (v *OfType[T]) resolve() {
 
 		v.source = SourceEnvironment
 
-		n, c, err := v.spec.Unmarshal(lit)
+		n, c, err := v.spec.Unmarshal(ConstraintContextFinal, lit)
 		if err != nil {
 			v.availability = AvailabilityInvalid
 			v.err = valueError{

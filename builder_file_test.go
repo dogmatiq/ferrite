@@ -123,6 +123,30 @@ var _ = Describe("type FileBuilder", func() {
 			})
 		})
 	})
+
+	When("the must-exist constraint is applied", func() {
+		It("panics if the file does not exist", func() {
+			os.Setenv("FERRITE_FILE", "/path/to/file")
+
+			Expect(func() {
+				builder.
+					WithMustExist().
+					Required().
+					Value()
+			}).To(PanicWith("value of FERRITE_FILE (/path/to/file) is invalid: the file does not exist"))
+		})
+
+		It("panics if the path refers to a directory", func() {
+			os.Setenv("FERRITE_FILE", "testdata/dir")
+
+			Expect(func() {
+				builder.
+					WithMustExist().
+					Required().
+					Value()
+			}).To(PanicWith("value of FERRITE_FILE (testdata/dir) is invalid: the path refers to a directory, expected a file"))
+		})
+	})
 })
 
 var _ = Describe("type FileName", func() {

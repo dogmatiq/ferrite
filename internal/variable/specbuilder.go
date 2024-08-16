@@ -47,7 +47,7 @@ func (b *TypedSpecBuilder[T]) Default(v T) {
 // Ferrite itself), use UserConstraint() instead.
 func (b *TypedSpecBuilder[T]) BuiltInConstraint(
 	desc string,
-	fn func(T) ConstraintError,
+	fn func(ConstraintContext, T) ConstraintError,
 ) {
 	b.spec.constraints = append(
 		b.spec.constraints,
@@ -65,7 +65,7 @@ func (b *TypedSpecBuilder[T]) UserConstraint(
 		constraint[T]{
 			desc,
 			true,
-			func(v T) ConstraintError {
+			func(_ ConstraintContext, v T) ConstraintError {
 				if fn(v) {
 					return nil
 				}
@@ -167,7 +167,7 @@ func (b *TypedSpecBuilder[T]) finalize() error {
 	}
 
 	if v, ok := b.def.Get(); ok {
-		lit, err := b.spec.Marshal(v)
+		lit, err := b.spec.Marshal(ConstraintContextDefault, v)
 		if err != nil {
 			return SpecError{
 				name:  b.spec.name,
@@ -197,7 +197,7 @@ func (b *TypedSpecBuilder[T]) buildExamples() error {
 
 	// Add the examples provided directly to the builder.
 	for _, eg := range b.examples {
-		lit, err := b.spec.Marshal(eg.Native)
+		lit, err := b.spec.Marshal(ConstraintContextExample, eg.Native)
 		if err != nil {
 			return err
 		}
@@ -221,7 +221,7 @@ func (b *TypedSpecBuilder[T]) buildExamples() error {
 	// Generate examples from the schema and add each one only if it meets all
 	// of the constraints (and there is no existing example of the same value).
 	for _, eg := range b.spec.schema.Examples(conservative) {
-		if lit, err := b.spec.Marshal(eg.Native); err == nil {
+		if lit, err := b.spec.Marshal(ConstraintContextExample, eg.Native); err == nil {
 			if _, ok := uniq[lit]; !ok {
 				uniq[lit] = struct{}{}
 				b.spec.examples = append(b.spec.examples, Example{

@@ -16,7 +16,7 @@ type TypedConstraint[T any] interface {
 	Constraint
 
 	// Check returns an error if v does not satisfy the constraint.
-	Check(T) ConstraintError
+	Check(ConstraintContext, T) ConstraintError
 }
 
 // ConstraintError indicates that a value does not satisfy a constraint.
@@ -28,7 +28,7 @@ type ConstraintError interface {
 type constraint[T any] struct {
 	desc  string
 	user  bool
-	check func(T) ConstraintError
+	check func(ConstraintContext, T) ConstraintError
 }
 
 // Description returns a description of the constraint.
@@ -42,6 +42,23 @@ func (c constraint[T]) IsUserDefined() bool {
 }
 
 // Check returns an error if v does not satisfy the constraint.
-func (c constraint[T]) Check(v T) ConstraintError {
-	return c.check(v)
+func (c constraint[T]) Check(ctx ConstraintContext, v T) ConstraintError {
+	return c.check(ctx, v)
 }
+
+// ConstraintContext is the context in which a constraint is evaluated.
+type ConstraintContext int
+
+const (
+	// ConstraintContextFinal indicates that the constraint is being
+	// evaluated during the final resolution of the variable value.
+	ConstraintContextFinal ConstraintContext = iota
+
+	// ConstraintContextExample indicates that the constraint is being evaluated
+	// against an example value.
+	ConstraintContextExample
+
+	// ConstraintContextDefault indicates that the constraint is being evaluated
+	// against the default value.
+	ConstraintContextDefault
+)

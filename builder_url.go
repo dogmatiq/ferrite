@@ -24,7 +24,7 @@ func URL(name, desc string) *URLBuilder {
 	b.builder.Description(desc)
 	b.builder.BuiltInConstraint(
 		"**MUST** be a fully-qualified URL",
-		func(v *url.URL) variable.ConstraintError {
+		func(_ variable.ConstraintContext, v *url.URL) variable.ConstraintError {
 			if v.Scheme == "" {
 				return errors.New("URL must have a scheme")
 			}

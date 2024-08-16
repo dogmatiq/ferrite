@@ -56,7 +56,7 @@ func KubernetesService(svc string) *KubernetesServiceBuilder {
 	)
 	b.hostBuilder.BuiltInConstraint(
 		"**MUST** be a valid hostname",
-		func(h string) variable.ConstraintError {
+		func(_ variable.ConstraintContext, h string) variable.ConstraintError {
 			return validateHost(h)
 		},
 	)
@@ -80,7 +80,7 @@ func KubernetesService(svc string) *KubernetesServiceBuilder {
 	)
 	b.portBuilder.BuiltInConstraint(
 		"**MUST** be a valid network port",
-		func(p string) variable.ConstraintError {
+		func(_ variable.ConstraintContext, p string) variable.ConstraintError {
 			return validatePort(p)
 		},
 	)

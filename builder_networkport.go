@@ -18,7 +18,7 @@ func NetworkPort(name, desc string) *NetworkPortBuilder {
 	b.builder.Description(desc)
 	b.builder.BuiltInConstraint(
 		"**MUST** be a valid network port",
-		func(v string) variable.ConstraintError {
+		func(_ variable.ConstraintContext, v string) variable.ConstraintError {
 			return validatePort(v)
 		},
 	)

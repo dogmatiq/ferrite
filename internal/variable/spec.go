@@ -157,9 +157,9 @@ func (s *TypedSpec[T]) addRelationship(r Relationship) {
 
 // CheckConstraints returns an error if v does not satisfy any one of the
 // specification's constraints.
-func (s *TypedSpec[T]) CheckConstraints(v T) ConstraintError {
+func (s *TypedSpec[T]) CheckConstraints(ctx ConstraintContext, v T) ConstraintError {
 	for _, c := range s.constraints {
-		if err := c.Check(v); err != nil {
+		if err := c.Check(ctx, v); err != nil {
 			return err
 		}
 	}
@@ -171,8 +171,8 @@ func (s *TypedSpec[T]) CheckConstraints(v T) ConstraintError {
 //
 // It returns an error if v does not meet the specification's constraints or
 // marshaling fails at the schema level.
-func (s *TypedSpec[T]) Marshal(v T) (Literal, error) {
-	if err := s.CheckConstraints(v); err != nil {
+func (s *TypedSpec[T]) Marshal(ctx ConstraintContext, v T) (Literal, error) {
+	if err := s.CheckConstraints(ctx, v); err != nil {
 		return Literal{}, err
 	}
 
@@ -183,13 +183,13 @@ func (s *TypedSpec[T]) Marshal(v T) (Literal, error) {
 //
 // It returns an error if v does not meet the specification's constraints or
 // unmarshaling fails at the schema level.
-func (s *TypedSpec[T]) Unmarshal(v Literal) (T, Literal, error) {
+func (s *TypedSpec[T]) Unmarshal(ctx ConstraintContext, v Literal) (T, Literal, error) {
 	n, err := s.schema.Unmarshal(v)
 	if err != nil {
 		return n, Literal{}, err
 	}
 
-	if err := s.CheckConstraints(n); err != nil {
+	if err := s.CheckConstraints(ctx, n); err != nil {
 		return n, Literal{}, err
 	}
 
