@@ -61,7 +61,7 @@ type URLBuilder struct {
 
 var _ isBuilderOf[*url.URL, *URLBuilder]
 
-// WithDefault sets a default value of the variable.
+// WithDefault sets the default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b *URLBuilder) WithDefault(v string) *URLBuilder {

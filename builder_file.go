@@ -20,7 +20,8 @@ func File(name, desc string) *FileBuilder {
 	return b
 }
 
-// FileBuilder builds a specification for a boolean value.
+// FileBuilder builds a specification for a string value that is the name of a
+// file.
 type FileBuilder struct {
 	schema  variable.TypedString[FileName]
 	builder variable.TypedSpecBuilder[FileName]
@@ -28,7 +29,7 @@ type FileBuilder struct {
 
 var _ isBuilderOf[FileName, *FileBuilder]
 
-// WithDefault sets a default value of the variable.
+// WithDefault sets the default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b *FileBuilder) WithDefault(v string) *FileBuilder {

@@ -52,7 +52,7 @@ type UnsignedBuilder[T constraints.Unsigned] struct {
 
 var _ isBuilderOf[uint, *UnsignedBuilder[uint]]
 
-// WithDefault sets a default value of the variable.
+// WithDefault sets the default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b *UnsignedBuilder[T]) WithDefault(v T) *UnsignedBuilder[T] {

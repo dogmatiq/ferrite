@@ -50,7 +50,7 @@ type BinaryBuilder[T ~[]B, B ~byte] struct {
 
 var _ isBuilderOf[[]byte, *BinaryBuilder[[]byte, byte]]
 
-// WithDefault sets a default value of the variable.
+// WithDefault sets the default value of the variable.
 //
 // v is the raw binary value, not the encoded representation used within the
 // environment variable.

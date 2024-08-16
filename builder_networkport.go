@@ -37,7 +37,7 @@ type NetworkPortBuilder struct {
 
 var _ isBuilderOf[string, *NetworkPortBuilder]
 
-// WithDefault sets a default value of the variable.
+// WithDefault sets the default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b *NetworkPortBuilder) WithDefault(v string) *NetworkPortBuilder {

@@ -69,7 +69,7 @@ type FloatBuilder[T constraints.Float] struct {
 
 var _ isBuilderOf[float32, *FloatBuilder[float32]]
 
-// WithDefault sets a default value of the variable.
+// WithDefault sets the default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b *FloatBuilder[T]) WithDefault(v T) *FloatBuilder[T] {

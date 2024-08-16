@@ -35,7 +35,7 @@ type StringBuilder[T ~string] struct {
 
 var _ isBuilderOf[string, *StringBuilder[string]]
 
-// WithDefault sets a default value of the variable.
+// WithDefault sets the default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b *StringBuilder[T]) WithDefault(v T) *StringBuilder[T] {

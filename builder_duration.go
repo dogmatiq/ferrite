@@ -46,7 +46,7 @@ type DurationBuilder struct {
 
 var _ isBuilderOf[time.Duration, *DurationBuilder]
 
-// WithDefault sets a default value of the variable.
+// WithDefault sets the default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b *DurationBuilder) WithDefault(v time.Duration) *DurationBuilder {
