@@ -48,7 +48,7 @@ func (b *DirBuilder) WithMustExist() *DirBuilder {
 			info, err := os.Stat(string(v))
 			if err != nil {
 				if os.IsNotExist(err) {
-					return errors.New("the directory does not exist")
+					return errors.New("expected the directory to exist")
 				}
 				return err
 			}

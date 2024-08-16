@@ -133,7 +133,7 @@ var _ = Describe("type FileBuilder", func() {
 					WithMustExist().
 					Required().
 					Value()
-			}).To(PanicWith("value of FERRITE_FILE (/path/to/file) is invalid: the file does not exist"))
+			}).To(PanicWith("value of FERRITE_FILE (/path/to/file) is invalid: expected the file to exist"))
 		})
 
 		It("panics if the path refers to a directory", func() {

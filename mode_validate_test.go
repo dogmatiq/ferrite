@@ -27,6 +27,11 @@ func ExampleInit_validation() {
 		Bool("FERRITE_BOOL", "example bool").
 		Required()
 
+	os.Setenv("FERRITE_DIR", "/path/to/dir")
+	ferrite.
+		Dir("FERRITE_DIR", "example dir").
+		Required()
+
 	os.Setenv("FERRITE_DURATION", "3h20m")
 	ferrite.
 		Duration("FERRITE_DURATION", "example duration").
@@ -36,6 +41,11 @@ func ExampleInit_validation() {
 	ferrite.
 		Enum("FERRITE_ENUM", "example enum").
 		WithMembers("foo", "bar", "baz").
+		Required()
+
+	os.Setenv("FERRITE_FILE", "/path/to/file")
+	ferrite.
+		File("FERRITE_FILE", "example file").
 		Required()
 
 	os.Setenv("FERRITE_NETWORK_PORT", "8080")
@@ -92,8 +102,10 @@ func ExampleInit_validation() {
 	//    FERRITE_BINARY            example binary                           <base64>           ✓ set to {12 bytes}
 	//    FERRITE_BINARY_SENSITIVE  example sensitive binary                 <base64>           ✓ set to {12 bytes}
 	//    FERRITE_BOOL              example bool                             true | false       ✓ set to true
+	//    FERRITE_DIR               example dir                              <string>           ✓ set to /path/to/dir
 	//    FERRITE_DURATION          example duration                         1ns ...            ✓ set to 3h20m
 	//    FERRITE_ENUM              example enum                             foo | bar | baz    ✓ set to foo
+	//    FERRITE_FILE              example file                             <string>           ✓ set to /path/to/file
 	//    FERRITE_NETWORK_PORT      example network port                     <string>           ✓ set to 8080
 	//    FERRITE_NUM_FLOAT         example float-point                      <float32>          ✓ set to -123.45
 	//    FERRITE_NUM_SIGNED        example signed integer                   <int16>            ✓ set to -123
@@ -128,6 +140,11 @@ func ExampleInit_validationWithDefaultValues() {
 		Required()
 
 	ferrite.
+		Dir("FERRITE_DIR", "example dir").
+		WithDefault("/path/to/dir").
+		Required()
+
+	ferrite.
 		Duration("FERRITE_DURATION", "example duration").
 		WithDefault(10 * time.Second).
 		Required()
@@ -136,6 +153,11 @@ func ExampleInit_validationWithDefaultValues() {
 		Enum("FERRITE_ENUM", "example enum").
 		WithMembers("foo", "bar", "baz").
 		WithDefault("bar").
+		Required()
+
+	ferrite.
+		File("FERRITE_FILE", "example file").
+		WithDefault("/path/to/file").
 		Required()
 
 	ferrite.
@@ -191,8 +213,10 @@ func ExampleInit_validationWithDefaultValues() {
 	//    FERRITE_BINARY            example binary                         [ <base64> ] = {12 bytes}           ✓ using default value
 	//    FERRITE_BINARY_SENSITIVE  example sensitive binary               [ <base64> ] = {12 bytes}           ✓ using default value
 	//    FERRITE_BOOL              example bool                           [ true | false ] = true             ✓ using default value
+	//    FERRITE_DIR               example dir                            [ <string> ] = /path/to/dir         ✓ using default value
 	//    FERRITE_DURATION          example duration                       [ 1ns ... ] = 10s                   ✓ using default value
 	//    FERRITE_ENUM              example enum                           [ foo | bar | baz ] = bar           ✓ using default value
+	//    FERRITE_FILE              example file                           [ <string> ] = /path/to/file        ✓ using default value
 	//    FERRITE_NETWORK_PORT      example network port                   [ <string> ] = 8080                 ✓ using default value
 	//    FERRITE_NUM_FLOAT         example float-point                    [ <float32> ] = -123.45             ✓ using default value
 	//    FERRITE_NUM_SIGNED        example signed integer                 [ <int16> ] = -123                  ✓ using default value
@@ -224,12 +248,20 @@ func ExampleInit_validationWithOptionalValues() {
 		Optional()
 
 	ferrite.
+		Dir("FERRITE_DIR", "example dir").
+		Optional()
+
+	ferrite.
 		Duration("FERRITE_DURATION", "example duration").
 		Optional()
 
 	ferrite.
 		Enum("FERRITE_ENUM", "example enum").
 		WithMembers("foo", "bar", "baz").
+		Optional()
+
+	ferrite.
+		File("FERRITE_FILE", "example file").
 		Optional()
 
 	ferrite.
@@ -277,8 +309,10 @@ func ExampleInit_validationWithOptionalValues() {
 	//    FERRITE_BINARY            example binary                         [ <base64> ]         • undefined
 	//    FERRITE_BINARY_SENSITIVE  example sensitive binary               [ <base64> ]         • undefined
 	//    FERRITE_BOOL              example bool                           [ true | false ]     • undefined
+	//    FERRITE_DIR               example dir                            [ <string> ]         • undefined
 	//    FERRITE_DURATION          example duration                       [ 1ns ... ]          • undefined
 	//    FERRITE_ENUM              example enum                           [ foo | bar | baz ]  • undefined
+	//    FERRITE_FILE              example file                           [ <string> ]         • undefined
 	//    FERRITE_NETWORK_PORT      example network port                   [ <string> ]         • undefined
 	//    FERRITE_NUM_FLOAT         example float-point                    [ <float32> ]        • undefined
 	//    FERRITE_NUM_SIGNED        example signed integer                 [ <int16> ]          • undefined
@@ -335,6 +369,12 @@ func ExampleInit_validationWithInvalidValues() {
 		Bool("FERRITE_BOOL", "example bool").
 		Required()
 
+	os.Setenv("FERRITE_DIR", "/path/to/dir")
+	ferrite.
+		Dir("FERRITE_DIR", "example dir").
+		WithMustExist().
+		Required()
+
 	os.Setenv("FERRITE_DURATION", "-+10s")
 	ferrite.
 		Duration("FERRITE_DURATION", "example duration").
@@ -344,6 +384,12 @@ func ExampleInit_validationWithInvalidValues() {
 	ferrite.
 		Enum("FERRITE_ENUM", "example enum").
 		WithMembers("foo", "bar", "baz").
+		Required()
+
+	os.Setenv("FERRITE_FILE", "/path/to/file")
+	ferrite.
+		File("FERRITE_FILE", "example file").
+		WithMustExist().
 		Required()
 
 	os.Setenv("FERRITE_NETWORK_PORT", "<invalid port>")
@@ -408,8 +454,10 @@ func ExampleInit_validationWithInvalidValues() {
 	//  ❯ FERRITE_BINARY            example binary                           <base64>           ✗ set to {16 bytes}, illegal base64 data at input byte 0
 	//  ❯ FERRITE_BINARY_SENSITIVE  example sensitive binary                 <base64>           ✗ set to {16 bytes}, illegal base64 data at input byte 0
 	//  ❯ FERRITE_BOOL              example bool                             true | false       ✗ set to yes, expected either true or false
+	//  ❯ FERRITE_DIR               example dir                              <string>           ✗ set to /path/to/dir, expected the directory to exist
 	//  ❯ FERRITE_DURATION          example duration                         1ns ...            ✗ set to -+10s, expected duration
 	//  ❯ FERRITE_ENUM              example enum                             foo | bar | baz    ✗ set to qux, expected foo, bar or baz
+	//  ❯ FERRITE_FILE              example file                             <string>           ✗ set to /path/to/file, expected the file to exist
 	//  ❯ FERRITE_NETWORK_PORT      example network port                     <string>           ✗ set to '<invalid port>', IANA service name must contain only ASCII letters, digits and hyphen
 	//  ❯ FERRITE_NUM_FLOAT         example float-point                      <float32>          ✗ set to -123w45, expected float32
 	//  ❯ FERRITE_NUM_SIGNED        example signed integer                   <int16>            ✗ set to 123.3, expected integer between -32768 and +32767

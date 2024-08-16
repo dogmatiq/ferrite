@@ -38,8 +38,8 @@ func (b *FileBuilder) WithDefault(v string) *FileBuilder {
 	return b
 }
 
-// WithMustExist adds a constraint that requires the file to already exist when
-// the application starts.
+// WithMustExist adds a constraint that requires the value to refer to an
+// existing file.
 func (b *FileBuilder) WithMustExist() *FileBuilder {
 	b.builder.BuiltInConstraint(
 		"**MUST** refer to a file that already exists",
@@ -51,7 +51,7 @@ func (b *FileBuilder) WithMustExist() *FileBuilder {
 			info, err := os.Stat(string(v))
 			if err != nil {
 				if os.IsNotExist(err) {
-					return errors.New("the file does not exist")
+					return errors.New("expected the file to exist")
 				}
 				return err
 			}

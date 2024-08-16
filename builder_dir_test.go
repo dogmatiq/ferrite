@@ -132,7 +132,7 @@ var _ = Describe("type DirBuilder", func() {
 					WithMustExist().
 					Required().
 					Value()
-			}).To(PanicWith("value of FERRITE_DIR (/path/to/dir) is invalid: the directory does not exist"))
+			}).To(PanicWith("value of FERRITE_DIR (/path/to/dir) is invalid: expected the directory to exist"))
 		})
 
 		It("panics if the path refers to a non-directory", func() {
