@@ -148,22 +148,6 @@ var _ = Describe("type DirBuilder", func() {
 	})
 })
 
-// var _ = Describe("type DirName", func() {
-// 	var dirname = DirName("testdata/subdir/created")
-
-// 	Describe("func XXX()", func() {
-// 		It("creates the directory and returns the path", func() {
-// 			r, err := dirname.XXX()
-// 			Expect(err).ShouldNot(HaveOccurred())
-// 			defer r.Close()
-
-// 			data, err := io.ReadAll(r)
-// 			Expect(err).ShouldNot(HaveOccurred())
-// 			Expect(string(data)).To(Equal("Hello, world!\n"))
-// 		})
-// 	})
-// })
-
 func ExampleDir_required() {
 	defer example()()
 
