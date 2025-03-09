@@ -1,6 +1,9 @@
 module github.com/dogmatiq/ferrite
 
-go 1.22.0
+go 1.23.0
+
+toolchain go1.23.4
+
 require (
 	github.com/dogmatiq/iago v0.4.0
 	github.com/mattn/go-runewidth v0.0.16
