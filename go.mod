@@ -7,7 +7,7 @@ toolchain go1.23.4
 require (
 	github.com/dogmatiq/iago v0.4.0
 	github.com/mattn/go-runewidth v0.0.16
-	github.com/onsi/ginkgo/v2 v2.22.2
+	github.com/onsi/ginkgo/v2 v2.23.0
 	github.com/onsi/gomega v1.36.2
 	github.com/rivo/uniseg v0.4.7
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
