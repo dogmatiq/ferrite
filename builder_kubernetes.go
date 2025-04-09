@@ -199,6 +199,7 @@ func (b *KubernetesServiceBuilder) Required(options ...RequiredOption) Required[
 				port.NativeValue(),
 			}, nil
 		},
+		b.literalResolver(host, port),
 	}
 }
 
@@ -224,6 +225,7 @@ func (b *KubernetesServiceBuilder) Optional(options ...OptionalOption) Optional[
 	return optionalFunc[KubernetesAddress]{
 		[]variable.Any{host, port},
 		b.optionalResolver(host, port),
+		b.literalResolver(host, port),
 	}
 }
 
@@ -253,6 +255,7 @@ func (b *KubernetesServiceBuilder) Deprecated(options ...DeprecatedOption) Depre
 	return deprecatedFunc[KubernetesAddress]{
 		[]variable.Any{host, port},
 		b.optionalResolver(host, port),
+		b.literalResolver(host, port),
 	}
 }
 
@@ -286,6 +289,24 @@ func (b *KubernetesServiceBuilder) optionalResolver(
 			host.NativeValue(),
 			port.NativeValue(),
 		}, availability == variable.AvailabilityOK, nil
+	}
+}
+
+func (b *KubernetesServiceBuilder) literalResolver(
+	host, port *variable.OfType[string],
+) func(KubernetesAddress) ([]variable.Literal, error) {
+	return func(x KubernetesAddress) ([]variable.Literal, error) {
+		h, err := host.TypedSpec.Marshal(variable.ConstraintContextExample, x.Host)
+		if err != nil {
+			return nil, err
+		}
+
+		p, err := port.TypedSpec.Marshal(variable.ConstraintContextExample, x.Port)
+		if err != nil {
+			return nil, err
+		}
+
+		return []variable.Literal{h, p}, nil
 	}
 }
 

@@ -18,9 +18,6 @@ type option struct {
 	ApplyToSpecInOptionalSet   func(variable.SpecBuilder)
 	ApplyToDeprecatedSetConfig func(*variableSetConfig)
 	ApplyToSpecInDeprecatedSet func(variable.SpecBuilder)
-
-	ApplyToRefersToRelationship   func(*variable.RefersTo)
-	ApplyToSupersedesRelationship func(*variable.Supersedes)
 }
 
 func (o option) applyInitOption(cfg *initConfig) {
@@ -53,14 +50,6 @@ func (o option) applyDeprecatedOptionToConfig(cfg *variableSetConfig) {
 
 func (o option) applyDeprecatedOptionToSpec(b variable.SpecBuilder) {
 	applyOption(b, o.ApplyToSpec, o.ApplyToSpecInDeprecatedSet)
-}
-
-func (o option) applyRefersToOption(r *variable.RefersTo) {
-	applyOption(r, o.ApplyToRefersToRelationship)
-}
-
-func (o option) applySupersedesOption(r *variable.Supersedes) {
-	applyOption(r, o.ApplyToSupersedesRelationship)
 }
 
 func applyOption[T any](cfg T, funcs ...func(T)) {

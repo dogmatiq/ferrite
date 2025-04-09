@@ -12,9 +12,10 @@ import (
 //
 // It is common for a variable set to contain a single variable. However, some
 // builders produce sets containing multiple variables.
-type VariableSet interface {
+type VariableSet[T any] interface {
 	variables() []variable.Any
-	value() any
+	native() (T, bool)
+	literals(T) ([]variable.Literal, error)
 }
 
 // variableSetConfig encapsulates configuration common to all variable sets.

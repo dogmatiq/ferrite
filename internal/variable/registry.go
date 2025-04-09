@@ -77,7 +77,7 @@ func Register[T any](
 	}
 
 	v := &OfType[T]{
-		spec: spec,
+		TypedSpec: spec,
 	}
 
 	for _, reg := range registries {

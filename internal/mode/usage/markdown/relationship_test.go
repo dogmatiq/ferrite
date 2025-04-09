@@ -161,4 +161,69 @@ var _ = DescribeTable(
 				)
 		},
 	),
+	Entry(
+		"depends on + multiple (simple requirement)",
+		"depends-on/multiple-simple.md",
+		func(reg ferrite.Registry) {
+			colorEnabled := ferrite.
+				Bool("COLOR_ENABLED", "enable colors").
+				Required(ferrite.WithRegistry(reg))
+
+			widgetEnabled := ferrite.
+				Bool("WIDGET_ENABLED", "enable the widget").
+				Required(ferrite.WithRegistry(reg))
+
+			ferrite.
+				String("WIDGET_COLOR", "the color of the widget").
+				Required(
+					ferrite.WithRegistry(reg),
+					ferrite.RelevantIf(colorEnabled),
+					ferrite.RelevantIf(widgetEnabled),
+				)
+		},
+	),
+	Entry(
+		"depends on + multiple (complex requirement)",
+		"depends-on/multiple-complex.md",
+		func(reg ferrite.Registry) {
+			colorEnabled := ferrite.
+				Bool("COLOR_ENABLED", "enable colors").
+				Required(ferrite.WithRegistry(reg))
+
+			widgetEnabled := ferrite.
+				Enum("WIDGET_MODE", "set the widget mode").
+				WithMembers("grayscale", "color").
+				Required(ferrite.WithRegistry(reg))
+
+			ferrite.
+				String("WIDGET_COLOR", "the color of the widget").
+				Required(
+					ferrite.WithRegistry(reg),
+					ferrite.RelevantIf(colorEnabled),
+					ferrite.RelevantWhen(widgetEnabled, "color"),
+				)
+		},
+	),
+	Entry(
+		"depends on + specific value",
+		"depends-on/with-value.md",
+		func(reg ferrite.Registry) {
+			redisService := ferrite.
+				KubernetesService("redis").
+				Required(ferrite.WithRegistry(reg))
+
+			ferrite.
+				Bool("REDIS_DEBUG", "debug local redis connections").
+				Required(
+					ferrite.WithRegistry(reg),
+					ferrite.RelevantWhen(
+						redisService,
+						ferrite.KubernetesAddress{
+							Host: "localhost",
+							Port: "6379",
+						},
+					),
+				)
+		},
+	),
 )

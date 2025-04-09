@@ -7,7 +7,7 @@ import (
 // Optional is a VariableSet used to obtain a value that may be unavailable, due
 // to the environment variables not being defined.
 type Optional[T any] interface {
-	VariableSet
+	VariableSet[T]
 
 	// Value returns the parsed and validated value.
 	//
@@ -51,31 +51,41 @@ func optional[T any, Schema variable.TypedSchema[T]](
 				v.Availability() == variable.AvailabilityOK,
 				v.Error()
 		},
+		func(x T) ([]variable.Literal, error) {
+			lit, err := v.TypedSpec.Marshal(variable.ConstraintContextExample, x)
+			if err != nil {
+				return nil, err
+			}
+			return []variable.Literal{lit}, nil
+		},
 	}
 }
 
 // optionalFunc is an implementation of Optional[T] that obtains the value from
 // an arbitrary function.
 type optionalFunc[T any] struct {
-	vars []variable.Any
-	fn   func() (T, bool, error)
+	vars       []variable.Any
+	nativeFn   func() (T, bool, error)
+	literalsFn func(T) ([]variable.Literal, error)
 }
 
 func (s optionalFunc[T]) Value() (T, bool) {
-	n, ok, err := s.fn()
+	n, ok, err := s.nativeFn()
 	if err != nil {
 		panic(err.Error())
 	}
 	return n, ok
 }
 
-func (s optionalFunc[T]) value() any {
-	if n, ok, _ := s.fn(); ok {
-		return n
-	}
-	return nil
-}
-
 func (s optionalFunc[T]) variables() []variable.Any {
 	return s.vars
+}
+
+func (s optionalFunc[T]) native() (T, bool) {
+	n, ok, err := s.nativeFn()
+	return n, ok && err == nil
+}
+
+func (s optionalFunc[T]) literals(v T) ([]variable.Literal, error) {
+	return s.literalsFn(v)
 }

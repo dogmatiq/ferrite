@@ -150,7 +150,7 @@ func (s TypedSpec[T]) Relationships() []Relationship {
 	return s.relationships
 }
 
-// AddRelationship adds a relationship that involves this variable.
+// addRelationship adds a relationship that involves this variable.
 func (s *TypedSpec[T]) addRelationship(r Relationship) {
 	s.relationships = append(s.relationships, r)
 }

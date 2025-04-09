@@ -17,6 +17,10 @@ var needsQuotes = regexp.MustCompile(`[^\w@%+=:,./-]`)
 // Quote returns an escaped string representation of the value that can be used
 // directly in the shell.
 func (l Literal) Quote() string {
+	if l.String == "" {
+		return `''`
+	}
+
 	if !needsQuotes.MatchString(l.String) {
 		return l.String
 	}

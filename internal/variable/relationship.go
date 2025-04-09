@@ -1,5 +1,7 @@
 package variable
 
+import "github.com/dogmatiq/ferrite/internal/maybe"
+
 // Relationship represents a relationship between two variables.
 type Relationship interface {
 	subject() Spec
@@ -75,9 +77,13 @@ func (r RefersTo) object() Spec {
 }
 
 // DependsOn is a relationship type that indicates that a variable requires
-// another variable to be "truthy" in order be used.
+// another variable to have a specific value in order be used.
 type DependsOn struct {
 	Subject, DependsOn Spec
+
+	// Value is the value that the dependency must have in order for the subject
+	// to be used. If it is absent the dependency must be any "truthy" value.
+	Value maybe.Value[Literal]
 }
 
 func (r DependsOn) subject() Spec {

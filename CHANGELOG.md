@@ -10,6 +10,23 @@ The format is based on [Keep a Changelog], and this project adheres to
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+## [1.5.0] - 2025-04-10
+
+### Added
+
+- Added `ReleventWhen()` option, which conditionally enables an environment
+  variable when another variable has a specific value.
+
+### Changed
+
+The following changes are technically not backwards compatible from a Go
+perspective, but under normal usage (as per the examples) they do not actually
+alter the usage of the Ferrite API:
+
+- Changed the `VariableSet` to accept a type parameter for the value produced.
+- Changed `ReleventIf()`, `SeeAlso()` and `SupersededBy()` to accept a type
+  parameter for the value produced.
+
 ## [1.4.0] - 2024-03-15
 
 ### Added

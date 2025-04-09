@@ -7,7 +7,7 @@ import (
 // Deprecated is a VariableSet used to obtain a value that may be unavailable,
 // due to the environment variables not being defined.
 type Deprecated[T any] interface {
-	VariableSet
+	VariableSet[T]
 
 	// DeprecatedValue returns the parsed and validated value built from the
 	// environment variable(s).
@@ -54,31 +54,41 @@ func deprecated[T any, Schema variable.TypedSchema[T]](
 				v.Availability() == variable.AvailabilityOK,
 				v.Error()
 		},
+		func(x T) ([]variable.Literal, error) {
+			lit, err := v.TypedSpec.Marshal(variable.ConstraintContextExample, x)
+			if err != nil {
+				return nil, err
+			}
+			return []variable.Literal{lit}, nil
+		},
 	}
 }
 
 // deprecatedFunc is an implementation of Deprecated[T] that obtains the value
 // from an arbitrary function.
 type deprecatedFunc[T any] struct {
-	vars []variable.Any
-	fn   func() (T, bool, error)
+	vars       []variable.Any
+	nativeFn   func() (T, bool, error)
+	literalsFn func(T) ([]variable.Literal, error)
 }
 
 func (s deprecatedFunc[T]) DeprecatedValue() (T, bool) {
-	n, ok, err := s.fn()
+	n, ok, err := s.nativeFn()
 	if err != nil {
 		panic(err.Error())
 	}
 	return n, ok
 }
 
-func (s deprecatedFunc[T]) value() any {
-	if n, ok, _ := s.fn(); ok {
-		return n
-	}
-	return nil
-}
-
 func (s deprecatedFunc[T]) variables() []variable.Any {
 	return s.vars
+}
+
+func (s deprecatedFunc[T]) native() (T, bool) {
+	n, ok, err := s.nativeFn()
+	return n, ok && err == nil
+}
+
+func (s deprecatedFunc[T]) literals(v T) ([]variable.Literal, error) {
+	return s.literalsFn(v)
 }

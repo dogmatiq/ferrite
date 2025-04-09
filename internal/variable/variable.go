@@ -58,7 +58,7 @@ type Any interface {
 
 // OfType is an environment variable depicted by type T.
 type OfType[T any] struct {
-	spec *TypedSpec[T]
+	TypedSpec *TypedSpec[T]
 
 	once         sync.Once
 	availability Availability
@@ -69,7 +69,7 @@ type OfType[T any] struct {
 
 // Spec returns the variable's specification.
 func (v *OfType[T]) Spec() Spec {
-	return v.spec
+	return v.TypedSpec
 }
 
 // Availability returns the variable's availability.
@@ -120,7 +120,7 @@ func (v *OfType[T]) resolve() {
 		// Override the availability to AvailabilityIgnored if any of the
 		// preconditions fail.
 		defer func() {
-			for _, fn := range v.spec.preconditions {
+			for _, fn := range v.TypedSpec.preconditions {
 				if !fn() {
 					v.availability = AvailabilityIgnored
 					break
@@ -129,28 +129,28 @@ func (v *OfType[T]) resolve() {
 		}()
 
 		lit := Literal{
-			String: environment.Get(v.spec.name),
+			String: environment.Get(v.TypedSpec.name),
 		}
 
 		if lit.String == "" {
-			if def, ok := v.spec.def.Get(); ok {
+			if def, ok := v.TypedSpec.def.Get(); ok {
 				v.availability = AvailabilityOK
 				v.source = SourceDefault
 				v.value = def
-			} else if v.spec.required {
+			} else if v.TypedSpec.required {
 				v.availability = AvailabilityNone
-				v.err = undefinedError{v.spec.Name()}
+				v.err = undefinedError{v.TypedSpec.Name()}
 			}
 			return
 		}
 
 		v.source = SourceEnvironment
 
-		n, c, err := v.spec.Unmarshal(ConstraintContextFinal, lit)
+		n, c, err := v.TypedSpec.Unmarshal(ConstraintContextFinal, lit)
 		if err != nil {
 			v.availability = AvailabilityInvalid
 			v.err = valueError{
-				name:    v.spec.name,
+				name:    v.TypedSpec.name,
 				literal: lit,
 				cause:   err,
 			}

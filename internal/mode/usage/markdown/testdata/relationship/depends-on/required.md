@@ -9,8 +9,8 @@
 
 > the color of the widget
 
-The `WIDGET_COLOR` variable **MAY** be left undefined if and only if
-[`WIDGET_ENABLED`] is `false`.
+The `WIDGET_COLOR` variable **MAY** be left undefined when [`WIDGET_ENABLED`] is
+`false`.
 
 ```bash
 export WIDGET_COLOR=foo # (non-normative)

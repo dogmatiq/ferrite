@@ -8,7 +8,7 @@ import (
 // available, either from explicit environment variable values or by falling
 // back to defaults.
 type Required[T any] interface {
-	VariableSet
+	VariableSet[T]
 
 	// Value returns the parsed and validated value.
 	//
@@ -49,31 +49,41 @@ func required[T any, Schema variable.TypedSchema[T]](
 		func() (T, error) {
 			return v.NativeValue(), v.Error()
 		},
+		func(x T) ([]variable.Literal, error) {
+			lit, err := v.TypedSpec.Marshal(variable.ConstraintContextExample, x)
+			if err != nil {
+				return nil, err
+			}
+			return []variable.Literal{lit}, nil
+		},
 	}
 }
 
 // requiredFunc is an implementation of Required[T] that obtains the value from
 // an arbitrary function.
 type requiredFunc[T any] struct {
-	vars []variable.Any
-	fn   func() (T, error)
+	vars       []variable.Any
+	nativeFn   func() (T, error)
+	literalsFn func(T) ([]variable.Literal, error)
 }
 
 func (s requiredFunc[T]) Value() T {
-	n, err := s.fn()
+	n, err := s.nativeFn()
 	if err != nil {
 		panic(err.Error())
 	}
 	return n
 }
 
-func (s requiredFunc[T]) value() any {
-	if n, err := s.fn(); err == nil {
-		return n
-	}
-	return nil
-}
-
 func (s requiredFunc[T]) variables() []variable.Any {
 	return s.vars
+}
+
+func (s requiredFunc[T]) native() (T, bool) {
+	n, err := s.nativeFn()
+	return n, err == nil
+}
+
+func (s requiredFunc[T]) literals(v T) ([]variable.Literal, error) {
+	return s.literalsFn(v)
 }
