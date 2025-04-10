@@ -10,8 +10,8 @@
 > the color of the widget
 
 ⚠️ The `WIDGET_COLOR` variable is **deprecated**; its use is **NOT RECOMMENDED**
-as it may be removed in a future version. The value is not used when
-[`WIDGET_ENABLED`] is `false`.
+as it may be removed in a future version. It is ignored when [`WIDGET_ENABLED`]
+is `false`.
 
 ```bash
 export WIDGET_COLOR=foo # (non-normative)

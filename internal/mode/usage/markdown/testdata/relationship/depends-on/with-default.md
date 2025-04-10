@@ -10,8 +10,7 @@
 > the color of the widget
 
 The `WIDGET_COLOR` variable **MAY** be left undefined, in which case the default
-value of `turquoise` is used. The value is not used when [`WIDGET_ENABLED`] is
-`false`.
+value of `turquoise` is used. It is ignored when [`WIDGET_ENABLED`] is `false`.
 
 ```bash
 export WIDGET_COLOR=turquoise # (default)

@@ -42,6 +42,21 @@ var _ = DescribeTable(
 		},
 	),
 	Entry(
+		"required with user-defined constraint",
+		"with-constraint.md",
+		func(reg ferrite.Registry) {
+			ferrite.
+				String("READ_DSN", "database connection string for read-models").
+				WithConstraint(
+					"must be a valid DSN",
+					func(s string) bool {
+						return true
+					},
+				).
+				Required(ferrite.WithRegistry(reg))
+		},
+	),
+	Entry(
 		"optional with default value",
 		"with-default.md",
 		func(reg ferrite.Registry) {

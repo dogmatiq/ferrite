@@ -121,7 +121,7 @@ func (r *specRenderer) renderPrimaryRequirement(f string, v ...any) {
 	if r.spec.IsDeprecated() {
 		r.renderPrimaryRequirementDeprecated(req)
 	} else if def, ok := r.renderDefaultValueFragment(); ok {
-		r.renderPrimaryRequirementDefault(req, def)
+		r.renderPrimaryRequirementWithDefaultValue(req, def)
 	} else if r.spec.IsRequired() {
 		r.renderPrimaryRequirementRequired(req)
 	} else {
@@ -129,7 +129,7 @@ func (r *specRenderer) renderPrimaryRequirement(f string, v ...any) {
 	}
 }
 
-func (r *specRenderer) renderPrimaryRequirementDefault(req, def string) {
+func (r *specRenderer) renderPrimaryRequirementWithDefaultValue(req, def string) {
 	r.ren.paragraph(
 		func(write func(string, ...any)) {
 			write(
@@ -142,8 +142,8 @@ func (r *specRenderer) renderPrimaryRequirementDefault(req, def string) {
 				write(" Otherwise, the value %s.", req)
 			}
 
-			if dependsOn := r.renderDependsOnClause(); dependsOn != "" {
-				write(" The value is not used %s.", dependsOn)
+			if dependsOn, ok := r.renderDependsOnConditionSentence(); ok {
+				write(" %s", dependsOn)
 			}
 		},
 	)
@@ -154,19 +154,34 @@ func (r *specRenderer) renderPrimaryRequirementRequired(req string) {
 		func(write func(string, ...any)) {
 			length := r.renderLengthClause(r.spec.Schema(), req == "")
 
-			if dependsOn := r.renderDependsOnClause(); dependsOn != "" {
-				write(
-					"The `%s` variable **MAY** be left undefined %s.",
-					r.spec.Name(),
-					dependsOn,
-				)
+			if cond, ignored, ok := r.renderDependsOnCondition(); ok {
+				if ignored {
+					write(
+						"The `%s` variable **MAY** be left undefined when %s",
+						r.spec.Name(),
+						cond,
+					)
+				} else {
+					write(
+						"The `%s` variable **MUST** be defined when %s",
+						r.spec.Name(),
+						cond,
+					)
+				}
+
+				connective := ", in which case"
+				if ignored {
+					connective = ". Otherwise,"
+				}
 
 				if req != "" && length != "" {
-					write(" Otherwise, the value %s with %s.", req, length)
+					write("%s its value %s with %s.", connective, req, length)
 				} else if req != "" {
-					write(" Otherwise, the value %s.", req)
+					write("%s its value %s.", connective, req)
 				} else if length != "" {
-					write(" Otherwise, the value **MUST** have %s.", length)
+					write("%s its value **MUST** have %s.", connective, length)
+				} else {
+					write(".")
 				}
 
 				return
@@ -203,8 +218,8 @@ func (r *specRenderer) renderPrimaryRequirementOptional(req string) {
 				write(" Otherwise, the value **MUST** have %s.", length)
 			}
 
-			if dependsOn := r.renderDependsOnClause(); dependsOn != "" {
-				write(" The value is not used %s.", dependsOn)
+			if dependsOn, ok := r.renderDependsOnConditionSentence(); ok {
+				write(" %s", dependsOn)
 			}
 		},
 	)
@@ -241,8 +256,8 @@ func (r *specRenderer) renderPrimaryRequirementDeprecated(req string) {
 				write(" If defined, the value **MUST** have %s.", length)
 			}
 
-			if dependsOn := r.renderDependsOnClause(); dependsOn != "" {
-				write(" The value is not used %s.", dependsOn)
+			if dependsOn, ok := r.renderDependsOnConditionSentence(); ok {
+				write(" %s", dependsOn)
 			}
 		},
 	)
@@ -261,7 +276,19 @@ func (r *specRenderer) renderDefaultValueFragment() (string, bool) {
 	return fmt.Sprintf("the default value of `%s`", def.String), true
 }
 
-func (r *specRenderer) renderDependsOnClause() string {
+func (r *specRenderer) renderDependsOnConditionSentence() (string, bool) {
+	if cond, ignored, ok := r.renderDependsOnCondition(); ok {
+		if ignored {
+			return fmt.Sprintf("It is ignored when %s.", cond), true
+		} else {
+			return fmt.Sprintf("It is only used when %s.", cond), true
+		}
+	}
+
+	return "", false
+}
+
+func (r *specRenderer) renderDependsOnCondition() (clause string, ignored, ok bool) {
 	rels := variable.Relationships[variable.DependsOn](r.spec)
 
 	var hasZeroes, hasValues bool
@@ -274,62 +301,62 @@ func (r *specRenderer) renderDependsOnClause() string {
 	}
 
 	if hasValues && hasZeroes {
-		return fmt.Sprintf(
-			"when %s",
-			orList(
-				rels,
-				func(rel variable.DependsOn) string {
-					if v, ok := rel.Value.Get(); ok {
-						return fmt.Sprintf(
-							"%s is not `%s`",
-							r.ren.linkToSpec(rel.DependsOn),
-							v.Quote(),
-						)
-					}
-
+		return orList(
+			rels,
+			func(rel variable.DependsOn) string {
+				if v, ok := rel.Value.Get(); ok {
 					return fmt.Sprintf(
-						"%s is `%s`",
+						"%s is not `%s`",
 						r.ren.linkToSpec(rel.DependsOn),
-						rel.DependsOn.Zero().Quote(),
+						v.Quote(),
 					)
-				},
-			),
-		)
+				}
+
+				return fmt.Sprintf(
+					"%s is `%s`",
+					r.ren.linkToSpec(rel.DependsOn),
+					rel.DependsOn.Zero().Quote(),
+				)
+			},
+		), true, true
 	}
 
 	if hasZeroes {
-		return fmt.Sprintf(
-			"when %s",
-			orList(
-				rels,
-				func(rel variable.DependsOn) string {
+		return orList(
+			rels,
+			func(rel variable.DependsOn) string {
+				v := rel.DependsOn.Zero()
+
+				if v.String == "" {
 					return fmt.Sprintf(
-						"%s is `%s`",
+						"%s is undefined",
 						r.ren.linkToSpec(rel.DependsOn),
-						rel.DependsOn.Zero().Quote(),
 					)
-				},
-			),
-		)
+				}
+
+				return fmt.Sprintf(
+					"%s is `%s`",
+					r.ren.linkToSpec(rel.DependsOn),
+					v.Quote(),
+				)
+			},
+		), true, true
 	}
 
 	if hasValues {
-		return fmt.Sprintf(
-			"unless %s",
-			andList(
-				rels,
-				func(rel variable.DependsOn) string {
-					return fmt.Sprintf(
-						"%s is `%s`",
-						r.ren.linkToSpec(rel.DependsOn),
-						rel.Value.MustGet().Quote(),
-					)
-				},
-			),
-		)
+		return andList(
+			rels,
+			func(rel variable.DependsOn) string {
+				return fmt.Sprintf(
+					"%s is `%s`",
+					r.ren.linkToSpec(rel.DependsOn),
+					rel.Value.MustGet().Quote(),
+				)
+			},
+		), false, true
 	}
 
-	return ""
+	return "", false, false
 }
 
 // bestConstraint returns the constraint to use as the "primary"

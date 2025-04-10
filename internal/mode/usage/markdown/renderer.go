@@ -7,7 +7,6 @@ import (
 
 	"github.com/dogmatiq/ferrite/internal/variable"
 	"github.com/dogmatiq/ferrite/internal/wordwrap"
-	"gopkg.in/yaml.v3"
 )
 
 type renderer struct {
@@ -128,14 +127,6 @@ func (r *renderer) paragraph(
 	})
 
 	r.paragraphf("%s")(w.String())
-}
-
-func (r *renderer) yaml(v string) string {
-	data, err := yaml.Marshal(v)
-	if err != nil {
-		panic(err)
-	}
-	return strings.TrimSpace(string(data))
 }
 
 func andList[T any](

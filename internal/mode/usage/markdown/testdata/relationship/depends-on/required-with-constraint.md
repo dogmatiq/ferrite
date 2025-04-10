@@ -10,7 +10,7 @@
 > the color of the widget
 
 The `WIDGET_COLOR` variable **MAY** be left undefined when [`WIDGET_ENABLED`] is
-`false`. Otherwise, the value must be a valid CSS color.
+`false`. Otherwise, its value must be a valid CSS color.
 
 ```bash
 export WIDGET_COLOR=foo # (non-normative)

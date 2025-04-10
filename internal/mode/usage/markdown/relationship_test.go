@@ -126,6 +126,22 @@ var _ = DescribeTable(
 		},
 	),
 	Entry(
+		"depends on + required (string)",
+		"depends-on/required-string.md",
+		func(reg ferrite.Registry) {
+			widgetType := ferrite.
+				String("WIDGET_TYPE", "the type of widget").
+				Required(ferrite.WithRegistry(reg))
+
+			ferrite.
+				String("WIDGET_COLOR", "the color of the widget").
+				Required(
+					ferrite.WithRegistry(reg),
+					ferrite.RelevantIf(widgetType),
+				)
+		},
+	),
+	Entry(
 		"depends on + required + constraint",
 		"depends-on/required-with-constraint.md",
 		func(reg ferrite.Registry) {

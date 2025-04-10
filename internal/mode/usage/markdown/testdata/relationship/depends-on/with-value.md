@@ -10,9 +10,9 @@
 
 > debug local redis connections
 
-The `REDIS_DEBUG` variable **MAY** be left undefined unless
-[`REDIS_SERVICE_HOST`] is `localhost` and [`REDIS_SERVICE_PORT`] is `6379`.
-Otherwise, the value **MUST** be either `true` or `false`.
+The `REDIS_DEBUG` variable **MUST** be defined when [`REDIS_SERVICE_HOST`] is
+`localhost` and [`REDIS_SERVICE_PORT`] is `6379`, in which case its value
+**MUST** be either `true` or `false`.
 
 ```bash
 export REDIS_DEBUG=true
