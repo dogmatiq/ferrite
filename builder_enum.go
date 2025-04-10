@@ -42,7 +42,10 @@ type EnumBuilder[T any] struct {
 	builder variable.TypedSpecBuilder[T]
 }
 
-var _ isBuilderOf[any, *EnumBuilder[any]]
+var _ isBuilderOfMinimal[
+	int,
+	*EnumBuilder[int],
+]
 
 // WithMembers adds members to the enum.
 //

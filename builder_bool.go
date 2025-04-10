@@ -44,7 +44,10 @@ type BoolBuilder[T ~bool] struct {
 	builder variable.TypedSpecBuilder[T]
 }
 
-var _ isBuilderOf[bool, *BoolBuilder[bool]]
+var _ isBuilderOfMinimal[
+	bool,
+	*BoolBuilder[bool],
+]
 
 // WithLiterals overrides the default literals used to represent true and false.
 //

@@ -28,13 +28,23 @@ type FileBuilder struct {
 	builder variable.TypedSpecBuilder[FileName]
 }
 
-var _ isBuilderOf[FileName, *FileBuilder]
+var _ isBuilderOf[
+	FileName,
+	string,
+	*FileBuilder,
+]
 
 // WithDefault sets the default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b *FileBuilder) WithDefault(v string) *FileBuilder {
 	b.builder.Default(FileName(v))
+	return b
+}
+
+// WithExample adds an example value to the variable's documentation.
+func (b *FileBuilder) WithExample(v string, desc string) *FileBuilder {
+	b.builder.NormativeExample(FileName(v), desc)
 	return b
 }
 

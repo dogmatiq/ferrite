@@ -59,13 +59,23 @@ type URLBuilder struct {
 	builder variable.TypedSpecBuilder[*url.URL]
 }
 
-var _ isBuilderOf[*url.URL, *URLBuilder]
+var _ isBuilderOf[
+	*url.URL,
+	string,
+	*URLBuilder,
+]
 
 // WithDefault sets the default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b *URLBuilder) WithDefault(v string) *URLBuilder {
 	b.builder.Default(mustParseURL(v))
+	return b
+}
+
+// WithExample adds an example value to the variable's documentation.
+func (b *URLBuilder) WithExample(v string, desc string) *URLBuilder {
+	b.builder.NormativeExample(mustParseURL(v), desc)
 	return b
 }
 

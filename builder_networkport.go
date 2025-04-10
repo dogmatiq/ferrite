@@ -35,13 +35,23 @@ type NetworkPortBuilder struct {
 	builder variable.TypedSpecBuilder[string]
 }
 
-var _ isBuilderOf[string, *NetworkPortBuilder]
+var _ isBuilderOf[
+	string,
+	string,
+	*NetworkPortBuilder,
+]
 
 // WithDefault sets the default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b *NetworkPortBuilder) WithDefault(v string) *NetworkPortBuilder {
 	b.builder.Default(v)
+	return b
+}
+
+// WithExample adds an example value to the variable's documentation.
+func (b *NetworkPortBuilder) WithExample(v string, desc string) *NetworkPortBuilder {
+	b.builder.NormativeExample(v, desc)
 	return b
 }
 

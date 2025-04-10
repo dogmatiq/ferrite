@@ -67,13 +67,23 @@ type FloatBuilder[T constraints.Float] struct {
 	builder variable.TypedSpecBuilder[T]
 }
 
-var _ isBuilderOf[float32, *FloatBuilder[float32]]
+var _ isBuilderOf[
+	float32,
+	float32,
+	*FloatBuilder[float32],
+]
 
 // WithDefault sets the default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b *FloatBuilder[T]) WithDefault(v T) *FloatBuilder[T] {
 	b.builder.Default(v)
+	return b
+}
+
+// WithExample adds an example value to the variable's documentation.
+func (b *FloatBuilder[T]) WithExample(v T, desc string) *FloatBuilder[T] {
+	b.builder.NormativeExample(v, desc)
 	return b
 }
 

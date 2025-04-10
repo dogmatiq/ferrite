@@ -27,11 +27,23 @@ type DirBuilder struct {
 	builder variable.TypedSpecBuilder[DirName]
 }
 
+var _ isBuilderOf[
+	DirName,
+	string,
+	*DirBuilder,
+]
+
 // WithDefault sets the default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b *DirBuilder) WithDefault(v string) *DirBuilder {
 	b.builder.Default(DirName(v))
+	return b
+}
+
+// WithExample adds an example value to the variable's documentation.
+func (b *DirBuilder) WithExample(v string, desc string) *DirBuilder {
+	b.builder.NormativeExample(DirName(v), desc)
 	return b
 }
 
@@ -80,8 +92,6 @@ func (b *DirBuilder) Optional(options ...OptionalOption) Optional[DirName] {
 func (b *DirBuilder) Deprecated(options ...DeprecatedOption) Deprecated[DirName] {
 	return deprecated(b.schema, &b.builder, options...)
 }
-
-var _ isBuilderOf[DirName, *DirBuilder]
 
 // DirName is the name of a directory.
 type DirName string

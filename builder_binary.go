@@ -48,7 +48,11 @@ type BinaryBuilder[T ~[]B, B ~byte] struct {
 	builder variable.TypedSpecBuilder[T]
 }
 
-var _ isBuilderOf[[]byte, *BinaryBuilder[[]byte, byte]]
+var _ isBuilderOf[
+	[]byte,
+	[]byte,
+	*BinaryBuilder[[]byte, byte],
+]
 
 // WithDefault sets the default value of the variable.
 //
@@ -58,6 +62,12 @@ var _ isBuilderOf[[]byte, *BinaryBuilder[[]byte, byte]]
 // It is used when the environment variable is undefined or empty.
 func (b *BinaryBuilder[T, B]) WithDefault(v T) *BinaryBuilder[T, B] {
 	b.builder.Default(v)
+	return b
+}
+
+// WithExample adds an example value to the variable's documentation.
+func (b *BinaryBuilder[T, B]) WithExample(v T, desc string) *BinaryBuilder[T, B] {
+	b.builder.NormativeExample(v, desc)
 	return b
 }
 

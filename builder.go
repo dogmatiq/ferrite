@@ -2,8 +2,19 @@ package ferrite
 
 // isBuilderOf makes a static assertion that B has the common methods required
 // for all "builder" types.
-type isBuilderOf[T any, B interface {
-	Required(options ...RequiredOption) Required[T]
-	Optional(options ...OptionalOption) Optional[T]
-	Deprecated(options ...DeprecatedOption) Deprecated[T]
+type isBuilderOf[Result, Literal any, Builder interface {
+	WithDefault(Literal) Builder
+	WithExample(Literal, string) Builder
+
+	Required(...RequiredOption) Required[Result]
+	Optional(...OptionalOption) Optional[Result]
+	Deprecated(...DeprecatedOption) Deprecated[Result]
+}] struct{}
+
+// isBuilderOf makes a static assertion that B has the common methods required
+// for all "builder" types.
+type isBuilderOfMinimal[Result any, Builder interface {
+	Required(...RequiredOption) Required[Result]
+	Optional(...OptionalOption) Optional[Result]
+	Deprecated(...DeprecatedOption) Deprecated[Result]
 }] struct{}

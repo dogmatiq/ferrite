@@ -50,13 +50,23 @@ type UnsignedBuilder[T constraints.Unsigned] struct {
 	builder variable.TypedSpecBuilder[T]
 }
 
-var _ isBuilderOf[uint, *UnsignedBuilder[uint]]
+var _ isBuilderOf[
+	uint,
+	uint,
+	*UnsignedBuilder[uint],
+]
 
 // WithDefault sets the default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
 func (b *UnsignedBuilder[T]) WithDefault(v T) *UnsignedBuilder[T] {
 	b.builder.Default(v)
+	return b
+}
+
+// WithExample adds an example value to the variable's documentation.
+func (b *UnsignedBuilder[T]) WithExample(v T, desc string) *UnsignedBuilder[T] {
+	b.builder.NormativeExample(v, desc)
 	return b
 }
 

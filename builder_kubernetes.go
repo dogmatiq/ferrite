@@ -115,7 +115,10 @@ type KubernetesServiceBuilder struct {
 	portBuilder variable.TypedSpecBuilder[string]
 }
 
-var _ isBuilderOf[KubernetesAddress, *KubernetesServiceBuilder]
+var _ isBuilderOfMinimal[
+	KubernetesAddress,
+	*KubernetesServiceBuilder,
+]
 
 // WithNamedPort uses a Kubernetes named port instead of the default service
 // port.
