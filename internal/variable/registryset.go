@@ -1,8 +1,9 @@
 package variable
 
 import (
+	"cmp"
 	"fmt"
-	"sort"
+	"slices"
 )
 
 // RegistrySet is a set of multiple environment variable registries
@@ -56,12 +57,27 @@ func (s *RegistrySet) Add(r *Registry) {
 		return true
 	})
 
-	sort.Slice(
+	slices.SortFunc(
 		s.variables,
-		func(i, j int) bool {
-			a := s.variables[i]
-			b := s.variables[j]
-			return a.Spec().Name() < b.Spec().Name()
+		func(a, b RegisteredVariable) int {
+			if a.Registry.IsDefault != b.Registry.IsDefault {
+				if a.Registry.IsDefault {
+					return -1
+				}
+				return 1
+			}
+
+			if v := cmp.Compare(
+				a.Registry.Key,
+				b.Registry.Key,
+			); v != 0 {
+				return v
+			}
+
+			return cmp.Compare(
+				a.Spec().Name(),
+				b.Spec().Name(),
+			)
 		},
 	)
 
