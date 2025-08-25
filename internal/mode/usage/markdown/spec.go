@@ -43,7 +43,7 @@ func (r *specRenderer) Render() {
 // "binary" schema type.
 func (r *specRenderer) VisitBinary(s variable.Binary) {
 	if con := r.bestConstraint(); con != nil {
-		r.renderPrimaryRequirement(con.Description())
+		r.renderPrimaryRequirement("%s", con.Description())
 	} else {
 		r.renderPrimaryRequirement("**MUST** be a binary value expressed using the `%s` encoding scheme", s.EncodingDescription())
 	}
@@ -91,7 +91,7 @@ func (r *specRenderer) VisitSet(s variable.Set) {
 // schema type.
 func (r *specRenderer) VisitString(variable.String) {
 	if con := r.bestConstraint(); con != nil {
-		r.renderPrimaryRequirement(con.Description())
+		r.renderPrimaryRequirement("%s", con.Description())
 	} else {
 		r.renderPrimaryRequirement("")
 	}
@@ -106,7 +106,7 @@ func (r *specRenderer) VisitOther(variable.Other) {
 		break
 	}
 
-	r.renderPrimaryRequirement(con)
+	r.renderPrimaryRequirement("%s", con)
 }
 
 // renderPrimaryRequirement renders information about the most important
@@ -280,9 +280,8 @@ func (r *specRenderer) renderDependsOnConditionSentence() (string, bool) {
 	if cond, ignored, ok := r.renderDependsOnCondition(); ok {
 		if ignored {
 			return fmt.Sprintf("It is ignored when %s.", cond), true
-		} else {
-			return fmt.Sprintf("It is only used when %s.", cond), true
 		}
+		return fmt.Sprintf("It is only used when %s.", cond), true
 	}
 
 	return "", false
