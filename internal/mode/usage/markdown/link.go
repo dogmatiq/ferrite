@@ -39,16 +39,6 @@ func (r *renderer) linkToURL(text, url string, optionalRef ...string) string {
 	return fmt.Sprintf("[%s](%s)", text, ref)
 }
 
-// linkToRFC returns the markdown that links to the given RFC number.
-func (r *renderer) linkToRFC(number int) string {
-	n := fmt.Sprintf("%04d", number)
-
-	return r.linkToURL(
-		"RFC "+n,
-		fmt.Sprintf("https://www.rfc-editor.org/rfc/rfc%s.html", n),
-	)
-}
-
 // linkToSpec returns markdown that links to the given variable specification.
 func (r *renderer) linkToSpec(s variable.Spec) string {
 	return r.linkToURL(
