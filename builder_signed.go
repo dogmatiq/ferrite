@@ -61,7 +61,7 @@ var _ isBuilderOf[
 //
 // It is used when the environment variable is undefined or empty.
 func (b *SignedBuilder[T]) WithDefault(v T) *SignedBuilder[T] {
-	b.builder.Default(v)
+	b.builder.Default(variable.ConstDefault(v))
 	return b
 }
 

@@ -38,7 +38,7 @@ var _ isBuilderOf[
 //
 // It is used when the environment variable is undefined or empty.
 func (b *FileBuilder) WithDefault(v string) *FileBuilder {
-	b.builder.Default(FileName(v))
+	b.builder.Default(variable.ConstDefault(FileName(v)))
 	return b
 }
 

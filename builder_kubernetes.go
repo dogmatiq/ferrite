@@ -158,8 +158,8 @@ func (b *KubernetesServiceBuilder) WithNamedPort(port string) *KubernetesService
 // service name (such as "https"). The IANA name is not to be confused with the
 // Kubernetes servcice name or port name.
 func (b *KubernetesServiceBuilder) WithDefault(host, port string) *KubernetesServiceBuilder {
-	b.hostBuilder.Default(host)
-	b.portBuilder.Default(port)
+	b.hostBuilder.Default(variable.ConstDefault(host))
+	b.portBuilder.Default(variable.ConstDefault(port))
 	return b
 }
 

@@ -84,7 +84,7 @@ func (b *EnumBuilder[T]) WithRenderer(fn func(T) variable.Literal) *EnumBuilder[
 //
 // It is used when the environment variable is undefined or empty.
 func (b *EnumBuilder[T]) WithDefault(v T) *EnumBuilder[T] {
-	b.builder.Default(v)
+	b.builder.Default(variable.ConstDefault(v))
 	return b
 }
 

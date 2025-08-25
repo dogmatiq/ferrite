@@ -22,7 +22,7 @@ type SpecBuilder interface {
 // TypedSpecBuilder builds a specification for a variable of type T.
 type TypedSpecBuilder[T any] struct {
 	spec     TypedSpec[T]
-	def      maybe.Value[T]
+	def      maybe.Value[Default[T]]
 	examples []TypedExample[T]
 }
 
@@ -37,7 +37,7 @@ func (b *TypedSpecBuilder[T]) Description(desc string) {
 }
 
 // Default sets the default value for the variable.
-func (b *TypedSpecBuilder[T]) Default(v T) {
+func (b *TypedSpecBuilder[T]) Default(v Default[T]) {
 	b.def = maybe.Some(v)
 }
 

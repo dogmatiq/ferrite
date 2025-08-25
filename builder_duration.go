@@ -54,7 +54,7 @@ var _ isBuilderOf[
 //
 // It is used when the environment variable is undefined or empty.
 func (b *DurationBuilder) WithDefault(v time.Duration) *DurationBuilder {
-	b.builder.Default(v)
+	b.builder.Default(variable.ConstDefault(v))
 	return b
 }
 

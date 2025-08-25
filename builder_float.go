@@ -77,7 +77,7 @@ var _ isBuilderOf[
 //
 // It is used when the environment variable is undefined or empty.
 func (b *FloatBuilder[T]) WithDefault(v T) *FloatBuilder[T] {
-	b.builder.Default(v)
+	b.builder.Default(variable.ConstDefault(v))
 	return b
 }
 

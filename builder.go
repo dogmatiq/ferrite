@@ -4,6 +4,7 @@ package ferrite
 // for all "builder" types.
 type isBuilderOf[Result, Literal any, Builder interface {
 	WithDefault(Literal) Builder
+	// WithDefaultFrom(VariableSet[Result]) Builder
 	WithExample(Literal, string) Builder
 
 	Required(...RequiredOption) Required[Result]

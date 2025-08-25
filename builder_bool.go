@@ -68,7 +68,7 @@ func (b *BoolBuilder[T]) WithLiterals(t, f string) *BoolBuilder[T] {
 //
 // It is used when the environment variable is undefined or empty.
 func (b *BoolBuilder[T]) WithDefault(v T) *BoolBuilder[T] {
-	b.builder.Default(v)
+	b.builder.Default(variable.ConstDefault(v))
 	return b
 }
 

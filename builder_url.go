@@ -69,7 +69,7 @@ var _ isBuilderOf[
 //
 // It is used when the environment variable is undefined or empty.
 func (b *URLBuilder) WithDefault(v string) *URLBuilder {
-	b.builder.Default(mustParseURL(v))
+	b.builder.Default(variable.ConstDefault(mustParseURL(v)))
 	return b
 }
 
