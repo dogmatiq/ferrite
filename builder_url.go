@@ -79,6 +79,18 @@ func (b *URLBuilder) WithExample(v string, desc string) *URLBuilder {
 	return b
 }
 
+// WithConstraint adds a constraint to the variable.
+//
+// fn is called with the environment variable value after it is parsed. If fn
+// returns false the value is considered invalid.
+func (b *URLBuilder) WithConstraint(
+	desc string,
+	fn func(*url.URL) bool,
+) *URLBuilder {
+	b.builder.UserConstraint(desc, fn)
+	return b
+}
+
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
 func (b *URLBuilder) Required(options ...RequiredOption) Required[*url.URL] {

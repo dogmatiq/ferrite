@@ -2,6 +2,7 @@ package ferrite_test
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 
 	"github.com/dogmatiq/ferrite"
@@ -173,6 +174,30 @@ func ExampleURL_optional() {
 
 	// Output:
 	// value is undefined
+}
+
+func ExampleURL_constraint() {
+	defer example()()
+
+	ferrite.
+		URL("FERRITE_URL", "example constrained URL variable").
+		WithConstraint(
+			"must use https scheme",
+			func(u *url.URL) bool {
+				return u.Scheme == "https"
+			},
+		).
+		Required()
+
+	os.Setenv("FERRITE_URL", "http://example.org/path")
+	ferrite.Init()
+
+	// Output:
+	// Environment Variables:
+	//
+	//  ❯ FERRITE_URL  example constrained URL variable    <string>    ✗ set to http://example.org/path, must use https scheme
+	//
+	// <process exited with error code 1>
 }
 func ExampleURL_deprecated() {
 	defer example()()

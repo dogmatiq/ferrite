@@ -10,6 +10,13 @@ The format is based on [Keep a Changelog], and this project adheres to
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+## [Unreleased]
+
+### Added
+
+- Added `URLBuilder.WithConstraint()` to allow user-defined validation of URL
+  variables.
+
 ## [1.5.1] - 2025-04-11
 
 ### Changed
