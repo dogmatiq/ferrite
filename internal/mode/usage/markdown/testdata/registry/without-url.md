@@ -18,4 +18,4 @@ This variable is imported from Third-party Product.
 
 <!-- references -->
 
-[`read_dsn`]: #READ_DSN
+[`read_dsn`]: #read_dsn

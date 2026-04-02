@@ -66,7 +66,7 @@ export BIND_VERSION=4 # (default)
 
 <!-- references -->
 
-[`bind_address`]: #BIND_ADDRESS
-[`bind_host`]: #BIND_HOST
-[`bind_port`]: #BIND_PORT
-[`bind_version`]: #BIND_VERSION
+[`bind_address`]: #bind_address
+[`bind_host`]: #bind_host
+[`bind_port`]: #bind_port
+[`bind_version`]: #bind_version

@@ -29,4 +29,4 @@ export READ_DSN=postgres://user:pass@localhost:5432/dbname # user-defined exampl
 <!-- references -->
 
 [ferrite]: https://github.com/dogmatiq/ferrite
-[`read_dsn`]: #READ_DSN
+[`read_dsn`]: #read_dsn

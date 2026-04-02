@@ -43,7 +43,7 @@ func (r *renderer) linkToURL(text, url string, optionalRef ...string) string {
 func (r *renderer) linkToSpec(s variable.Spec) string {
 	return r.linkToURL(
 		fmt.Sprintf("`%s`", s.Name()),
-		fmt.Sprintf("#%s", s.Name()),
+		fmt.Sprintf("#%s", strings.ToLower(s.Name())),
 	)
 }
 

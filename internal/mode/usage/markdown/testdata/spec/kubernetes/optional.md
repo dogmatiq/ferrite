@@ -48,5 +48,5 @@ UNIX-like systems. Standard service names are published by IANA.
 
 <!-- references -->
 
-[`redis_service_host`]: #REDIS_SERVICE_HOST
-[`redis_service_port`]: #REDIS_SERVICE_PORT
+[`redis_service_host`]: #redis_service_host
+[`redis_service_port`]: #redis_service_port

@@ -34,5 +34,5 @@ export WIDGET_ENABLED=false
 
 <!-- references -->
 
-[`widget_color`]: #WIDGET_COLOR
-[`widget_enabled`]: #WIDGET_ENABLED
+[`widget_color`]: #widget_color
+[`widget_enabled`]: #widget_enabled

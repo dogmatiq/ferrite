@@ -32,5 +32,5 @@ export WIDGET_TYPE=foo # (non-normative)
 
 <!-- references -->
 
-[`widget_color`]: #WIDGET_COLOR
-[`widget_type`]: #WIDGET_TYPE
+[`widget_color`]: #widget_color
+[`widget_type`]: #widget_type

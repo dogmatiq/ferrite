@@ -46,6 +46,6 @@ export WIDGET_MODE=color
 
 <!-- references -->
 
-[`color_enabled`]: #COLOR_ENABLED
-[`widget_color`]: #WIDGET_COLOR
-[`widget_mode`]: #WIDGET_MODE
+[`color_enabled`]: #color_enabled
+[`widget_color`]: #widget_color
+[`widget_mode`]: #widget_mode

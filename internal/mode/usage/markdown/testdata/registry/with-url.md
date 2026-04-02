@@ -18,5 +18,5 @@ This variable is imported from [Third-party Product](registry:3p).
 
 <!-- references -->
 
-[`read_dsn`]: #READ_DSN
+[`read_dsn`]: #read_dsn
 [registry:3p]: https://example.org/docs/registry.html

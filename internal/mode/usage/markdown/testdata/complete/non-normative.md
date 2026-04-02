@@ -34,4 +34,4 @@ export READ_DSN=foo # (non-normative)
 <!-- references -->
 
 [ferrite]: https://github.com/dogmatiq/ferrite
-[`read_dsn`]: #READ_DSN
+[`read_dsn`]: #read_dsn
