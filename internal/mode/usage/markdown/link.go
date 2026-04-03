@@ -41,9 +41,10 @@ func (r *renderer) linkToURL(text, url string, optionalRef ...string) string {
 
 // linkToSpec returns markdown that links to the given variable specification.
 func (r *renderer) linkToSpec(s variable.Spec) string {
+	heading := fmt.Sprintf("`%s`", s.Name())
 	return r.linkToURL(
-		fmt.Sprintf("`%s`", s.Name()),
-		fmt.Sprintf("#%s", strings.ToLower(s.Name())),
+		heading,
+		"#"+headingSlug(heading),
 	)
 }
 
