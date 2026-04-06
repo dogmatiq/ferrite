@@ -35,5 +35,5 @@ export VERBOSE=false
 
 <!-- references -->
 
-[`debug`]: #DEBUG
-[`verbose`]: #VERBOSE
+[`debug`]: #debug
+[`verbose`]: #verbose
