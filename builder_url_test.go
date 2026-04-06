@@ -123,6 +123,45 @@ var _ = Describe("type URLBuilder", func() {
 			})
 		})
 	})
+
+	Describe("func WithScheme()", func() {
+		It("panics if the scheme is not permitted", func() {
+			os.Setenv("FERRITE_URL", "ftp://example.org/path")
+
+			Expect(func() {
+				builder.
+					WithScheme("https", "secure HTTP access").
+					WithScheme("ssh", "SSH port forwarding").
+					Required().
+					Value()
+			}).To(PanicWith(
+				"value of FERRITE_URL (ftp://example.org/path) is invalid: expected the scheme to be one of `https` or `ssh`",
+			))
+		})
+
+		It("returns the value when the scheme is permitted", func() {
+			os.Setenv("FERRITE_URL", "HTTPS://example.org/path")
+
+			v := builder.
+				WithScheme("https", "Secure HTTP access").
+				Required().
+				Value()
+
+			Expect(v.String()).To(Equal("https://example.org/path"))
+		})
+
+		It("accepts schemes added across multiple calls", func() {
+			os.Setenv("FERRITE_URL", "ssh://example.org/path")
+
+			v := builder.
+				WithScheme("https", "Secure HTTP access").
+				WithScheme("ssh", "SSH tunnel endpoints").
+				Required().
+				Value()
+
+			Expect(v.String()).To(Equal("ssh://example.org/path"))
+		})
+	})
 })
 
 func ExampleURL_required() {

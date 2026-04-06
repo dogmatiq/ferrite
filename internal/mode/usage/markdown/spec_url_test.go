@@ -61,4 +61,15 @@ var _ = DescribeTable(
 				Required(ferrite.WithRegistry(reg))
 		},
 	),
+	Entry(
+		"required with restricted schemes",
+		"with-scheme.md",
+		func(reg ferrite.Registry) {
+			ferrite.
+				URL("API_URL", "the URL of the REST API").
+				WithScheme("https", "External HTTPS endpoint").
+				WithScheme("ssh", "Reverse SSH tunnel endpoint").
+				Required(ferrite.WithRegistry(reg))
+		},
+	),
 )

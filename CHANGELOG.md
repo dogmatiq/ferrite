@@ -16,6 +16,8 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 - Added `URLBuilder.WithConstraint()` to allow user-defined validation of URL
   variables.
+- Added `URLBuilder.WithScheme()` to restrict URLs to specific schemes, each
+  with optional documentation describing when to use it.
 
 ## [1.5.1] - 2025-04-11
 
