@@ -7,15 +7,24 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 <!-- references -->
 
+[bc]: https://github.com/dogmatiq/.github/blob/main/VERSIONING.md#changelogs
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
-## [Unreleased]
+## [1.6.0] - 2026-04-07
 
 ### Added
 
+- Added `WithExample()` to all builder types, allowing custom example values to
+  be included in generated documentation.
 - Added `URLBuilder.WithConstraint()` to allow user-defined validation of URL
   variables.
+
+### Changed
+
+- Variables from imported registries are now listed after variables from the
+  default registry in generated documentation and validation output. Within each
+  registry, variables are still sorted alphabetically by name.
 
 ## [1.5.1] - 2025-04-11
 
@@ -319,6 +328,7 @@ The two most important changes in usage are:
 [1.4.0]: https://github.com/dogmatiq/ferrite/releases/tag/v1.4.0
 [1.5.0]: https://github.com/dogmatiq/ferrite/releases/tag/v1.5.0
 [1.5.1]: https://github.com/dogmatiq/ferrite/releases/tag/v1.5.1
+[1.6.0]: https://github.com/dogmatiq/ferrite/releases/tag/v1.6.0
 
 <!-- version template
 ## [0.0.1] - YYYY-MM-DD
