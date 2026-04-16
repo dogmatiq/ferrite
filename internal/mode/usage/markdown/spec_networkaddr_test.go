@@ -19,7 +19,7 @@ var _ = DescribeTable(
 		"deprecated.md",
 		func(reg ferrite.Registry) {
 			ferrite.
-				NetworkAddr("LISTEN_ADDR", "listen address for the HTTP server").
+				NetworkAddress("LISTEN_ADDR", "listen address for the HTTP server").
 				Deprecated(ferrite.WithRegistry(reg))
 		},
 	),
@@ -28,7 +28,7 @@ var _ = DescribeTable(
 		"optional.md",
 		func(reg ferrite.Registry) {
 			ferrite.
-				NetworkAddr("LISTEN_ADDR", "listen address for the HTTP server").
+				NetworkAddress("LISTEN_ADDR", "listen address for the HTTP server").
 				Optional(ferrite.WithRegistry(reg))
 		},
 	),
@@ -37,7 +37,7 @@ var _ = DescribeTable(
 		"required.md",
 		func(reg ferrite.Registry) {
 			ferrite.
-				NetworkAddr("LISTEN_ADDR", "listen address for the HTTP server").
+				NetworkAddress("LISTEN_ADDR", "listen address for the HTTP server").
 				Required(ferrite.WithRegistry(reg))
 		},
 	),
@@ -46,7 +46,7 @@ var _ = DescribeTable(
 		"with-default.md",
 		func(reg ferrite.Registry) {
 			ferrite.
-				NetworkAddr("LISTEN_ADDR", "listen address for the HTTP server").
+				NetworkAddress("LISTEN_ADDR", "listen address for the HTTP server").
 				WithDefault("0.0.0.0:8080").
 				Optional(ferrite.WithRegistry(reg))
 		},
@@ -56,7 +56,7 @@ var _ = DescribeTable(
 		"with-default.md",
 		func(reg ferrite.Registry) {
 			ferrite.
-				NetworkAddr("LISTEN_ADDR", "listen address for the HTTP server").
+				NetworkAddress("LISTEN_ADDR", "listen address for the HTTP server").
 				WithDefault("0.0.0.0:8080").
 				Required(ferrite.WithRegistry(reg))
 		},

@@ -10,11 +10,11 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("func NetworkAddr", func() {
-	var builder *NetworkAddrBuilder
+var _ = Describe("func NetworkAddress", func() {
+	var builder *NetworkAddressBuilder
 
 	BeforeEach(func() {
-		builder = NetworkAddr("FERRITE_NETWORK_ADDR", "<desc>")
+		builder = NetworkAddress("FERRITE_NETWORK_ADDR", "<desc>")
 	})
 
 	AfterEach(func() {
@@ -23,13 +23,13 @@ var _ = Describe("func NetworkAddr", func() {
 
 	It("panics if the name is empty", func() {
 		Expect(func() {
-			NetworkAddr("", "<desc>").Optional()
+			NetworkAddress("", "<desc>").Optional()
 		}).To(PanicWith("invalid specification: variable name must not be empty"))
 	})
 
 	It("panics if the description is empty", func() {
 		Expect(func() {
-			NetworkAddr("FERRITE_NETWORK_ADDR", "").Optional()
+			NetworkAddress("FERRITE_NETWORK_ADDR", "").Optional()
 		}).To(PanicWith("specification for FERRITE_NETWORK_ADDR is invalid: variable description must not be empty"))
 	})
 
@@ -38,7 +38,7 @@ var _ = Describe("func NetworkAddr", func() {
 			Describe("func Value()", func() {
 				DescribeTable(
 					"it returns the parsed address",
-					func(input string, expected NetworkAddress) {
+					func(input string, expected NetworkAddr) {
 						os.Setenv("FERRITE_NETWORK_ADDR", input)
 
 						v := builder.
@@ -50,22 +50,22 @@ var _ = Describe("func NetworkAddr", func() {
 					Entry(
 						"IPv4 address",
 						"192.168.0.1:8080",
-						NetworkAddress{Host: "192.168.0.1", Port: "8080"},
+						NetworkAddr{Host: "192.168.0.1", Port: "8080"},
 					),
 					Entry(
 						"IPv6 address",
 						"[::1]:8080",
-						NetworkAddress{Host: "::1", Port: "8080"},
+						NetworkAddr{Host: "::1", Port: "8080"},
 					),
 					Entry(
 						"hostname with numeric port",
 						"host.example.org:8080",
-						NetworkAddress{Host: "host.example.org", Port: "8080"},
+						NetworkAddr{Host: "host.example.org", Port: "8080"},
 					),
 					Entry(
 						"hostname with IANA service name",
 						"host.example.org:https",
-						NetworkAddress{Host: "host.example.org", Port: "https"},
+						NetworkAddr{Host: "host.example.org", Port: "https"},
 					),
 				)
 
@@ -90,7 +90,7 @@ var _ = Describe("func NetworkAddr", func() {
 							Required().
 							Value()
 
-						Expect(v).To(Equal(NetworkAddress{Host: "localhost", Port: "8080"}))
+						Expect(v).To(Equal(NetworkAddr{Host: "localhost", Port: "8080"}))
 					})
 				})
 			})
@@ -122,7 +122,7 @@ var _ = Describe("func NetworkAddr", func() {
 						Value()
 
 					Expect(ok).To(BeTrue())
-					Expect(v).To(Equal(NetworkAddress{Host: "192.168.0.1", Port: "8080"}))
+					Expect(v).To(Equal(NetworkAddr{Host: "192.168.0.1", Port: "8080"}))
 				})
 			})
 		})
@@ -137,7 +137,7 @@ var _ = Describe("func NetworkAddr", func() {
 							Value()
 
 						Expect(ok).To(BeTrue())
-						Expect(v).To(Equal(NetworkAddress{Host: "localhost", Port: "8080"}))
+						Expect(v).To(Equal(NetworkAddr{Host: "localhost", Port: "8080"}))
 					})
 				})
 			})
@@ -156,24 +156,24 @@ var _ = Describe("func NetworkAddr", func() {
 		})
 	})
 
-	Describe("func NetworkAddress.String()", func() {
+	Describe("func NetworkAddr.String()", func() {
 		It("returns the address in host:port form for IPv4", func() {
-			addr := NetworkAddress{Host: "192.168.0.1", Port: "8080"}
+			addr := NetworkAddr{Host: "192.168.0.1", Port: "8080"}
 			Expect(addr.String()).To(Equal("192.168.0.1:8080"))
 		})
 
 		It("returns the address in [host]:port form for IPv6", func() {
-			addr := NetworkAddress{Host: "::1", Port: "8080"}
+			addr := NetworkAddr{Host: "::1", Port: "8080"}
 			Expect(addr.String()).To(Equal("[::1]:8080"))
 		})
 	})
 })
 
-func ExampleNetworkAddr_required() {
+func ExampleNetworkAddress_required() {
 	defer example()()
 
 	v := ferrite.
-		NetworkAddr("FERRITE_NETWORK_ADDR", "example network address variable").
+		NetworkAddress("FERRITE_NETWORK_ADDR", "example network address variable").
 		Required()
 
 	os.Setenv("FERRITE_NETWORK_ADDR", "host.example.org:https")
@@ -185,11 +185,11 @@ func ExampleNetworkAddr_required() {
 	// value is host.example.org:https
 }
 
-func ExampleNetworkAddr_default() {
+func ExampleNetworkAddress_default() {
 	defer example()()
 
 	v := ferrite.
-		NetworkAddr("FERRITE_NETWORK_ADDR", "example network address variable").
+		NetworkAddress("FERRITE_NETWORK_ADDR", "example network address variable").
 		WithDefault("localhost:8080").
 		Required()
 
@@ -201,11 +201,11 @@ func ExampleNetworkAddr_default() {
 	// value is localhost:8080
 }
 
-func ExampleNetworkAddr_optional() {
+func ExampleNetworkAddress_optional() {
 	defer example()()
 
 	v := ferrite.
-		NetworkAddr("FERRITE_NETWORK_ADDR", "example network address variable").
+		NetworkAddress("FERRITE_NETWORK_ADDR", "example network address variable").
 		Optional()
 
 	ferrite.Init()
@@ -220,11 +220,11 @@ func ExampleNetworkAddr_optional() {
 	// value is undefined
 }
 
-func ExampleNetworkAddr_deprecated() {
+func ExampleNetworkAddress_deprecated() {
 	defer example()()
 
 	v := ferrite.
-		NetworkAddr("FERRITE_NETWORK_ADDR", "example network address variable").
+		NetworkAddress("FERRITE_NETWORK_ADDR", "example network address variable").
 		Deprecated()
 
 	os.Setenv("FERRITE_NETWORK_ADDR", "host.example.org:https")

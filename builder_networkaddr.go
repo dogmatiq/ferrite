@@ -6,25 +6,25 @@ import (
 	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
-// NetworkAddress is a network address in host:port form.
-type NetworkAddress struct {
+// NetworkAddr is a network address in host:port form.
+type NetworkAddr struct {
 	Host string
 	Port string
 }
 
 // String returns the network address in host:port form.
-func (a NetworkAddress) String() string {
+func (a NetworkAddr) String() string {
 	return net.JoinHostPort(a.Host, a.Port)
 }
 
-// NetworkAddr configures an environment variable as a network address in
+// NetworkAddress configures an environment variable as a network address in
 // host:port form, as accepted by net.SplitHostPort.
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
-func NetworkAddr(name, desc string) *NetworkAddrBuilder {
-	b := &NetworkAddrBuilder{
-		schema: variable.TypedOther[NetworkAddress]{
+func NetworkAddress(name, desc string) *NetworkAddressBuilder {
+	b := &NetworkAddressBuilder{
+		schema: variable.TypedOther[NetworkAddr]{
 			Marshaler: networkAddrMarshaler{},
 		},
 	}
@@ -33,7 +33,7 @@ func NetworkAddr(name, desc string) *NetworkAddrBuilder {
 	b.builder.Description(desc)
 	b.builder.BuiltInConstraint(
 		"**MUST** be a valid network address",
-		func(_ variable.ConstraintContext, v NetworkAddress) variable.ConstraintError {
+		func(_ variable.ConstraintContext, v NetworkAddr) variable.ConstraintError {
 			return nil
 		},
 	)
@@ -54,72 +54,72 @@ func NetworkAddr(name, desc string) *NetworkAddrBuilder {
 	return b
 }
 
-// NetworkAddrBuilder builds a specification for a network address variable.
-type NetworkAddrBuilder struct {
-	schema  variable.TypedOther[NetworkAddress]
-	builder variable.TypedSpecBuilder[NetworkAddress]
+// NetworkAddressBuilder builds a specification for a network address variable.
+type NetworkAddressBuilder struct {
+	schema  variable.TypedOther[NetworkAddr]
+	builder variable.TypedSpecBuilder[NetworkAddr]
 }
 
 var _ isBuilderOf[
-	NetworkAddress,
+	NetworkAddr,
 	string,
-	*NetworkAddrBuilder,
+	*NetworkAddressBuilder,
 ]
 
 // WithDefault sets the default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
-func (b *NetworkAddrBuilder) WithDefault(v string) *NetworkAddrBuilder {
+func (b *NetworkAddressBuilder) WithDefault(v string) *NetworkAddressBuilder {
 	b.builder.Default(mustParseNetworkAddr(v))
 	return b
 }
 
 // WithExample adds an example value to the variable's documentation.
-func (b *NetworkAddrBuilder) WithExample(v string, desc string) *NetworkAddrBuilder {
+func (b *NetworkAddressBuilder) WithExample(v string, desc string) *NetworkAddressBuilder {
 	b.builder.NormativeExample(mustParseNetworkAddr(v), desc)
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b *NetworkAddrBuilder) Required(options ...RequiredOption) Required[NetworkAddress] {
+func (b *NetworkAddressBuilder) Required(options ...RequiredOption) Required[NetworkAddr] {
 	return required(b.schema, &b.builder, options...)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b *NetworkAddrBuilder) Optional(options ...OptionalOption) Optional[NetworkAddress] {
+func (b *NetworkAddressBuilder) Optional(options ...OptionalOption) Optional[NetworkAddr] {
 	return optional(b.schema, &b.builder, options...)
 }
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
-func (b *NetworkAddrBuilder) Deprecated(options ...DeprecatedOption) Deprecated[NetworkAddress] {
+func (b *NetworkAddressBuilder) Deprecated(options ...DeprecatedOption) Deprecated[NetworkAddr] {
 	return deprecated(b.schema, &b.builder, options...)
 }
 
 type networkAddrMarshaler struct{}
 
-func (networkAddrMarshaler) Marshal(v NetworkAddress) (variable.Literal, error) {
+func (networkAddrMarshaler) Marshal(v NetworkAddr) (variable.Literal, error) {
 	return variable.Literal{
 		String: v.String(),
 	}, nil
 }
 
-func (networkAddrMarshaler) Unmarshal(v variable.Literal) (NetworkAddress, error) {
+func (networkAddrMarshaler) Unmarshal(v variable.Literal) (NetworkAddr, error) {
 	host, port, err := net.SplitHostPort(v.String)
 	if err != nil {
-		return NetworkAddress{}, err
+		return NetworkAddr{}, err
 	}
-	return NetworkAddress{Host: host, Port: port}, nil
+	return NetworkAddr{Host: host, Port: port}, nil
 }
 
-func mustParseNetworkAddr(v string) NetworkAddress {
+func mustParseNetworkAddr(v string) NetworkAddr {
 	host, port, err := net.SplitHostPort(v)
 	if err != nil {
 		panic(err)
 	}
-	return NetworkAddress{Host: host, Port: port}
+	return NetworkAddr{Host: host, Port: port}
 }
 
 func buildNetworkAddrSyntaxDocumentation(d variable.DocumentationBuilder) {
