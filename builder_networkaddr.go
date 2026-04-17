@@ -1,6 +1,7 @@
 package ferrite
 
 import (
+	"errors"
 	"net"
 
 	"github.com/dogmatiq/ferrite/internal/variable"
@@ -34,7 +35,10 @@ func NetworkAddress(name, desc string) *NetworkAddressBuilder {
 	b.builder.BuiltInConstraint(
 		"**MUST** be a valid network address",
 		func(_ variable.ConstraintContext, v NetworkAddr) variable.ConstraintError {
-			return nil
+			if v.Host == "" {
+				return errors.New("host must not be empty")
+			}
+			return validatePort(v.Port)
 		},
 	)
 	b.builder.NonNormativeExample(
