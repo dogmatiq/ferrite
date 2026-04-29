@@ -88,7 +88,7 @@ func (v *OfType[T]) Availability() Availability {
 
 	r := v.resolve()
 
-	if _, ok := r.err.(valueError); ok {
+	if _, ok := r.err.(ValueError); ok {
 		return AvailabilityInvalid
 	}
 
