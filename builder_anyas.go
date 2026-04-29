@@ -39,8 +39,8 @@ func AnyAs[T any](
 	return b
 }
 
-// AnyAsBuilder builds a specification for a variable of an arbitrary type that
-// is parsed from a string using a user-supplied function.
+// AnyAsBuilder builds a specification for a variable of an arbitrary type,
+// using caller-supplied functions to marshal and unmarshal the value.
 type AnyAsBuilder[T any] struct {
 	schema  variable.TypedOther[T]
 	builder variable.TypedSpecBuilder[T]
@@ -119,5 +119,20 @@ func (m anyAsMarshaler[T]) Marshal(v T) (variable.Literal, error) {
 }
 
 func (m anyAsMarshaler[T]) Unmarshal(v variable.Literal) (T, error) {
-	return m.unmarshal(v.String)
+	n, err := m.unmarshal(v.String)
+	if err != nil {
+		return n, err
+	}
+
+	// Verify that the unmarshaled value can be round-tripped through the
+	// marshal function. [variable.TypedSpec] re-marshals every valid value to
+	// compute its canonical literal representation, and panics if marshaling
+	// fails. Since these are user-supplied functions, it's plausible that
+	// unmarshal accepts values that marshal can't represent, so we check here
+	// to surface that as a validation error rather than a panic.
+	if _, err := m.marshal(n); err != nil {
+		return n, err
+	}
+
+	return n, nil
 }
