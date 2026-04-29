@@ -79,7 +79,7 @@ var _ = Describe("type AnyAsBuilder", func() {
 					Required().
 					Value()
 			}).To(PanicWith(
-				`value of FERRITE_ANY_AS (hello) is invalid: value cannot be marshaled: marshal failed`,
+				`value of FERRITE_ANY_AS (hello) is invalid: marshal failed`,
 			))
 		})
 	})

@@ -1,8 +1,6 @@
 package ferrite
 
 import (
-	"fmt"
-
 	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
@@ -133,7 +131,7 @@ func (m anyAsMarshaler[T]) Unmarshal(v variable.Literal) (T, error) {
 	// unmarshal accepts values that marshal can't represent, so we check here
 	// to surface that as a validation error rather than a panic.
 	if _, err := m.marshal(n); err != nil {
-		return n, fmt.Errorf("value cannot be marshaled: %w", err)
+		return n, err
 	}
 
 	return n, nil
