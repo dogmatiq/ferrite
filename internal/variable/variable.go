@@ -3,6 +3,7 @@ package variable
 import (
 	"fmt"
 	"sync"
+	"sync/atomic"
 
 	"github.com/dogmatiq/ferrite/internal/environment"
 )
@@ -60,11 +61,16 @@ type Any interface {
 type OfType[T any] struct {
 	TypedSpec *TypedSpec[T]
 
-	once         sync.Once
-	availability Availability
-	source       Source
-	value        valueOf[T]
-	err          Error
+	m          sync.Mutex
+	resolution atomic.Pointer[resolution[T]]
+}
+
+// resolution holds the cached result of resolving an environment variable.
+type resolution[T any] struct {
+	lit    string
+	source Source
+	value  valueOf[T]
+	err    Error
 }
 
 // Spec returns the variable's specification.
@@ -74,14 +80,28 @@ func (v *OfType[T]) Spec() Spec {
 
 // Availability returns the variable's availability.
 func (v *OfType[T]) Availability() Availability {
-	v.resolve()
-	return v.availability
+	for _, fn := range v.TypedSpec.preconditions {
+		if !fn() {
+			return AvailabilityIgnored
+		}
+	}
+
+	r := v.resolve()
+
+	if _, ok := r.err.(ValueError); ok {
+		return AvailabilityInvalid
+	}
+
+	if r.source == SourceNone {
+		return AvailabilityNone
+	}
+
+	return AvailabilityOK
 }
 
 // Source returns the source of the variable's value.
 func (v *OfType[T]) Source() Source {
-	v.resolve()
-	return v.source
+	return v.resolve().source
 }
 
 // Value returns the variable's value.
@@ -89,8 +109,7 @@ func (v *OfType[T]) Source() Source {
 // If no value is available it returns a zero-value. It is the caller's
 // responsibility to check the variable's availability before using the value.
 func (v *OfType[T]) Value() Value {
-	v.resolve()
-	return v.value
+	return v.resolve().value
 }
 
 // NativeValue returns the variable's value.
@@ -98,8 +117,7 @@ func (v *OfType[T]) Value() Value {
 // If no value is available it returns a zero-value. It is the caller's
 // responsibility to check the variable's availability before using the value.
 func (v *OfType[T]) NativeValue() T {
-	v.resolve()
-	return v.value.native
+	return v.resolve().value.native
 }
 
 // Error returns an error describing the variable's state.
@@ -111,59 +129,59 @@ func (v *OfType[T]) NativeValue() T {
 // has an availability of AvailabilityOK, or if it has an availability of
 // AvailabilityNone and v.Spec().IsRequired() is false.
 func (v *OfType[T]) Error() Error {
-	v.resolve()
-	return v.err
+	return v.resolve().err
 }
 
-func (v *OfType[T]) resolve() {
-	v.once.Do(func() {
-		// Override the availability to AvailabilityIgnored if any of the
-		// preconditions fail.
-		defer func() {
-			for _, fn := range v.TypedSpec.preconditions {
-				if !fn() {
-					v.availability = AvailabilityIgnored
-					break
-				}
-			}
-		}()
+func (v *OfType[T]) resolve() *resolution[T] {
+	lit := environment.Get(v.TypedSpec.name)
 
-		lit := Literal{
-			String: environment.Get(v.TypedSpec.name),
+	if r := v.resolution.Load(); r != nil {
+		if r.lit == lit {
+			return r
 		}
+	}
 
-		if lit.String == "" {
-			if def, ok := v.TypedSpec.def.Get(); ok {
-				v.availability = AvailabilityOK
-				v.source = SourceDefault
-				v.value = def
-			} else if v.TypedSpec.required {
-				v.availability = AvailabilityNone
-				v.err = undefinedError{v.TypedSpec.Name()}
-			}
-			return
+	v.m.Lock()
+	defer v.m.Unlock()
+
+	if r := v.resolution.Load(); r != nil {
+		if r.lit == lit {
+			return r
 		}
+	}
 
-		v.source = SourceEnvironment
+	r := &resolution[T]{
+		lit: lit,
+	}
 
-		n, c, err := v.TypedSpec.Unmarshal(ConstraintContextFinal, lit)
+	if lit == "" {
+		if def, ok := v.TypedSpec.def.Get(); ok {
+			r.source = SourceDefault
+			r.value = def
+		} else if v.TypedSpec.required {
+			r.err = undefinedError{v.TypedSpec.Name()}
+		}
+	} else {
+		r.source = SourceEnvironment
+
+		n, c, err := v.TypedSpec.Unmarshal(ConstraintContextFinal, Literal{String: lit})
 		if err != nil {
-			v.availability = AvailabilityInvalid
-			v.err = valueError{
+			r.err = valueError{
 				name:    v.TypedSpec.name,
-				literal: lit,
+				literal: Literal{String: lit},
 				cause:   err,
 			}
-			return
+		} else {
+			r.value = valueOf[T]{
+				verbatim:  Literal{String: lit},
+				native:    n,
+				canonical: c,
+			}
 		}
+	}
 
-		v.availability = AvailabilityOK
-		v.value = valueOf[T]{
-			verbatim:  lit,
-			native:    n,
-			canonical: c,
-		}
-	})
+	v.resolution.Store(r)
+	return r
 }
 
 // undefinedError is an Error that indicates that a variable is undefined and
