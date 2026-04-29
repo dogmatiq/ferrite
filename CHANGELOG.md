@@ -11,6 +11,16 @@ The format is based on [Keep a Changelog], and this project adheres to
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+## [Unreleased]
+
+### Fixed
+
+- Environment variable values are now re-resolved when the environment changes,
+  allowing `t.Setenv()` to work naturally in tests without any special helpers.
+- Preconditions (e.g., `RelevantIf()`, `RelevantWhen()`) are now re-evaluated
+  on every call to `Availability()`, reflecting changes to dependent variables
+  immediately.
+
 ## [1.6.1] - 2026-04-07
 
 ### Fixed
