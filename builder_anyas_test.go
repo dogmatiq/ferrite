@@ -66,6 +66,24 @@ var _ = Describe("type AnyAsBuilder", func() {
 		}).To(PanicWith("AnyAs: marshal function must not be nil"))
 	})
 
+	When("the value cannot be marshaled after unmarshaling", func() {
+		It("panics with a validation error", func() {
+			os.Setenv("FERRITE_ANY_AS", "hello")
+
+			marshal := func(v uppercased) (string, error) {
+				return "", errors.New("marshal failed")
+			}
+
+			Expect(func() {
+				AnyAs("FERRITE_ANY_AS", "<desc>", parseUppercased, marshal).
+					Required().
+					Value()
+			}).To(PanicWith(
+				`value of FERRITE_ANY_AS (hello) is invalid: value cannot be marshaled: marshal failed`,
+			))
+		})
+	})
+
 	When("the variable is required", func() {
 		When("the value is not empty", func() {
 			Describe("func Value()", func() {
