@@ -13,6 +13,11 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Added `AnyAs[T]()` builder for environment variables that are parsed into
+  arbitrary user-defined types using caller-supplied marshal/unmarshal functions.
+
 ### Fixed
 
 - Environment variable values are now re-resolved when the environment changes,
