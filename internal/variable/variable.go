@@ -67,11 +67,10 @@ type OfType[T any] struct {
 
 // resolution holds the cached result of resolving an environment variable.
 type resolution[T any] struct {
-	lit          string
-	availability Availability
-	source       Source
-	value        valueOf[T]
-	err          Error
+	lit    string
+	source Source
+	value  valueOf[T]
+	err    Error
 }
 
 // Spec returns the variable's specification.
@@ -81,7 +80,23 @@ func (v *OfType[T]) Spec() Spec {
 
 // Availability returns the variable's availability.
 func (v *OfType[T]) Availability() Availability {
-	return v.resolve().availability
+	for _, fn := range v.TypedSpec.preconditions {
+		if !fn() {
+			return AvailabilityIgnored
+		}
+	}
+
+	r := v.resolve()
+
+	if _, ok := r.err.(valueError); ok {
+		return AvailabilityInvalid
+	}
+
+	if r.source == SourceNone {
+		return AvailabilityNone
+	}
+
+	return AvailabilityOK
 }
 
 // Source returns the source of the variable's value.
@@ -141,11 +156,9 @@ func (v *OfType[T]) resolve() *resolution[T] {
 
 	if lit == "" {
 		if def, ok := v.TypedSpec.def.Get(); ok {
-			r.availability = AvailabilityOK
 			r.source = SourceDefault
 			r.value = def
 		} else if v.TypedSpec.required {
-			r.availability = AvailabilityNone
 			r.err = undefinedError{v.TypedSpec.Name()}
 		}
 	} else {
@@ -153,26 +166,17 @@ func (v *OfType[T]) resolve() *resolution[T] {
 
 		n, c, err := v.TypedSpec.Unmarshal(ConstraintContextFinal, Literal{String: lit})
 		if err != nil {
-			r.availability = AvailabilityInvalid
 			r.err = valueError{
 				name:    v.TypedSpec.name,
 				literal: Literal{String: lit},
 				cause:   err,
 			}
 		} else {
-			r.availability = AvailabilityOK
 			r.value = valueOf[T]{
 				verbatim:  Literal{String: lit},
 				native:    n,
 				canonical: c,
 			}
-		}
-	}
-
-	for _, fn := range v.TypedSpec.preconditions {
-		if !fn() {
-			r.availability = AvailabilityIgnored
-			break
 		}
 	}
 

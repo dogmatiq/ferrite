@@ -125,6 +125,40 @@ var _ = Describe("type StringBuilder", func() {
 		})
 	})
 
+	It("re-resolves when the environment variable changes", func() {
+		os.Setenv("FERRITE_STRING", "<original>")
+
+		varset := builder.Required()
+		Expect(varset.Value()).To(Equal(userDefinedString("<original>")))
+
+		os.Setenv("FERRITE_STRING", "<changed>")
+		Expect(varset.Value()).To(Equal(userDefinedString("<changed>")))
+	})
+
+	It("re-resolves from set to unset", func() {
+		os.Setenv("FERRITE_STRING", "<value>")
+
+		varset := builder.Optional()
+		v, ok := varset.Value()
+		Expect(ok).To(BeTrue())
+		Expect(v).To(Equal(userDefinedString("<value>")))
+
+		os.Unsetenv("FERRITE_STRING")
+		_, ok = varset.Value()
+		Expect(ok).To(BeFalse())
+	})
+
+	It("re-resolves from unset to set", func() {
+		varset := builder.Optional()
+		_, ok := varset.Value()
+		Expect(ok).To(BeFalse())
+
+		os.Setenv("FERRITE_STRING", "<value>")
+		v, ok := varset.Value()
+		Expect(ok).To(BeTrue())
+		Expect(v).To(Equal(userDefinedString("<value>")))
+	})
+
 	When("the value is shorter than the minimum length", func() {
 		When("the limit is set using WithMinimumLength()", func() {
 			It("panics", func() {
