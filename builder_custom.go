@@ -4,7 +4,7 @@ import (
 	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
-// AnyAs configures an environment variable as a value of type T, using
+// Custom configures an environment variable as a value of type T, using
 // caller-supplied functions to marshal and unmarshal the value.
 //
 // name is the name of the environment variable to read. desc is a
@@ -15,21 +15,21 @@ import (
 //
 // marshal is called to convert a T value back to its string representation.
 // It is used to render defaults and examples in validation output.
-func AnyAs[T any](
+func Custom[T any](
 	name, desc string,
 	unmarshal func(string) (T, error),
 	marshal func(T) (string, error),
-) *AnyAsBuilder[T] {
+) *CustomBuilder[T] {
 	if unmarshal == nil {
-		panic("AnyAs: unmarshal function must not be nil")
+		panic("Custom: unmarshal function must not be nil")
 	}
 	if marshal == nil {
-		panic("AnyAs: marshal function must not be nil")
+		panic("Custom: marshal function must not be nil")
 	}
 
-	b := &AnyAsBuilder[T]{
+	b := &CustomBuilder[T]{
 		schema: variable.TypedOther[T]{
-			Marshaler: anyAsMarshaler[T]{unmarshal, marshal},
+			Marshaler: customMarshaler[T]{unmarshal, marshal},
 		},
 	}
 
@@ -39,9 +39,9 @@ func AnyAs[T any](
 	return b
 }
 
-// AnyAsBuilder builds a specification for a variable of an arbitrary type,
+// CustomBuilder builds a specification for a variable of an arbitrary type,
 // using caller-supplied functions to marshal and unmarshal the value.
-type AnyAsBuilder[T any] struct {
+type CustomBuilder[T any] struct {
 	schema  variable.TypedOther[T]
 	builder variable.TypedSpecBuilder[T]
 }
@@ -49,19 +49,19 @@ type AnyAsBuilder[T any] struct {
 var _ isBuilderOf[
 	any,
 	any,
-	*AnyAsBuilder[any],
+	*CustomBuilder[any],
 ]
 
 // WithDefault sets the default value of the variable.
 //
 // It is used when the environment variable is undefined or empty.
-func (b *AnyAsBuilder[T]) WithDefault(v T) *AnyAsBuilder[T] {
+func (b *CustomBuilder[T]) WithDefault(v T) *CustomBuilder[T] {
 	b.builder.Default(v)
 	return b
 }
 
 // WithExample adds an example value to the variable's documentation.
-func (b *AnyAsBuilder[T]) WithExample(v T, desc string) *AnyAsBuilder[T] {
+func (b *CustomBuilder[T]) WithExample(v T, desc string) *CustomBuilder[T] {
 	b.builder.NormativeExample(v, desc)
 	return b
 }
@@ -70,10 +70,10 @@ func (b *AnyAsBuilder[T]) WithExample(v T, desc string) *AnyAsBuilder[T] {
 //
 // fn is called with the environment variable value after it is parsed. If fn
 // returns false the value is considered invalid.
-func (b *AnyAsBuilder[T]) WithConstraint(
+func (b *CustomBuilder[T]) WithConstraint(
 	desc string,
 	fn func(T) bool,
-) *AnyAsBuilder[T] {
+) *CustomBuilder[T] {
 	b.builder.UserConstraint(desc, fn)
 	return b
 }
@@ -82,35 +82,35 @@ func (b *AnyAsBuilder[T]) WithConstraint(
 //
 // Values of sensitive variables are not printed to the console or included in
 // generated documentation.
-func (b *AnyAsBuilder[T]) WithSensitiveContent() *AnyAsBuilder[T] {
+func (b *CustomBuilder[T]) WithSensitiveContent() *CustomBuilder[T] {
 	b.builder.MarkSensitive()
 	return b
 }
 
 // Required completes the build process and registers a required variable with
 // Ferrite's validation system.
-func (b *AnyAsBuilder[T]) Required(options ...RequiredOption) Required[T] {
+func (b *CustomBuilder[T]) Required(options ...RequiredOption) Required[T] {
 	return required(b.schema, &b.builder, options...)
 }
 
 // Optional completes the build process and registers an optional variable with
 // Ferrite's validation system.
-func (b *AnyAsBuilder[T]) Optional(options ...OptionalOption) Optional[T] {
+func (b *CustomBuilder[T]) Optional(options ...OptionalOption) Optional[T] {
 	return optional(b.schema, &b.builder, options...)
 }
 
 // Deprecated completes the build process and registers a deprecated variable
 // with Ferrite's validation system.
-func (b *AnyAsBuilder[T]) Deprecated(options ...DeprecatedOption) Deprecated[T] {
+func (b *CustomBuilder[T]) Deprecated(options ...DeprecatedOption) Deprecated[T] {
 	return deprecated(b.schema, &b.builder, options...)
 }
 
-type anyAsMarshaler[T any] struct {
+type customMarshaler[T any] struct {
 	unmarshal func(string) (T, error)
 	marshal   func(T) (string, error)
 }
 
-func (m anyAsMarshaler[T]) Marshal(v T) (variable.Literal, error) {
+func (m customMarshaler[T]) Marshal(v T) (variable.Literal, error) {
 	s, err := m.marshal(v)
 	if err != nil {
 		return variable.Literal{}, err
@@ -118,7 +118,7 @@ func (m anyAsMarshaler[T]) Marshal(v T) (variable.Literal, error) {
 	return variable.Literal{String: s}, nil
 }
 
-func (m anyAsMarshaler[T]) Unmarshal(v variable.Literal) (T, error) {
+func (m customMarshaler[T]) Unmarshal(v variable.Literal) (T, error) {
 	n, err := m.unmarshal(v.String)
 	if err != nil {
 		return n, err

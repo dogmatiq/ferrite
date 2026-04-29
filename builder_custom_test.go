@@ -31,11 +31,11 @@ func formatUppercased(v uppercased) (string, error) {
 	return v.Value, nil
 }
 
-var _ = Describe("type AnyAsBuilder", func() {
-	var builder *AnyAsBuilder[uppercased]
+var _ = Describe("type CustomBuilder", func() {
+	var builder *CustomBuilder[uppercased]
 
 	BeforeEach(func() {
-		builder = AnyAs("FERRITE_ANY_AS", "<desc>", parseUppercased, formatUppercased)
+		builder = Custom("FERRITE_CUSTOM", "<desc>", parseUppercased, formatUppercased)
 	})
 
 	AfterEach(func() {
@@ -44,42 +44,42 @@ var _ = Describe("type AnyAsBuilder", func() {
 
 	It("panics if the name is empty", func() {
 		Expect(func() {
-			AnyAs("", "<desc>", parseUppercased, formatUppercased).Optional()
+			Custom("", "<desc>", parseUppercased, formatUppercased).Optional()
 		}).To(PanicWith("invalid specification: variable name must not be empty"))
 	})
 
 	It("panics if the description is empty", func() {
 		Expect(func() {
-			AnyAs("FERRITE_ANY_AS", "", parseUppercased, formatUppercased).Optional()
-		}).To(PanicWith("specification for FERRITE_ANY_AS is invalid: variable description must not be empty"))
+			Custom("FERRITE_CUSTOM", "", parseUppercased, formatUppercased).Optional()
+		}).To(PanicWith("specification for FERRITE_CUSTOM is invalid: variable description must not be empty"))
 	})
 
 	It("panics if the unmarshal function is nil", func() {
 		Expect(func() {
-			AnyAs[uppercased]("FERRITE_ANY_AS", "<desc>", nil, formatUppercased)
-		}).To(PanicWith("AnyAs: unmarshal function must not be nil"))
+			Custom("FERRITE_CUSTOM", "<desc>", nil, formatUppercased)
+		}).To(PanicWith("Custom: unmarshal function must not be nil"))
 	})
 
 	It("panics if the marshal function is nil", func() {
 		Expect(func() {
-			AnyAs("FERRITE_ANY_AS", "<desc>", parseUppercased, nil)
-		}).To(PanicWith("AnyAs: marshal function must not be nil"))
+			Custom("FERRITE_CUSTOM", "<desc>", parseUppercased, nil)
+		}).To(PanicWith("Custom: marshal function must not be nil"))
 	})
 
 	When("the value cannot be marshaled after unmarshaling", func() {
 		It("panics with a validation error", func() {
-			os.Setenv("FERRITE_ANY_AS", "hello")
+			os.Setenv("FERRITE_CUSTOM", "hello")
 
 			marshal := func(v uppercased) (string, error) {
 				return "", errors.New("marshal failed")
 			}
 
 			Expect(func() {
-				AnyAs("FERRITE_ANY_AS", "<desc>", parseUppercased, marshal).
+				Custom("FERRITE_CUSTOM", "<desc>", parseUppercased, marshal).
 					Required().
 					Value()
 			}).To(PanicWith(
-				`value of FERRITE_ANY_AS (hello) is invalid: marshal failed`,
+				`value of FERRITE_CUSTOM (hello) is invalid: marshal failed`,
 			))
 		})
 	})
@@ -88,7 +88,7 @@ var _ = Describe("type AnyAsBuilder", func() {
 		When("the value is not empty", func() {
 			Describe("func Value()", func() {
 				It("returns the parsed value", func() {
-					os.Setenv("FERRITE_ANY_AS", "hello")
+					os.Setenv("FERRITE_CUSTOM", "hello")
 
 					v := builder.
 						Required().
@@ -121,7 +121,7 @@ var _ = Describe("type AnyAsBuilder", func() {
 								Required().
 								Value()
 						}).To(PanicWith(
-							"FERRITE_ANY_AS is undefined and does not have a default value",
+							"FERRITE_CUSTOM is undefined and does not have a default value",
 						))
 					})
 				})
@@ -133,7 +133,7 @@ var _ = Describe("type AnyAsBuilder", func() {
 		When("the value is not empty", func() {
 			Describe("func Value()", func() {
 				It("returns the parsed value", func() {
-					os.Setenv("FERRITE_ANY_AS", "hello")
+					os.Setenv("FERRITE_CUSTOM", "hello")
 
 					v, ok := builder.
 						Optional().
@@ -175,14 +175,14 @@ var _ = Describe("type AnyAsBuilder", func() {
 	})
 })
 
-func ExampleAnyAs_required() {
+func ExampleCustom_required() {
 	defer example()()
 
 	v := ferrite.
-		AnyAs("FERRITE_ANY_AS", "example parsed variable", parseUppercased, formatUppercased).
+		Custom("FERRITE_CUSTOM", "example parsed variable", parseUppercased, formatUppercased).
 		Required()
 
-	os.Setenv("FERRITE_ANY_AS", "hello")
+	os.Setenv("FERRITE_CUSTOM", "hello")
 	ferrite.Init()
 
 	fmt.Println("value is", v.Value().Value)
@@ -191,11 +191,11 @@ func ExampleAnyAs_required() {
 	// value is HELLO
 }
 
-func ExampleAnyAs_default() {
+func ExampleCustom_default() {
 	defer example()()
 
 	v := ferrite.
-		AnyAs("FERRITE_ANY_AS", "example parsed variable", parseUppercased, formatUppercased).
+		Custom("FERRITE_CUSTOM", "example parsed variable", parseUppercased, formatUppercased).
 		WithDefault(uppercased{Value: "DEFAULT"}).
 		Required()
 
@@ -207,11 +207,11 @@ func ExampleAnyAs_default() {
 	// value is DEFAULT
 }
 
-func ExampleAnyAs_optional() {
+func ExampleCustom_optional() {
 	defer example()()
 
 	v := ferrite.
-		AnyAs("FERRITE_ANY_AS", "example parsed variable", parseUppercased, formatUppercased).
+		Custom("FERRITE_CUSTOM", "example parsed variable", parseUppercased, formatUppercased).
 		Optional()
 
 	ferrite.Init()
@@ -226,11 +226,11 @@ func ExampleAnyAs_optional() {
 	// value is undefined
 }
 
-func ExampleAnyAs_constraint() {
+func ExampleCustom_constraint() {
 	defer example()()
 
 	ferrite.
-		AnyAs("FERRITE_ANY_AS", "example constrained parsed variable", parseUppercased, formatUppercased).
+		Custom("FERRITE_CUSTOM", "example constrained parsed variable", parseUppercased, formatUppercased).
 		WithConstraint(
 			"must contain X",
 			func(v uppercased) bool {
@@ -239,13 +239,13 @@ func ExampleAnyAs_constraint() {
 		).
 		Required()
 
-	os.Setenv("FERRITE_ANY_AS", "hello")
+	os.Setenv("FERRITE_CUSTOM", "hello")
 	ferrite.Init()
 
 	// Output:
 	// Environment Variables:
 	//
-	//  ❯ FERRITE_ANY_AS  example constrained parsed variable    <string>    ✗ set to hello, must contain X
+	//  ❯ FERRITE_CUSTOM  example constrained parsed variable    <string>    ✗ set to hello, must contain X
 	//
 	// <process exited with error code 1>
 }

@@ -15,7 +15,7 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Added
 
-- Added `AnyAs[T]()` builder for environment variables that are parsed into
+- Added `Custom()` builder for environment variables that are parsed into
   arbitrary user-defined types using caller-supplied marshal/unmarshal functions.
 
 ### Fixed
