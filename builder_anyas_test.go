@@ -54,6 +54,18 @@ var _ = Describe("type AnyAsBuilder", func() {
 		}).To(PanicWith("specification for FERRITE_ANY_AS is invalid: variable description must not be empty"))
 	})
 
+	It("panics if the unmarshal function is nil", func() {
+		Expect(func() {
+			AnyAs[uppercased]("FERRITE_ANY_AS", "<desc>", nil, formatUppercased)
+		}).To(PanicWith("AnyAs: unmarshal function must not be nil"))
+	})
+
+	It("panics if the marshal function is nil", func() {
+		Expect(func() {
+			AnyAs("FERRITE_ANY_AS", "<desc>", parseUppercased, nil)
+		}).To(PanicWith("AnyAs: marshal function must not be nil"))
+	})
+
 	When("the variable is required", func() {
 		When("the value is not empty", func() {
 			Describe("func Value()", func() {

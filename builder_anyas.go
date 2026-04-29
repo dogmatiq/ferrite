@@ -4,8 +4,8 @@ import (
 	"github.com/dogmatiq/ferrite/internal/variable"
 )
 
-// AnyAs configures an environment variable that is parsed from a string into an
-// arbitrary type using a user-supplied parse function.
+// AnyAs configures an environment variable as a value of type T, using
+// caller-supplied functions to marshal and unmarshal the value.
 //
 // name is the name of the environment variable to read. desc is a
 // human-readable description of the environment variable.
@@ -20,6 +20,13 @@ func AnyAs[T any](
 	unmarshal func(string) (T, error),
 	marshal func(T) (string, error),
 ) *AnyAsBuilder[T] {
+	if unmarshal == nil {
+		panic("AnyAs: unmarshal function must not be nil")
+	}
+	if marshal == nil {
+		panic("AnyAs: marshal function must not be nil")
+	}
+
 	b := &AnyAsBuilder[T]{
 		schema: variable.TypedOther[T]{
 			Marshaler: anyAsMarshaler[T]{unmarshal, marshal},
