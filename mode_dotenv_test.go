@@ -68,6 +68,11 @@ func ExampleInit_exportDotEnvFile() {
 		WithSensitiveContent().
 		Required()
 
+	os.Setenv("FERRITE_TEXT", "text:hello")
+	ferrite.
+		TextAs[textValue]("FERRITE_TEXT", "example text-marshaled").
+		Required()
+
 	os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
 	os.Setenv("FERRITE_SVC_SERVICE_PORT", "443")
 	ferrite.
@@ -123,6 +128,9 @@ func ExampleInit_exportDotEnvFile() {
 	//
 	// # kubernetes "ferrite-svc" service port (deprecated)
 	// export FERRITE_SVC_SERVICE_PORT=443
+	//
+	// # example text-marshaled (required)
+	// export FERRITE_TEXT=text:hello
 	//
 	// # example URL (required)
 	// export FERRITE_URL= # https//example.org is invalid: URL must have a scheme
