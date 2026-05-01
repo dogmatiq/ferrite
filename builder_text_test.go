@@ -265,8 +265,8 @@ func ExampleTextAsP_required() {
 	// value is hello
 }
 
-// textValue is a test type that implements encoding.TextMarshaler and
-// encoding.TextUnmarshaler via its pointer receiver.
+// textValue is a test type that implements encoding.TextMarshaler via a value
+// receiver and encoding.TextUnmarshaler via a pointer receiver.
 type textValue struct {
 	Data string
 }

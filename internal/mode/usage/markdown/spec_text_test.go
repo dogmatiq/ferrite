@@ -8,8 +8,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 )
 
-// textSpecValue is a test type that implements encoding.TextMarshaler and
-// encoding.TextUnmarshaler via its pointer receiver.
+// textSpecValue is a test type that implements encoding.TextMarshaler via a
+// value receiver and encoding.TextUnmarshaler via a pointer receiver.
 type textSpecValue struct {
 	Data string
 }
