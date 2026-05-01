@@ -79,6 +79,11 @@ func ExampleInit_validation() {
 		WithSensitiveContent().
 		Required()
 
+	os.Setenv("FERRITE_TEXT", "text:hello")
+	ferrite.
+		TextAs[textValue]("FERRITE_TEXT", "example text").
+		Required()
+
 	os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
 	os.Setenv("FERRITE_SVC_SERVICE_PORT", "443")
 	ferrite.
@@ -114,6 +119,7 @@ func ExampleInit_validation() {
 	//    FERRITE_STRING_SENSITIVE  example sensitive string                 <string>           ✓ set to *******
 	//    FERRITE_SVC_SERVICE_HOST  kubernetes "ferrite-svc" service host    <string>           ✓ set to host.example.org
 	//    FERRITE_SVC_SERVICE_PORT  kubernetes "ferrite-svc" service port    <string>           ✓ set to 443
+	//    FERRITE_TEXT              example text                             <string>           ✓ set to text:hello
 	//    FERRITE_URL               example URL                              <string>           ✓ set to https://example.org
 	//  ❯ FERRITE_XTRIGGER          trigger failure for example              <string>           ✗ undefined
 	//
@@ -192,6 +198,11 @@ func ExampleInit_validationWithDefaultValues() {
 		Required()
 
 	ferrite.
+		TextAs[textValue]("FERRITE_TEXT", "example text").
+		WithDefault(textValue{Data: "fallback"}).
+		Required()
+
+	ferrite.
 		KubernetesService("ferrite-svc").
 		WithDefault("host.example.org", "443").
 		Required()
@@ -225,6 +236,7 @@ func ExampleInit_validationWithDefaultValues() {
 	//    FERRITE_STRING_SENSITIVE  example sensitive string               [ <string> ] = *******              ✓ using default value
 	//    FERRITE_SVC_SERVICE_HOST  kubernetes "ferrite-svc" service host  [ <string> ] = host.example.org     ✓ using default value
 	//    FERRITE_SVC_SERVICE_PORT  kubernetes "ferrite-svc" service port  [ <string> ] = 443                  ✓ using default value
+	//    FERRITE_TEXT              example text                           [ <string> ] = text:fallback        ✓ using default value
 	//    FERRITE_URL               example URL                            [ <string> ] = https://example.org  ✓ using default value
 	//  ❯ FERRITE_XTRIGGER          trigger failure for example              <string>                          ✗ undefined
 	//
@@ -290,6 +302,10 @@ func ExampleInit_validationWithOptionalValues() {
 		Optional()
 
 	ferrite.
+		TextAs[textValue]("FERRITE_TEXT", "example text").
+		Optional()
+
+	ferrite.
 		KubernetesService("ferrite-svc").
 		Optional()
 
@@ -321,6 +337,7 @@ func ExampleInit_validationWithOptionalValues() {
 	//    FERRITE_STRING_SENSITIVE  example sensitive string               [ <string> ]         • undefined
 	//    FERRITE_SVC_SERVICE_HOST  kubernetes "ferrite-svc" service host  [ <string> ]         • undefined
 	//    FERRITE_SVC_SERVICE_PORT  kubernetes "ferrite-svc" service port  [ <string> ]         • undefined
+	//    FERRITE_TEXT              example text                           [ <string> ]         • undefined
 	//    FERRITE_URL               example URL                            [ <string> ]         • undefined
 	//  ❯ FERRITE_XTRIGGER          trigger failure for example              <string>           ✗ undefined
 	//
@@ -435,6 +452,11 @@ func ExampleInit_validationWithInvalidValues() {
 		WithSensitiveContent().
 		Required()
 
+	os.Setenv("FERRITE_TEXT", "not-text-prefixed")
+	ferrite.
+		TextAs[textValue]("FERRITE_TEXT", "example text").
+		Required()
+
 	os.Setenv("FERRITE_SVC_SERVICE_HOST", ".local")
 	os.Setenv("FERRITE_SVC_SERVICE_PORT", "https-")
 	ferrite.
@@ -466,6 +488,7 @@ func ExampleInit_validationWithInvalidValues() {
 	//  ❯ FERRITE_STRING_SENSITIVE  example sensitive string                 <string>           ✗ set to *******, must not contain whitespace
 	//  ❯ FERRITE_SVC_SERVICE_HOST  kubernetes "ferrite-svc" service host    <string>           ✗ set to .local, host must not begin or end with a dot
 	//  ❯ FERRITE_SVC_SERVICE_PORT  kubernetes "ferrite-svc" service port    <string>           ✗ set to https-, IANA service name must not begin or end with a hyphen
+	//  ❯ FERRITE_TEXT              example text                             <string>           ✗ set to not-text-prefixed, expected text: prefix
 	//  ❯ FERRITE_URL               example URL                              <string>           ✗ set to /relative/path, URL must have a scheme
 	//
 	// <process exited with error code 1>
