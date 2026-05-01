@@ -15,8 +15,8 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Added
 
-- Added `Custom()` builder for environment variables that are parsed into
-  arbitrary user-defined types using caller-supplied marshal/unmarshal functions.
+- Added `TextAs()` and `TextAsP()` builders for environment variables with types
+  that implement `encoding.TextMarshaler` and `encoding.TextUnmarshaler`.
 
 ### Fixed
 
