@@ -15,8 +15,9 @@ The format is based on [Keep a Changelog], and this project adheres to
 
 ### Added
 
-- Added `TextAs()` and `TextAsP()` builders for environment variables with types
-  that implement `encoding.TextMarshaler` and `encoding.TextUnmarshaler`.
+- Added `TextEncoded()` and `TextEncodedP()` builders for environment variables
+  with types that implement `encoding.TextMarshaler` and
+  `encoding.TextUnmarshaler`.
 
 ### Fixed
 

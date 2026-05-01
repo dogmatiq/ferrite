@@ -27,9 +27,9 @@ func (v *textSpecValue) UnmarshalText(data []byte) error {
 }
 
 var _ = DescribeTable(
-	"text spec",
+	"text-encoded spec",
 	tableTest(
-		"spec/text",
+		"spec/text-encoded",
 		WithoutExplanatoryText(),
 		WithoutIndex(),
 		WithoutUsageExamples(),
@@ -39,7 +39,7 @@ var _ = DescribeTable(
 		"deprecated.md",
 		func(reg ferrite.Registry) {
 			ferrite.
-				TextAs[textSpecValue]("FERRITE_TEXT", "example text-marshaled value").
+				TextEncoded[textSpecValue]("FERRITE_TEXT", "example text-marshaled value").
 				WithExample(textSpecValue{Data: "hello"}, "a greeting").
 				Deprecated(ferrite.WithRegistry(reg))
 		},
@@ -49,7 +49,7 @@ var _ = DescribeTable(
 		"optional.md",
 		func(reg ferrite.Registry) {
 			ferrite.
-				TextAs[textSpecValue]("FERRITE_TEXT", "example text-marshaled value").
+				TextEncoded[textSpecValue]("FERRITE_TEXT", "example text-marshaled value").
 				WithExample(textSpecValue{Data: "hello"}, "a greeting").
 				Optional(ferrite.WithRegistry(reg))
 		},
@@ -59,7 +59,7 @@ var _ = DescribeTable(
 		"required.md",
 		func(reg ferrite.Registry) {
 			ferrite.
-				TextAs[textSpecValue]("FERRITE_TEXT", "example text-marshaled value").
+				TextEncoded[textSpecValue]("FERRITE_TEXT", "example text-marshaled value").
 				WithExample(textSpecValue{Data: "hello"}, "a greeting").
 				Required(ferrite.WithRegistry(reg))
 		},
@@ -69,7 +69,7 @@ var _ = DescribeTable(
 		"with-default.md",
 		func(reg ferrite.Registry) {
 			ferrite.
-				TextAs[textSpecValue]("FERRITE_TEXT", "example text-marshaled value").
+				TextEncoded[textSpecValue]("FERRITE_TEXT", "example text-marshaled value").
 				WithDefault(textSpecValue{Data: "fallback"}).
 				Required(ferrite.WithRegistry(reg))
 		},

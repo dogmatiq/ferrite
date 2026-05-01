@@ -81,7 +81,7 @@ func ExampleInit_validation() {
 
 	os.Setenv("FERRITE_TEXT", "text:hello")
 	ferrite.
-		TextAs[textValue]("FERRITE_TEXT", "example text").
+		TextEncoded[textValue]("FERRITE_TEXT", "example text").
 		Required()
 
 	os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")
@@ -198,7 +198,7 @@ func ExampleInit_validationWithDefaultValues() {
 		Required()
 
 	ferrite.
-		TextAs[textValue]("FERRITE_TEXT", "example text").
+		TextEncoded[textValue]("FERRITE_TEXT", "example text").
 		WithDefault(textValue{Data: "fallback"}).
 		Required()
 
@@ -302,7 +302,7 @@ func ExampleInit_validationWithOptionalValues() {
 		Optional()
 
 	ferrite.
-		TextAs[textValue]("FERRITE_TEXT", "example text").
+		TextEncoded[textValue]("FERRITE_TEXT", "example text").
 		Optional()
 
 	ferrite.
@@ -454,7 +454,7 @@ func ExampleInit_validationWithInvalidValues() {
 
 	os.Setenv("FERRITE_TEXT", "not-text-prefixed")
 	ferrite.
-		TextAs[textValue]("FERRITE_TEXT", "example text").
+		TextEncoded[textValue]("FERRITE_TEXT", "example text").
 		Required()
 
 	os.Setenv("FERRITE_SVC_SERVICE_HOST", ".local")

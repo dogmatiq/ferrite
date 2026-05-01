@@ -70,7 +70,7 @@ func ExampleInit_exportDotEnvFile() {
 
 	os.Setenv("FERRITE_TEXT", "text:hello")
 	ferrite.
-		TextAs[textValue]("FERRITE_TEXT", "example text-marshaled").
+		TextEncoded[textValue]("FERRITE_TEXT", "example text-marshaled").
 		Required()
 
 	os.Setenv("FERRITE_SVC_SERVICE_HOST", "host.example.org")

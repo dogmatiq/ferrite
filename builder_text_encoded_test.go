@@ -10,11 +10,11 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("type TextAsBuilder", func() {
-	var builder *TextAsBuilder[textValue]
+var _ = Describe("type TextEncodedBuilder", func() {
+	var builder *TextEncodedBuilder[textValue]
 
 	BeforeEach(func() {
-		builder = TextAs[textValue]("FERRITE_TEXT", "<desc>")
+		builder = TextEncoded[textValue]("FERRITE_TEXT", "<desc>")
 	})
 
 	AfterEach(func() {
@@ -23,13 +23,13 @@ var _ = Describe("type TextAsBuilder", func() {
 
 	It("panics if the name is empty", func() {
 		Expect(func() {
-			TextAs[textValue]("", "<desc>").Optional()
+			TextEncoded[textValue]("", "<desc>").Optional()
 		}).To(PanicWith("invalid specification: variable name must not be empty"))
 	})
 
 	It("panics if the description is empty", func() {
 		Expect(func() {
-			TextAs[textValue]("FERRITE_TEXT", "").Optional()
+			TextEncoded[textValue]("FERRITE_TEXT", "").Optional()
 		}).To(PanicWith("specification for FERRITE_TEXT is invalid: variable description must not be empty"))
 	})
 
@@ -124,11 +124,11 @@ var _ = Describe("type TextAsBuilder", func() {
 	})
 })
 
-var _ = Describe("func TextAsP", func() {
-	var builder *TextAsBuilder[*textValue]
+var _ = Describe("func TextEncodedP", func() {
+	var builder *TextEncodedBuilder[*textValue]
 
 	BeforeEach(func() {
-		builder = TextAsP[*textValue]("FERRITE_TEXT_P", "<desc>")
+		builder = TextEncodedP[*textValue]("FERRITE_TEXT_P", "<desc>")
 	})
 
 	AfterEach(func() {
@@ -198,11 +198,11 @@ var _ = Describe("func TextAsP", func() {
 	})
 })
 
-func ExampleTextAs_required() {
+func ExampleTextEncoded_required() {
 	defer example()()
 
 	v := ferrite.
-		TextAs[textValue]("FERRITE_TEXT", "example text-marshaled variable").
+		TextEncoded[textValue]("FERRITE_TEXT", "example text-marshaled variable").
 		Required()
 
 	os.Setenv("FERRITE_TEXT", "text:hello")
@@ -214,11 +214,11 @@ func ExampleTextAs_required() {
 	// value is hello
 }
 
-func ExampleTextAs_default() {
+func ExampleTextEncoded_default() {
 	defer example()()
 
 	v := ferrite.
-		TextAs[textValue]("FERRITE_TEXT", "example text-marshaled variable").
+		TextEncoded[textValue]("FERRITE_TEXT", "example text-marshaled variable").
 		WithDefault(textValue{Data: "fallback"}).
 		Required()
 
@@ -230,11 +230,11 @@ func ExampleTextAs_default() {
 	// value is fallback
 }
 
-func ExampleTextAs_optional() {
+func ExampleTextEncoded_optional() {
 	defer example()()
 
 	v := ferrite.
-		TextAs[textValue]("FERRITE_TEXT", "example text-marshaled variable").
+		TextEncoded[textValue]("FERRITE_TEXT", "example text-marshaled variable").
 		Optional()
 
 	ferrite.Init()
@@ -249,11 +249,11 @@ func ExampleTextAs_optional() {
 	// value is undefined
 }
 
-func ExampleTextAsP_required() {
+func ExampleTextEncodedP_required() {
 	defer example()()
 
 	v := ferrite.
-		TextAsP[*textValue]("FERRITE_TEXT_P", "example text-marshaled pointer variable").
+		TextEncodedP[*textValue]("FERRITE_TEXT_P", "example text-marshaled pointer variable").
 		Required()
 
 	os.Setenv("FERRITE_TEXT_P", "text:hello")
