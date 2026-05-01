@@ -128,7 +128,7 @@ var _ = Describe("func TextAsP", func() {
 	var builder *TextAsBuilder[*textValue]
 
 	BeforeEach(func() {
-		builder = TextAsP[textValue]("FERRITE_TEXT_P", "<desc>")
+		builder = TextAsP[*textValue]("FERRITE_TEXT_P", "<desc>")
 	})
 
 	AfterEach(func() {
@@ -253,7 +253,7 @@ func ExampleTextAsP_required() {
 	defer example()()
 
 	v := ferrite.
-		TextAsP[textValue]("FERRITE_TEXT_P", "example text-marshaled pointer variable").
+		TextAsP[*textValue]("FERRITE_TEXT_P", "example text-marshaled pointer variable").
 		Required()
 
 	os.Setenv("FERRITE_TEXT_P", "text:hello")

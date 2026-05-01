@@ -42,25 +42,25 @@ func TextAs[
 }
 
 // TextAsP configures an environment variable as a value of type P (a pointer
-// to T), which implements [encoding.TextMarshaler] and
+// to E), which implements [encoding.TextMarshaler] and
 // [encoding.TextUnmarshaler].
 //
 // The result type of the variable is P (the pointer type). Use [TextAs] if the
-// result type should be T (the value type).
+// result type should be a value type.
 func TextAsP[
-	T any,
 	P interface {
-		*T
+		*E
 		encoding.TextMarshaler
 		encoding.TextUnmarshaler
 	},
+	E any,
 ](name, desc string) *TextAsBuilder[P] {
 	b := &TextAsBuilder[P]{
 		schema: variable.TypedOther[P]{
 			Marshaler: textMarshaler[P]{
 				marshal: P.MarshalText,
 				unmarshal: func(data []byte) (P, error) {
-					v := P(new(T))
+					v := P(new(E))
 					if err := v.UnmarshalText(data); err != nil {
 						return nil, err
 					}
