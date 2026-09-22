@@ -90,4 +90,6 @@ library with similar features to Ferrite.
 Dogmatiq contributor [@danilvpetrov](https://github.com/danilvpetrov) has shared
 a video introduction that he recorded to introduce his colleagues to Ferrite.
 
+<center>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/LWtEL9pE6ME?si=f1siO_5utSqOg_i6" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</center>
