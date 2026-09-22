@@ -80,7 +80,14 @@ with tools like [`dotenv`](https://github.com/motdotla/dotenv) and the
 [`env_file`](https://docs.docker.com/compose/compose-file/#env_file) directive
 in Docker compose files.
 
-## Other Implementations
+## Implementations
 
 [Austenite](https://github.com/eloquent/austenite) is a TypeScript
 library with similar features to Ferrite.
+
+## Resources
+
+Dogmatiq contributor [@danilvpetrov](https://github.com/danilvpetrov) has shared
+a video introduction that he recorded to introduce his colleagues to Ferrite.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/LWtEL9pE6ME?si=f1siO_5utSqOg_i6" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
