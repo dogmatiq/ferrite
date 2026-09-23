@@ -88,7 +88,7 @@ library with similar features to Ferrite.
 ## Resources
 
 Dogmatiq contributor [@danilvpetrov](https://github.com/danilvpetrov) has shared
-a video introduction that he recorded to introduce his colleagues to Ferrite.
+a video that he recorded to introduce his colleagues to Ferrite.
 
 <div align="center">
 
