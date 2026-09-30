@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/dogmatiq/ferrite/internal/maybe"
-	"github.com/dogmatiq/ferrite/internal/reflectx"
+	"github.com/dogmatiq/ferrite/internal/numeric"
 	"github.com/dogmatiq/ferrite/internal/variable"
 	"golang.org/x/exp/constraints"
 )
@@ -50,7 +50,7 @@ func Float[T constraints.Float](name, desc string) *FloatBuilder[T] {
 		).
 		Format(
 			name,
-			reflectx.BitSize[T](),
+			numeric.BitSize[T](),
 			reflect.TypeFor[T]().Kind(),
 		).
 		Paragraph(
@@ -127,7 +127,7 @@ func (floatMarshaler[T]) Marshal(v T) (variable.Literal, error) {
 }
 
 func (floatMarshaler[T]) Unmarshal(v variable.Literal) (T, error) {
-	n, err := strconv.ParseFloat(v.String, reflectx.BitSize[T]())
+	n, err := strconv.ParseFloat(v.String, numeric.BitSize[T]())
 	return T(n), variable.UnwrapNumericParseError(err, formatFloat[T])
 }
 
@@ -136,7 +136,7 @@ func formatFloat[T constraints.Float](v T) string {
 		float64(v),
 		'g',
 		-1,
-		reflectx.BitSize[T](),
+		numeric.BitSize[T](),
 	)
 
 	switch s[0] {

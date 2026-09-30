@@ -1,4 +1,4 @@
-package limits
+package numeric
 
 import (
 	"math"
@@ -7,8 +7,8 @@ import (
 	"golang.org/x/exp/constraints"
 )
 
-// Of returns the minimum and maximum values of type T.
-func Of[T constraints.Integer | constraints.Float]() (min, max T) {
+// Limits returns the minimum and maximum values of type T.
+func Limits[T constraints.Integer | constraints.Float]() (min, max T) {
 	switch reflect.TypeFor[T]().Kind() {
 
 	// constraints.Signed ...

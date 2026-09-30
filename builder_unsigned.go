@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/dogmatiq/ferrite/internal/maybe"
-	"github.com/dogmatiq/ferrite/internal/reflectx"
+	"github.com/dogmatiq/ferrite/internal/numeric"
 	"github.com/dogmatiq/ferrite/internal/variable"
 	"golang.org/x/exp/constraints"
 )
@@ -37,7 +37,7 @@ func Unsigned[T constraints.Unsigned](name, desc string) *UnsignedBuilder[T] {
 		).
 		Format(
 			name,
-			reflectx.BitSize[T](),
+			numeric.BitSize[T](),
 			reflect.TypeFor[T]().Kind(),
 		).
 		Done()
@@ -110,7 +110,7 @@ func (unsignedMarshaler[T]) Marshal(v T) (variable.Literal, error) {
 }
 
 func (unsignedMarshaler[T]) Unmarshal(v variable.Literal) (T, error) {
-	n, err := strconv.ParseUint(v.String, 10, reflectx.BitSize[T]())
+	n, err := strconv.ParseUint(v.String, 10, numeric.BitSize[T]())
 	return T(n), variable.UnwrapNumericParseError(err, formatUnsigned[T])
 }
 

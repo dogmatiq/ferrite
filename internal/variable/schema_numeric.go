@@ -8,8 +8,8 @@ import (
 	"strings"
 	"unsafe"
 
-	"github.com/dogmatiq/ferrite/internal/limits"
 	"github.com/dogmatiq/ferrite/internal/maybe"
+	"github.com/dogmatiq/ferrite/internal/numeric"
 	"golang.org/x/exp/constraints"
 )
 
@@ -56,7 +56,7 @@ func (s TypedNumeric[T]) Max() (Literal, bool) {
 // by the application, or false if either of the limits is simply the limit
 // of the underlying type.
 func (s TypedNumeric[T]) Limits() (min, max Literal, explicit bool) {
-	lower, upper := limits.Of[T]()
+	lower, upper := numeric.Limits[T]()
 	explicit = true
 
 	if v, ok := s.NativeMin.Get(); ok {
@@ -137,7 +137,7 @@ func (s TypedNumeric[T]) Unmarshal(v Literal) (T, error) {
 func (s TypedNumeric[T]) Examples(conservative bool) []TypedExample[T] {
 	var examples []TypedExample[T]
 
-	min, max := limits.Of[T]()
+	min, max := numeric.Limits[T]()
 	if v, ok := s.NativeMin.Get(); ok {
 		min = v
 		examples = append(
@@ -281,7 +281,7 @@ func UnwrapNumericParseError[T constraints.Integer | constraints.Float](
 ) error {
 	var numErr *strconv.NumError
 	if errors.As(err, &numErr) {
-		min, max := limits.Of[T]()
+		min, max := numeric.Limits[T]()
 		kind := reflect.TypeFor[T]().Kind()
 
 		switch numErr.Err {

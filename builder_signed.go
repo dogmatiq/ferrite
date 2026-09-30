@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/dogmatiq/ferrite/internal/maybe"
-	"github.com/dogmatiq/ferrite/internal/reflectx"
+	"github.com/dogmatiq/ferrite/internal/numeric"
 	"github.com/dogmatiq/ferrite/internal/variable"
 	"golang.org/x/exp/constraints"
 )
@@ -38,7 +38,7 @@ func Signed[T constraints.Signed](name, desc string) *SignedBuilder[T] {
 		).
 		Format(
 			name,
-			reflectx.BitSize[T](),
+			numeric.BitSize[T](),
 			reflect.TypeFor[T]().Kind(),
 		).
 		Done()
@@ -111,7 +111,7 @@ func (signedMarshaler[T]) Marshal(v T) (variable.Literal, error) {
 }
 
 func (signedMarshaler[T]) Unmarshal(v variable.Literal) (T, error) {
-	n, err := strconv.ParseInt(v.String, 10, reflectx.BitSize[T]())
+	n, err := strconv.ParseInt(v.String, 10, numeric.BitSize[T]())
 	return T(n), variable.UnwrapNumericParseError(err, formatSigned[T])
 }
 
