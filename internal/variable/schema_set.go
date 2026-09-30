@@ -4,8 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-
-	"github.com/dogmatiq/ferrite/internal/reflectx"
+	"slices"
 )
 
 // Set is a schema that only allows a specific set of static values.
@@ -39,7 +38,7 @@ func (s TypedSet[T]) Literals() []Literal {
 
 // Type returns the type of the native value.
 func (s TypedSet[T]) Type() reflect.Type {
-	return reflectx.TypeOf[T]()
+	return reflect.TypeFor[T]()
 }
 
 // Finalize prepares the schema for use.
@@ -59,13 +58,11 @@ func (s TypedSet[T]) Finalize() error {
 			return errors.New("literals can not be an empty string")
 		}
 
-		for _, v := range uniq {
-			if v == lit {
-				return fmt.Errorf(
-					"literals must be unique but multiple values are represented as %q",
-					lit.String,
-				)
-			}
+		if slices.Contains(uniq, lit) {
+			return fmt.Errorf(
+				"literals must be unique but multiple values are represented as %q",
+				lit.String,
+			)
 		}
 
 		uniq = append(uniq, lit)

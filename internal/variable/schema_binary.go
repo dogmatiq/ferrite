@@ -6,7 +6,6 @@ import (
 	"reflect"
 
 	"github.com/dogmatiq/ferrite/internal/maybe"
-	"github.com/dogmatiq/ferrite/internal/reflectx"
 )
 
 // Binary is a schema that allows input of binary data.
@@ -49,7 +48,7 @@ func (s TypedBinary[T, B]) EncodingDescription() string {
 
 // Type returns the type of the native value.
 func (s TypedBinary[T, B]) Type() reflect.Type {
-	return reflectx.TypeOf[T]()
+	return reflect.TypeFor[T]()
 }
 
 // Finalize prepares the schema for use.

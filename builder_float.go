@@ -3,6 +3,7 @@ package ferrite
 import (
 	"errors"
 	"math"
+	"reflect"
 	"strconv"
 
 	"github.com/dogmatiq/ferrite/internal/maybe"
@@ -50,7 +51,7 @@ func Float[T constraints.Float](name, desc string) *FloatBuilder[T] {
 		Format(
 			name,
 			reflectx.BitSize[T](),
-			reflectx.KindOf[T](),
+			reflect.TypeFor[T]().Kind(),
 		).
 		Paragraph(
 			"The non-finite values `NaN`, `+Inf` and `-Inf` are not accepted.",

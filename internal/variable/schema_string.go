@@ -6,7 +6,6 @@ import (
 	"reflect"
 
 	"github.com/dogmatiq/ferrite/internal/maybe"
-	"github.com/dogmatiq/ferrite/internal/reflectx"
 )
 
 // String is a schema that allows arbitrary string input.
@@ -37,7 +36,7 @@ func (s TypedString[T]) LengthDescription() string {
 
 // Type returns the type of the native value.
 func (s TypedString[T]) Type() reflect.Type {
-	return reflectx.TypeOf[T]()
+	return reflect.TypeFor[T]()
 }
 
 // Finalize prepares the schema for use.

@@ -68,7 +68,7 @@ func (r *valueRenderer) visitGeneric(s variable.Schema) {
 	if r.Spec.IsSensitive() {
 		n := len(r.In.String)
 		r.Out.Grow(n)
-		for i := 0; i < n; i++ {
+		for range n {
 			r.Out.WriteByte('*')
 		}
 	} else {

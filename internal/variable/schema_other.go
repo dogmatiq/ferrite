@@ -2,8 +2,6 @@ package variable
 
 import (
 	"reflect"
-
-	"github.com/dogmatiq/ferrite/internal/reflectx"
 )
 
 // Other is a schema for representing values of arbitrary types.
@@ -24,7 +22,7 @@ type TypedOther[T any] struct {
 
 // Type returns the type of the native value.
 func (s TypedOther[T]) Type() reflect.Type {
-	return reflectx.TypeOf[T]()
+	return reflect.TypeFor[T]()
 }
 
 // Finalize prepares the schema for use.

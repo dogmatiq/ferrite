@@ -2,6 +2,7 @@ package ferrite
 
 import (
 	"fmt"
+	"reflect"
 	"strconv"
 
 	"github.com/dogmatiq/ferrite/internal/maybe"
@@ -37,7 +38,7 @@ func Unsigned[T constraints.Unsigned](name, desc string) *UnsignedBuilder[T] {
 		Format(
 			name,
 			reflectx.BitSize[T](),
-			reflectx.KindOf[T](),
+			reflect.TypeFor[T]().Kind(),
 		).
 		Done()
 

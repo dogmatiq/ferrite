@@ -1,10 +1,12 @@
 package dotenv
 
 import (
+	"fmt"
+	"io"
+
 	"github.com/dogmatiq/ferrite/internal/mode"
 	"github.com/dogmatiq/ferrite/internal/mode/internal/render"
 	"github.com/dogmatiq/ferrite/internal/variable"
-	"github.com/dogmatiq/iago/must"
 )
 
 // Run generates and env file describing the environment variables and their
@@ -14,33 +16,32 @@ func Run(cfg mode.Config) {
 		s := v.Spec()
 
 		if i > 0 {
-			must.Fprintf(cfg.Out, "\n")
+			fprintf(cfg.Out, "\n")
 		}
 
-		must.Fprintf(cfg.Out, "# %s (", s.Description())
+		fprintf(cfg.Out, "# %s (", s.Description())
 
 		if def, ok := s.Default(); ok {
-			must.WriteString(cfg.Out, "default: ")
-			must.WriteString(cfg.Out, render.Value(s, def))
+			fprintf(cfg.Out, "default: %s", render.Value(s, def))
 		} else if s.IsDeprecated() {
-			must.Fprintf(cfg.Out, "deprecated")
+			fprintf(cfg.Out, "deprecated")
 		} else if s.IsRequired() {
-			must.Fprintf(cfg.Out, "required")
+			fprintf(cfg.Out, "required")
 		} else {
-			must.Fprintf(cfg.Out, "optional")
+			fprintf(cfg.Out, "optional")
 		}
 
 		if s.IsSensitive() {
-			must.Fprintf(cfg.Out, ", sensitive")
+			fprintf(cfg.Out, ", sensitive")
 		}
 
-		must.Fprintf(cfg.Out, ")\n")
-		must.Fprintf(cfg.Out, "export %s=", s.Name())
+		fprintf(cfg.Out, ")\n")
+		fprintf(cfg.Out, "export %s=", s.Name())
 
 		if v.Source() == variable.SourceEnvironment {
 			err := v.Error()
 			if err, ok := err.(variable.ValueError); ok {
-				must.Fprintf(
+				fprintf(
 					cfg.Out,
 					" # %s is invalid: %s",
 					err.Literal().Quote(),
@@ -49,14 +50,14 @@ func Run(cfg mode.Config) {
 			} else {
 				value := v.Value()
 
-				must.Fprintf(
+				fprintf(
 					cfg.Out,
 					"%s",
 					value.Verbatim().Quote(),
 				)
 
 				if value.Verbatim() != value.Canonical() {
-					must.Fprintf(
+					fprintf(
 						cfg.Out,
 						" # equivalent to %s",
 						value.Canonical().Quote(),
@@ -65,8 +66,14 @@ func Run(cfg mode.Config) {
 			}
 		}
 
-		must.Fprintf(cfg.Out, "\n")
+		fprintf(cfg.Out, "\n")
 	}
 
 	cfg.Exit(0)
+}
+
+func fprintf(w io.Writer, format string, args ...any) {
+	if _, err := fmt.Fprintf(w, format, args...); err != nil {
+		panic(err)
+	}
 }

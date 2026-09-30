@@ -2,6 +2,7 @@ package ferrite
 
 import (
 	"fmt"
+	"reflect"
 	"strconv"
 
 	"github.com/dogmatiq/ferrite/internal/maybe"
@@ -38,7 +39,7 @@ func Signed[T constraints.Signed](name, desc string) *SignedBuilder[T] {
 		Format(
 			name,
 			reflectx.BitSize[T](),
-			reflectx.KindOf[T](),
+			reflect.TypeFor[T]().Kind(),
 		).
 		Done()
 

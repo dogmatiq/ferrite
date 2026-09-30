@@ -11,6 +11,12 @@ The format is based on [Keep a Changelog], and this project adheres to
 [keep a changelog]: https://keepachangelog.com/en/1.0.0/
 [semantic versioning]: https://semver.org/spec/v2.0.0.html
 
+## [1.7.1] - 2026-10-01
+
+### Changed
+
+- Removed dependency on the deprecated `dogmatiq/iago` package.
+
 ## [1.7.0] - 2026-05-01
 
 ### Added
@@ -354,6 +360,7 @@ The two most important changes in usage are:
 [1.6.0]: https://github.com/dogmatiq/ferrite/releases/tag/v1.6.0
 [1.6.1]: https://github.com/dogmatiq/ferrite/releases/tag/v1.6.1
 [1.7.0]: https://github.com/dogmatiq/ferrite/releases/tag/v1.7.0
+[1.7.1]: https://github.com/dogmatiq/ferrite/releases/tag/v1.7.1
 
 <!-- version template
 ## [0.0.1] - YYYY-MM-DD

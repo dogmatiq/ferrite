@@ -10,7 +10,6 @@ import (
 
 	"github.com/dogmatiq/ferrite/internal/limits"
 	"github.com/dogmatiq/ferrite/internal/maybe"
-	"github.com/dogmatiq/ferrite/internal/reflectx"
 	"golang.org/x/exp/constraints"
 )
 
@@ -92,7 +91,7 @@ func (s TypedNumeric[T]) Bits() int {
 
 // Type returns the type of the native value.
 func (s TypedNumeric[T]) Type() reflect.Type {
-	return reflectx.TypeOf[T]()
+	return reflect.TypeFor[T]()
 }
 
 // Finalize prepares the schema for use.
@@ -283,7 +282,7 @@ func UnwrapNumericParseError[T constraints.Integer | constraints.Float](
 	var numErr *strconv.NumError
 	if errors.As(err, &numErr) {
 		min, max := limits.Of[T]()
-		kind := reflectx.KindOf[T]()
+		kind := reflect.TypeFor[T]().Kind()
 
 		switch numErr.Err {
 		case strconv.ErrSyntax:
