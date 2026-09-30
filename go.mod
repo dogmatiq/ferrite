@@ -3,7 +3,7 @@ module github.com/dogmatiq/ferrite
 go 1.26.0
 
 require (
-	github.com/mattn/go-runewidth v0.0.27
+	github.com/mattn/go-runewidth v0.0.30
 	github.com/onsi/ginkgo/v2 v2.33.0
 	github.com/onsi/gomega v1.44.0
 	github.com/rivo/uniseg v0.4.7
