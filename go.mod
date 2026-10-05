@@ -8,7 +8,7 @@ require (
 	github.com/onsi/gomega v1.44.0
 	github.com/rivo/uniseg v0.4.7
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
-	golang.org/x/tools v0.50.0
+	golang.org/x/tools v0.51.0
 )
 
 require (
